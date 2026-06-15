@@ -117,10 +117,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(
-                ['init', '--no-install-skill', '--project-name', 'acme/demo'],
-                { from: 'user' },
-            );
+            await program.parseAsync(['init', '--no-install-skill', '--project-name', 'acme/demo'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('[deprecated]');
