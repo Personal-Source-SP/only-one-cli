@@ -1,0 +1,37 @@
+{
+    "name": "only-one-cli",
+    "version": "0.0.1",
+    "type": "module",
+    "bin": {
+        "only-one-cli": "./dist/index.js"
+    },
+    "files": [
+        "dist",
+        "scripts"
+    ],
+    "scripts": {
+        "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json",
+        "dev": "tsx src/index.ts",
+        "prepare": "npm run build",
+        "test": "npm run format && vitest run",
+        "publish:npm": "npm run format && ./scripts/publish-npm.sh",
+        "publish:local": "npm run format && ./scripts/publish-npm.sh --local",
+        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+        "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\""
+    },
+    "dependencies": {
+        "@inquirer/prompts": "^8.4.3",
+        "commander": "^14.0.2",
+        "js-yaml": "^4.1.0",
+        "lodash": "^4.18.1"
+    },
+    "devDependencies": {
+        "@types/js-yaml": "^4.0.9",
+        "@types/lodash": "^4.17.24",
+        "@types/node": "^24.10.1",
+        "prettier": "^3.8.3",
+        "tsx": "^4.20.6",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.14"
+    }
+}
