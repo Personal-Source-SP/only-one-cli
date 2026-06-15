@@ -1,14 +1,25 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mkdtemp, readFile, rm, symlink, writeFile, mkdir } from 'node:fs/promises';
+import { mkdtemp, rm, symlink, writeFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
 import { createProgram, isCliEntrypoint } from '@src/index.js';
 
-const projectConfigPath = (cwd: string) => join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE);
+vi.mock('@src/core/init/openspec-bootstrap.js', () => ({
+    ensureOpenspecCli: vi.fn().mockResolvedValue(undefined),
+    runOpenspecInit: vi.fn().mockResolvedValue(undefined),
+    OpenspecBootstrapError: class extends Error {
+        constructor(message: string) {
+            super(message);
+            this.name = 'OpenspecBootstrapError';
+        }
+    },
+}));
 
-const apiHeaders = { Authorization: 'Bearer dev-api-key' };
+vi.mock('@src/core/init/custom-skills-sync.js', () => ({
+    syncCustomSkills: vi.fn().mockResolvedValue(undefined),
+    readOpenspecConfig: vi.fn().mockResolvedValue({ agent_tools: [] }),
+}));
 
 const mockInitFetcher = vi.fn(async (url: string, init?: RequestInit) => {
     if (url.endsWith('/projects') && init?.method === 'POST') {
@@ -179,7 +190,7 @@ describe('only-one-cli CLI', () => {
         expect(writes.join('\n')).toContain('Root: handler');
     });
 
-    it('initializes a config file without prompts', async () => {
+    it('initializes with openspec bootstrap', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
         const writes: string[] = [];
 
@@ -191,19 +202,13 @@ describe('only-one-cli CLI', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(
-                ['init', '--no-install-skill', '--server', 'http://api', '--project-name', 'acme/demo', '--index-mode', 'local'],
-                {
-                    from: 'user',
-                },
-            );
+            await program.parseAsync(['init', '--force'], { from: 'user' });
 
-            const config = await readFile(projectConfigPath(cwd), 'utf-8');
-            expect(config).toContain('server: http://api');
-            expect(config).toContain('project: demo');
-            expect(config).not.toContain('api_key:');
-            expect(config).toContain('index_mode: local');
-            expect(writes.join('\n')).toContain('Created .only-one-cli/.onlyonecli.yml');
+            const output = writes.join('\n');
+            expect(output).toContain('Checking openspec CLI');
+            expect(output).toContain('Running openspec init');
+            expect(output).toContain('Syncing custom skills');
+            expect(output).toContain('Init complete');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
@@ -221,159 +226,29 @@ describe('only-one-cli CLI', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(
-                ['--json', 'init', '--no-install-skill', '--server', 'http://api', '--project-name', 'acme/demo', '--index-mode', 'local'],
-                {
-                    from: 'user',
-                },
-            );
+            await program.parseAsync(['--json', 'init', '--no-install-skill'], { from: 'user' });
 
-            expect(JSON.parse(writes.join('\n'))).toMatchObject({
-                path: '.only-one-cli/.onlyonecli.yml',
-                config: {
-                    server: 'http://api',
-                    project: 'demo',
-                    project_name: expect.any(String),
-                    index_mode: 'local',
-                },
-            });
-            expect(JSON.parse(writes.join('\n')).config).not.toHaveProperty('api_key');
+            expect(JSON.parse(writes.join('\n'))).toEqual({ installSkipped: true });
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
     });
 
-    it('prompts for init values when flags are omitted', async () => {
+    it('skips install when --no-install-skill is passed', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
+        const writes: string[] = [];
 
         try {
             const program = createProgram({
                 cwd,
                 env: {},
                 fetcher: mockInitFetcher,
-                stdout: vi.fn(),
-                prompts: {
-                    input: vi.fn().mockResolvedValueOnce('http://prompted').mockResolvedValueOnce('acme/demo'),
-                    select: vi.fn().mockResolvedValueOnce('docker'),
-                    confirm: vi.fn().mockResolvedValueOnce(false),
-                },
+                stdout: (line) => writes.push(line),
             });
 
             await program.parseAsync(['init', '--no-install-skill'], { from: 'user' });
 
-            const config = await readFile(projectConfigPath(cwd), 'utf-8');
-            expect(config).toContain('server: http://prompted');
-            expect(config).toContain('project_name: acme/demo');
-            expect(config).toContain('organization: acme');
-            expect(config).toContain('project: demo');
-            expect(config).not.toContain('api_key:');
-            expect(config).toContain('index_mode: docker');
-            expect(config).toContain('incremental: false');
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
-    it('writes index_mode from --index-mode flag', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: mockInitFetcher,
-                stdout: vi.fn(),
-            });
-
-            await program.parseAsync(
-                ['init', '--no-install-skill', '--server', 'http://api', '--project', 'demo', '--index-mode', 'docker'],
-                { from: 'user' },
-            );
-
-            const config = await readFile(projectConfigPath(cwd), 'utf-8');
-            expect(config).toContain('index_mode: docker');
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
-    it('cancels init when existing config is not confirmed for overwrite', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
-        await writeFile(join(cwd, '.onlyonecli.yml'), 'server: http://old\n');
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: mockInitFetcher,
-                stdout: vi.fn(),
-                prompts: {
-                    input: vi.fn(),
-                    select: vi.fn(),
-                    confirm: vi.fn().mockResolvedValueOnce(false),
-                },
-            });
-
-            await program.parseAsync(['init', '--no-install-skill', '--server', 'http://api', '--project', 'demo'], {
-                from: 'user',
-            });
-
-            const config = await readFile(join(cwd, '.onlyonecli.yml'), 'utf-8');
-            expect(config).toBe('server: http://old\n');
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
-    it('overwrites existing config when user confirms', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
-        await writeFile(join(cwd, '.onlyonecli.yml'), 'server: http://old\n');
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: mockInitFetcher,
-                stdout: vi.fn(),
-                prompts: {
-                    input: vi.fn(),
-                    select: vi.fn(),
-                    confirm: vi.fn().mockResolvedValueOnce(true),
-                },
-            });
-
-            await program.parseAsync(
-                ['init', '--no-install-skill', '--server', 'http://api', '--project', 'demo', '--index-mode', 'docker'],
-                { from: 'user' },
-            );
-
-            const config = await readFile(projectConfigPath(cwd), 'utf-8');
-            expect(config).toContain('server: http://api');
-            expect(config).toContain('index_mode: docker');
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
-    it('overwrites existing config when --force is used', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
-        await writeFile(join(cwd, '.onlyonecli.yml'), 'server: http://old\n');
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: mockInitFetcher,
-                stdout: vi.fn(),
-            });
-
-            await program.parseAsync(['init', '--no-install-skill', '--server', 'http://api', '--project', 'demo', '--force'], {
-                from: 'user',
-            });
-
-            const config = await readFile(projectConfigPath(cwd), 'utf-8');
-            expect(config).toContain('server: http://api');
-            expect(config).not.toContain('http://old');
+            expect(writes.join('\n')).toContain('Init complete (skill installation skipped)');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
