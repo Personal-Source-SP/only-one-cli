@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "type": "module",
     "bin": {
-        "only-one-cli": "./dist/index.js"
+        "only-one-cli": "./bin/cli.js"
     },
     "files": [
         "dist",

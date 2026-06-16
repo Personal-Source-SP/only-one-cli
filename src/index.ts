@@ -16,7 +16,7 @@ export function isCliEntrypoint(moduleUrl: string, argvPath = process.argv[1]) {
     }
 }
 
-if (isCliEntrypoint(import.meta.url)) {
+if (isCliEntrypoint(import.meta.url) || process.env.ONLY_ONE_CLI_BYPASS_ENTRYPOINT_CHECK) {
     const program = createProgram({
         cwd: process.cwd(),
         env: process.env,
