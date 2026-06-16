@@ -1,0 +1,12 @@
+name: "IDSD Flow Setup"
+description: "Predefined Intent-Spec-Driven development flow combo"
+packages:
+  - "@fission-ai/openspec"
+skills:
+  - "architectural-decision-records"
+  - "c4-diagrams"
+  - "gherkin-authoring"
+  - "grill-me"
+  - "openspec-git-discipline"
+configs:
+  - "openspec"

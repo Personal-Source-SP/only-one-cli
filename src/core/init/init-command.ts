@@ -16,6 +16,7 @@ import type {
     ToolsStepResult,
     PackagesStepResult,
     SkillsStepResult,
+    ConfigsStepResult,
     PackageManifest,
     ComboManifest,
 } from './types.js';
@@ -54,6 +55,7 @@ const readComboManifests = async (): Promise<(ComboManifest & { id: string })[]>
 
 const packagesDir = new URL('../../../libraries/packages', import.meta.url).pathname;
 const skillsDir = new URL('../../../libraries/skills', import.meta.url).pathname;
+const configsDir = new URL('../../../libraries/configs', import.meta.url).pathname;
 
 const readPackageManifests = async (): Promise<PackageManifest[]> => {
     if (!existsSync(packagesDir)) return [];
@@ -227,6 +229,44 @@ const executeSkillsStep = async (
     return { installedSkills: selectedSkillNames };
 };
 
+const executeConfigsStep = async (deps: ProgramDeps, projectDir: string): Promise<ConfigsStepResult | null> => {
+    const indexYamlPath = join(configsDir, 'index.yaml');
+    if (!existsSync(indexYamlPath)) {
+        deps.stdout('  No config templates available');
+        return null;
+    }
+
+    try {
+        const indexRaw = await readFile(indexYamlPath, 'utf-8');
+        const index = yaml.load(indexRaw) as Record<string, { description?: string }> | null;
+        if (!index) {
+            deps.stdout('  No config templates available');
+            return null;
+        }
+
+        const choices = Object.entries(index).map(([name, config]) => {
+            const alreadyExists = existsSync(join(projectDir, name));
+            return {
+                name: config.description ? `${name} — ${config.description}` : name,
+                value: name,
+                configured: alreadyExists,
+            };
+        });
+
+        const selectedConfigNames = await searchableMultiSelect({
+            message: 'Select configuration templates to copy:',
+            choices,
+        });
+
+        if (!selectedConfigNames?.length) return null;
+
+        return { selectedConfigs: selectedConfigNames };
+    } catch {
+        deps.stdout('  Failed to read configuration templates');
+        return null;
+    }
+};
+
 // ─── Orchestrator ─────────────────────────────────────────────────────
 
 export const executeInitCommand = async (originalDeps: ProgramDeps, request: InitCommandRequest): Promise<InitCommandResponse | null> => {
@@ -248,6 +288,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         let selectedTools: ToolsStepResult['selectedTools'] = [];
         let selectedPackageNames: string[] = [];
         let selectedSkillNames: string[] = [];
+        let selectedConfigNames: string[] = [];
 
         let isComboFlow = false;
         let selectedCombos: (ComboManifest & { id: string })[] = [];
@@ -305,6 +346,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         if (isComboFlow) {
             const mergedPackages = new Set<string>();
             const mergedSkills = new Set<string>();
+            const mergedConfigs = new Set<string>();
             for (const combo of selectedCombos) {
                 if (combo.packages) {
                     for (const pkg of combo.packages) {
@@ -316,9 +358,15 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                         mergedSkills.add(skill);
                     }
                 }
+                if (combo.configs) {
+                    for (const config of combo.configs) {
+                        mergedConfigs.add(config);
+                    }
+                }
             }
             selectedPackageNames = Array.from(mergedPackages);
             selectedSkillNames = Array.from(mergedSkills);
+            selectedConfigNames = Array.from(mergedConfigs);
         } else {
             // Step 2: Prompt Packages selection
             if (!skip.includes('packages') && (!step || step === 'packages')) {
@@ -348,14 +396,23 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                     }
                 }
             }
+            // Step 4: Prompt Configs selection
+            if (!skip.includes('configs') && (!step || step === 'configs')) {
+                deps.stdout('\n── Step 4: Configuration Templates ──');
+                const result = await executeConfigsStep(deps, projectDir);
+                if (result) {
+                    selectedConfigNames = result.selectedConfigs;
+                }
+            }
         }
 
         const hasTools = selectedTools.length > 0;
         const hasPackages = selectedPackageNames.length > 0;
         const hasSkills = selectedSkillNames.length > 0;
+        const hasConfigs = selectedConfigNames.length > 0;
 
-        if (!hasTools && !hasPackages && !hasSkills) {
-            deps.stdout('\nNo tools, packages, or skills selected. Exiting.');
+        if (!hasTools && !hasPackages && !hasSkills && !hasConfigs) {
+            deps.stdout('\nNo tools, packages, skills, or configs selected. Exiting.');
             return {};
         }
 
@@ -408,6 +465,15 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                     const statusBadge = alreadyExists ? '[⚠️ Already exists - will overwrite]' : '[New]';
                     deps.stdout(`      -> ${tool.name}: ${destPath} ${statusBadge}`);
                 }
+            }
+        }
+
+        if (selectedConfigNames?.length) {
+            deps.stdout('\nConfiguration Templates to Copy:');
+            for (const name of selectedConfigNames) {
+                const alreadyExists = existsSync(join(projectDir, name));
+                const statusBadge = alreadyExists ? '[⚠️ Already exists - will overwrite]' : '[New]';
+                deps.stdout(`  - ${name} ${statusBadge}`);
             }
         }
 
@@ -467,6 +533,19 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 }
             }
             packagesStepResult = { installedPackages };
+
+            if (installedPackages.includes('@fission-ai/openspec')) {
+                deps.stdout('\nInitializing OpenSpec CLI...');
+                const toolIds = selectedTools.map((t) => t.value).join(',');
+                const toolsArg = toolIds || 'none';
+                try {
+                    deps.stdout(`  Running: npx openspec init --tools ${toolsArg} --force`);
+                    await execFileAsync('npx', ['openspec', 'init', '--tools', toolsArg, '--force'], { cwd: projectDir });
+                    deps.stdout('    ✓ OpenSpec CLI initialized successfully');
+                } catch (error) {
+                    deps.stdout(`    ✗ OpenSpec CLI initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+                }
+            }
         }
 
         // 3. Skills execution
@@ -501,10 +580,55 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             skillsStepResult = { installedSkills };
         }
 
+        // 4. Configs execution
+        if (selectedConfigNames?.length && existsSync(configsDir)) {
+            const indexYamlPath = join(configsDir, 'index.yaml');
+            if (existsSync(indexYamlPath)) {
+                try {
+                    const indexRaw = await readFile(indexYamlPath, 'utf-8');
+                    const index = yaml.load(indexRaw) as Record<string, { files?: { src: string; dest: string }[] }> | null;
+                    if (index) {
+                        deps.stdout('\nSyncing configuration templates...');
+                        for (const configName of selectedConfigNames) {
+                            const configEntry = index[configName];
+                            if (configEntry?.files) {
+                                for (const fileEntry of configEntry.files) {
+                                    const srcPath = join(configsDir, fileEntry.src);
+                                    const destPath = join(projectDir, fileEntry.dest);
+                                    if (existsSync(srcPath)) {
+                                        try {
+                                            const isDir = (await stat(srcPath)).isDirectory();
+                                            if (!isDir) {
+                                                await mkdir(join(destPath, '..'), { recursive: true });
+                                            } else {
+                                                await mkdir(destPath, { recursive: true });
+                                            }
+                                            await cp(srcPath, destPath, { recursive: true, force: true });
+                                            deps.stdout(`  ✓ Copied ${fileEntry.src} -> ${fileEntry.dest}`);
+                                        } catch (error) {
+                                            deps.stdout(`  ✗ Failed to copy ${fileEntry.src}: ${error instanceof Error ? error.message : String(error)}`);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    deps.stdout(`\n✗ Failed to load configuration index: ${error instanceof Error ? error.message : String(error)}`);
+                }
+            }
+        }
+
+        let configsStepResult: ConfigsStepResult | undefined = undefined;
+        if (selectedConfigNames?.length) {
+            configsStepResult = { selectedConfigs: selectedConfigNames };
+        }
+
         return {
             toolsStep: toolsStepResult,
             packagesStep: packagesStepResult,
             skillsStep: skillsStepResult,
+            configsStep: configsStepResult,
         };
     } catch (error: any) {
         if (error?.name === 'ExitPromptError' || error?.message?.includes('force closed')) {
@@ -524,6 +648,7 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                 tools: result.toolsStep?.selectedTools.map((t) => t.value),
                 packages: result.packagesStep?.installedPackages,
                 skills: result.skillsStep?.installedSkills,
+                configs: result.configsStep?.selectedConfigs,
             },
             deps.stdout,
         );
@@ -540,5 +665,8 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
     }
     if (result.skillsStep && result.skillsStep.installedSkills.length > 0) {
         deps.stdout(`  Skills: ${result.skillsStep.installedSkills.join(', ')}`);
+    }
+    if (result.configsStep && result.configsStep.selectedConfigs.length > 0) {
+        deps.stdout(`  Configs: ${result.configsStep.selectedConfigs.join(', ')}`);
     }
 };

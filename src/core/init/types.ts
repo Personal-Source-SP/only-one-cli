@@ -25,6 +25,10 @@ export interface SkillsStepResult {
     installedSkills: string[];
 }
 
+export interface ConfigsStepResult {
+    selectedConfigs: string[];
+}
+
 export interface InitCommandRequest {
     command: import('commander').Command;
     json?: boolean;
@@ -36,6 +40,7 @@ export interface InitCommandResponse {
     toolsStep?: ToolsStepResult;
     packagesStep?: PackagesStepResult;
     skillsStep?: SkillsStepResult;
+    configsStep?: ConfigsStepResult;
 }
 
 export interface ComboManifest {
@@ -43,4 +48,5 @@ export interface ComboManifest {
     description?: string;
     packages?: string[];
     skills?: string[];
+    configs?: string[];
 }

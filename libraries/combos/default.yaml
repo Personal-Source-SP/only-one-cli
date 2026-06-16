@@ -1,7 +1,0 @@
-name: "Default Agent Setup"
-description: "Standard set of packages and skills for development"
-packages:
-  - "@fission-ai/openspec"
-skills:
-  - "grill-me"
-  - "openspec-git-discipline"

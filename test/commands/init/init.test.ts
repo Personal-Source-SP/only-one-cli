@@ -115,7 +115,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--yes', '--combo', 'default', '--skip', 'tools'], { from: 'user' });
+            await program.parseAsync(['init', '--yes', '--combo', 'idsd-flow', '--skip', 'tools'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
         } finally {

@@ -8,8 +8,8 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .description('Initialize project with agent tools, packages, and custom skills')
         .argument('[path]', 'Project path')
         .option('--yes', 'Auto-confirm all existence checks')
-        .option('--step <name>', 'Run only a specific step (tools, packages, skills)')
-        .option('--skip <names>', 'Comma-separated steps to skip (tools, packages, skills)')
+        .option('--step <name>', 'Run only a specific step (tools, packages, skills, configs)')
+        .option('--skip <names>', 'Comma-separated steps to skip (tools, packages, skills, configs)')
         .option('--combo <names>', 'Comma-separated combos of packages and skills to install');
 
     cmd.action(async (path: string | undefined, options: InitCommandOptions, command) => {
