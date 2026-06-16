@@ -2,8 +2,8 @@ import type { ProgramDeps } from '../../cli/deps.js';
 import { printJson } from '../output/index.js';
 import { assertProjectDirectory, resolveProjectDir } from '../runtime/globals.js';
 import type { InitCommandRequest, InitCommandResponse } from './types.js';
-import { ensureOpenspecCli, runOpenspecInit, OpenspecBootstrapError } from './openspec-bootstrap.js';
-import { syncCustomSkills } from './custom-skills-sync.js';
+import { ensureOpenspecCli, runOpenspecInit, OpenspecBootstrapError } from '@library/openspec-bootstrap/index.js';
+import { syncCustomSkills } from '@library/custom-skills-sync/index.js';
 
 export const executeInitCommand = async (deps: ProgramDeps, request: InitCommandRequest): Promise<InitCommandResponse | null> => {
     const projectDir = resolveProjectDir(deps, request.path);

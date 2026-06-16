@@ -2,11 +2,21 @@ import { existsSync } from 'node:fs';
 import { cp, mkdir, readFile, readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import yaml from 'js-yaml';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { getAgentToolById } from '../agent/tools.js';
+import type { ProgramDeps } from '../../src/cli/deps.js';
+import { getAgentToolById } from '../../src/core/agent/tools.js';
 
 const OPENSPEC_CONFIG_FILE = '.openspec.yaml';
-const CUSTOM_SKILLS_DIR = '.agents/skills';
+const CUSTOM_SKILLS_DIRS = ['libraries/skills', '.agents/skills'] as const;
+
+const resolveCustomSkillsDir = (projectDir: string): string | null => {
+    for (const dir of CUSTOM_SKILLS_DIRS) {
+        const fullPath = join(projectDir, dir);
+        if (existsSync(fullPath)) {
+            return fullPath;
+        }
+    }
+    return null;
+};
 
 interface OpenspecConfig {
     agent_tools?: string[];
@@ -37,10 +47,10 @@ export const syncCustomSkills = async (deps: ProgramDeps, projectDir: string): P
         return;
     }
 
-    const customSkillsDir = join(projectDir, CUSTOM_SKILLS_DIR);
+    const customSkillsDir = resolveCustomSkillsDir(projectDir);
 
-    if (!existsSync(customSkillsDir)) {
-        deps.stdout(`  Custom skills: ${CUSTOM_SKILLS_DIR} not found, nothing to sync`);
+    if (!customSkillsDir) {
+        deps.stdout(`  Custom skills: no skills directory found (checked: ${CUSTOM_SKILLS_DIRS.join(', ')}), nothing to sync`);
         return;
     }
 

@@ -7,9 +7,12 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "outDir": "dist",
-        "rootDir": "src",
-        "types": ["node"]
+        "types": ["node"],
+        "baseUrl": ".",
+        "paths": {
+            "@library/*": ["./libraries/*"]
+        }
     },
-    "include": ["src/**/*.ts"],
+    "include": ["src/**/*.ts", "libraries/**/*.ts"],
     "exclude": ["test/**/*.ts"]
 }

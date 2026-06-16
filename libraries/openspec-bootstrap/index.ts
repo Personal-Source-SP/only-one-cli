@@ -1,6 +1,6 @@
 import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
-import type { ProgramDeps } from '../../cli/deps.js';
+import type { ProgramDeps } from '../../src/cli/deps.js';
 
 const execFileAsync = promisify(execFile);
 
