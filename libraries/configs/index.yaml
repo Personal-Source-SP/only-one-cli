@@ -1,5 +1,5 @@
 openspec:
   description: "OpenSpec default rules configuration"
   files:
-    - src: "openspec/config.yaml"
-      dest: "openspec/config.yaml"
+    - src: "openspec"
+      dest: "openspec"
