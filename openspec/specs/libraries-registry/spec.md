@@ -40,6 +40,12 @@ Rule: The `libraries/` directory SHALL follow a fixed layout: `skills/`, `templa
 - **THEN** it scans `libraries/skills/` for available skill dirs
 - **AND** it scans `libraries/packages/*.yaml` for available packages
 
+#### Scenario: Packaged init reads from libraries layout
+- **GIVEN** a packaged `only-one` installation
+- **WHEN** the init command starts
+- **THEN** it scans the packaged `libraries/skills/` for available skill dirs
+- **AND** it scans the packaged `libraries/packages/*.yaml` for available packages
+
 #### Scenario: Missing subdirectory
 - **GIVEN** `libraries/skills/` is empty or missing
 - **WHEN** the init command reaches the skills step
