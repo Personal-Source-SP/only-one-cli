@@ -606,7 +606,9 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                                             await cp(srcPath, destPath, { recursive: true, force: true });
                                             deps.stdout(`  ✓ Copied ${fileEntry.src} -> ${fileEntry.dest}`);
                                         } catch (error) {
-                                            deps.stdout(`  ✗ Failed to copy ${fileEntry.src}: ${error instanceof Error ? error.message : String(error)}`);
+                                            deps.stdout(
+                                                `  ✗ Failed to copy ${fileEntry.src}: ${error instanceof Error ? error.message : String(error)}`,
+                                            );
                                         }
                                     }
                                 }
