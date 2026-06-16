@@ -1,11 +1,11 @@
 ## Context
 
-The `only-one` CLI uses `commander` to orchestrate project initialization. The initialization wizard is monolithic and interactive by default. To support modular usage (e.g., in CI or automation scripts), we will decompose the initialization flow into subcommands (`init tools`, `init package`, `init skill`, `init configs`, `init combo`) while retaining the main `init` command's interactive behavior by having it delegate to these subcommand logic paths. We will also implement automatic updates to `.gitignore` to ignore local agent/tool directories (e.g., `.cursor/`, `.claude/`, etc.) by default.
+The `only-one` CLI uses `commander` to orchestrate project initialization. The initialization wizard is monolithic and interactive by default. To support modular usage (e.g., in CI or automation scripts), we will decompose the initialization flow into subcommands (`init combo`, `init skill`, `init package`, `init configs`) while retaining the main `init` command's interactive behavior by having it delegate to these subcommand logic paths. We will also implement automatic updates to `.gitignore` to ignore local agent/tool directories (e.g., `.cursor/`, `.claude/`, etc.) by default.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- Expose subcommands: `init combo`, `init skill`, `init package`, `init tools`, `init configs`.
+- Expose subcommands: `init combo`, `init skill`, `init package`, `init configs`.
 - Subcommands support direct arguments (e.g. `only-one init package typescript,prettier`) as well as interactive mode when arguments are omitted.
 - Share execution logic between parent `init` command and subcommands to ensure DRY codebase.
 - Automatically add paths of initialized tools/skills to the project's `.gitignore` by default.
@@ -13,6 +13,7 @@ The `only-one` CLI uses `commander` to orchestrate project initialization. The i
 
 **Non-Goals:**
 - Support custom user-defined gitignore rules in the `--ignore` command option.
+- Support a dedicated subcommand for configuring tools alone (`init tools`).
 - Change the core behavior of skill syncing or package installation.
 
 ## Decisions
@@ -21,12 +22,11 @@ The `only-one` CLI uses `commander` to orchestrate project initialization. The i
 We will register subcommands directly under the `init` command using Commander nested commands.
 ```typescript
 const initCmd = new Command('init');
-initCmd.command('tools').action(...);
 initCmd.command('package').action(...);
 // etc.
 ```
 - **Rationale**: Keeps CLI configuration modular.
-- **Alternatives Considered**: Creating top-level commands like `init-tools` or `init-skills`. Rejected because nested commands under `init` (`init tools`) offer cleaner CLI UX.
+- **Alternatives Considered**: Keeping a separate `init tools` subcommand. Rejected because tool configuration is tightly coupled with packages/skills setups and does not require its own standalone subcommand in this scope.
 
 ### 2. Architecture: Refactoring Core Logic
 We will refactor the step functions (`executeToolsStep`, `executePackagesStep`, `executeSkillsStep`, `executeConfigsStep`) in `src/core/init/init-command.ts` to be exported and accept parameters directly (in addition to prompts) so subcommands can call them directly.
@@ -36,7 +36,6 @@ flowchart TD
     subgraph CLI ["CLI Command Entrypoints"]
         Init["only-one init (Parent Command)"]
         SubCombo["only-one init combo"]
-        SubTools["only-one init tools"]
         SubPackages["only-one init package"]
         SubSkills["only-one init skill"]
         SubConfigs["only-one init configs"]
@@ -58,7 +57,6 @@ flowchart TD
     InitOrchestrator --> ConfigsStep
 
     SubCombo --> InitOrchestrator
-    SubTools --> ToolsStep
     SubPackages --> PackagesStep
     SubSkills --> SkillsStep
     SubConfigs --> ConfigsStep
@@ -68,12 +66,9 @@ flowchart TD
 ```
 
 - **Rationale**: Promotes maximum reuse. The parent `init` orchestrator remains the entry point for combo/wizard-based initialization, while subcommands bypass other steps and invoke their respective step logic directly.
-- **Alternatives Considered**: Let subcommands duplicate logic. Rejected because it violates DRY and increases maintenance overhead.
 
 ### 3. Gitignore Management
 Create a helper function `updateGitignore(projectDir: string, pathsToIgnore: string[])` in `src/core/init/gitignore.ts` to append directories to `.gitignore` if they do not already exist.
-- **Rationale**: Enhances user security/hygiene by default.
-- **Alternatives Considered**: Require user to manually run a separate `ignore` command. Rejected because automatic updating on init is more convenient.
 
 ## Risks / Trade-offs
 
@@ -89,4 +84,4 @@ No database or major data migrations. This is a CLI UX upgrade. We will update t
 
 ## Open Questions
 
-None. The user has chosen the `--no-ignore` design with auto-ignore on by default, and preferred the subcommand approach.
+None.

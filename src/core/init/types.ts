@@ -5,6 +5,11 @@ export interface InitCommandOptions {
     step?: string;
     skip?: string;
     combo?: string;
+    noIgnore?: boolean;
+    tools?: string;
+    packages?: string;
+    skills?: string;
+    configs?: string;
 }
 
 export interface ToolsStepResult {

@@ -10,6 +10,7 @@ import { printJson } from '@/core/output/index.js';
 import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
 import { getInstallableAgentTools, getAgentToolById } from '@/core/agent/tools.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
+import { updateGitignore } from './gitignore.js';
 import type {
     InitCommandRequest,
     InitCommandResponse,
@@ -107,7 +108,11 @@ const npmInstall = async (name: string, scope: 'global' | 'local', projectDir: s
 
 // ─── Step 1: Tools ───────────────────────────────────────────────────
 
-const executeToolsStep = async (deps: ProgramDeps, projectDir: string): Promise<ToolsStepResult | null> => {
+export const executeToolsStep = async (
+    deps: ProgramDeps,
+    projectDir: string,
+    selectedValuesOverride?: string[],
+): Promise<ToolsStepResult | null> => {
     const tools = getInstallableAgentTools();
 
     if (tools.length === 0) {
@@ -115,25 +120,35 @@ const executeToolsStep = async (deps: ProgramDeps, projectDir: string): Promise<
         return null;
     }
 
-    const choices = tools.map((t) => {
-        const configured = t.skillsDir ? existsSync(join(projectDir, t.skillsDir)) : false;
-        const detected = t.detectionPaths ? t.detectionPaths.some((p) => existsSync(join(projectDir, p))) : false;
-        return {
-            name: t.name,
-            value: t.value,
-            configured,
-            detected,
-        };
-    });
+    let selectedValues: string[] = [];
+    if (selectedValuesOverride) {
+        for (const val of selectedValuesOverride) {
+            if (!getAgentToolById(val)) {
+                throw new Error(`Agent tool '${val}' not found in AI_TOOLS`);
+            }
+        }
+        selectedValues = selectedValuesOverride;
+    } else {
+        const choices = tools.map((t) => {
+            const configured = t.skillsDir ? existsSync(join(projectDir, t.skillsDir)) : false;
+            const detected = t.detectionPaths ? t.detectionPaths.some((p) => existsSync(join(projectDir, p))) : false;
+            return {
+                name: t.name,
+                value: t.value,
+                configured,
+                detected,
+            };
+        });
 
-    const selectedValues = await searchableMultiSelect({
-        message: 'Select agent tools to initialize:',
-        choices,
-        validate: (selected: string[]) => {
-            if (selected.length === 0) return 'Select at least one tool';
-            return true;
-        },
-    });
+        selectedValues = await searchableMultiSelect({
+            message: 'Select agent tools to initialize:',
+            choices,
+            validate: (selected: string[]) => {
+                if (selected.length === 0) return 'Select at least one tool';
+                return true;
+            },
+        });
+    }
 
     if (selectedValues.length === 0) return null;
 
@@ -144,7 +159,11 @@ const executeToolsStep = async (deps: ProgramDeps, projectDir: string): Promise<
 
 // ─── Step 2: Packages ─────────────────────────────────────────────────
 
-const executePackagesStep = async (deps: ProgramDeps, projectDir: string): Promise<PackagesStepResult | null> => {
+export const executePackagesStep = async (
+    deps: ProgramDeps,
+    projectDir: string,
+    selectedNamesOverride?: string[],
+): Promise<PackagesStepResult | null> => {
     const manifests = await readPackageManifests();
 
     if (manifests.length === 0) {
@@ -152,22 +171,33 @@ const executePackagesStep = async (deps: ProgramDeps, projectDir: string): Promi
         return null;
     }
 
-    const choices = await Promise.all(
-        manifests.map(async (pkg) => {
-            const scope = pkg.scope ?? 'global';
-            const configured = await isPackageInstalled(pkg.name, scope, projectDir);
-            return {
-                name: pkg.description ? `${pkg.name} — ${pkg.description}` : pkg.name,
-                value: pkg.name,
-                configured,
-            };
-        }),
-    );
+    let selectedNames: string[] = [];
+    if (selectedNamesOverride) {
+        for (const name of selectedNamesOverride) {
+            const found = manifests.find((m) => m.name === name);
+            if (!found) {
+                throw new Error(`Package '${name}' not found in libraries/packages`);
+            }
+        }
+        selectedNames = selectedNamesOverride;
+    } else {
+        const choices = await Promise.all(
+            manifests.map(async (pkg) => {
+                const scope = pkg.scope ?? 'global';
+                const configured = await isPackageInstalled(pkg.name, scope, projectDir);
+                return {
+                    name: pkg.description ? `${pkg.name} — ${pkg.description}` : pkg.name,
+                    value: pkg.name,
+                    configured,
+                };
+            }),
+        );
 
-    const selectedNames = await searchableMultiSelect({
-        message: 'Select packages to install:',
-        choices,
-    });
+        selectedNames = await searchableMultiSelect({
+            message: 'Select packages to install:',
+            choices,
+        });
+    }
 
     if (selectedNames.length === 0) return null;
 
@@ -176,10 +206,11 @@ const executePackagesStep = async (deps: ProgramDeps, projectDir: string): Promi
 
 // ─── Step 3: Skills ───────────────────────────────────────────────────
 
-const executeSkillsStep = async (
+export const executeSkillsStep = async (
     deps: ProgramDeps,
     projectDir: string,
     selectedTools: ToolsStepResult['selectedTools'],
+    selectedSkillNamesOverride?: string[],
 ): Promise<SkillsStepResult | null> => {
     if (!existsSync(skillsDir)) {
         deps.stdout('  No skills available');
@@ -204,32 +235,46 @@ const executeSkillsStep = async (
         return null;
     }
 
-    const choices = skillNames.map((name) => {
-        let configured = false;
-        for (const tool of selectedTools) {
-            if (tool.skillsDir && existsSync(join(projectDir, tool.skillsDir, 'skills', name))) {
-                configured = true;
-                break;
+    let selectedSkillNames: string[] = [];
+    if (selectedSkillNamesOverride) {
+        for (const name of selectedSkillNamesOverride) {
+            if (!skillNames.includes(name)) {
+                throw new Error(`Skill '${name}' not found in libraries/skills`);
             }
         }
-        return {
-            name,
-            value: name,
-            configured,
-        };
-    });
+        selectedSkillNames = selectedSkillNamesOverride;
+    } else {
+        const choices = skillNames.map((name) => {
+            let configured = false;
+            for (const tool of selectedTools) {
+                if (tool.skillsDir && existsSync(join(projectDir, tool.skillsDir, 'skills', name))) {
+                    configured = true;
+                    break;
+                }
+            }
+            return {
+                name,
+                value: name,
+                configured,
+            };
+        });
 
-    const selectedSkillNames = await searchableMultiSelect({
-        message: 'Select skills to install:',
-        choices,
-    });
+        selectedSkillNames = await searchableMultiSelect({
+            message: 'Select skills to install:',
+            choices,
+        });
+    }
 
     if (selectedSkillNames.length === 0) return null;
 
     return { installedSkills: selectedSkillNames };
 };
 
-const executeConfigsStep = async (deps: ProgramDeps, projectDir: string): Promise<ConfigsStepResult | null> => {
+export const executeConfigsStep = async (
+    deps: ProgramDeps,
+    projectDir: string,
+    selectedConfigNamesOverride?: string[],
+): Promise<ConfigsStepResult | null> => {
     const indexYamlPath = join(configsDir, 'index.yaml');
     if (!existsSync(indexYamlPath)) {
         deps.stdout('  No config templates available');
@@ -244,19 +289,29 @@ const executeConfigsStep = async (deps: ProgramDeps, projectDir: string): Promis
             return null;
         }
 
-        const choices = Object.entries(index).map(([name, config]) => {
-            const alreadyExists = existsSync(join(projectDir, name));
-            return {
-                name: config.description ? `${name} — ${config.description}` : name,
-                value: name,
-                configured: alreadyExists,
-            };
-        });
+        let selectedConfigNames: string[] = [];
+        if (selectedConfigNamesOverride) {
+            for (const name of selectedConfigNamesOverride) {
+                if (!index[name]) {
+                    throw new Error(`Config template '${name}' not found in libraries/configs`);
+                }
+            }
+            selectedConfigNames = selectedConfigNamesOverride;
+        } else {
+            const choices = Object.entries(index).map(([name, config]) => {
+                const alreadyExists = existsSync(join(projectDir, name));
+                return {
+                    name: config.description ? `${name} — ${config.description}` : name,
+                    value: name,
+                    configured: alreadyExists,
+                };
+            });
 
-        const selectedConfigNames = await searchableMultiSelect({
-            message: 'Select configuration templates to copy:',
-            choices,
-        });
+            selectedConfigNames = await searchableMultiSelect({
+                message: 'Select configuration templates to copy:',
+                choices,
+            });
+        }
 
         if (!selectedConfigNames?.length) return null;
 
@@ -284,6 +339,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         const skip = options.skip ? options.skip.split(',').map((s) => s.trim()) : [];
         const step = options.step;
         const comboOption = options.combo;
+        const noIgnore = options.noIgnore ?? false;
 
         let selectedTools: ToolsStepResult['selectedTools'] = [];
         let selectedPackageNames: string[] = [];
@@ -337,7 +393,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         // Step 1: Prompt Tools selection
         if (!skip.includes('tools') && (!step || step === 'tools')) {
             deps.stdout('\n── Step 1: Tools Configuration ──');
-            const result = await executeToolsStep(deps, projectDir);
+            const toolsOverride = options.tools ? options.tools.split(',').map((t) => t.trim()) : undefined;
+            const result = await executeToolsStep(deps, projectDir, toolsOverride);
             if (result) {
                 selectedTools = result.selectedTools;
             }
@@ -371,7 +428,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             // Step 2: Prompt Packages selection
             if (!skip.includes('packages') && (!step || step === 'packages')) {
                 deps.stdout('\n── Step 2: Packages Selection ──');
-                const result = await executePackagesStep(deps, projectDir);
+                const packagesOverride = options.packages ? options.packages.split(',').map((p) => p.trim()) : undefined;
+                const result = await executePackagesStep(deps, projectDir, packagesOverride);
                 if (result) {
                     selectedPackageNames = result.installedPackages;
                 }
@@ -390,7 +448,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                     deps.stdout('\n── Step 3: Skills (skipped — no tools configured or selected) ──');
                 } else {
                     deps.stdout('\n── Step 3: Skills Selection ──');
-                    const result = await executeSkillsStep(deps, projectDir, toolsForSkills);
+                    const skillsOverride = options.skills ? options.skills.split(',').map((s) => s.trim()) : undefined;
+                    const result = await executeSkillsStep(deps, projectDir, toolsForSkills, skillsOverride);
                     if (result) {
                         selectedSkillNames = result.installedSkills;
                     }
@@ -399,7 +458,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             // Step 4: Prompt Configs selection
             if (!skip.includes('configs') && (!step || step === 'configs')) {
                 deps.stdout('\n── Step 4: Configuration Templates ──');
-                const result = await executeConfigsStep(deps, projectDir);
+                const configsOverride = options.configs ? options.configs.split(',').map((c) => c.trim()) : undefined;
+                const result = await executeConfigsStep(deps, projectDir, configsOverride);
                 if (result) {
                     selectedConfigNames = result.selectedConfigs;
                 }
@@ -474,6 +534,34 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 const alreadyExists = existsSync(join(projectDir, name));
                 const statusBadge = alreadyExists ? '[⚠️ Already exists - will overwrite]' : '[New]';
                 deps.stdout(`  - ${name} ${statusBadge}`);
+            }
+        }
+
+        if (!noIgnore) {
+            const gitignorePaths: string[] = [];
+            for (const tool of selectedTools) {
+                if (tool.skillsDir) {
+                    gitignorePaths.push(tool.skillsDir);
+                }
+            }
+            if (hasSkills) {
+                let toolsForSkills = selectedTools;
+                if (toolsForSkills.length === 0) {
+                    const tools = getInstallableAgentTools();
+                    toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+                }
+                for (const tool of toolsForSkills) {
+                    if (tool.skillsDir) {
+                        gitignorePaths.push(tool.skillsDir);
+                    }
+                }
+            }
+            const uniquePaths = Array.from(new Set(gitignorePaths));
+            if (uniquePaths.length > 0) {
+                deps.stdout('\nPaths to ignore in .gitignore:');
+                for (const p of uniquePaths) {
+                    deps.stdout(`  - ${p}/`);
+                }
             }
         }
 
@@ -624,6 +712,38 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         let configsStepResult: ConfigsStepResult | undefined = undefined;
         if (selectedConfigNames?.length) {
             configsStepResult = { selectedConfigs: selectedConfigNames };
+        }
+
+        // 5. Update Gitignore
+        if (!noIgnore) {
+            const gitignorePaths: string[] = [];
+            for (const tool of selectedTools) {
+                if (tool.skillsDir) {
+                    gitignorePaths.push(tool.skillsDir);
+                }
+            }
+            if (hasSkills) {
+                let toolsForSkills = selectedTools;
+                if (toolsForSkills.length === 0) {
+                    const tools = getInstallableAgentTools();
+                    toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+                }
+                for (const tool of toolsForSkills) {
+                    if (tool.skillsDir) {
+                        gitignorePaths.push(tool.skillsDir);
+                    }
+                }
+            }
+            const uniqueGitignorePaths = Array.from(new Set(gitignorePaths));
+            if (uniqueGitignorePaths.length > 0) {
+                deps.stdout('\nUpdating .gitignore...');
+                try {
+                    await updateGitignore(projectDir, uniqueGitignorePaths);
+                    deps.stdout('  ✓ Updated .gitignore');
+                } catch (error) {
+                    deps.stdout(`  ✗ Failed to update .gitignore: ${error instanceof Error ? error.message : String(error)}`);
+                }
+            }
         }
 
         return {
