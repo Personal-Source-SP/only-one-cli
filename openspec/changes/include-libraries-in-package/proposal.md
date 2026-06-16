@@ -5,6 +5,7 @@ Currently, the `libraries` directory (containing packages, skills, and templates
 ## What Changes
 
 - Add `"libraries"` to the `"files"` array in `package.json` to ensure it is packaged during `npm pack` and `npm publish`.
+- Update `scripts/publish-npm.sh` to copy the `libraries` directory into the temporary packaging folder.
 - Ensure paths in `src/core/init/init-command.ts` to `libraries` resolve correctly within the installed node_modules structure (which they already do since `import.meta.url` resolved to `dist/core/init/init-command.js` and `../../../libraries` correctly points to the root of the package, where the `libraries` folder will now be included).
 
 ## Capabilities

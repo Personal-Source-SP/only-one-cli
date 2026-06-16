@@ -22,6 +22,9 @@ Currently, the `only-one` package's distribution configuration in `package.json`
 2. **Keep the relative path structure**:
    Since the relative paths from the compiled JavaScript files in `dist/` to the root folder remain unchanged (`../../../libraries`), no code changes are required in `init-command.ts`.
 
+3. **Copy `libraries` in `publish-npm.sh`**:
+   Copy the `libraries` directory to the temporary packaging folder (`PACK_ROOT`) inside `publish-npm.sh` so it is present during packaging and publication.
+
 ## Risks / Trade-offs
 
 - **Risk**: Increased npm package size.

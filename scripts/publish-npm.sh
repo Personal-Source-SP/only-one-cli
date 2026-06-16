@@ -132,6 +132,7 @@ mkdir -p "$PACK_ROOT/scripts"
 [[ -f scripts/cocoindex_documents.py ]] && cp scripts/cocoindex_documents.py "$PACK_ROOT/scripts/"
 [[ -f README.md ]] && cp README.md "$PACK_ROOT/"
 [[ -f LICENSE ]] && cp LICENSE "$PACK_ROOT/"
+[[ -d libraries ]] && cp -R libraries "$PACK_ROOT/"
 
 # Stamp version into the packaged package.json
 node -e "

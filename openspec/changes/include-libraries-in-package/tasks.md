@@ -1,6 +1,7 @@
 ## 1. Package Configuration
 
 - [x] 1.1 Add `"libraries"` to the `"files"` array in `package.json`
+- [x] 1.2 Copy `libraries` to the packaging folder in `scripts/publish-npm.sh`
 
 ## 2. Verification
 
