@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import type { ProgramDeps } from '../../cli/deps.js';
 
@@ -58,10 +58,21 @@ export const runOpenspecInit = async (
     args.push(projectDir);
 
     try {
-        await execFileAsync('openspec', args, {
+        const child = spawn('openspec', args, {
             cwd: projectDir,
             timeout: 120000,
             stdio: deps.prompts ? 'inherit' : undefined,
+        });
+
+        await new Promise<void>((resolve, reject) => {
+            child.on('exit', (code) => {
+                if (code === 0) {
+                    resolve();
+                } else {
+                    reject(new Error(`openspec init exited with code ${code}`));
+                }
+            });
+            child.on('error', reject);
         });
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
