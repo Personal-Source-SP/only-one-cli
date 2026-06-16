@@ -81,7 +81,7 @@ describe('doctor command', () => {
             expect(writes.join('\n')).toContain('Pre-indexing readiness: READY');
             expect(writes.join('\n')).toContain('source: config');
             expect(writes.join('\n')).toContain('gitnexus');
-            expect(writes.join('\n')).toContain('Config (.only-one/.hybridindex.yml):');
+            expect(writes.join('\n')).toContain('Config (.only-one/.onlyonecli.yml):');
             expect(writes.join('\n')).toContain('Commands:');
             expect(writes.join('\n')).toContain('only-one index:create');
             expect(writes.join('\n')).toContain('only-one push-index');

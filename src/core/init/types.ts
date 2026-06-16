@@ -27,6 +27,7 @@ export interface SkillsStepResult {
 export interface InitCommandRequest {
     command: import('commander').Command;
     json?: boolean;
+    path?: string;
     options: InitCommandOptions;
 }
 

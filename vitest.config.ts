@@ -8,6 +8,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@src': path.join(cliRoot, 'src'),
+            '@': path.join(cliRoot, 'src'),
         },
     },
     test: {

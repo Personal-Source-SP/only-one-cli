@@ -353,7 +353,7 @@ describe('doctor checks (existing)', () => {
             expect(commands).toEqual([
                 {
                     command: 'only-one init',
-                    description: 'Create .only-one/.hybridindex.yml for this project',
+                    description: 'Create .only-one/.onlyonecli.yml for this project',
                 },
             ]);
         });
