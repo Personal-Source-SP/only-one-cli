@@ -54,6 +54,12 @@ SHALL install each selected package via npm after confirmation.
 - **THEN** an error message is printed with the npm error details
 - **AND** the init continues with remaining steps
 
+#### Scenario: Package post-install initialization command execution
+- **GIVEN** `@fission-ai/openspec` package is installed successfully during init
+- **AND** a list of agent tools/CLIs is selected in the Tools configuration step (Step 1)
+- **WHEN** the package execution completes
+- **THEN** the init command runs `openspec init --tools <selectedTools>` with the comma-separated list of selected tools
+
 ### Requirement: Package Existence Check
 SHALL check if a package is already installed before attempting installation.
 
