@@ -2,8 +2,8 @@ import { existsSync } from 'node:fs';
 import { cp, mkdir, readFile, readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import yaml from 'js-yaml';
-import type { ProgramDeps } from '../../src/cli/deps.js';
-import { getAgentToolById } from '../../src/core/agent/tools.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { getAgentToolById } from '@/core/agent/tools.js';
 
 const OPENSPEC_CONFIG_FILE = '.openspec.yaml';
 const CUSTOM_SKILLS_DIRS = ['libraries/skills', '.agents/skills'] as const;

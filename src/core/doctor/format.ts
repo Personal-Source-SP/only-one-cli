@@ -2,7 +2,7 @@ import forEach from 'lodash/forEach.js';
 import isEmpty from 'lodash/isEmpty.js';
 import max from 'lodash/max.js';
 import map from 'lodash/map.js';
-import { localConfigDisplayPath } from '../config/index.js';
+import { localConfigDisplayPath } from '@/core/config/index.js';
 import type { SampleCommand } from './checks.js';
 import type { DoctorPrintInstallResultsRequest, DoctorPrintReportRequest } from './types.js';
 

@@ -1,8 +1,8 @@
-import type { HybridIndexConfig } from '../config/index.js';
-import { persistConfigProjectId } from '../config/index.js';
-import type { HybridApiClient } from '../client/index.js';
-import type { BackendProject, CreateProjectInput } from '../client/types.js';
-import { isUuidV4 } from '../../utils/uuid.js';
+import type { HybridIndexConfig } from '@/core/config/index.js';
+import { persistConfigProjectId } from '@/core/config/index.js';
+import type { HybridApiClient } from '@/core/client/index.js';
+import type { BackendProject, CreateProjectInput } from '@/core/client/types.js';
+import { isUuidV4 } from '@/utils/uuid.js';
 
 export interface FindProjectByIdentityRequest {
     client: HybridApiClient;

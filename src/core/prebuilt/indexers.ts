@@ -3,17 +3,17 @@ import { realpathSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { loadConfig, resolveIndexMode, type IndexMode } from '../config/index.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { loadConfig, resolveIndexMode, type IndexMode } from '@/core/config/index.js';
 import {
     assertCocoindexScriptExists,
     GITNEXUS_DOCKER_CLI_PATH,
     resolveCocoindexImage,
     resolveGitnexusBin,
     resolveGitnexusImage,
-} from '../indexing/tools.js';
-import { ensureIndexOutputDir, relocateArtifactDir, resolveManifestPath } from '../prebuilt/index-output.js';
-import { buildManifestData, type ManifestData } from '../prebuilt/manifest.js';
+} from '@/core/indexing/tools.js';
+import { ensureIndexOutputDir, relocateArtifactDir, resolveManifestPath } from '@/core/prebuilt/index-output.js';
+import { buildManifestData, type ManifestData } from '@/core/prebuilt/manifest.js';
 
 const execFileAsync = promisify(execFile);
 

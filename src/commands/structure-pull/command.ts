@@ -1,11 +1,11 @@
 import { Command } from 'commander';
 import { relative } from 'node:path';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { printJson, printProjectsWithStructure } from '../../core/output/index.js';
-import { assertProjectDirectory, clientFor, globalsFor, resolveProjectDir } from '../../core/runtime/globals.js';
-import { fetchRemoteStructure, saveStructureLocally } from '../../core/structure/remote.js';
-import { selectBackendProject, selectStructuralProject } from '../../prompts/project-select.js';
-import type { BackendProject } from '../../core/client/index.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { printJson, printProjectsWithStructure } from '@/core/output/index.js';
+import { assertProjectDirectory, clientFor, globalsFor, resolveProjectDir } from '@/core/runtime/globals.js';
+import { fetchRemoteStructure, saveStructureLocally } from '@/core/structure/remote.js';
+import { selectBackendProject, selectStructuralProject } from '@/prompts/project-select.js';
+import type { BackendProject } from '@/core/client/index.js';
 import type { StructurePullCommandOptions, StructurePullCommandJson } from './types.js';
 
 const STRUCTURE_PULL_DESCRIPTION =

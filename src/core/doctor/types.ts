@@ -1,6 +1,6 @@
-import type { ProgramDeps } from '../../cli/deps.js';
+import type { ProgramDeps } from '@/cli/deps.js';
 import type { CheckResult, DoctorReport, SampleCommand } from './checks.js';
-import type { DoctorMode } from '../indexing/tools.js';
+import type { DoctorMode } from '@/core/indexing/tools.js';
 
 export interface InstallResult {
     ok: boolean;

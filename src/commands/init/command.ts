@@ -1,6 +1,6 @@
 import { Command } from 'commander';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { executeInitCommand, printInitResult } from '../../core/init/init-command.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { executeInitCommand, printInitResult } from '@/core/init/init-command.js';
 import type { InitCommandOptions } from './types.js';
 
 export function createInitCommand(deps: ProgramDeps): Command {

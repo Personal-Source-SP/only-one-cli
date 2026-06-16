@@ -1,5 +1,5 @@
-import { formatCursorCommandFile } from '../command-generation/adapters/cursor.js';
-import { STRUCTURALS_DIR } from '../structure/paths.js';
+import { formatCursorCommandFile } from '@/core/command-generation/adapters/cursor.js';
+import { STRUCTURALS_DIR } from '@/core/structure/paths.js';
 
 export const STRUCTURE_APPLY_SKILL_NAME = 'only-one-structure-apply';
 export const STRUCTURE_APPLY_SKILL_DIR = STRUCTURE_APPLY_SKILL_NAME;

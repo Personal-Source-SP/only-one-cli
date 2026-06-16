@@ -2,15 +2,15 @@ import { access, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import yaml from 'js-yaml';
-import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint, resolveApiKey } from '../runtime/credentials.js';
-import { isUuidV4 } from '../../utils/uuid.js';
+import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint, resolveApiKey } from '@/core/runtime/credentials.js';
+import { isUuidV4 } from '@/utils/uuid.js';
 import {
     HYBRID_INDEX_CONFIG_FILE,
     HYBRID_INDEX_DIR,
     ensureIndexOutputDir,
     resolveLocalConfigPath,
     resolveLocalConfigPathForProject,
-} from '../prebuilt/index-output.js';
+} from '@/core/prebuilt/index-output.js';
 import type {
     BulkConfig,
     GlobalOptions,
@@ -25,8 +25,8 @@ import type {
     SearchScope,
 } from './types.js';
 
-export { HYBRID_API_KEY_ENV, formatApiKeyConfigHint, resolveApiKey } from '../runtime/credentials.js';
-export { isUuidV4 } from '../../utils/uuid.js';
+export { HYBRID_API_KEY_ENV, formatApiKeyConfigHint, resolveApiKey } from '@/core/runtime/credentials.js';
+export { isUuidV4 } from '@/utils/uuid.js';
 
 let legacyCredentialWarningShown = false;
 

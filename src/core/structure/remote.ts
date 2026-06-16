@@ -2,9 +2,9 @@ import { confirm as confirmPrompt } from '@inquirer/prompts';
 import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, relative } from 'node:path';
-import type { PromptDeps } from '../../cli/deps.js';
-import type { BackendProject } from '../client/index.js';
-import { HybridApiClient } from '../client/index.js';
+import type { PromptDeps } from '@/cli/deps.js';
+import type { BackendProject } from '@/core/client/index.js';
+import { HybridApiClient } from '@/core/client/index.js';
 import { resolveStructureBlueprintPath, resolveStructurePathIdentity } from './blueprint.js';
 
 export const fetchRemoteStructure = async (client: HybridApiClient, project: BackendProject): Promise<string> => {

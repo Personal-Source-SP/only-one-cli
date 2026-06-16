@@ -1,12 +1,12 @@
-import type { ProgramDeps } from '../../cli/deps.js';
-import { loadConfig } from '../config/index.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { loadConfig } from '@/core/config/index.js';
 import { getMissingStructureTools, hasStructureAgentSkills, hasStructureSkillForTool } from './skill-presence.js';
 import { AgentSkillSetupError, formatAgentSkillSetupError, getAgentToolDisplayName, promptAgentSkillSetup } from './prompt-setup.js';
 import { isPromptInteractive } from './interactive.js';
 import { resolveToolsArg, ResolveToolsArgError } from './resolve-tools.js';
 import { getToolsWithSkillsDir } from './tools.js';
-import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '../templates/structure.js';
-import { STRUCTURE_APPLY_COMMAND_ID, STRUCTURE_APPLY_SKILL_NAME } from '../templates/structure-apply.js';
+import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
+import { STRUCTURE_APPLY_COMMAND_ID, STRUCTURE_APPLY_SKILL_NAME } from '@/core/templates/structure-apply.js';
 
 export type EnsureStructureAgentSkillsRequest = {
     force?: boolean;

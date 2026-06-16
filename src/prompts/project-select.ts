@@ -1,7 +1,7 @@
 import { select as selectPrompt } from '@inquirer/prompts';
-import { HybridApiClient } from '../core/client/index.js';
-import type { BackendProject, ProjectStructureInfo } from '../core/client/index.js';
-import type { ProgramDeps } from '../cli/deps.js';
+import { HybridApiClient } from '@/core/client/index.js';
+import type { BackendProject, ProjectStructureInfo } from '@/core/client/index.js';
+import type { ProgramDeps } from '@/cli/deps.js';
 
 export const selectBackendProject = async (client: HybridApiClient, deps: ProgramDeps): Promise<BackendProject> => {
     const projects = await client.listProjects('ready');

@@ -1,9 +1,9 @@
 import { Command } from 'commander';
 import { existsSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { HybridApiClient } from '../client/index.js';
-import { loadConfig, resolveGlobals } from '../config/index.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { HybridApiClient } from '@/core/client/index.js';
+import { loadConfig, resolveGlobals } from '@/core/config/index.js';
 
 /** Resolve the project root from an optional path relative to the shell cwd. */
 export const resolveProjectDir = (deps: ProgramDeps, path?: string): string => resolve(deps.cwd, path ?? '.');

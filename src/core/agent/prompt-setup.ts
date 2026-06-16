@@ -1,7 +1,7 @@
 import { confirm as confirmPrompt } from '@inquirer/prompts';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { readCliVersion } from '../runtime/read-cli-version.js';
-import { searchableMultiSelect } from '../../prompts/searchable-multi-select.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { readCliVersion } from '@/core/runtime/read-cli-version.js';
+import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
 import { detectActiveAgentToolId } from './detect-active-agent.js';
 import { getAvailableTools } from './detect-tools.js';
 import { installAgentArtifacts, type InstallAgentArtifactsResult } from './install.js';

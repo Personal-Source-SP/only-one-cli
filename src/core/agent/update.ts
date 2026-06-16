@@ -1,6 +1,6 @@
-import { loadConfig, persistConfigAgentTools } from '../config/index.js';
-import { extractGeneratedByVersion } from '../structure/status.js';
-import { readCliVersion } from '../runtime/read-cli-version.js';
+import { loadConfig, persistConfigAgentTools } from '@/core/config/index.js';
+import { extractGeneratedByVersion } from '@/core/structure/status.js';
+import { readCliVersion } from '@/core/runtime/read-cli-version.js';
 import { installAgentArtifacts, type InstallAgentArtifactsResult } from './install.js';
 import { resolveStructureSkillPath } from './skill-presence.js';
 import { getAgentToolDisplayName } from './prompt-setup.js';

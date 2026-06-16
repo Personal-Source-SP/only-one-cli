@@ -1,7 +1,7 @@
 /** Ported from open-spec-source command-generation/adapters/kiro.ts */
 
 import { join } from 'node:path';
-import type { CommandContent, ToolCommandAdapter } from '../types.js';
+import type { CommandContent, ToolCommandAdapter } from '@/core/command-generation/types.js';
 
 /**
  * Kiro adapter for command generation.

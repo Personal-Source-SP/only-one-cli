@@ -1,4 +1,4 @@
-import type { Fetcher } from '../core/client/index.js';
+import type { Fetcher } from '@/core/client/index.js';
 
 export interface PromptDeps {
     input: (config: { message: string; default?: string }) => Promise<string>;

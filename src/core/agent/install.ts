@@ -1,20 +1,20 @@
 import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { CommandAdapterRegistry } from '../command-generation/registry.js';
-import { generateCommand, resolveCommandWritePath } from '../command-generation/generator.js';
+import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
+import { generateCommand, resolveCommandWritePath } from '@/core/command-generation/generator.js';
 import {
     buildStructureCommandContent,
     buildStructureSkillMarkdown,
     STRUCTURE_COMMAND_ID,
     STRUCTURE_SKILL_NAME,
-} from '../templates/structure.js';
+} from '@/core/templates/structure.js';
 import {
     buildStructureApplyCommandContent,
     buildStructureApplySkillMarkdown,
     STRUCTURE_APPLY_COMMAND_ID,
     STRUCTURE_APPLY_SKILL_NAME,
-} from '../templates/structure-apply.js';
+} from '@/core/templates/structure-apply.js';
 import { getAgentToolById } from './tools.js';
 import { normalizeStructureCommandPath, resolveStructureSkillPath } from './command-path.js';
 
@@ -123,4 +123,4 @@ export const installAgentArtifacts = async (
     return { tools };
 };
 
-export { STRUCTURE_SLASH } from '../templates/structure.js';
+export { STRUCTURE_SLASH } from '@/core/templates/structure.js';

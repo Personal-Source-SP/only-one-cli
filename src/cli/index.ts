@@ -6,7 +6,7 @@ import {
     createStructureApplyCommand,
     createStructurePullCommand,
     createUpdateCommand,
-} from '../commands/index.js';
+} from '@/commands/index.js';
 import type { ProgramDeps } from './deps.js';
 
 export function createProgram(deps: ProgramDeps) {

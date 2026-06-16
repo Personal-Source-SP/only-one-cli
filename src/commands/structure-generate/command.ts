@@ -1,17 +1,17 @@
 import { Command } from 'commander';
 import { basename, relative } from 'node:path';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { buildAgentArtifactSummaries, formatAgentToolInstruction } from '../../core/agent/artifact-summary.js';
-import { ensureStructureAgentSkills } from '../../core/agent/ensure-skills.js';
-import { getAgentToolDisplayName } from '../../core/agent/prompt-setup.js';
-import { loadConfig, persistConfigAgentTools } from '../../core/config/index.js';
-import { printJson } from '../../core/output/index.js';
-import { readCliVersion } from '../../core/runtime/read-cli-version.js';
-import { assertProjectDirectory, resolveProjectDir } from '../../core/runtime/globals.js';
-import { STRUCTURALS_DIR, StructurePathResolutionError } from '../../core/structure/paths.js';
-import { scaffoldStructureOutput } from '../../core/structure/scaffold.js';
-import { readBlueprintStatus } from '../../core/structure/status.js';
-import { getStructurePlaybookSteps, STRUCTURE_BLUEPRINT_NAMING_HINT, STRUCTURE_SKILL_NAME } from '../../core/templates/structure.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { buildAgentArtifactSummaries, formatAgentToolInstruction } from '@/core/agent/artifact-summary.js';
+import { ensureStructureAgentSkills } from '@/core/agent/ensure-skills.js';
+import { getAgentToolDisplayName } from '@/core/agent/prompt-setup.js';
+import { loadConfig, persistConfigAgentTools } from '@/core/config/index.js';
+import { printJson } from '@/core/output/index.js';
+import { readCliVersion } from '@/core/runtime/read-cli-version.js';
+import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
+import { STRUCTURALS_DIR, StructurePathResolutionError } from '@/core/structure/paths.js';
+import { scaffoldStructureOutput } from '@/core/structure/scaffold.js';
+import { readBlueprintStatus } from '@/core/structure/status.js';
+import { getStructurePlaybookSteps, STRUCTURE_BLUEPRINT_NAMING_HINT, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
 import type { AgentArtifactSummary, StructureGenerateCommandJson, StructureGenerateCommandOptions } from './types.js';
 
 const STRUCTURE_GENERATE_DESCRIPTION =

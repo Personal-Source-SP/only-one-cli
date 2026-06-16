@@ -1,4 +1,4 @@
-import type { ProgramDeps } from '../../cli/deps.js';
+import type { ProgramDeps } from '@/cli/deps.js';
 
 export const isPromptInteractive = (deps: ProgramDeps): boolean => {
     if (deps.isInteractive === false) {

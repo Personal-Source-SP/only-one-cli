@@ -1,7 +1,7 @@
 import { isAbsolute, join } from 'node:path';
-import { CommandAdapterRegistry } from '../command-generation/registry.js';
-import type { ToolCommandAdapter } from '../command-generation/types.js';
-import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '../templates/structure.js';
+import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
+import type { ToolCommandAdapter } from '@/core/command-generation/types.js';
+import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
 import { getAgentToolById } from './tools.js';
 
 /** Map OpenSpec opsx-oriented paths to only-one-cli structure-generate and structure-apply command paths. */

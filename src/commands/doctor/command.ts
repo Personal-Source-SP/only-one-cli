@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 import isEmpty from 'lodash/isEmpty.js';
 import some from 'lodash/some.js';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { hasLocalConfig, loadConfig, resolveIndexMode } from '../../core/config/index.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { hasLocalConfig, loadConfig, resolveIndexMode } from '@/core/config/index.js';
 import {
     buildDoctorReport,
     buildNotInitializedReport,
@@ -14,13 +14,13 @@ import {
     checkServer,
     checkYamlConfig,
     runIndexingChecks,
-} from '../../core/doctor/checks.js';
-import { buildInstallScript } from '../../core/doctor/install.js';
-import { printDoctorReport } from '../../core/doctor/format.js';
-import { maybeInstallMissing } from '../../core/doctor/install-flow.js';
-import type { DoctorCommandOptions } from '../../core/doctor/types.js';
-import { printJson } from '../../core/output/index.js';
-import { assertProjectDirectory, globalsFor, resolveProjectDir } from '../../core/runtime/globals.js';
+} from '@/core/doctor/checks.js';
+import { buildInstallScript } from '@/core/doctor/install.js';
+import { printDoctorReport } from '@/core/doctor/format.js';
+import { maybeInstallMissing } from '@/core/doctor/install-flow.js';
+import type { DoctorCommandOptions } from '@/core/doctor/types.js';
+import { printJson } from '@/core/output/index.js';
+import { assertProjectDirectory, globalsFor, resolveProjectDir } from '@/core/runtime/globals.js';
 
 export function createDoctorCommand(deps: ProgramDeps): Command {
     return new Command('doctor')

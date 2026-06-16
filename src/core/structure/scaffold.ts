@@ -1,8 +1,8 @@
 import { existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { loadConfig } from '../config/index.js';
-import { ensureIndexOutputDir, resolveIndexOutputDir } from '../prebuilt/index-output.js';
+import { loadConfig } from '@/core/config/index.js';
+import { ensureIndexOutputDir, resolveIndexOutputDir } from '@/core/prebuilt/index-output.js';
 import { resolveStructureBlueprintPath, resolveStructureBlueprintRelative, resolveStructureOutputDirLabel } from './blueprint.js';
 import { isExplicitBlueprintFileOutput } from './paths.js';
 

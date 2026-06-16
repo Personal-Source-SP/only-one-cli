@@ -4,16 +4,16 @@ import { existsSync } from 'node:fs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { promisify } from 'node:util';
-import type { IndexMode } from '../config/index.js';
+import type { IndexMode } from '@/core/config/index.js';
 import {
     GITNEXUS_DOCKER_CLI_PATH,
     resolveCocoindexImage,
     resolveCocoindexScript,
     resolveGitnexusBin,
     resolveGitnexusImage,
-} from '../indexing/tools.js';
-import { verifyGitnexusInContainer } from '../indexing/docker-runtime.js';
-import { listStructureRelativePaths } from '../structure/paths.js';
+} from '@/core/indexing/tools.js';
+import { verifyGitnexusInContainer } from '@/core/indexing/docker-runtime.js';
+import { listStructureRelativePaths } from '@/core/structure/paths.js';
 
 const execFileAsync = promisify(execFile);
 

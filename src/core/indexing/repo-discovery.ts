@@ -1,6 +1,6 @@
 import { readdirSync } from 'node:fs';
 import { join, relative, basename, dirname } from 'node:path';
-import type { BulkConfig } from '../config/index.js';
+import type { BulkConfig } from '@/core/config/index.js';
 
 export interface DiscoveredRepo {
     /** Absolute path to repo root (parent of .git) */

@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { basename } from 'node:path';
-import { CommandAdapterRegistry } from '../command-generation/registry.js';
-import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '../templates/structure.js';
+import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
+import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
 import { resolveStructureCommandPath, resolveStructureSkillPath } from './command-path.js';
 import type { AgentArtifactSummary } from './types.js';
 

@@ -1,8 +1,8 @@
 import { Command } from 'commander';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { formatUpdateHumanLines, updateAgentArtifacts } from '../../core/agent/update.js';
-import { printJson } from '../../core/output/index.js';
-import { assertProjectDirectory, resolveProjectDir } from '../../core/runtime/globals.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { formatUpdateHumanLines, updateAgentArtifacts } from '@/core/agent/update.js';
+import { printJson } from '@/core/output/index.js';
+import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
 
 export function createUpdateCommand(deps: ProgramDeps): Command {
     return new Command('update')

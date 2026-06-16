@@ -1,4 +1,4 @@
-import type { AgentArtifactSummary } from '../../core/agent/types.js';
+import type { AgentArtifactSummary } from '@/core/agent/types.js';
 
 export type { AgentArtifactSummary };
 

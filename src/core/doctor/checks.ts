@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { access, readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { Fetcher } from '../client/index.js';
+import type { Fetcher } from '@/core/client/index.js';
 import {
     hasLocalConfig,
     loadConfig,
@@ -11,11 +11,11 @@ import {
     resolveIndexMode,
     type HybridIndexConfig,
     type IndexModeSource,
-} from '../config/index.js';
-import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint } from '../runtime/credentials.js';
-import { resolveLocalConfigPathForProject } from '../prebuilt/index-output.js';
-import type { DoctorMode } from '../indexing/tools.js';
-import { resolveCocoindexImage, resolveCocoindexScript, resolveGitnexusBin, resolveGitnexusImage } from '../indexing/tools.js';
+} from '@/core/config/index.js';
+import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint } from '@/core/runtime/credentials.js';
+import { resolveLocalConfigPathForProject } from '@/core/prebuilt/index-output.js';
+import type { DoctorMode } from '@/core/indexing/tools.js';
+import { resolveCocoindexImage, resolveCocoindexScript, resolveGitnexusBin, resolveGitnexusImage } from '@/core/indexing/tools.js';
 import {
     COCOINDEX_CONTAINER_NAME,
     ensureCocoindexContainerRunning,
@@ -27,7 +27,7 @@ import {
     isDockerDaemonRunning,
     verifyCocoindexInContainer,
     verifyGitnexusInContainer,
-} from '../indexing/docker-runtime.js';
+} from '@/core/indexing/docker-runtime.js';
 
 export interface RunIndexingChecksOptions {
     autoStartContainers?: boolean;

@@ -1,6 +1,6 @@
-import type { ProgramDeps } from '../../cli/deps.js';
-import { printJson } from '../output/index.js';
-import { assertProjectDirectory, resolveProjectDir } from '../runtime/globals.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { printJson } from '@/core/output/index.js';
+import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
 import type { InitCommandRequest, InitCommandResponse } from './types.js';
 import { ensureOpenspecCli, runOpenspecInit, OpenspecBootstrapError } from '@library/openspec-bootstrap/index.js';
 import { syncCustomSkills } from '@library/custom-skills-sync/index.js';

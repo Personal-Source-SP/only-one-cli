@@ -2,15 +2,15 @@ import filter from 'lodash/filter.js';
 import isEmpty from 'lodash/isEmpty.js';
 import map from 'lodash/map.js';
 import { execFileSync } from 'node:child_process';
-import type { DoctorMode } from '../indexing/tools.js';
-import { resolveCocoindexImage, resolveGitnexusImage } from '../indexing/tools.js';
+import type { DoctorMode } from '@/core/indexing/tools.js';
+import { resolveCocoindexImage, resolveGitnexusImage } from '@/core/indexing/tools.js';
 import type { CheckResult } from './checks.js';
 import {
     COCOINDEX_CONTAINER_NAME,
     ensureCocoindexContainerRunning,
     ensureGitnexusContainerRunning,
     GITNEXUS_CONTAINER_NAME,
-} from '../indexing/docker-runtime.js';
+} from '@/core/indexing/docker-runtime.js';
 import type { DoctorBuildInstallScriptRequest, DoctorInstallDependenciesRequest, InstallResult } from './types.js';
 
 export function missingIndexingDependencies(checks: CheckResult[]): string[] {

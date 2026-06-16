@@ -1,7 +1,7 @@
 /** Ported from open-spec-source command-generation/adapters/costrict.ts */
 
 import { join } from 'node:path';
-import type { CommandContent, ToolCommandAdapter } from '../types.js';
+import type { CommandContent, ToolCommandAdapter } from '@/core/command-generation/types.js';
 
 /**
  * CoStrict adapter for command generation.

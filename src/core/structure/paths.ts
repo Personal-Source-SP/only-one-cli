@@ -1,6 +1,6 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { basename, join, dirname } from 'node:path';
-import { resolveIndexOutputDir } from '../prebuilt/index-output.js';
+import { resolveIndexOutputDir } from '@/core/prebuilt/index-output.js';
 
 export const STRUCTURALS_DIR = 'structure';
 export const LEGACY_STRUCTURAL_BLUEPRINT_FILENAME = 'structural-blueprint.md';

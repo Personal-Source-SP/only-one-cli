@@ -1,8 +1,8 @@
 import { existsSync } from 'node:fs';
 import { resolveStructureCommandPath, resolveStructureSkillPath } from './command-path.js';
-import { CommandAdapterRegistry } from '../command-generation/registry.js';
+import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import { getToolsWithSkillsDir } from './tools.js';
-import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '../templates/structure.js';
+import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
 
 export { resolveStructureCommandPath, resolveStructureSkillPath } from './command-path.js';
 

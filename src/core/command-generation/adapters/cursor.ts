@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import type { CommandContent, ToolCommandAdapter } from '../types.js';
+import type { CommandContent, ToolCommandAdapter } from '@/core/command-generation/types.js';
 
 const escapeYamlValue = (value: string): string => {
     const needsQuoting = /[:\n\r#{}[\],&*!|>'"%@`]|^\s|\s$/.test(value);

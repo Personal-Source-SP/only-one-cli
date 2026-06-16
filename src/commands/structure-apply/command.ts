@@ -1,29 +1,29 @@
 import { Command } from 'commander';
 import { basename, relative } from 'node:path';
-import type { ProgramDeps } from '../../cli/deps.js';
-import { buildAgentArtifactSummaries, formatAgentToolInstruction } from '../../core/agent/artifact-summary.js';
-import { ensureStructureAgentSkills } from '../../core/agent/ensure-skills.js';
-import { getAgentToolDisplayName } from '../../core/agent/prompt-setup.js';
-import { loadConfig, persistConfigAgentTools } from '../../core/config/index.js';
-import { printJson } from '../../core/output/index.js';
-import { readCliVersion } from '../../core/runtime/read-cli-version.js';
-import { assertProjectDirectory, resolveProjectDir } from '../../core/runtime/globals.js';
-import { STRUCTURALS_DIR, StructurePathResolutionError } from '../../core/structure/paths.js';
-import { scaffoldStructureOutput } from '../../core/structure/scaffold.js';
-import { readBlueprintStatus } from '../../core/structure/status.js';
+import type { ProgramDeps } from '@/cli/deps.js';
+import { buildAgentArtifactSummaries, formatAgentToolInstruction } from '@/core/agent/artifact-summary.js';
+import { ensureStructureAgentSkills } from '@/core/agent/ensure-skills.js';
+import { getAgentToolDisplayName } from '@/core/agent/prompt-setup.js';
+import { loadConfig, persistConfigAgentTools } from '@/core/config/index.js';
+import { printJson } from '@/core/output/index.js';
+import { readCliVersion } from '@/core/runtime/read-cli-version.js';
+import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
+import { STRUCTURALS_DIR, StructurePathResolutionError } from '@/core/structure/paths.js';
+import { scaffoldStructureOutput } from '@/core/structure/scaffold.js';
+import { readBlueprintStatus } from '@/core/structure/status.js';
 import {
     getStructureApplyPlaybookSteps,
     STRUCTURE_APPLY_BLUEPRINT_NAMING_HINT,
     STRUCTURE_APPLY_SKILL_NAME,
     STRUCTURE_APPLY_COMMAND_ID,
-} from '../../core/templates/structure-apply.js';
+} from '@/core/templates/structure-apply.js';
 import type { AgentArtifactSummary, StructureApplyCommandJson, StructureApplyCommandOptions } from './types.js';
 
 import { confirm as confirmPrompt } from '@inquirer/prompts';
-import { clientFor, globalsFor } from '../../core/runtime/globals.js';
-import { fetchRemoteStructure, saveStructureLocally } from '../../core/structure/remote.js';
-import { selectBackendProject } from '../../prompts/project-select.js';
-import type { BackendProject } from '../../core/client/index.js';
+import { clientFor, globalsFor } from '@/core/runtime/globals.js';
+import { fetchRemoteStructure, saveStructureLocally } from '@/core/structure/remote.js';
+import { selectBackendProject } from '@/prompts/project-select.js';
+import type { BackendProject } from '@/core/client/index.js';
 
 const STRUCTURE_APPLY_DESCRIPTION =
     'Confirm structural blueprint and print the hybrid-index-structure-apply agent playbook.\n\n' +

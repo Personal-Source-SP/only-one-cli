@@ -1,7 +1,7 @@
 /** Ported from open-spec-source command-generation/adapters/github-copilot.ts */
 
 import { join } from 'node:path';
-import type { CommandContent, ToolCommandAdapter } from '../types.js';
+import type { CommandContent, ToolCommandAdapter } from '@/core/command-generation/types.js';
 
 /**
  * GitHub Copilot adapter for command generation.

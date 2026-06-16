@@ -2,7 +2,7 @@
 
 import os from 'node:os';
 import { join, resolve } from 'node:path';
-import type { CommandContent, ToolCommandAdapter } from '../types.js';
+import type { CommandContent, ToolCommandAdapter } from '@/core/command-generation/types.js';
 
 /**
  * Returns the Codex home directory.

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { GITNEXUS_DOCKER_CLI_PATH, resolveCocoindexImage, resolveGitnexusImage } from '../indexing/tools.js';
+import { GITNEXUS_DOCKER_CLI_PATH, resolveCocoindexImage, resolveGitnexusImage } from '@/core/indexing/tools.js';
 
 export const GITNEXUS_CONTAINER_NAME = 'only-one-gitnexus';
 export const COCOINDEX_CONTAINER_NAME = 'only-one-cocoindex';
