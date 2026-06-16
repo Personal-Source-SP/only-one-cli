@@ -73,14 +73,6 @@ Apply a structural blueprint to the project.
 only-one-cli structure-apply [path] [options]
 ```
 
-### `structure-pull`
-
-Pull structural blueprint from the project.
-
-```bash
-only-one-cli structure-pull [path] [options]
-```
-
 ### `update`
 
 Refresh installed structural agent skills for tools listed in `agent_tools`.
