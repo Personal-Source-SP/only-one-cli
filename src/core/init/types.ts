@@ -8,7 +8,6 @@ export interface InitCommandRequest {
     command: import('commander').Command;
     json?: boolean;
     options: InitCommandOptions;
-    path?: string;
 }
 
 export interface InitCommandResponse {

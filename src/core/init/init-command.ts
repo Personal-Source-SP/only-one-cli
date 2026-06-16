@@ -6,7 +6,7 @@ import { ensureOpenspecCli, runOpenspecInit, OpenspecBootstrapError } from '@lib
 import { syncCustomSkills } from '@library/custom-skills-sync/index.js';
 
 export const executeInitCommand = async (deps: ProgramDeps, request: InitCommandRequest): Promise<InitCommandResponse | null> => {
-    const projectDir = resolveProjectDir(deps, request.path);
+    const projectDir = resolveProjectDir(deps, undefined);
     assertProjectDirectory(projectDir);
     const options = request.options;
     const installSkill = options.installSkill !== false;

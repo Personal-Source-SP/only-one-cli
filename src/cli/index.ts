@@ -4,7 +4,6 @@ import {
     createInitCommand,
     createStructureGenerateCommand,
     createStructureApplyCommand,
-    createStructurePullCommand,
     createUpdateCommand,
 } from '@/commands/index.js';
 import type { ProgramDeps } from './deps.js';
@@ -24,7 +23,7 @@ export function createProgram(deps: ProgramDeps) {
     program.addCommand(createInitCommand(deps));
     program.addCommand(createStructureGenerateCommand(deps));
     program.addCommand(createStructureApplyCommand(deps));
-    program.addCommand(createStructurePullCommand(deps));
+
     program.addCommand(createUpdateCommand(deps));
 
     program.addCommand(createDoctorCommand(deps));
