@@ -242,7 +242,7 @@ export async function checkDocker(mode: DoctorMode): Promise<CheckResult> {
             ok: false,
             detail: 'daemon not running',
             required: mode === 'docker',
-            remediation: 'Start Docker Desktop or the Docker daemon, then re-run only-one-cli doctor',
+            remediation: 'Start Docker Desktop or the Docker daemon, then re-run only-one doctor',
         };
     }
 
@@ -296,7 +296,7 @@ async function checkGitnexusDocker(options: RunIndexingChecksOptions): Promise<C
             ok: false,
             detail: `image not found (${image})`,
             required: true,
-            remediation: `Pull GitNexus image: docker pull ${image} (or only-one-cli doctor --install-missing)`,
+            remediation: `Pull GitNexus image: docker pull ${image} (or only-one doctor --install-missing)`,
         };
     }
 
@@ -324,7 +324,7 @@ async function checkGitnexusDocker(options: RunIndexingChecksOptions): Promise<C
                         ? `container ${GITNEXUS_CONTAINER_NAME} stopped`
                         : `container ${GITNEXUS_CONTAINER_NAME} missing`,
                 required: true,
-                remediation: `Run only-one-cli doctor to start ${GITNEXUS_CONTAINER_NAME}`,
+                remediation: `Run only-one doctor to start ${GITNEXUS_CONTAINER_NAME}`,
             };
         }
     }
@@ -343,7 +343,7 @@ async function checkGitnexusDocker(options: RunIndexingChecksOptions): Promise<C
             ok: false,
             detail: `container ${GITNEXUS_CONTAINER_NAME} unhealthy`,
             required: true,
-            remediation: `Recreate container: docker rm -f ${GITNEXUS_CONTAINER_NAME} && only-one-cli doctor --install-missing`,
+            remediation: `Recreate container: docker rm -f ${GITNEXUS_CONTAINER_NAME} && only-one doctor --install-missing`,
         };
     }
 }
@@ -366,7 +366,7 @@ async function checkCocoindexLocal(): Promise<CheckResult> {
                 ok: false,
                 detail: 'index script not found',
                 required: true,
-                remediation: 'Reinstall only-one-cli (includes scripts/cocoindex_documents.py) or set COCOINDEX_SCRIPT to the script path',
+                remediation: 'Reinstall only-one (includes scripts/cocoindex_documents.py) or set COCOINDEX_SCRIPT to the script path',
             };
         }
 
@@ -399,7 +399,7 @@ async function checkCocoindexDocker(options: RunIndexingChecksOptions): Promise<
             ok: false,
             detail: `image not found (${image})`,
             required: true,
-            remediation: `Pull CocoIndex image: docker pull ${image} (or only-one-cli doctor --install-missing)`,
+            remediation: `Pull CocoIndex image: docker pull ${image} (or only-one doctor --install-missing)`,
         };
     }
 
@@ -427,7 +427,7 @@ async function checkCocoindexDocker(options: RunIndexingChecksOptions): Promise<
                         ? `container ${COCOINDEX_CONTAINER_NAME} stopped`
                         : `container ${COCOINDEX_CONTAINER_NAME} missing`,
                 required: true,
-                remediation: `Run only-one-cli doctor to start ${COCOINDEX_CONTAINER_NAME}`,
+                remediation: `Run only-one doctor to start ${COCOINDEX_CONTAINER_NAME}`,
             };
         }
     }
@@ -446,7 +446,7 @@ async function checkCocoindexDocker(options: RunIndexingChecksOptions): Promise<
             ok: false,
             detail: `container ${COCOINDEX_CONTAINER_NAME} unhealthy`,
             required: true,
-            remediation: `Recreate container: docker rm -f ${COCOINDEX_CONTAINER_NAME} && only-one-cli doctor --install-missing`,
+            remediation: `Recreate container: docker rm -f ${COCOINDEX_CONTAINER_NAME} && only-one doctor --install-missing`,
         };
     }
 }
@@ -458,7 +458,7 @@ export async function runIndexingChecks(mode: DoctorMode, options: RunIndexingCh
 
 export async function assertIndexingReadiness(cwd: string, modeOverride?: string): Promise<DoctorReport> {
     if (!(await hasLocalConfig(cwd))) {
-        throw new Error('Project not initialized. Run only-one-cli init before indexing.');
+        throw new Error('Project not initialized. Run only-one init before indexing.');
     }
 
     const config = await loadConfig(cwd);
@@ -470,7 +470,7 @@ export async function assertIndexingReadiness(cwd: string, modeOverride?: string
         const remediation = report.remediation.length
             ? `\nRemediation:\n${report.remediation.map((step) => `  - ${step}`).join('\n')}`
             : '';
-        throw new Error(`Indexing prerequisites are not ready (status: ${report.status}). Run only-one-cli doctor.${remediation}`);
+        throw new Error(`Indexing prerequisites are not ready (status: ${report.status}). Run only-one doctor.${remediation}`);
     }
 
     return report;
@@ -483,7 +483,7 @@ export function buildNotInitializedReport(mode: DoctorMode, modeSource: IndexMod
         modeSource,
         checks: [],
         missing: [localConfigDisplayPath()],
-        remediation: ['Run only-one-cli init to create project configuration'],
+        remediation: ['Run only-one init to create project configuration'],
     };
 }
 
@@ -518,7 +518,7 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
     if (status === 'NOT_INITIALIZED') {
         return [
             {
-                command: 'only-one-cli init',
+                command: 'only-one init',
                 description: `Create ${localConfigDisplayPath()} for this project`,
             },
         ];
@@ -527,11 +527,11 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
     if (status === 'MISSING') {
         return [
             {
-                command: 'only-one-cli doctor --yes',
+                command: 'only-one doctor --yes',
                 description: 'Install missing GitNexus/CocoIndex dependencies',
             },
             {
-                command: 'only-one-cli doctor --print-install-script',
+                command: 'only-one doctor --print-install-script',
                 description: 'Print manual install commands',
             },
         ];
@@ -539,19 +539,19 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
 
     return [
         {
-            command: 'only-one-cli index:create',
-            description: 'Build GitNexus + CocoIndex under .only-one-cli/ (manifest.json included)',
+            command: 'only-one index:create',
+            description: 'Build GitNexus + CocoIndex under .only-one/ (manifest.json included)',
         },
         {
-            command: 'only-one-cli push-index',
-            description: 'Upload prebuilt bundle from .only-one-cli/ to backend',
+            command: 'only-one push-index',
+            description: 'Upload prebuilt bundle from .only-one/ to backend',
         },
         {
-            command: 'only-one-cli status --index',
+            command: 'only-one status --index',
             description: 'Compare local index vs remote (commit, tool versions)',
         },
         {
-            command: 'only-one-cli list --versions',
+            command: 'only-one list --versions',
             description: 'List index versions stored on the backend',
         },
     ];

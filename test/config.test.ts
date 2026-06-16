@@ -32,7 +32,7 @@ const writeProjectConfig = async (cwd: string, content: string, legacy = false):
 };
 
 describe('CLI config', () => {
-    it('loads .only-one-cli/.onlyonecli.yml when present', async () => {
+    it('loads .only-one/.onlyonecli.yml when present', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-'));
         await writeProjectConfig(cwd, ['server: http://configured', 'project: proj-1'].join('\n'));
 
@@ -146,7 +146,7 @@ describe('CLI config', () => {
         expect(config).toEqual({ server: 'http://api' });
     });
 
-    it('writes .only-one-cli/.onlyonecli.yml with default include and exclude patterns', async () => {
+    it('writes .only-one/.onlyonecli.yml with default include and exclude patterns', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-'));
 
         try {
@@ -179,7 +179,7 @@ describe('CLI config', () => {
             expect(raw).not.toContain('api_key:');
             expect(raw).not.toContain('api_key_env:');
             expect(raw).toContain('# Maximum number of results (-k, --top-k)');
-            expect(raw).toContain('# Defaults for only-one-cli search');
+            expect(raw).toContain('# Defaults for only-one search');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
@@ -256,7 +256,7 @@ describe('CLI config', () => {
         expect(() => parseIndexMode('invalid')).toThrow('Invalid index mode');
     });
 
-    it('loads index_mode from .only-one-cli/.onlyonecli.yml', async () => {
+    it('loads index_mode from .only-one/.onlyonecli.yml', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-mode-'));
         await writeProjectConfig(cwd, ['server: http://configured', 'project: proj-1', 'index_mode: docker'].join('\n'));
 

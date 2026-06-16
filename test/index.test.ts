@@ -5,20 +5,12 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createProgram, isCliEntrypoint } from '@src/index.js';
 
-vi.mock('@src/core/init/openspec-bootstrap.js', () => ({
-    ensureOpenspecCli: vi.fn().mockResolvedValue(undefined),
-    runOpenspecInit: vi.fn().mockResolvedValue(undefined),
-    OpenspecBootstrapError: class extends Error {
-        constructor(message: string) {
-            super(message);
-            this.name = 'OpenspecBootstrapError';
-        }
-    },
+vi.mock('@src/prompts/searchable-multi-select.js', () => ({
+    searchableMultiSelect: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('@src/core/init/custom-skills-sync.js', () => ({
-    syncCustomSkills: vi.fn().mockResolvedValue(undefined),
-    readOpenspecConfig: vi.fn().mockResolvedValue({ agent_tools: [] }),
+vi.mock('@inquirer/prompts', () => ({
+    confirm: vi.fn().mockResolvedValue(true),
 }));
 
 const mockInitFetcher = vi.fn(async (url: string, init?: RequestInit) => {
@@ -28,11 +20,11 @@ const mockInitFetcher = vi.fn(async (url: string, init?: RequestInit) => {
     return { ok: true, json: async () => ({}) };
 });
 
-describe('only-one-cli CLI', () => {
+describe('only-one CLI', () => {
     it('detects npm global symlink entrypoints', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-entrypoint-'));
         const targetPath = join(cwd, 'dist-index.js');
-        const symlinkPath = join(cwd, 'only-one-cli');
+        const symlinkPath = join(cwd, 'only-one');
         await writeFile(targetPath, '');
         await symlink(targetPath, symlinkPath);
 
@@ -190,7 +182,7 @@ describe('only-one-cli CLI', () => {
         expect(writes.join('\n')).toContain('Root: handler');
     });
 
-    it('initializes with openspec bootstrap', async () => {
+    it('initializes with all steps skipped', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
         const writes: string[] = [];
 
@@ -202,12 +194,9 @@ describe('only-one-cli CLI', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--force'], { from: 'user' });
+            await program.parseAsync(['init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
 
             const output = writes.join('\n');
-            expect(output).toContain('Checking openspec CLI');
-            expect(output).toContain('Running openspec init');
-            expect(output).toContain('Syncing custom skills');
             expect(output).toContain('Init complete');
         } finally {
             await rm(cwd, { recursive: true, force: true });
@@ -226,15 +215,15 @@ describe('only-one-cli CLI', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['--json', 'init', '--no-install-skill'], { from: 'user' });
+            await program.parseAsync(['--json', 'init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
 
-            expect(JSON.parse(writes.join('\n'))).toEqual({ installSkipped: true });
+            expect(JSON.parse(writes.join('\n'))).toEqual({});
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
     });
 
-    it('skips install when --no-install-skill is passed', async () => {
+    it('runs specific step with --step', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
         const writes: string[] = [];
 
@@ -246,9 +235,10 @@ describe('only-one-cli CLI', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--no-install-skill'], { from: 'user' });
+            await program.parseAsync(['init', '--yes', '--step', 'packages', '--skip', 'tools,skills'], { from: 'user' });
 
-            expect(writes.join('\n')).toContain('Init complete (skill installation skipped)');
+            const output = writes.join('\n');
+            expect(output).toContain('Init complete');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

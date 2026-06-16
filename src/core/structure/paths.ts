@@ -75,7 +75,7 @@ export const resolveStructureBlueprintPath = (
         const identity = resolveStructurePathIdentity({ organization, project });
         if (!identity) {
             throw new StructurePathResolutionError(
-                'Cannot resolve structural blueprint path: set `project` in .onlyonecli.yml, pass an explicit --output file path ending in .md, or run `only-one-cli init`.',
+                'Cannot resolve structural blueprint path: set `project` in .onlyonecli.yml, pass an explicit --output file path ending in .md, or run `only-one init`.',
             );
         }
 
@@ -85,7 +85,7 @@ export const resolveStructureBlueprintPath = (
     const identity = resolveStructurePathIdentity({ organization, project });
     if (!identity) {
         throw new StructurePathResolutionError(
-            'Cannot resolve structural blueprint path: set `project` in .onlyonecli.yml (run `only-one-cli init`) or pass --output <path-to-file.md>.',
+            'Cannot resolve structural blueprint path: set `project` in .onlyonecli.yml (run `only-one init`) or pass --output <path-to-file.md>.',
         );
     }
 

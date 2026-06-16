@@ -1,11 +1,11 @@
-# only-one-cli
+# only-one
 
 CLI for initializing OpenSpec workflow projects and managing structural agent skills.
 
 ## Install
 
 ```bash
-npm install -g only-one-cli
+npm install -g only-one
 ```
 
 Requires **Node.js 18+**. Also requires `openspec` CLI (`@fission-ai/openspec`) — installed automatically when you run `init`.
@@ -14,13 +14,13 @@ Requires **Node.js 18+**. Also requires `openspec` CLI (`@fission-ai/openspec`) 
 
 ```bash
 # Initialize project with openspec and agent skills
-only-one-cli init
+only-one init
 
 # Generate structural blueprint
-only-one-cli structure-generate
+only-one structure-generate
 
 # Check environment readiness
-only-one-cli doctor
+only-one doctor
 ```
 
 ## Commands
@@ -30,7 +30,7 @@ only-one-cli doctor
 Initialize project with openspec CLI and install custom agent skills.
 
 ```bash
-only-one-cli init [path] [options]
+only-one init [path] [options]
 ```
 
 | Option               | Description                                                                 |
@@ -48,13 +48,13 @@ Flow:
 
 ```bash
 # Interactive init
-only-one-cli init
+only-one init
 
 # Init without agent skills
-only-one-cli init --no-install-skill
+only-one init --no-install-skill
 
 # Non-interactive: install for Cursor and Claude
-only-one-cli init --tools cursor,claude
+only-one init --tools cursor,claude
 ```
 
 ### `structure-generate`
@@ -62,7 +62,7 @@ only-one-cli init --tools cursor,claude
 Generate a structural blueprint markdown file for the project.
 
 ```bash
-only-one-cli structure-generate [path] [options]
+only-one structure-generate [path] [options]
 ```
 
 ### `structure-apply`
@@ -70,7 +70,7 @@ only-one-cli structure-generate [path] [options]
 Apply a structural blueprint to the project.
 
 ```bash
-only-one-cli structure-apply [path] [options]
+only-one structure-apply [path] [options]
 ```
 
 ### `update`
@@ -78,7 +78,7 @@ only-one-cli structure-apply [path] [options]
 Refresh installed structural agent skills for tools listed in `agent_tools`.
 
 ```bash
-only-one-cli update [path] [--force]
+only-one update [path] [--force]
 ```
 
 ### `doctor`
@@ -86,7 +86,7 @@ only-one-cli update [path] [--force]
 Check environment readiness and CLI configuration.
 
 ```bash
-only-one-cli doctor
+only-one doctor
 ```
 
 ## JSON Output
@@ -94,7 +94,7 @@ only-one-cli doctor
 Any command supports `--json` for machine-readable output:
 
 ```bash
-only-one-cli --json init --no-install-skill
+only-one --json init --no-install-skill
 ```
 
 ## Development

@@ -1,16 +1,16 @@
 {
-    "name": "only-one-cli",
+    "name": "only-one",
     "version": "0.0.1",
     "type": "module",
     "bin": {
-        "only-one-cli": "./bin/cli.js"
+        "only-one": "./dist/index.js"
     },
     "files": [
         "dist",
         "scripts"
     ],
     "scripts": {
-        "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json",
+        "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node scripts/postbuild-paths.cjs && chmod +x dist/index.js",
         "dev": "tsx src/index.ts",
         "prepare": "npm run build",
         "test": "npm run format && vitest run",

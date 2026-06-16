@@ -12,7 +12,7 @@ export interface ArchiveResult {
 }
 
 export function createArchive(repoPath: string): ArchiveResult {
-    const zipPath = join(tmpdir(), `only-one-cli-${randomUUID()}.zip`);
+    const zipPath = join(tmpdir(), `only-one-${randomUUID()}.zip`);
 
     execFileSync('git', ['archive', '--format=zip', 'HEAD', `--output=${zipPath}`], {
         cwd: repoPath,

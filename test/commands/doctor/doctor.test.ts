@@ -59,7 +59,7 @@ describe('doctor command', () => {
 
             await program.parseAsync(['doctor'], { from: 'user' });
             expect(writes.join('\n')).toContain('NOT_INITIALIZED');
-            expect(writes.join('\n')).toContain('only-one-cli init');
+            expect(writes.join('\n')).toContain('only-one init');
             expect(process.exitCode).toBe(1);
         } finally {
             process.exitCode = undefined;
@@ -81,10 +81,10 @@ describe('doctor command', () => {
             expect(writes.join('\n')).toContain('Pre-indexing readiness: READY');
             expect(writes.join('\n')).toContain('source: config');
             expect(writes.join('\n')).toContain('gitnexus');
-            expect(writes.join('\n')).toContain('Config (.only-one-cli/.hybridindex.yml):');
+            expect(writes.join('\n')).toContain('Config (.only-one/.hybridindex.yml):');
             expect(writes.join('\n')).toContain('Commands:');
-            expect(writes.join('\n')).toContain('only-one-cli index:create');
-            expect(writes.join('\n')).toContain('only-one-cli push-index');
+            expect(writes.join('\n')).toContain('only-one index:create');
+            expect(writes.join('\n')).toContain('only-one push-index');
         });
     });
 

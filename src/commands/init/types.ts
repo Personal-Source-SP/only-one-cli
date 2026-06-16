@@ -1,5 +1,5 @@
 export interface InitCommandOptions {
-    force?: boolean;
-    installSkill?: boolean;
-    tools?: string;
+    yes?: boolean;
+    step?: string;
+    skip?: string;
 }

@@ -27,7 +27,7 @@ export const updateAgentArtifacts = async (request: UpdateAgentArtifactsRequest)
         return {
             agentTools: [],
             cliVersion,
-            message: 'No agent_tools configured. Run only-one-cli init or structure to install skills.',
+            message: 'No agent_tools configured. Run only-one init or structure to install skills.',
             structure: { tools: [] },
             updated: false,
         };

@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
-- **Client-side pre-indexing:** `index:create` builds GitNexus and CocoIndex artifacts locally under `.only-one-cli/`; `push-index` bundles and uploads them to the backend.
+- **Client-side pre-indexing:** `index:create` builds GitNexus and CocoIndex artifacts locally under `.only-one/`; `push-index` bundles and uploads them to the backend.
 - **`status --index`:** Compare local manifest fingerprints with the remote index (states: not indexed, local-only, uploaded latest/stale, tool-version mismatch). Replaces `index:status`.
 - **`list --versions`:** List uploaded prebuilt index versions with filtering by project and tag. Replaces `index:list`.
 - **Backend code intelligence:** `search` (semantic + optional structural context), `impact`, and `call-graph` query commands against the API.

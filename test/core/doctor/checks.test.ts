@@ -87,7 +87,7 @@ describe('indexing doctor checks', () => {
             });
             const result = await checkGitnexus('docker');
             expect(result.ok).toBe(true);
-            expect(result.detail).toContain('only-one-cli-gitnexus');
+            expect(result.detail).toContain('only-one-gitnexus');
         });
 
         it('auto-starts gitnexus container when image exists but container is stopped', async () => {
@@ -107,7 +107,7 @@ describe('indexing doctor checks', () => {
             });
             const result = await checkGitnexus('docker');
             expect(result.ok).toBe(true);
-            expect(execFileSync).toHaveBeenCalledWith('docker', ['start', 'only-one-cli-gitnexus'], expect.any(Object));
+            expect(execFileSync).toHaveBeenCalledWith('docker', ['start', 'only-one-gitnexus'], expect.any(Object));
         });
     });
 
@@ -138,7 +138,7 @@ describe('indexing doctor checks', () => {
             });
             const result = await checkCocoindex('docker');
             expect(result.ok).toBe(true);
-            expect(result.detail).toContain('only-one-cli-cocoindex');
+            expect(result.detail).toContain('only-one-cocoindex');
         });
     });
 
@@ -258,7 +258,7 @@ describe('doctor install helpers', () => {
             expect(execFileSync).toHaveBeenCalledWith('docker', ['pull', 'cocoindex/cocoindex-code:latest'], expect.any(Object));
             expect(execFileSync).toHaveBeenCalledWith(
                 'docker',
-                ['run', '-d', '--name', 'only-one-cli-gitnexus', '--restart', 'unless-stopped', 'ghcr.io/abhigyanpatwari/gitnexus:1.6.4'],
+                ['run', '-d', '--name', 'only-one-gitnexus', '--restart', 'unless-stopped', 'ghcr.io/abhigyanpatwari/gitnexus:1.6.4'],
                 expect.any(Object),
             );
         });
@@ -352,27 +352,24 @@ describe('doctor checks (existing)', () => {
             const commands = buildSampleCommands('NOT_INITIALIZED');
             expect(commands).toEqual([
                 {
-                    command: 'only-one-cli init',
-                    description: 'Create .only-one-cli/.hybridindex.yml for this project',
+                    command: 'only-one init',
+                    description: 'Create .only-one/.hybridindex.yml for this project',
                 },
             ]);
         });
 
         it('returns install commands when dependencies are missing', () => {
             const commands = buildSampleCommands('MISSING');
-            expect(commands.map((item) => item.command)).toEqual([
-                'only-one-cli doctor --yes',
-                'only-one-cli doctor --print-install-script',
-            ]);
+            expect(commands.map((item) => item.command)).toEqual(['only-one doctor --yes', 'only-one doctor --print-install-script']);
         });
 
         it('returns index lifecycle commands when ready', () => {
             const commands = buildSampleCommands('READY');
             expect(commands.map((item) => item.command)).toEqual([
-                'only-one-cli index:create',
-                'only-one-cli push-index',
-                'only-one-cli status --index',
-                'only-one-cli list --versions',
+                'only-one index:create',
+                'only-one push-index',
+                'only-one status --index',
+                'only-one list --versions',
             ]);
             expect(commands[0].description).toContain('GitNexus');
             expect(commands[1].description).toContain('Upload');

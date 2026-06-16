@@ -9,7 +9,7 @@ import {
 import type { ProgramDeps } from './deps.js';
 
 export function createProgram(deps: ProgramDeps) {
-    const program = new Command('only-one-cli');
+    const program = new Command('only-one');
 
     program
         .version('0.0.1')

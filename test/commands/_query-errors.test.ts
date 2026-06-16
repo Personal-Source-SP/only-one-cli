@@ -16,7 +16,7 @@ describe('query errors', () => {
         const message = formatQueryValidationError('search', {
             summary: 'Project id is required',
             cause: 'No project id was resolved',
-            fixes: ['Pass --project <id>', 'Run only-one-cli list'],
+            fixes: ['Pass --project <id>', 'Run only-one list'],
         });
 
         expect(message).toContain('[search] Project id is required');

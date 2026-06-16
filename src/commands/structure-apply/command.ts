@@ -153,7 +153,7 @@ export function createStructureApplyCommand(deps: ProgramDeps): Command {
 
             if (scaffold.usesDefaultOrganization) {
                 deps.stdout(
-                    '  Note: organization not set in config; using "default" in blueprint filename. Run only-one-cli init to set organization.',
+                    '  Note: organization not set in config; using "default" in blueprint filename. Run only-one init to set organization.',
                 );
             }
 

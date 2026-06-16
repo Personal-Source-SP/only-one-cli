@@ -57,7 +57,7 @@ export function printDoctorReport(request: DoctorPrintReportRequest): void {
                 write(`  - ${step}`);
             });
             write('');
-            write('Tip: answer Yes when prompted to install missing dependencies, or run only-one-cli doctor --yes');
+            write('Tip: answer Yes when prompted to install missing dependencies, or run only-one doctor --yes');
         }
     }
 

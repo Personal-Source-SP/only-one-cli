@@ -90,10 +90,10 @@ export const resolveBackendProjectId = async (request: ResolveBackendProjectIdRe
                 summary: 'Backend project not found for Git identity',
                 cause: `No backend project exists for ${organization}/${projectSlug}`,
                 fixes: [
-                    'Run only-one-cli init to register the project on the backend',
-                    'Run only-one-cli push-index to create and upload indexes',
+                    'Run only-one init to register the project on the backend',
+                    'Run only-one push-index to create and upload indexes',
                     'Pass --project <id> to target a specific backend project',
-                    'Run only-one-cli list to discover project ids',
+                    'Run only-one list to discover project ids',
                 ],
             },
         };
@@ -107,7 +107,7 @@ export const resolveBackendProjectId = async (request: ResolveBackendProjectIdRe
         failure: {
             summary: 'Project id is required',
             cause: 'No backend project id was resolved',
-            fixes: ['Pass --project <id>', 'Set HYBRID_PROJECT', 'Run only-one-cli init'],
+            fixes: ['Pass --project <id>', 'Set HYBRID_PROJECT', 'Run only-one init'],
         },
     };
 };

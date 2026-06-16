@@ -1,0 +1,3 @@
+name: "@fission-ai/openspec"
+description: "OpenSpec CLI — project setup, tool selection, and agent skill management"
+scope: global

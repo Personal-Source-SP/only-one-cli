@@ -4,25 +4,17 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createProgram } from '@src/index.js';
 
-vi.mock('@src/core/init/openspec-bootstrap.js', () => ({
-    ensureOpenspecCli: vi.fn().mockResolvedValue(undefined),
-    runOpenspecInit: vi.fn().mockResolvedValue(undefined),
-    OpenspecBootstrapError: class extends Error {
-        constructor(message: string) {
-            super(message);
-            this.name = 'OpenspecBootstrapError';
-        }
-    },
+vi.mock('@src/prompts/searchable-multi-select.js', () => ({
+    searchableMultiSelect: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('@src/core/init/custom-skills-sync.js', () => ({
-    syncCustomSkills: vi.fn().mockResolvedValue(undefined),
-    readOpenspecConfig: vi.fn().mockResolvedValue({ agent_tools: [] }),
+vi.mock('@inquirer/prompts', () => ({
+    confirm: vi.fn().mockResolvedValue(true),
 }));
 
 describe('init command', () => {
-    it('runs init successfully with --no-install-skill', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'init-test-noinstall-'));
+    it('runs init with --yes and skips all steps', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'init-test-skipall-'));
         const writes: string[] = [];
 
         try {
@@ -33,16 +25,16 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--no-install-skill'], { from: 'user' });
+            await program.parseAsync(['init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
 
-            expect(writes.join('\n')).toContain('Init complete (skill installation skipped)');
+            expect(writes.join('\n')).toContain('Init complete');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
     });
 
-    it('runs init with openspec bootstrap and custom skills sync', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'init-test-full-'));
+    it('accepts --step flag to run specific step', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'init-test-step-'));
         const writes: string[] = [];
 
         try {
@@ -53,31 +45,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init'], { from: 'user' });
-
-            const output = writes.join('\n');
-            expect(output).toContain('Checking openspec CLI');
-            expect(output).toContain('Running openspec init');
-            expect(output).toContain('Syncing custom skills');
-            expect(output).toContain('Init complete');
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
-    it('runs init with --force flag', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'init-test-force-'));
-        const writes: string[] = [];
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
-                stdout: (line) => writes.push(line),
-            });
-
-            await program.parseAsync(['init', '--force'], { from: 'user' });
+            await program.parseAsync(['init', '--yes', '--step', 'packages', '--skip', 'tools,skills'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
         } finally {
@@ -97,31 +65,9 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['--json', 'init', '--no-install-skill'], { from: 'user' });
+            await program.parseAsync(['--json', 'init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
 
-            expect(JSON.parse(writes.join('\n'))).toEqual({ installSkipped: true });
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
-    it('shows deprecation warning for removed flags', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'init-test-deprecate-'));
-        const writes: string[] = [];
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
-                stdout: (line) => writes.push(line),
-            });
-
-            await program.parseAsync(['init', '--no-install-skill', '--project-name', 'acme/demo'], { from: 'user' });
-
-            const output = writes.join('\n');
-            expect(output).toContain('[deprecated]');
-            expect(output).toContain('--project-name');
+            expect(JSON.parse(writes.join('\n'))).toEqual({});
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
@@ -139,9 +85,9 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', cwd, '--no-install-skill'], { from: 'user' });
+            await program.parseAsync(['init', cwd, '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
 
-            expect(writes.join('\n')).toContain('Init complete (skill installation skipped)');
+            expect(writes.join('\n')).toContain('Init complete');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

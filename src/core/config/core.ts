@@ -30,7 +30,7 @@ export { isUuidV4 } from '@/utils/uuid.js';
 
 let legacyCredentialWarningShown = false;
 
-const LEGACY_CREDENTIAL_DEPRECATION = `only-one-cli: api_key and api_key_env in YAML are ignored; use ${formatApiKeyConfigHint()}.`;
+const LEGACY_CREDENTIAL_DEPRECATION = `only-one: api_key and api_key_env in YAML are ignored; use ${formatApiKeyConfigHint()}.`;
 
 /** @internal Resets one-time deprecation warning state (tests only). */
 export const resetLegacyCredentialWarningForTests = (): void => {
@@ -269,7 +269,7 @@ export const formatSearchSectionYaml = (search?: SearchConfig): string => {
     const resolved = { ...defaultSearchConfig(), ...search };
     const lines = [
         'search:',
-        '  # Defaults for only-one-cli search; CLI flags override these values when passed on the command line.',
+        '  # Defaults for only-one search; CLI flags override these values when passed on the command line.',
         `  top_k: ${resolved.top_k}  # Maximum number of results (-k, --top-k)`,
         `  snippet_lines: ${resolved.snippet_lines}  # Max snippet lines per hit; 0 = show full excerpt (--snippet-lines)`,
         `  structural: ${resolved.structural}  # Add GitNexus execution-flow context (--structural; per-project only)`,

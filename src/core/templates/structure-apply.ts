@@ -36,7 +36,7 @@ Structure sections of the blueprint to process:
 
 1. **Confirm the blueprint path** via CLI:
    \`\`\`bash
-   only-one-cli structure-apply [path] --json
+   only-one structure-apply [path] --json
    \`\`\`
    Parse \`projectDir\`, \`outputPath\`, \`relativeBlueprintPath\`, \`blueprintFile\`.
 
@@ -59,9 +59,9 @@ export const buildStructureApplySkillMarkdown = (cliVersion: string): string => 
 name: ${STRUCTURE_APPLY_SKILL_NAME}
 description: ${STRUCTURE_APPLY_SKILL_DESCRIPTION}
 license: MIT
-compatibility: Requires only-one-cli CLI.
+compatibility: Requires only-one CLI.
 metadata:
-  author: only-one-cli
+  author: only-one
   version: "1.0"
   generatedBy: "${cliVersion}"
 ---
@@ -75,7 +75,7 @@ export const buildStructureApplyCommandContent = (): import('../command-generati
     description: STRUCTURE_APPLY_SKILL_DESCRIPTION,
     id: STRUCTURE_APPLY_COMMAND_ID,
     name: STRUCTURE_APPLY_SKILL_NAME,
-    tags: ['only-one-cli', 'structure-apply'],
+    tags: ['only-one', 'structure-apply'],
 });
 
 export const buildStructureApplyCommandFile = (): string =>
@@ -95,7 +95,7 @@ export type StructureApplyPlaybookStep = {
 export const getStructureApplyPlaybookSteps = (): StructureApplyPlaybookStep[] => [
     { id: 'scaffold', summary: `CLI confirms structural blueprint path` },
     { id: 'skills', summary: 'Ensure agent skills are installed (structure-apply will prompt if missing)' },
-    { id: 'resolve', summary: 'Run only-one-cli structure-apply [path] --json to confirm outputPath' },
+    { id: 'resolve', summary: 'Run only-one structure-apply [path] --json to confirm outputPath' },
     { id: 'read', summary: 'Read structural blueprint from outputPath' },
     { id: 'scaffold-dirs', summary: 'Re-create directory structure and add base configuration files' },
     { id: 'verify', summary: 'Confirm source skeleton has been initialized successfully' },

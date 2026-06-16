@@ -75,7 +75,7 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
 
             if (scaffold.usesDefaultOrganization) {
                 deps.stdout(
-                    '  Note: organization not set in config; using "default" in blueprint filename. Run only-one-cli init to set organization.',
+                    '  Note: organization not set in config; using "default" in blueprint filename. Run only-one init to set organization.',
                 );
             }
 
@@ -164,7 +164,7 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
             deps.stdout('  1. Open your AI agent/IDE chat window.');
             deps.stdout('  2. Type the slash command, tag the file, or run the command shown above.');
             deps.stdout('  3. Upload the generated index to the backend server:');
-            deps.stdout('     only-one-cli push-index --skip-gitnexus --skip-cocoindex');
+            deps.stdout('     only-one push-index --skip-gitnexus --skip-cocoindex');
             deps.stdout('──────────────────────────────────────────────────────────────────────────');
         });
 }

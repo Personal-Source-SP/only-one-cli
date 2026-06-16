@@ -1,7 +1,7 @@
 /**
  * API credential (v1: built-in constant for local/dev).
  *
- * Future `only-one-cli login` should extend `resolveApiKey()` here
+ * Future `only-one login` should extend `resolveApiKey()` here
  * (session file before this constant).
  */
 

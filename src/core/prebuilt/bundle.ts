@@ -26,7 +26,7 @@ export function createPrebuiltBundle(indexOutputDir: string, bundlePath: string)
 
     if (!dirs.length) {
         throw new Error(
-            'No index artifacts found. Run only-one-cli index:create first, or omit --skip-gitnexus / --skip-cocoindex on push-index.',
+            'No index artifacts found. Run only-one index:create first, or omit --skip-gitnexus / --skip-cocoindex on push-index.',
         );
     }
 

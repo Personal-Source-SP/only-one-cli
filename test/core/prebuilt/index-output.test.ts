@@ -11,8 +11,8 @@ import {
 } from '@src/core/prebuilt/index-output.js';
 
 describe('index-output', () => {
-    it('defaults to .only-one-cli under the project root', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'only-one-cli-output-'));
+    it('defaults to .only-one under the project root', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'only-one-output-'));
         try {
             expect(resolveIndexOutputDir(cwd)).toBe(join(cwd, HYBRID_INDEX_DIR));
         } finally {
@@ -21,7 +21,7 @@ describe('index-output', () => {
     });
 
     it('resolves custom --output relative to project root', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'only-one-cli-output-'));
+        const cwd = await mkdtemp(join(tmpdir(), 'only-one-output-'));
         try {
             expect(resolveIndexOutputDir(cwd, 'artifacts/index')).toBe(join(cwd, 'artifacts/index'));
             expect(resolveManifestPath(join(cwd, HYBRID_INDEX_DIR))).toBe(join(cwd, HYBRID_INDEX_DIR, 'manifest.json'));

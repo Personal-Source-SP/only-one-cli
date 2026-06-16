@@ -26,7 +26,7 @@ export function buildInstallScript(request: DoctorBuildInstallScriptRequest): st
 
     if (missing.includes('docker')) {
         lines.push('# Install Docker: https://docs.docker.com/get-docker/');
-        lines.push('# After Docker is installed, start the daemon and re-run only-one-cli doctor');
+        lines.push('# After Docker is installed, start the daemon and re-run only-one doctor');
         lines.push('');
     }
 

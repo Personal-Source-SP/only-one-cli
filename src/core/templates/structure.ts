@@ -9,20 +9,20 @@ export const STRUCTURE_SLASH = '/only-one-structure-generate';
 export const STRUCTURE_BLUEPRINT_NAMING_HINT = `{organization}-{project}-structural.md under .only-one/${STRUCTURALS_DIR}/`;
 
 export const STRUCTURE_SKILL_DESCRIPTION =
-    'Generate organization-project-structural.md under .only-one/structure/ (architecture skeleton only, no business logic). Requires only-one-cli init or structure-generate scaffold and installed agent skills.';
+    'Generate organization-project-structural.md under .only-one/structure/ (architecture skeleton only, no business logic). Requires only-one init or structure-generate scaffold and installed agent skills.';
 
 export const buildStructureSkillBody =
     (): string => `Generate the structural blueprint markdown for this repo — zero business/domain content.
 
 **Target path:** \`.only-one/${STRUCTURALS_DIR}/{organization}-{project}-structural.md\` (filename segments come from \`.onlyonecli.yml\`).
 
-**Prerequisite:** \`only-one-cli init\` or \`only-one-cli structure-generate\` has created \`.only-one/${STRUCTURALS_DIR}/\` (or a custom \`--output\` layout).
+**Prerequisite:** \`only-one init\` or \`only-one structure-generate\` has created \`.only-one/${STRUCTURALS_DIR}/\` (or a custom \`--output\` layout).
 
 ---
 
 **Role**: You are an Expert Software Architect and Codebase Structure Analyzer.
 
-**Task**: Analyze the provided codebase/directory and write the blueprint to the path returned by the CLI (\`outputPath\` / \`relativeBlueprintPath\` in \`only-one-cli structure-generate --json\`).
+**Task**: Analyze the provided codebase/directory and write the blueprint to the path returned by the CLI (\`outputPath\` / \`relativeBlueprintPath\` in \`only-one structure-generate --json\`).
 
 **CRITICAL RULE**: You MUST completely strip away and ignore all business logic, domain-specific terminology, and product features. Focus ONLY on the "skeleton" of the project: the physical structure, architectural paradigms, dependency rules, and coding conventions.
 
@@ -63,7 +63,7 @@ Structure the markdown file with these sections:
 
 2. **Confirm paths via CLI**
    \`\`\`bash
-   only-one-cli structure-generate [path] --json
+   only-one structure-generate [path] --json
    \`\`\`
    Parse \`projectDir\`, \`outputPath\`, \`relativeBlueprintPath\`, \`blueprintFile\`, \`folderCreated\`.
 
@@ -86,9 +86,9 @@ export const buildStructureSkillMarkdown = (cliVersion: string): string => `---
 name: ${STRUCTURE_SKILL_NAME}
 description: ${STRUCTURE_SKILL_DESCRIPTION}
 license: MIT
-compatibility: Requires only-one-cli CLI.
+compatibility: Requires only-one CLI.
 metadata:
-  author: only-one-cli
+  author: only-one
   version: "1.0"
   generatedBy: "${cliVersion}"
 ---
@@ -102,7 +102,7 @@ export const buildStructureCommandContent = (): import('../command-generation/ty
     description: STRUCTURE_SKILL_DESCRIPTION,
     id: STRUCTURE_COMMAND_ID,
     name: STRUCTURE_SKILL_NAME,
-    tags: ['only-one-cli', 'structure'],
+    tags: ['only-one', 'structure'],
 });
 
 export const buildStructureCommandFile = (): string =>
@@ -120,9 +120,9 @@ export type StructurePlaybookStep = {
 };
 
 export const getStructurePlaybookSteps = (): StructurePlaybookStep[] => [
-    { id: 'scaffold', summary: `CLI creates .only-one/${STRUCTURALS_DIR}/ (init or only-one-cli structure-generate)` },
+    { id: 'scaffold', summary: `CLI creates .only-one/${STRUCTURALS_DIR}/ (init or only-one structure-generate)` },
     { id: 'skills', summary: 'Ensure agent skills are installed (init or structure-generate will prompt if missing)' },
-    { id: 'resolve', summary: 'Run only-one-cli structure-generate [path] --json to confirm outputPath and blueprintFile' },
+    { id: 'resolve', summary: 'Run only-one structure-generate [path] --json to confirm outputPath and blueprintFile' },
     { id: 'explore', summary: 'Map directory tree and tooling manifests; ignore business semantics' },
     { id: 'write', summary: 'Write blueprint to outputPath from JSON (structure/{org}-{project}-structural.md)' },
     { id: 'verify', summary: 'Confirm file exists and summarize' },

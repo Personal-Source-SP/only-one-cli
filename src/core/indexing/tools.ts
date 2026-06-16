@@ -11,7 +11,7 @@ export const DEFAULT_COCOINDEX_IMAGE = 'cocoindex/cocoindex-code:latest';
 /**
  * Document-only CocoIndex script shipped with the CLI package.
  * Source: `cli/scripts/cocoindex_documents.py` → npm publish `scripts/cocoindex_documents.py`
- * (sibling to `dist/` when installed as `only-one-cli`).
+ * (sibling to `dist/` when installed as `only-one`).
  */
 export function resolveCocoindexScript(): string {
     if (process.env.COCOINDEX_SCRIPT) {
@@ -25,7 +25,7 @@ export function assertCocoindexScriptExists(scriptPath = resolveCocoindexScript(
     if (!existsSync(scriptPath)) {
         throw new Error(
             `CocoIndex script not found at ${scriptPath}.\n` +
-                '  Expected only-one-cli/scripts/cocoindex_documents.py next to dist/. Reinstall the CLI or set COCOINDEX_SCRIPT.',
+                '  Expected only-one/scripts/cocoindex_documents.py next to dist/. Reinstall the CLI or set COCOINDEX_SCRIPT.',
         );
     }
     return scriptPath;

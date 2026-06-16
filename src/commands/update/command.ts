@@ -6,7 +6,7 @@ import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/global
 
 export function createUpdateCommand(deps: ProgramDeps): Command {
     return new Command('update')
-        .description('Refresh installed only-one-cli structural agent skills for configured agent_tools')
+        .description('Refresh installed only-one structural agent skills for configured agent_tools')
         .option('--force', 'Overwrite agent workflow files even when versions match')
         .argument('[path]', 'Project directory (default: current directory)')
         .action(async (path: string | undefined, options: { force?: boolean }, command) => {

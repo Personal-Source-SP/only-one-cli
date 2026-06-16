@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# publish-npm.sh — Build and publish/install the only-one-cli CLI
+# publish-npm.sh — Build and publish/install the only-one CLI
 # Usage: ./scripts/publish-npm.sh [--dry-run] [--local] [--tag <tag>] [--otp <code>]
 #   --local      Build, pack, and install the tarball globally for local testing
 #   --tag next   Publish as a release candidate (won't affect 'latest')
@@ -162,7 +162,7 @@ elif $LOCAL_INSTALL; then
   npm install -g "$TARBALL_PATH"
   rm -rf "$PACK_DIR"
 
-  ok "Installed locally. Test with: only-one-cli --version"
+  ok "Installed locally. Test with: only-one --version"
 else
   info "Publishing $PKG_NAME@$PUBLISH_VERSION to npm (tag: $NPM_TAG)..."
   if [[ -n "$OTP" ]]; then

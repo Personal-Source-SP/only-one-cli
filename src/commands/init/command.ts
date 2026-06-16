@@ -5,18 +5,16 @@ import type { InitCommandOptions } from './types.js';
 
 export function createInitCommand(deps: ProgramDeps): Command {
     const cmd = new Command('init')
-        .description('Initialize project with openspec CLI and custom agent skills')
-        .option('--force', 'Pass --force to openspec init')
-        .option('--no-install-skill', 'Skip openspec bootstrapping and custom skills sync')
-        .option('--tools <tools>', 'Agent tools: all, none, or comma-separated ids (cursor, claude, opencode, …)');
+        .description('Initialize project with agent tools, packages, and custom skills')
+        .option('--yes', 'Auto-confirm all existence checks')
+        .option('--step <name>', 'Run only a specific step (tools, packages, skills)')
+        .option('--skip <names>', 'Comma-separated steps to skip (tools, packages, skills)');
 
     cmd.action(async (options: InitCommandOptions, command) => {
-        const installSkill = options.installSkill !== false;
-
         const result = await executeInitCommand(deps, {
             command,
             json: Boolean(command.parent?.opts()?.json),
-            options: { force: options.force, installSkill, tools: options.tools },
+            options: { yes: options.yes, step: options.step, skip: options.skip },
         });
 
         if (!result) return;
