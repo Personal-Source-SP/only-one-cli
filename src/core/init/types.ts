@@ -4,6 +4,7 @@ export interface InitCommandOptions {
     yes?: boolean;
     step?: string;
     skip?: string;
+    combo?: string;
 }
 
 export interface ToolsStepResult {
@@ -35,4 +36,11 @@ export interface InitCommandResponse {
     toolsStep?: ToolsStepResult;
     packagesStep?: PackagesStepResult;
     skillsStep?: SkillsStepResult;
+}
+
+export interface ComboManifest {
+    name: string;
+    description?: string;
+    packages?: string[];
+    skills?: string[];
 }

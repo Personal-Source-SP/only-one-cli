@@ -9,14 +9,15 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .argument('[path]', 'Project path')
         .option('--yes', 'Auto-confirm all existence checks')
         .option('--step <name>', 'Run only a specific step (tools, packages, skills)')
-        .option('--skip <names>', 'Comma-separated steps to skip (tools, packages, skills)');
+        .option('--skip <names>', 'Comma-separated steps to skip (tools, packages, skills)')
+        .option('--combo <names>', 'Comma-separated combos of packages and skills to install');
 
     cmd.action(async (path: string | undefined, options: InitCommandOptions, command) => {
         const result = await executeInitCommand(deps, {
             command,
             json: Boolean(command.parent?.opts()?.json),
             path,
-            options: { yes: options.yes, step: options.step, skip: options.skip },
+            options: { yes: options.yes, step: options.step, skip: options.skip, combo: options.combo },
         });
 
         if (!result) return;

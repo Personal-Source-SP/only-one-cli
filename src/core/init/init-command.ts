@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import yaml from 'js-yaml';
-import { confirm } from '@inquirer/prompts';
+import { confirm, select } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { printJson } from '@/core/output/index.js';
 import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
@@ -17,9 +17,38 @@ import type {
     PackagesStepResult,
     SkillsStepResult,
     PackageManifest,
+    ComboManifest,
 } from './types.js';
 
 const execFileAsync = promisify(execFile);
+
+// ─── Combo manifests helper ──────────────────────────────────────────
+
+const combosDir = new URL('../../../libraries/combos', import.meta.url).pathname;
+
+const readComboManifests = async (): Promise<(ComboManifest & { id: string })[]> => {
+    if (!existsSync(combosDir)) return [];
+
+    const entries = await readdir(combosDir);
+    const yamlFiles = entries.filter((e) => e.endsWith('.yaml') || e.endsWith('.yml'));
+
+    const combos: (ComboManifest & { id: string })[] = [];
+
+    for (const file of yamlFiles) {
+        try {
+            const raw = await readFile(join(combosDir, file), 'utf-8');
+            const parsed = yaml.load(raw) as ComboManifest | null;
+            if (parsed?.name) {
+                const id = file.replace(/\.(yaml|yml)$/, '');
+                combos.push({ ...parsed, id });
+            }
+        } catch {
+            // skip invalid combo
+        }
+    }
+
+    return combos;
+};
 
 // ─── Package manfiest helpers ─────────────────────────────────────────
 
@@ -214,10 +243,55 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         const yes = options.yes ?? false;
         const skip = options.skip ? options.skip.split(',').map((s) => s.trim()) : [];
         const step = options.step;
+        const comboOption = options.combo;
 
         let selectedTools: ToolsStepResult['selectedTools'] = [];
         let selectedPackageNames: string[] = [];
         let selectedSkillNames: string[] = [];
+
+        let isComboFlow = false;
+        let selectedCombos: (ComboManifest & { id: string })[] = [];
+
+        if (comboOption) {
+            isComboFlow = true;
+            const comboNames = comboOption.split(',').map((c) => c.trim().toLowerCase());
+            const availableCombos = await readComboManifests();
+            for (const name of comboNames) {
+                const found = availableCombos.find((c) => c.id.toLowerCase() === name || c.name.toLowerCase() === name);
+                if (!found) {
+                    throw new Error(`Combo '${name}' not found in libraries/combos`);
+                }
+                selectedCombos.push(found);
+            }
+        } else if (!isJson && !step && skip.length === 0) {
+            const availableCombos = await readComboManifests();
+            if (availableCombos.length > 0) {
+                const setupMethod = await select({
+                    message: 'Choose setup method:',
+                    choices: [
+                        { name: 'Combo (recommended predefined configurations)', value: 'combo' },
+                        { name: 'Custom (manual packages and skills selection)', value: 'custom' },
+                    ],
+                });
+
+                if (setupMethod === 'combo') {
+                    isComboFlow = true;
+                    const choices = availableCombos.map((c) => ({
+                        name: c.description ? `${c.name} — ${c.description}` : c.name,
+                        value: c.id,
+                    }));
+                    const selectedComboIds = await searchableMultiSelect({
+                        message: 'Select combos to install:',
+                        choices,
+                    });
+                    if (selectedComboIds.length === 0) {
+                        deps.stdout('No combos selected. Exiting.');
+                        return {};
+                    }
+                    selectedCombos = availableCombos.filter((c) => selectedComboIds.includes(c.id));
+                }
+            }
+        }
 
         // Step 1: Prompt Tools selection
         if (!skip.includes('tools') && (!step || step === 'tools')) {
@@ -228,31 +302,50 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             }
         }
 
-        // Step 2: Prompt Packages selection
-        if (!skip.includes('packages') && (!step || step === 'packages')) {
-            deps.stdout('\n── Step 2: Packages Selection ──');
-            const result = await executePackagesStep(deps, projectDir);
-            if (result) {
-                selectedPackageNames = result.installedPackages;
+        if (isComboFlow) {
+            const mergedPackages = new Set<string>();
+            const mergedSkills = new Set<string>();
+            for (const combo of selectedCombos) {
+                if (combo.packages) {
+                    for (const pkg of combo.packages) {
+                        mergedPackages.add(pkg);
+                    }
+                }
+                if (combo.skills) {
+                    for (const skill of combo.skills) {
+                        mergedSkills.add(skill);
+                    }
+                }
             }
-        }
-
-        // Step 3: Prompt Skills selection
-        if (!skip.includes('skills') && (!step || step === 'skills')) {
-            let toolsForSkills = selectedTools;
-            if (toolsForSkills.length === 0) {
-                // Auto-detect configured tools in workspace if no tools selected in this session
-                const tools = getInstallableAgentTools();
-                toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
-            }
-
-            if (toolsForSkills.length === 0 && !step) {
-                deps.stdout('\n── Step 3: Skills (skipped — no tools configured or selected) ──');
-            } else {
-                deps.stdout('\n── Step 3: Skills Selection ──');
-                const result = await executeSkillsStep(deps, projectDir, toolsForSkills);
+            selectedPackageNames = Array.from(mergedPackages);
+            selectedSkillNames = Array.from(mergedSkills);
+        } else {
+            // Step 2: Prompt Packages selection
+            if (!skip.includes('packages') && (!step || step === 'packages')) {
+                deps.stdout('\n── Step 2: Packages Selection ──');
+                const result = await executePackagesStep(deps, projectDir);
                 if (result) {
-                    selectedSkillNames = result.installedSkills;
+                    selectedPackageNames = result.installedPackages;
+                }
+            }
+
+            // Step 3: Prompt Skills selection
+            if (!skip.includes('skills') && (!step || step === 'skills')) {
+                let toolsForSkills = selectedTools;
+                if (toolsForSkills.length === 0) {
+                    // Auto-detect configured tools in workspace if no tools selected in this session
+                    const tools = getInstallableAgentTools();
+                    toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+                }
+
+                if (toolsForSkills.length === 0 && !step) {
+                    deps.stdout('\n── Step 3: Skills (skipped — no tools configured or selected) ──');
+                } else {
+                    deps.stdout('\n── Step 3: Skills Selection ──');
+                    const result = await executeSkillsStep(deps, projectDir, toolsForSkills);
+                    if (result) {
+                        selectedSkillNames = result.installedSkills;
+                    }
                 }
             }
         }
@@ -270,6 +363,10 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         deps.stdout('\n==================================================');
         deps.stdout('          INIT CONFIGURATION SUMMARY');
         deps.stdout('==================================================');
+
+        if (isComboFlow && selectedCombos.length > 0) {
+            deps.stdout(`\nSelected Combos: ${selectedCombos.map((c) => c.name).join(', ')}`);
+        }
 
         if (hasTools) {
             deps.stdout('\nAgent Tools to Configure:');
