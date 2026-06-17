@@ -86,7 +86,7 @@ const isPackageInstalled = async (name: string, scope: 'global' | 'local', proje
     try {
         const args = ['list', name, '--depth=0'];
         if (scope === 'global') args.push('-g');
-        await execFileAsync('npm', args, { cwd: projectDir });
+        await execFileAsync('npm', args, { cwd: projectDir, shell: true });
         return true;
     } catch {
         return false;
@@ -98,7 +98,7 @@ const npmInstall = async (name: string, scope: 'global' | 'local', projectDir: s
     if (scope === 'global') args.push('-g');
 
     try {
-        await execFileAsync('npm', args, { cwd: projectDir, timeout: 120000 });
+        await execFileAsync('npm', args, { cwd: projectDir, timeout: 120000, shell: true });
         return true;
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -341,6 +341,30 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         const step = options.step;
         const comboOption = options.combo;
         const noIgnore = options.noIgnore ?? false;
+
+        const isOpenSpecInstalled =
+            (await isPackageInstalled('@fission-ai/openspec', 'global', projectDir)) ||
+            (await isPackageInstalled('@fission-ai/openspec', 'local', projectDir));
+        if (!isOpenSpecInstalled && !isJson) {
+            if (yes) {
+                deps.stdout('\nOpenSpec CLI (@fission-ai/openspec) is not installed. Installing globally...');
+                await npmInstall('@fission-ai/openspec', 'global', projectDir);
+            } else {
+                const installOpenSpec = await confirm({
+                    message: 'OpenSpec CLI (@fission-ai/openspec) is not installed. Do you want to install it globally?',
+                    default: true,
+                });
+                if (installOpenSpec) {
+                    deps.stdout('\nInstalling OpenSpec CLI globally...');
+                    try {
+                        await npmInstall('@fission-ai/openspec', 'global', projectDir);
+                        deps.stdout('  ✓ OpenSpec CLI installed successfully\n');
+                    } catch (error) {
+                        deps.stdout(`  ✗ Failed to install OpenSpec CLI: ${error instanceof Error ? error.message : String(error)}\n`);
+                    }
+                }
+            }
+        }
 
         let selectedTools: ToolsStepResult['selectedTools'] = [];
         let selectedPackageNames: string[] = [];
@@ -629,7 +653,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 const toolsArg = toolIds || 'none';
                 try {
                     deps.stdout(`  Running: npx openspec init --tools ${toolsArg} --force`);
-                    await execFileAsync('npx', ['openspec', 'init', '--tools', toolsArg, '--force'], { cwd: projectDir });
+                    await execFileAsync('npx', ['openspec', 'init', '--tools', toolsArg, '--force'], { cwd: projectDir, shell: true });
                     deps.stdout('    ✓ OpenSpec CLI initialized successfully');
                 } catch (error) {
                     deps.stdout(`    ✗ OpenSpec CLI initialization failed: ${error instanceof Error ? error.message : String(error)}`);
