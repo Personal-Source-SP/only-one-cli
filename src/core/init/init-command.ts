@@ -3,6 +3,7 @@ import { mkdir, cp, readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { confirm, select } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
@@ -26,7 +27,7 @@ const execFileAsync = promisify(execFile);
 
 // ─── Combo manifests helper ──────────────────────────────────────────
 
-const combosDir = new URL('../../../libraries/combos', import.meta.url).pathname;
+const combosDir = fileURLToPath(new URL('../../../libraries/combos', import.meta.url));
 
 const readComboManifests = async (): Promise<(ComboManifest & { id: string })[]> => {
     if (!existsSync(combosDir)) return [];
@@ -54,9 +55,9 @@ const readComboManifests = async (): Promise<(ComboManifest & { id: string })[]>
 
 // ─── Package manfiest helpers ─────────────────────────────────────────
 
-const packagesDir = new URL('../../../libraries/packages', import.meta.url).pathname;
-const skillsDir = new URL('../../../libraries/skills', import.meta.url).pathname;
-const configsDir = new URL('../../../libraries/configs', import.meta.url).pathname;
+const packagesDir = fileURLToPath(new URL('../../../libraries/packages', import.meta.url));
+const skillsDir = fileURLToPath(new URL('../../../libraries/skills', import.meta.url));
+const configsDir = fileURLToPath(new URL('../../../libraries/configs', import.meta.url));
 
 const readPackageManifests = async (): Promise<PackageManifest[]> => {
     if (!existsSync(packagesDir)) return [];

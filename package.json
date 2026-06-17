@@ -15,13 +15,13 @@
         "dev": "tsx src/index.ts",
         "prepare": "npm run build",
         "test": "npm run format && vitest run",
-        "publish:npm": "npm run format && ./scripts/publish-npm.sh",
-        "publish:local": "npm run format && ./scripts/publish-npm.sh --local",
+        "publish:npm": "npm run format && node scripts/publish.js",
+        "publish:local": "npm run format && node scripts/publish.js --local",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\""
     },
     "dependencies": {
-        "@inquirer/prompts": "^8.4.3",
+        "@inquirer/prompts": "^7.10.1",
         "commander": "^14.0.2",
         "js-yaml": "^4.1.0",
         "lodash": "^4.18.1"
