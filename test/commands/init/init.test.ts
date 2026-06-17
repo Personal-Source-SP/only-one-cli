@@ -185,4 +185,33 @@ describe('init command', () => {
             await rm(cwd, { recursive: true, force: true });
         }
     });
+
+    it('writes default AI ignores and the custom header # AI ignores to .gitignore', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'init-test-default-ignores-'));
+        const writes: string[] = [];
+
+        try {
+            const program = createProgram({
+                cwd,
+                env: {},
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: (line) => writes.push(line),
+            });
+
+            await program.parseAsync(['init', 'skill', cwd, 'grill-me', '--yes'], { from: 'user' });
+
+            const gitignorePath = join(cwd, '.gitignore');
+            const { existsSync } = await import('node:fs');
+            expect(existsSync(gitignorePath)).toBe(true);
+
+            const gitignoreContent = await import('node:fs/promises').then((fs) => fs.readFile(gitignorePath, 'utf-8'));
+            expect(gitignoreContent).toContain('# AI ignores');
+            expect(gitignoreContent).toContain('.agent/');
+            expect(gitignoreContent).toContain('openspec/');
+            expect(gitignoreContent).toContain('adr');
+            expect(gitignoreContent).toContain('openspec');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
 });

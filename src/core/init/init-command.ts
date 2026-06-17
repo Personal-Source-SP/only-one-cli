@@ -735,14 +735,12 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 }
             }
             const uniqueGitignorePaths = Array.from(new Set(gitignorePaths));
-            if (uniqueGitignorePaths.length > 0) {
-                deps.stdout('\nUpdating .gitignore...');
-                try {
-                    await updateGitignore(projectDir, uniqueGitignorePaths);
-                    deps.stdout('  ✓ Updated .gitignore');
-                } catch (error) {
-                    deps.stdout(`  ✗ Failed to update .gitignore: ${error instanceof Error ? error.message : String(error)}`);
-                }
+            deps.stdout('\nUpdating .gitignore...');
+            try {
+                await updateGitignore(projectDir, uniqueGitignorePaths);
+                deps.stdout('  ✓ Updated .gitignore');
+            } catch (error) {
+                deps.stdout(`  ✗ Failed to update .gitignore: ${error instanceof Error ? error.message : String(error)}`);
             }
         }
 
