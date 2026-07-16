@@ -8,7 +8,7 @@ import {
     createUpdateCommand,
     createSettingVsCommand,
 } from '@/commands/index.js';
-import { COLORS } from '@/constants/index.js';
+import { COLORS, VERSION } from '@/constants/index.js';
 import type { ProgramDeps } from './deps.js';
 
 export function createProgram(deps: ProgramDeps) {
@@ -39,7 +39,7 @@ export function createProgram(deps: ProgramDeps) {
     }
 
     program
-        .version('0.0.1', '-v, --version', 'output the current version')
+        .version(VERSION, '-v, --version', 'output the current version')
         .helpOption('-h, --help', 'display help for command')
         .description('🚀 Only-one CLI - Developer environment setups, VS Code configuration syncing, and agent workspaces manager.')
         .addHelpText(
