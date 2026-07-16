@@ -17,6 +17,7 @@ import type { AgentArtifactSummary, StructureGenerateCommandJson, StructureGener
 export function createStructureGenerateCommand(deps: ProgramDeps): Command {
     return new Command('structure-generate')
         .description('Scaffold structural blueprint markdown files and output the only-one-structure-generate playbook.')
+        .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory to scaffold (default: current directory)')
         .option(
             '--output <path>',

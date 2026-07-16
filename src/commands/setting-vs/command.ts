@@ -28,6 +28,7 @@ const selectEditors = async (deps: ProgramDeps, options: SettingVsOptions): Prom
 export const createSettingVsCommand = (deps: ProgramDeps): Command => {
     const cmd = new Command('setting-vs')
         .description('Merge editor configurations (settings.json) from libraries/vs library to local editors.')
+        .helpOption('-h, --help', 'display help for command')
         .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: vscode, cursor, antigravity)')
         .addHelpText(
             'after',

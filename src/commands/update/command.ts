@@ -7,6 +7,7 @@ import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/global
 export function createUpdateCommand(deps: ProgramDeps): Command {
     return new Command('update')
         .description('Refresh installed only-one structural agent skills and workflow templates for configured agent tools.')
+        .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .option('--force', 'Overwrite agent skill and workflow files even if local and remote versions match')
         .addHelpText(

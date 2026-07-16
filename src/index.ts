@@ -25,5 +25,9 @@ if (isCliEntrypoint(import.meta.url) || process.env.ONLY_ONE_CLI_BYPASS_ENTRYPOI
         stderr: (line) => console.error(line),
     });
 
+    if (process.argv.length <= 2) {
+        process.argv.push('--help');
+    }
+
     await program.parseAsync(process.argv);
 }

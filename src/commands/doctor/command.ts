@@ -5,6 +5,7 @@ import { checkGit, checkNode } from '@/core/doctor/checks.js';
 export function createDoctorCommand(deps: ProgramDeps): Command {
     return new Command('doctor')
         .description('Check environment readiness (Git and Node.js) for developer setup.')
+        .helpOption('-h, --help', 'display help for command')
         .addHelpText(
             'after',
             '\nExamples:\n' +

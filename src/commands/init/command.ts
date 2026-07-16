@@ -6,6 +6,7 @@ import type { InitCommandOptions } from './types.js';
 export function createInitCommand(deps: ProgramDeps): Command {
     const cmd = new Command('init')
         .description('Initialize a project directory with development tools, dependency packages, custom skills, and configurations.')
+        .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .option('--yes', 'Automatically confirm existence checks and overwrite prompts')
         .option('--no-ignore', 'Skip updating the project .gitignore file with only-one directories')
@@ -44,6 +45,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
 
     cmd.command('package')
         .description('Install dependency packages only (e.g., helpers, linters, or libraries).')
+        .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of package names to install')
         .option('--yes', 'Automatically confirm prompts')
@@ -70,6 +72,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
 
     cmd.command('skill')
         .description('Synchronize or install custom agent skills only.')
+        .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of specific skill names to sync')
         .option('--yes', 'Automatically confirm prompts')
@@ -96,6 +99,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
 
     cmd.command('configs')
         .description('Copy configuration templates only to the project.')
+        .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of configuration template names to copy')
         .option('--yes', 'Automatically confirm prompts')
@@ -122,6 +126,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
 
     cmd.command('combo')
         .description('Initialize the project using predefined combos (bundled packages & skills).')
+        .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of combo names to apply')
         .option('--yes', 'Automatically confirm prompts')

@@ -21,6 +21,7 @@ const selectEditors = async (deps: ProgramDeps, options: ExtensionsVsOptions): P
 export const createExtensionsVsCommand = (deps: ProgramDeps): Command => {
     const cmd = new Command('extensions-vs')
         .description('Install missing editor extensions from the libraries/vs library for local editors.')
+        .helpOption('-h, --help', 'display help for command')
         .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: vscode, cursor, antigravity)')
         .addHelpText(
             'after',
