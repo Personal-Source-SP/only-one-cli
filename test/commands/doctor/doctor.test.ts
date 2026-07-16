@@ -83,8 +83,8 @@ describe('doctor command', () => {
             expect(writes.join('\n')).toContain('gitnexus');
             expect(writes.join('\n')).toContain('Config (.only-one/.onlyonecli.yml):');
             expect(writes.join('\n')).toContain('Commands:');
-            expect(writes.join('\n')).toContain('only-one index:create');
-            expect(writes.join('\n')).toContain('only-one push-index');
+            expect(writes.join('\n')).toContain('only-one structure-generate');
+            expect(writes.join('\n')).toContain('only-one setting-vs');
         });
     });
 

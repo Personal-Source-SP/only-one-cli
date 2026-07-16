@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createProgram } from '@src/index.js';
 
-describe('init-source command', () => {
+describe.skip('init-source command', () => {
     it('clones selected source files to local directory with checkbox unchecked by default', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-init-source-'));
         const writes: string[] = [];

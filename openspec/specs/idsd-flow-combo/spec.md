@@ -11,5 +11,5 @@ The system SHALL provide a predefined combo configuration named `idsd-flow` cont
 - **WHEN** the list of available combos is loaded
 - **THEN** the `idsd-flow` combo is identified by its ID `idsd-flow`
 - **AND** it is configured with package `@fission-ai/openspec`
-- **AND** it includes skills `architectural-decision-records`, `c4-diagrams`, `gherkin-authoring`, `grill-me`, and `openspec-git-discipline`
+- **AND** it includes skills `architectural-decision-records`, `c4-diagrams`, `gherkin-authoring`, and `grill-me`
 

@@ -366,13 +366,12 @@ describe('doctor checks (existing)', () => {
         it('returns index lifecycle commands when ready', () => {
             const commands = buildSampleCommands('READY');
             expect(commands.map((item) => item.command)).toEqual([
-                'only-one index:create',
-                'only-one push-index',
-                'only-one status --index',
-                'only-one list --versions',
+                'only-one structure-generate',
+                'only-one setting-vs --editors vscode,cursor,antigravity',
+                'only-one extensions-vs --editors vscode,cursor,antigravity',
             ]);
-            expect(commands[0].description).toContain('GitNexus');
-            expect(commands[1].description).toContain('Upload');
+            expect(commands[0].description).toContain('structural blueprint');
+            expect(commands[1].description).toContain('settings');
         });
     });
 

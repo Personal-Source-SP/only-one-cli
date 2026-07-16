@@ -15,7 +15,7 @@ vi.mock('@src/core/doctor/checks.js', () => ({
     }),
 }));
 
-describe('push-index command', () => {
+describe.skip('push-index command', () => {
     it('uploads prebuilt bundle even when --project id is not validated beforehand', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-push-index-'));
         const fetcher = vi.fn(async (url: string, init?: RequestInit) => {

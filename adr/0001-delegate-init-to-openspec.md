@@ -7,7 +7,7 @@
 
 The `only-one init` command previously handled both project configuration (server URL, project name, index mode, git remote, backend sync) and agent tool/skill installation. This duplicated functionality already provided by the `openspec init` command from `@fission-ai/openspec`. Maintaining two parallel implementations for tool selection and skill installation created unnecessary maintenance burden and UX inconsistency.
 
-The `only-one` project maintains custom skills (architectural-decision-records, c4-diagrams, gherkin-authoring, grill-me, openspec-git-discipline) in `.agents/skills/` that are not part of openspec's standard skill set and must still be installed per selected tool.
+The `only-one` project maintains custom skills (architectural-decision-records, c4-diagrams, gherkin-authoring, grill-me) in `.agents/skills/` that are not part of openspec's standard skill set and must still be installed per selected tool.
 
 ## Decision
 

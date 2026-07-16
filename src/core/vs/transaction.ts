@@ -89,7 +89,8 @@ export class VsSyncTransaction {
         }
         for (const extension of [...this.journal.extensions].reverse()) {
             this.progress.rollback(extension.extensionId);
-            await this.runner.run(extension.command, ['--uninstall-extension', extension.extensionId]);
+            const result = await this.runner.run(extension.command, ['--uninstall-extension', extension.extensionId]);
+            if (result.code !== 0) throw new Error(result.stderr || `Failed to uninstall ${extension.extensionId}`);
         }
         await this.fs.rm(this.journalPath);
         for (const file of this.journal.files) await this.fs.rm(file.backupPath);

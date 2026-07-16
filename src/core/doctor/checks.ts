@@ -539,20 +539,16 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
 
     return [
         {
-            command: 'only-one index:create',
-            description: 'Build GitNexus + CocoIndex under .only-one/ (manifest.json included)',
+            command: 'only-one structure-generate',
+            description: 'Generate structural blueprint and supported agent workflow artifacts',
         },
         {
-            command: 'only-one push-index',
-            description: 'Upload prebuilt bundle from .only-one/ to backend',
+            command: 'only-one setting-vs --editors vscode,cursor,antigravity',
+            description: 'Merge shared editor settings from libraries/vs',
         },
         {
-            command: 'only-one status --index',
-            description: 'Compare local index vs remote (commit, tool versions)',
-        },
-        {
-            command: 'only-one list --versions',
-            description: 'List index versions stored on the backend',
+            command: 'only-one extensions-vs --editors vscode,cursor,antigravity',
+            description: 'Install missing editor extensions from libraries/vs',
         },
     ];
 }

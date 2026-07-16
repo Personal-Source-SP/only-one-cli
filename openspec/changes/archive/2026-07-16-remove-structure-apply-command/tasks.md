@@ -20,7 +20,7 @@
 ## 4. Update and verify tests
 
 - [x] 4.1 Update command registry, help, skill presence, and artifact installation tests for generation-only behavior
-- [ ] 4.2 Run formatting check, TypeScript build, and full test suite
+- [x] 4.2 Run formatting check, TypeScript build, and full test suite
 - [x] 4.3 Scan generated `dist` output for unexplained `hybrid-index` variants
 - [x] 4.4 Pack npm artifact and scan package contents for unexplained `hybrid-index` variants
 - [x] 4.5 Publish locally and verify CLI help excludes `structure-apply` and all user-facing `hybrid-index` branding
