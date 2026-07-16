@@ -14,27 +14,32 @@ import { readBlueprintStatus } from '@/core/structure/status.js';
 import { getStructurePlaybookSteps, STRUCTURE_BLUEPRINT_NAMING_HINT, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
 import type { AgentArtifactSummary, StructureGenerateCommandJson, StructureGenerateCommandOptions } from './types.js';
 
-const STRUCTURE_GENERATE_DESCRIPTION =
-    'Scaffold structural blueprint output and print the only-one-structure-generate agent playbook.\n\n' +
-    'Installs agent skills when missing (same flow as init). Use --no-install-skill to scaffold only.\n\n' +
-    'Examples:\n' +
-    '  only-one structure-generate\n' +
-    '  only-one structure-generate --json\n' +
-    '  only-one structure-generate --tools cursor,windsurf\n' +
-    '  only-one structure-generate --no-install-skill\n';
-
 export function createStructureGenerateCommand(deps: ProgramDeps): Command {
     return new Command('structure-generate')
-        .description(STRUCTURE_GENERATE_DESCRIPTION)
-        .argument('[path]', 'Project directory (default: current directory)')
+        .description('Scaffold structural blueprint markdown files and output the only-one-structure-generate playbook.')
+        .argument('[path]', 'Target project directory to scaffold (default: current directory)')
         .option(
             '--output <path>',
-            `Blueprint file (.md) or index output directory (default: .only-one/${STRUCTURALS_DIR}/{org}-{project}-structural.md)`,
+            `Override output blueprint file path (.md) or directory (default: .only-one/${STRUCTURALS_DIR}/{org}-{project}-structural.md)`,
         )
-        .option('--no-install-skill', 'Skip skill check and install; scaffold only')
-        .option('--tools <tools>', 'Install skills: all (30 agents), none, or comma-separated ids (same as init)')
-        .option('--force', 'Overwrite existing structural skill/command files when installing')
-        .option('--status', 'Report blueprint file status only')
+        .option('--no-install-skill', 'Skip checking and downloading structural skills; generate structure scaffolding only')
+        .option(
+            '--tools <tools>',
+            'Install skills for specific agent tools (choices: all, none, or comma-separated editor ids like cursor,windsurf)',
+        )
+        .option('--force', 'Force overwrite of existing structural skills and workspace configurations')
+        .option('--status', 'Report existence and path details of the current structural blueprint only')
+        .addHelpText(
+            'after',
+            '\nExamples:\n' +
+                '  $ only-one structure-generate\n' +
+                '  $ only-one structure-generate --tools cursor,windsurf\n' +
+                '  $ only-one structure-generate --output ./custom-blueprint.md\n' +
+                '  $ only-one structure-generate --status\n\n' +
+                'Notes:\n' +
+                '  - Unless --no-install-skill is set, this command will automatically download and set up structural agent skills.\n' +
+                '  - If the organization name is not configured, a default "default" organization value is fallback.',
+        )
         .action(async (path: string | undefined, options: StructureGenerateCommandOptions, command) => {
             const projectDir = resolveProjectDir(deps, path);
             assertProjectDirectory(projectDir);

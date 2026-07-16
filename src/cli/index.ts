@@ -14,9 +14,15 @@ export function createProgram(deps: ProgramDeps) {
 
     program
         .version('0.0.1')
-        .option('--server <url>', 'Backend server URL')
-        .option('--project <id>', 'Project or GitNexus repo id')
-        .option('--json', 'Print JSON output');
+        .description('Only-one CLI - Developer environment setups, VS Code configuration syncing, and agent workspaces manager.')
+        .addHelpText(
+            'after',
+            '\nExamples:\n' +
+                '  $ only-one doctor\n' +
+                '  $ only-one init --step skills --yes\n\n' +
+                'Notes:\n' +
+                '  - Run "only-one <command> --help" for detailed option descriptions on each command.',
+        );
 
     /* ═══════════════════════════════════════════════════════════════════
      * SETUP & AGENTS — project config and Cursor workflow artifacts

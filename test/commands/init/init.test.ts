@@ -63,26 +63,6 @@ describe('init command', () => {
         }
     });
 
-    it('outputs JSON when --json is passed to parent', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'init-test-json-'));
-        const writes: string[] = [];
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
-                stdout: (line) => writes.push(line),
-            });
-
-            await program.parseAsync(['--json', 'init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
-
-            expect(JSON.parse(writes.join('\n'))).toEqual({});
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
     it('accepts path argument', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'init-test-path-'));
         const writes: string[] = [];

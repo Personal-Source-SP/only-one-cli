@@ -20,8 +20,17 @@ const selectEditors = async (deps: ProgramDeps, options: ExtensionsVsOptions): P
 
 export const createExtensionsVsCommand = (deps: ProgramDeps): Command => {
     const cmd = new Command('extensions-vs')
-        .description('Install missing VS Code/Cursor/Antigravity extensions from libraries/vs')
-        .option('--editors <ids>', 'Comma-separated editor ids: vscode,cursor,antigravity');
+        .description('Install missing editor extensions from the libraries/vs library for local editors.')
+        .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: vscode, cursor, antigravity)')
+        .addHelpText(
+            'after',
+            '\nExamples:\n' +
+                '  $ only-one extensions-vs\n' +
+                '  $ only-one extensions-vs --editors cursor\n\n' +
+                'Notes:\n' +
+                '  - If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).\n' +
+                '  - Requires the corresponding editor CLI tool (e.g. `code` or `cursor`) to be installed and available in the system PATH.',
+        );
 
     cmd.action(async (options: ExtensionsVsOptions) => {
         const editorIds = await selectEditors(deps, options);

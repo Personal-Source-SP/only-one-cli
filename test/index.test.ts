@@ -203,26 +203,6 @@ describe('only-one CLI', () => {
         }
     });
 
-    it('prints init output as JSON when requested', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
-        const writes: string[] = [];
-
-        try {
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: mockInitFetcher,
-                stdout: (line) => writes.push(line),
-            });
-
-            await program.parseAsync(['--json', 'init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
-
-            expect(JSON.parse(writes.join('\n'))).toEqual({});
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
     it('runs specific step with --step', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-cli-init-'));
         const writes: string[] = [];

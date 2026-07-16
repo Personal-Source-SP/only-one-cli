@@ -42,35 +42,6 @@ describe('installAgentArtifacts', () => {
 });
 
 describe('structure command', () => {
-    it('prints JSON playbook without OpenSpec fields', async () => {
-        const cwd = await mkdtemp(join(tmpdir(), 'hybrid-structural-json-'));
-        const lines: string[] = [];
-
-        try {
-            await writeProjectConfig(cwd, 'organization: acme\nproject: payments-api\n');
-
-            const program = createProgram({
-                cwd,
-                env: {},
-                fetcher: vi.fn(),
-                stdout: (line) => lines.push(line),
-            });
-
-            await program.parseAsync(['--json', 'structure-generate', '--no-install-skill'], { from: 'user' });
-
-            const payload = JSON.parse(lines.join('\n'));
-            expect(payload.projectDir).toBe(cwd);
-            expect(payload.agentArtifacts).toEqual([]);
-            expect(payload.relativeBlueprintPath).toBe('.only-one/structure/acme-payments-api-structural.md');
-            expect(payload.blueprintFile).toBe('acme-payments-api-structural.md');
-            expect(payload.relativeOutputDir).toBe('.only-one/structure');
-            expect(payload.steps?.length).toBeGreaterThan(0);
-            expect(JSON.stringify(payload)).not.toMatch(/openspec/i);
-        } finally {
-            await rm(cwd, { recursive: true, force: true });
-        }
-    });
-
     it('scaffolds structure directory', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'hybrid-structural-scaffold-'));
 

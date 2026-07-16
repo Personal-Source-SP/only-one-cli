@@ -27,8 +27,17 @@ const selectEditors = async (deps: ProgramDeps, options: SettingVsOptions): Prom
 
 export const createSettingVsCommand = (deps: ProgramDeps): Command => {
     const cmd = new Command('setting-vs')
-        .description('Merge VS Code/Cursor/Antigravity settings.json from libraries/vs')
-        .option('--editors <ids>', 'Comma-separated editor ids: vscode,cursor,antigravity');
+        .description('Merge editor configurations (settings.json) from libraries/vs library to local editors.')
+        .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: vscode, cursor, antigravity)')
+        .addHelpText(
+            'after',
+            '\nExamples:\n' +
+                '  $ only-one setting-vs\n' +
+                '  $ only-one setting-vs --editors vscode,cursor\n\n' +
+                'Notes:\n' +
+                '  - If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).\n' +
+                '  - Modifies the global user settings.json of the selected editor applications on your OS.',
+        );
 
     cmd.action(async (options: SettingVsOptions) => {
         const editorIds = await selectEditors(deps, options);

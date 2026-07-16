@@ -6,9 +6,18 @@ import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/global
 
 export function createUpdateCommand(deps: ProgramDeps): Command {
     return new Command('update')
-        .description('Refresh installed only-one structural agent skills for configured agent_tools')
-        .option('--force', 'Overwrite agent workflow files even when versions match')
-        .argument('[path]', 'Project directory (default: current directory)')
+        .description('Refresh installed only-one structural agent skills and workflow templates for configured agent tools.')
+        .argument('[path]', 'Target project directory path (default: current directory)')
+        .option('--force', 'Overwrite agent skill and workflow files even if local and remote versions match')
+        .addHelpText(
+            'after',
+            '\nExamples:\n' +
+                '  $ only-one update\n' +
+                '  $ only-one update /path/to/project --force\n\n' +
+                'Notes:\n' +
+                '  - Looks up installed agent tools in the project configurations and pulls the latest definitions from the source registry.\n' +
+                '  - Useful when updating CLI versions or retrieving upstream template improvements.',
+        )
         .action(async (path: string | undefined, options: { force?: boolean }, command) => {
             const projectDir = resolveProjectDir(deps, path);
             assertProjectDirectory(projectDir);
