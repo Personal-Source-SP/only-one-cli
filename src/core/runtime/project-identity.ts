@@ -1,4 +1,4 @@
-import type { HybridIndexConfig } from '@/core/config/index.js';
+import type { OnlyOneConfig } from '@/core/config/index.js';
 import { persistConfigProjectId } from '@/core/config/index.js';
 import type { HybridApiClient } from '@/core/client/index.js';
 import type { BackendProject, CreateProjectInput } from '@/core/client/types.js';
@@ -12,7 +12,7 @@ export interface FindProjectByIdentityRequest {
 
 export interface ResolveBackendProjectIdRequest {
     client: HybridApiClient;
-    config: HybridIndexConfig;
+    config: OnlyOneConfig;
     cwd?: string;
     override?: string;
     persistLookup?: boolean;

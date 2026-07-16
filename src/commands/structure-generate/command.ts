@@ -15,13 +15,13 @@ import { getStructurePlaybookSteps, STRUCTURE_BLUEPRINT_NAMING_HINT, STRUCTURE_S
 import type { AgentArtifactSummary, StructureGenerateCommandJson, StructureGenerateCommandOptions } from './types.js';
 
 const STRUCTURE_GENERATE_DESCRIPTION =
-    'Scaffold structural blueprint output and print the hybrid-index-structure-generate agent playbook.\n\n' +
+    'Scaffold structural blueprint output and print the only-one-structure-generate agent playbook.\n\n' +
     'Installs agent skills when missing (same flow as init). Use --no-install-skill to scaffold only.\n\n' +
     'Examples:\n' +
-    '  hybrid-index structure-generate\n' +
-    '  hybrid-index structure-generate --json\n' +
-    '  hybrid-index structure-generate --tools cursor,windsurf\n' +
-    '  hybrid-index structure-generate --no-install-skill\n';
+    '  only-one structure-generate\n' +
+    '  only-one structure-generate --json\n' +
+    '  only-one structure-generate --tools cursor,windsurf\n' +
+    '  only-one structure-generate --no-install-skill\n';
 
 export function createStructureGenerateCommand(deps: ProgramDeps): Command {
     return new Command('structure-generate')

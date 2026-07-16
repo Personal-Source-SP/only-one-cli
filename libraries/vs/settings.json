@@ -1,0 +1,101 @@
+{
+  "workbench.iconTheme": "material-icon-theme",
+  "editor.fontFamily": "'Fira Code'",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "workbench.colorTheme": "Dracula Theme",
+  "explorer.compactFolders": false,
+  "gitlens.views.scm.grouped.views": {
+    "commits": true,
+    "branches": true,
+    "remotes": true,
+    "stashes": false,
+    "tags": true,
+    "worktrees": true,
+    "contributors": true,
+    "repositories": false,
+    "searchAndCompare": false,
+    "launchpad": false
+  },
+  "extensions.ignoreRecommendations": true,
+  "diffEditor.ignoreTrimWhitespace": true,
+  "workbench.settings.applyToAllProfiles": [],
+  "workbench.activityBar.iconClickBehavior": "toggle",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "jest.enable": false,
+  "cSpell.userWords": [
+    "automapper",
+    "dtos",
+    "ILIKE",
+    "maplibregl",
+    "Popconfirm",
+    "Redlock",
+    "refinedev",
+    "Serper",
+    "Sider",
+    "zalo"
+  ],
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "git.confirmSync": false,
+  "cSpell.enabled": true,
+  "cSpell.language": "en,vi",
+  "terminal.integrated.profiles.osx": {
+    "bash": {
+      "path": "bash",
+      "args": ["-l"],
+      "icon": "terminal-bash"
+    },
+    "zsh": {
+      "path": "zsh",
+      "args": ["-l"]
+    },
+    "fish": {
+      "path": "fish",
+      "args": ["-l"]
+    },
+    "tmux": {
+      "path": "tmux",
+      "icon": "terminal-tmux"
+    },
+    "pwsh": {
+      "path": "pwsh",
+      "icon": "terminal-powershell"
+    },
+    "csh": {
+      "path": "/bin/csh"
+    }
+  },
+  "editor.formatOnSave": true,
+  "workbench.editor.showTabs": "multiple",
+  "workbench.editor.tabSizing": "shrink",
+  "window.autoDetectColorScheme": false,
+  "workbench.sideBar.location": "right",
+  "workbench.editorAssociations": {},
+  "python.languageServer": "None",
+  "cursorpyright.disableLanguageServices": true,
+  "files.associations": {
+    ".md": "markdown-preview-enhanced"
+  },
+  "explorer.confirmDelete": false
+}

@@ -1,10 +1,11 @@
 import { Command } from 'commander';
 import {
     createDoctorCommand,
+    createExtensionsVsCommand,
     createInitCommand,
     createStructureGenerateCommand,
-    createStructureApplyCommand,
     createUpdateCommand,
+    createSettingVsCommand,
 } from '@/commands/index.js';
 import type { ProgramDeps } from './deps.js';
 
@@ -22,11 +23,12 @@ export function createProgram(deps: ProgramDeps) {
      * ═══════════════════════════════════════════════════════════════════ */
     program.addCommand(createInitCommand(deps));
     program.addCommand(createStructureGenerateCommand(deps));
-    program.addCommand(createStructureApplyCommand(deps));
 
     program.addCommand(createUpdateCommand(deps));
 
     program.addCommand(createDoctorCommand(deps));
+    program.addCommand(createSettingVsCommand(deps));
+    program.addCommand(createExtensionsVsCommand(deps));
 
     return program;
 }

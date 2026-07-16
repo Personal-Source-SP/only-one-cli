@@ -9,12 +9,6 @@ import {
     STRUCTURE_COMMAND_ID,
     STRUCTURE_SKILL_NAME,
 } from '@/core/templates/structure.js';
-import {
-    buildStructureApplyCommandContent,
-    buildStructureApplySkillMarkdown,
-    STRUCTURE_APPLY_COMMAND_ID,
-    STRUCTURE_APPLY_SKILL_NAME,
-} from '@/core/templates/structure-apply.js';
 import { getAgentToolById } from './tools.js';
 import { normalizeStructureCommandPath, resolveStructureSkillPath } from './command-path.js';
 
@@ -70,16 +64,8 @@ const installForTool = async (
         throw new Error(`Unknown or non-installable tool '${toolId}'`);
     }
 
-    let skillContent = '';
-    let commandContent: import('../command-generation/types.js').CommandContent | null = null;
-
-    if (skillName === STRUCTURE_APPLY_SKILL_NAME) {
-        skillContent = buildStructureApplySkillMarkdown(cliVersion);
-        commandContent = buildStructureApplyCommandContent();
-    } else {
-        skillContent = buildStructureSkillMarkdown(cliVersion);
-        commandContent = buildStructureCommandContent();
-    }
+    const skillContent = buildStructureSkillMarkdown(cliVersion);
+    const commandContent = buildStructureCommandContent();
 
     const skillPath = resolveStructureSkillPath(projectDir, toolId, skillName);
     const skill = await writeTextFile(skillPath, skillContent, force);
@@ -113,11 +99,6 @@ export const installAgentArtifacts = async (
 
     for (const toolId of options.tools) {
         tools.push(await installForTool(projectDir, toolId, options.cliVersion, force, skillName, commandId));
-        if (skillName === STRUCTURE_SKILL_NAME) {
-            tools.push(
-                await installForTool(projectDir, toolId, options.cliVersion, force, STRUCTURE_APPLY_SKILL_NAME, STRUCTURE_APPLY_COMMAND_ID),
-            );
-        }
     }
 
     return { tools };

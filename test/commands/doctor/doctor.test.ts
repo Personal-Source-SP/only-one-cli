@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
+import { ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
 
 vi.mock('node:child_process', async (importOriginal) => {
     const actual = await importOriginal<typeof import('node:child_process')>();
@@ -25,8 +25,8 @@ function isCocoindexDockerVerify(args?: readonly string[]): boolean {
 
 async function withProjectConfig(configYaml: string, run: (cwd: string) => Promise<void>): Promise<void> {
     const cwd = await mkdtemp(join(tmpdir(), 'hybrid-doctor-'));
-    await mkdir(join(cwd, HYBRID_INDEX_DIR), { recursive: true });
-    await writeFile(join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE), configYaml);
+    await mkdir(join(cwd, ONLY_ONE_DIR), { recursive: true });
+    await writeFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), configYaml);
     try {
         await run(cwd);
     } finally {

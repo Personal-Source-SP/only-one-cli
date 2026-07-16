@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { HYBRID_INDEX_CONFIG_FILE, HYBRID_INDEX_DIR } from '@src/core/prebuilt/index-output.js';
+import { ONLY_ONE_CONFIG_FILE, ONLY_ONE_DIR } from '@src/core/prebuilt/index-output.js';
 import { createProgram } from '@src/index.js';
 
 vi.mock('@src/core/doctor/checks.js', () => ({
@@ -26,17 +26,13 @@ describe('push-index command', () => {
         });
 
         try {
-            await mkdir(join(cwd, HYBRID_INDEX_DIR), { recursive: true });
-            await writeFile(
-                join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
-                ['server: http://api', 'index_mode: local'].join('\n'),
-                'utf-8',
-            );
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.gitnexus'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.cocoindex'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, 'manifest.json'), '{}', 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), ['server: http://api', 'index_mode: local'].join('\n'), 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.gitnexus'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.cocoindex'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
+            await writeFile(join(cwd, ONLY_ONE_DIR, 'manifest.json'), '{}', 'utf-8');
 
             const program = createProgram({ cwd, env: {}, fetcher, stdout: () => {} });
 
@@ -62,17 +58,17 @@ describe('push-index command', () => {
         });
 
         try {
-            await mkdir(join(cwd, HYBRID_INDEX_DIR), { recursive: true });
+            await mkdir(join(cwd, ONLY_ONE_DIR), { recursive: true });
             await writeFile(
-                join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
+                join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE),
                 ['server: http://api', 'project: orien-trade-be', 'index_mode: local'].join('\n'),
                 'utf-8',
             );
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.gitnexus'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.cocoindex'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, 'manifest.json'), '{}', 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.gitnexus'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.cocoindex'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
+            await writeFile(join(cwd, ONLY_ONE_DIR, 'manifest.json'), '{}', 'utf-8');
 
             const program = createProgram({
                 cwd,
@@ -104,17 +100,17 @@ describe('push-index command', () => {
         });
 
         try {
-            await mkdir(join(cwd, HYBRID_INDEX_DIR), { recursive: true });
+            await mkdir(join(cwd, ONLY_ONE_DIR), { recursive: true });
             await writeFile(
-                join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
+                join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE),
                 ['server: http://api', 'project: orien-trade-be', 'index_mode: local'].join('\n'),
                 'utf-8',
             );
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.gitnexus'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.cocoindex'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, 'manifest.json'), '{}', 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.gitnexus'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.cocoindex'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
+            await writeFile(join(cwd, ONLY_ONE_DIR, 'manifest.json'), '{}', 'utf-8');
 
             const program = createProgram({
                 cwd,
@@ -129,7 +125,7 @@ describe('push-index command', () => {
 
             expect(writes.some((line) => line.includes('Upload complete'))).toBe(true);
             expect(fetcher).toHaveBeenCalledWith('http://api/api/v1/projects/prebuilt', expect.objectContaining({ method: 'POST' }));
-            const config = await readFile(join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE), 'utf-8');
+            const config = await readFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), 'utf-8');
             expect(config).toContain('project_id: proj-new-1');
             expect(writes.some((line) => line.includes('Saved project_id'))).toBe(true);
         } finally {
@@ -156,18 +152,14 @@ describe('push-index command', () => {
         });
 
         try {
-            await mkdir(join(cwd, HYBRID_INDEX_DIR), { recursive: true });
+            await mkdir(join(cwd, ONLY_ONE_DIR), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), ['server: http://api', 'index_mode: local'].join('\n'), 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.gitnexus'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.cocoindex'), { recursive: true });
+            await writeFile(join(cwd, ONLY_ONE_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
             await writeFile(
-                join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
-                ['server: http://api', 'index_mode: local'].join('\n'),
-                'utf-8',
-            );
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.gitnexus'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.cocoindex'), { recursive: true });
-            await writeFile(join(cwd, HYBRID_INDEX_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
-            await writeFile(
-                join(cwd, HYBRID_INDEX_DIR, 'manifest.json'),
+                join(cwd, ONLY_ONE_DIR, 'manifest.json'),
                 JSON.stringify({
                     schemaVersion: '1.0',
                     projectName: 'demo',
@@ -190,12 +182,12 @@ describe('push-index command', () => {
 
             await program.parseAsync(['--server', 'http://api', 'push-index', '--skip-gitnexus', '--skip-cocoindex'], { from: 'user' });
 
-            const manifest = JSON.parse(await readFile(join(cwd, HYBRID_INDEX_DIR, 'manifest.json'), 'utf-8')) as {
+            const manifest = JSON.parse(await readFile(join(cwd, ONLY_ONE_DIR, 'manifest.json'), 'utf-8')) as {
                 indexVersionId?: string;
             };
             expect(manifest.indexVersionId).toBe('idx-upload-42');
             expect(writes.some((line) => line.includes('Saved indexVersionId'))).toBe(true);
-            const config = await readFile(join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE), 'utf-8');
+            const config = await readFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), 'utf-8');
             expect(config).toContain('project_id: proj-new-1');
             expect(writes.some((line) => line.includes('Saved project_id'))).toBe(true);
         } finally {
@@ -213,13 +205,13 @@ describe('push-index command', () => {
         });
 
         try {
-            await mkdir(join(repo, HYBRID_INDEX_DIR, '.gitnexus'), { recursive: true });
-            await writeFile(join(repo, HYBRID_INDEX_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
-            await mkdir(join(repo, HYBRID_INDEX_DIR, '.cocoindex'), { recursive: true });
-            await writeFile(join(repo, HYBRID_INDEX_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
-            await writeFile(join(repo, HYBRID_INDEX_DIR, 'manifest.json'), '{}', 'utf-8');
+            await mkdir(join(repo, ONLY_ONE_DIR, '.gitnexus'), { recursive: true });
+            await writeFile(join(repo, ONLY_ONE_DIR, '.gitnexus', 'graph.json'), '{}', 'utf-8');
+            await mkdir(join(repo, ONLY_ONE_DIR, '.cocoindex'), { recursive: true });
+            await writeFile(join(repo, ONLY_ONE_DIR, '.cocoindex', 'index.bin'), 'x', 'utf-8');
+            await writeFile(join(repo, ONLY_ONE_DIR, 'manifest.json'), '{}', 'utf-8');
             await writeFile(
-                join(repo, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
+                join(repo, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE),
                 ['server: http://api', 'project: backend-proj-99', 'index_mode: local'].join('\n'),
                 'utf-8',
             );
@@ -237,7 +229,7 @@ describe('push-index command', () => {
             );
 
             expect(fetcher).toHaveBeenCalledWith('http://api/api/v1/projects/prebuilt', expect.objectContaining({ method: 'POST' }));
-            expect(writes.some((line) => line.includes('.only-one/.hybridindex.yml'))).toBe(true);
+            expect(writes.some((line) => line.includes('.only-one/.onlyonecli.yml'))).toBe(true);
         } finally {
             await rm(root, { recursive: true, force: true });
         }

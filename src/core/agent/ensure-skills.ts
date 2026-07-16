@@ -6,7 +6,6 @@ import { isPromptInteractive } from './interactive.js';
 import { resolveToolsArg, ResolveToolsArgError } from './resolve-tools.js';
 import { getToolsWithSkillsDir } from './tools.js';
 import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
-import { STRUCTURE_APPLY_COMMAND_ID, STRUCTURE_APPLY_SKILL_NAME } from '@/core/templates/structure-apply.js';
 
 export type EnsureStructureAgentSkillsRequest = {
     force?: boolean;
@@ -32,29 +31,9 @@ export const ensureStructureAgentSkills = async (
         return { agentTools: [], ok: true, setupRan: false };
     }
 
-    const checkHasSkills = (tools: string[]): boolean => {
-        if (skillName === STRUCTURE_SKILL_NAME) {
-            return (
-                hasStructureAgentSkills(request.projectDir, tools, STRUCTURE_SKILL_NAME, STRUCTURE_COMMAND_ID) &&
-                hasStructureAgentSkills(request.projectDir, tools, STRUCTURE_APPLY_SKILL_NAME, STRUCTURE_APPLY_COMMAND_ID)
-            );
-        }
-        return hasStructureAgentSkills(request.projectDir, tools, skillName, commandId);
-    };
+    const checkHasSkills = (tools: string[]): boolean => hasStructureAgentSkills(request.projectDir, tools, skillName, commandId);
 
-    const getMissingTools = (tools: string[]): string[] => {
-        if (skillName === STRUCTURE_SKILL_NAME) {
-            const missingGenerate = getMissingStructureTools(request.projectDir, tools, STRUCTURE_SKILL_NAME, STRUCTURE_COMMAND_ID);
-            const missingApply = getMissingStructureTools(
-                request.projectDir,
-                tools,
-                STRUCTURE_APPLY_SKILL_NAME,
-                STRUCTURE_APPLY_COMMAND_ID,
-            );
-            return Array.from(new Set([...missingGenerate, ...missingApply]));
-        }
-        return getMissingStructureTools(request.projectDir, tools, skillName, commandId);
-    };
+    const getMissingTools = (tools: string[]): string[] => getMissingStructureTools(request.projectDir, tools, skillName, commandId);
 
     if (request.toolsArg !== undefined) {
         try {
@@ -84,15 +63,7 @@ export const ensureStructureAgentSkills = async (
     if (!missing.length) {
         const activeTools = configured.length
             ? configured
-            : checkTools.filter((toolId) => {
-                  if (skillName === STRUCTURE_SKILL_NAME) {
-                      return (
-                          hasStructureSkillForTool(request.projectDir, toolId, STRUCTURE_SKILL_NAME, STRUCTURE_COMMAND_ID) &&
-                          hasStructureSkillForTool(request.projectDir, toolId, STRUCTURE_APPLY_SKILL_NAME, STRUCTURE_APPLY_COMMAND_ID)
-                      );
-                  }
-                  return hasStructureSkillForTool(request.projectDir, toolId, skillName, commandId);
-              });
+            : checkTools.filter((toolId) => hasStructureSkillForTool(request.projectDir, toolId, skillName, commandId));
         return { agentTools: activeTools, ok: true, setupRan: false };
     }
 

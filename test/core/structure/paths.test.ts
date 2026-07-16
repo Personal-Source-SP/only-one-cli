@@ -10,7 +10,7 @@ import {
     sanitizeStructureSegment,
     StructurePathResolutionError,
 } from '@src/core/structure/paths.js';
-import { HYBRID_INDEX_DIR } from '@src/core/prebuilt/index-output.js';
+import { ONLY_ONE_DIR } from '@src/core/prebuilt/index-output.js';
 
 describe('structure paths', () => {
     it('sanitizes filename segments', () => {
@@ -35,7 +35,7 @@ describe('structure paths', () => {
             project: 'payments-api',
         });
 
-        expect(path).toBe(join(projectDir, HYBRID_INDEX_DIR, 'structure', 'acme-payments-api-structural.md'));
+        expect(path).toBe(join(projectDir, ONLY_ONE_DIR, 'structure', 'acme-payments-api-structural.md'));
     });
 
     it('uses default organization segment when missing', () => {

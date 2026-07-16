@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { HYBRID_INDEX_CONFIG_FILE, HYBRID_INDEX_DIR } from '@src/core/prebuilt/index-output.js';
+import { ONLY_ONE_CONFIG_FILE, ONLY_ONE_DIR } from '@src/core/prebuilt/index-output.js';
 import { createProgram } from '@src/index.js';
 import { assertIndexingReadiness } from '@src/core/doctor/checks.js';
 
@@ -29,9 +29,9 @@ describe('index:create command', () => {
         const writes: string[] = [];
 
         try {
-            await mkdir(join(repo, HYBRID_INDEX_DIR), { recursive: true });
+            await mkdir(join(repo, ONLY_ONE_DIR), { recursive: true });
             await writeFile(
-                join(repo, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
+                join(repo, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE),
                 ['server: http://api', 'project: backend-proj-99', 'index_mode: local'].join('\n'),
                 'utf-8',
             );
@@ -48,14 +48,12 @@ describe('index:create command', () => {
             });
 
             expect(assertIndexingReadiness).toHaveBeenCalledWith(repo, undefined);
-            expect(writes.some((line) => line.includes(join('orien-trade-backend', HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE)))).toBe(
-                true,
-            );
+            expect(writes.some((line) => line.includes(join('orien-trade-backend', ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE)))).toBe(true);
 
             const { runGitnexus, runCocoindex, createManifest } = await import('@src/core/prebuilt/indexers.js');
             expect(runGitnexus).not.toHaveBeenCalled();
             expect(runCocoindex).not.toHaveBeenCalled();
-            expect(createManifest).toHaveBeenCalledWith(repo, join(repo, HYBRID_INDEX_DIR), 'orien-trade-backend', undefined);
+            expect(createManifest).toHaveBeenCalledWith(repo, join(repo, ONLY_ONE_DIR), 'orien-trade-backend', undefined);
         } finally {
             await rm(root, { recursive: true, force: true });
         }
@@ -66,10 +64,10 @@ describe('index:create command', () => {
         const repo = join(root, 'demo-repo');
 
         try {
-            await mkdir(join(repo, HYBRID_INDEX_DIR, '.gitnexus'), { recursive: true });
-            await mkdir(join(repo, HYBRID_INDEX_DIR, '.cocoindex'), { recursive: true });
+            await mkdir(join(repo, ONLY_ONE_DIR, '.gitnexus'), { recursive: true });
+            await mkdir(join(repo, ONLY_ONE_DIR, '.cocoindex'), { recursive: true });
             await writeFile(
-                join(repo, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
+                join(repo, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE),
                 ['server: http://api', 'index_mode: local'].join('\n'),
                 'utf-8',
             );

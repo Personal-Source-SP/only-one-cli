@@ -3,19 +3,19 @@ import { mkdir, rename, rm, readFile, appendFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 /** Default directory for project config and pre-index artifacts (under the project root). */
-export const HYBRID_INDEX_DIR = '.only-one';
+export const ONLY_ONE_DIR = '.only-one';
 
-export const HYBRID_INDEX_CONFIG_FILE = '.onlyonecli.yml';
+export const ONLY_ONE_CONFIG_FILE = '.onlyonecli.yml';
 
 export function resolveIndexOutputDir(projectDir: string, output?: string): string {
     if (output) {
         return resolve(projectDir, output);
     }
-    return join(projectDir, HYBRID_INDEX_DIR);
+    return join(projectDir, ONLY_ONE_DIR);
 }
 
 export function resolveLocalConfigPath(projectDir: string, output?: string): string {
-    return join(resolveIndexOutputDir(projectDir, output), HYBRID_INDEX_CONFIG_FILE);
+    return join(resolveIndexOutputDir(projectDir, output), ONLY_ONE_CONFIG_FILE);
 }
 
 /** Prefer `.only-one/.onlyonecli.yml`, fall back to legacy project-root config. */
@@ -24,7 +24,7 @@ export function resolveLocalConfigPathForProject(projectDir: string, output?: st
     if (existsSync(preferred)) {
         return preferred;
     }
-    const legacy = join(projectDir, HYBRID_INDEX_CONFIG_FILE);
+    const legacy = join(projectDir, ONLY_ONE_CONFIG_FILE);
     if (existsSync(legacy)) {
         return legacy;
     }

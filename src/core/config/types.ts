@@ -23,7 +23,7 @@ export interface SearchConfig {
     top_k?: number;
 }
 
-export interface HybridIndexConfig {
+export interface OnlyOneConfig {
     agent_tools?: string[];
     server?: string;
     project?: string;

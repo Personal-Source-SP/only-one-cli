@@ -4,7 +4,7 @@ import type { ToolCommandAdapter } from '@/core/command-generation/types.js';
 import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
 import { getAgentToolById } from './tools.js';
 
-/** Map OpenSpec opsx-oriented paths to only-one structure-generate and structure-apply command paths. */
+/** Map OpenSpec opsx-oriented paths to only-one structure-generate command paths. */
 export const normalizeStructureCommandPath = (filePath: string, commandId: string): string =>
     filePath.replace(/\/opsx\//g, '/').replace(new RegExp(`opsx-${commandId}`, 'g'), commandId);
 

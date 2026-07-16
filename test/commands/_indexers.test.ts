@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { HYBRID_INDEX_CONFIG_FILE, HYBRID_INDEX_DIR } from '@src/core/prebuilt/index-output.js';
+import { ONLY_ONE_CONFIG_FILE, ONLY_ONE_DIR } from '@src/core/prebuilt/index-output.js';
 import { createManifest } from '@src/core/prebuilt/indexers.js';
 
 vi.mock('@src/core/prebuilt/manifest.js', async (importOriginal) => {
@@ -29,17 +29,17 @@ describe('prebuilt indexers createManifest', () => {
         const cwd = await mkdtemp(join(tmpdir(), 'only-oneers-manifest-'));
 
         try {
-            await mkdir(join(cwd, HYBRID_INDEX_DIR), { recursive: true });
+            await mkdir(join(cwd, ONLY_ONE_DIR), { recursive: true });
             await writeFile(
-                join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE),
+                join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE),
                 ['server: http://api', 'project: demo', 'index_mode: local'].join('\n'),
                 'utf-8',
             );
-            await mkdir(join(cwd, HYBRID_INDEX_DIR, '.cocoindex'), { recursive: true });
+            await mkdir(join(cwd, ONLY_ONE_DIR, '.cocoindex'), { recursive: true });
 
-            await createManifest(cwd, join(cwd, HYBRID_INDEX_DIR), 'demo');
+            await createManifest(cwd, join(cwd, ONLY_ONE_DIR), 'demo');
 
-            const raw = await readFile(join(cwd, HYBRID_INDEX_DIR, 'manifest.json'), 'utf-8');
+            const raw = await readFile(join(cwd, ONLY_ONE_DIR, 'manifest.json'), 'utf-8');
             const manifest = JSON.parse(raw) as Record<string, unknown>;
             expect(manifest.schemaVersion).toBe('1.0');
             expect(manifest.gitnexusVersion).toBe('1.6.4');

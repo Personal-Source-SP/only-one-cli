@@ -65,13 +65,6 @@ Generate a structural blueprint markdown file for the project.
 only-one structure-generate [path] [options]
 ```
 
-### `structure-apply`
-
-Apply a structural blueprint to the project.
-
-```bash
-only-one structure-apply [path] [options]
-```
 
 ### `update`
 
@@ -88,6 +81,31 @@ Check environment readiness and CLI configuration.
 ```bash
 only-one doctor
 ```
+
+### `setting-vs`
+
+Merge `libraries/vs/settings.json` into VS Code, Cursor, or Antigravity user settings on macOS/Windows.
+
+```bash
+only-one setting-vs --editors vscode,cursor,antigravity
+```
+
+- Source settings win when a key conflicts.
+- Target-only settings are preserved.
+- Command writes through a backup journal and rolls back on failure or recoverable termination.
+
+### `extensions-vs`
+
+Install missing extension IDs from `libraries/vs/extensions.json` through each editor CLI.
+
+```bash
+only-one extensions-vs --editors vscode,cursor,antigravity
+```
+
+- Existing extensions are preserved.
+- Only missing source extensions are installed.
+- Progress is reported as monotonic percentages from 0 to 100.
+- Interrupted runs recover from `.only-one/vs-sync-journal.json` before starting new mutations.
 
 ## JSON Output
 

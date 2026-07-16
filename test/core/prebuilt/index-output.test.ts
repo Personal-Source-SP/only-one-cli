@@ -3,8 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-    HYBRID_INDEX_CONFIG_FILE,
-    HYBRID_INDEX_DIR,
+    ONLY_ONE_CONFIG_FILE,
+    ONLY_ONE_DIR,
     resolveIndexOutputDir,
     resolveLocalConfigPath,
     resolveManifestPath,
@@ -14,7 +14,7 @@ describe('index-output', () => {
     it('defaults to .only-one under the project root', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'only-one-output-'));
         try {
-            expect(resolveIndexOutputDir(cwd)).toBe(join(cwd, HYBRID_INDEX_DIR));
+            expect(resolveIndexOutputDir(cwd)).toBe(join(cwd, ONLY_ONE_DIR));
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
@@ -24,8 +24,8 @@ describe('index-output', () => {
         const cwd = await mkdtemp(join(tmpdir(), 'only-one-output-'));
         try {
             expect(resolveIndexOutputDir(cwd, 'artifacts/index')).toBe(join(cwd, 'artifacts/index'));
-            expect(resolveManifestPath(join(cwd, HYBRID_INDEX_DIR))).toBe(join(cwd, HYBRID_INDEX_DIR, 'manifest.json'));
-            expect(resolveLocalConfigPath(cwd)).toBe(join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE));
+            expect(resolveManifestPath(join(cwd, ONLY_ONE_DIR))).toBe(join(cwd, ONLY_ONE_DIR, 'manifest.json'));
+            expect(resolveLocalConfigPath(cwd)).toBe(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE));
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

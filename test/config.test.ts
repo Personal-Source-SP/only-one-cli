@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
+import { ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
 import {
     loadConfig,
     resolveGlobals,
@@ -24,11 +24,11 @@ import {
 
 const writeProjectConfig = async (cwd: string, content: string, legacy = false): Promise<void> => {
     if (legacy) {
-        await writeFile(join(cwd, HYBRID_INDEX_CONFIG_FILE), content, 'utf-8');
+        await writeFile(join(cwd, ONLY_ONE_CONFIG_FILE), content, 'utf-8');
         return;
     }
-    await mkdir(join(cwd, HYBRID_INDEX_DIR), { recursive: true });
-    await writeFile(join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE), content, 'utf-8');
+    await mkdir(join(cwd, ONLY_ONE_DIR), { recursive: true });
+    await writeFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), content, 'utf-8');
 };
 
 describe('CLI config', () => {
@@ -175,7 +175,7 @@ describe('CLI config', () => {
                 },
             });
 
-            const raw = await readFile(join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE), 'utf-8');
+            const raw = await readFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), 'utf-8');
             expect(raw).not.toContain('api_key:');
             expect(raw).not.toContain('api_key_env:');
             expect(raw).toContain('# Maximum number of results (-k, --top-k)');
@@ -313,7 +313,7 @@ describe('CLI config', () => {
         const changed = await persistConfigProjectId(cwd, '550e8400-e29b-41d4-a716-446655440000');
         expect(changed).toBe(true);
 
-        const raw = await readFile(join(cwd, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE), 'utf-8');
+        const raw = await readFile(join(cwd, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), 'utf-8');
         expect(raw).toContain('project: payments-api');
         expect(raw).toContain('project_id: 550e8400-e29b-41d4-a716-446655440000');
 

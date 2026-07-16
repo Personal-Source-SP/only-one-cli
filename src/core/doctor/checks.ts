@@ -9,7 +9,7 @@ import {
     loadConfig,
     localConfigDisplayPath,
     resolveIndexMode,
-    type HybridIndexConfig,
+    type OnlyOneConfig,
     type IndexModeSource,
 } from '@/core/config/index.js';
 import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint } from '@/core/runtime/credentials.js';
@@ -209,7 +209,7 @@ function maskApiKey(key: string): string {
 }
 
 /** Validates project settings in `.onlyonecli.yml` (not credentials — use `checkHybridApiKey`). */
-export function checkYamlConfig(config: HybridIndexConfig): CheckResult[] {
+export function checkYamlConfig(config: OnlyOneConfig): CheckResult[] {
     const checks: CheckResult[] = [
         {
             name: 'server',

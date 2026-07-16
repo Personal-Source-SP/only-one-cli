@@ -5,8 +5,8 @@ import yaml from 'js-yaml';
 import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint, resolveApiKey } from '@/core/runtime/credentials.js';
 import { isUuidV4 } from '@/utils/uuid.js';
 import {
-    HYBRID_INDEX_CONFIG_FILE,
-    HYBRID_INDEX_DIR,
+    ONLY_ONE_CONFIG_FILE,
+    ONLY_ONE_DIR,
     ensureIndexOutputDir,
     resolveLocalConfigPath,
     resolveLocalConfigPathForProject,
@@ -14,7 +14,7 @@ import {
 import type {
     BulkConfig,
     GlobalOptions,
-    HybridIndexConfig,
+    OnlyOneConfig,
     IndexMode,
     ResolvedBulkConfig,
     ResolvedGlobals,
@@ -46,9 +46,9 @@ export const warnLegacyYamlCredentials = (warn: (message: string) => void = (mes
 };
 
 export const stripLegacyCredentials = (
-    config: HybridIndexConfig & { api_key?: string; api_key_env?: string },
+    config: OnlyOneConfig & { api_key?: string; api_key_env?: string },
 ): {
-    config: HybridIndexConfig;
+    config: OnlyOneConfig;
     hadLegacy: boolean;
 } => {
     const hadLegacy = Boolean(config.api_key) || Boolean(config.api_key_env);
@@ -59,8 +59,8 @@ export const stripLegacyCredentials = (
     return { config: rest, hadLegacy: true };
 };
 
-const parseConfigYaml = (raw: string): HybridIndexConfig => {
-    const parsed = (yaml.load(raw) as (HybridIndexConfig & { api_key?: string; api_key_env?: string }) | null) ?? {};
+const parseConfigYaml = (raw: string): OnlyOneConfig => {
+    const parsed = (yaml.load(raw) as (OnlyOneConfig & { api_key?: string; api_key_env?: string }) | null) ?? {};
     const { config, hadLegacy } = stripLegacyCredentials(parsed);
     if (hadLegacy) {
         warnLegacyYamlCredentials();
@@ -68,7 +68,7 @@ const parseConfigYaml = (raw: string): HybridIndexConfig => {
     return config;
 };
 
-export const loadGlobalConfig = async (): Promise<HybridIndexConfig> => {
+export const loadGlobalConfig = async (): Promise<OnlyOneConfig> => {
     try {
         const raw = await readFile(join(homedir(), '.onlyonecli', 'config.yaml'), 'utf-8');
         return parseConfigYaml(raw);
@@ -77,9 +77,9 @@ export const loadGlobalConfig = async (): Promise<HybridIndexConfig> => {
     }
 };
 
-export const loadConfig = async (cwd = process.cwd()): Promise<HybridIndexConfig> => {
+export const loadConfig = async (cwd = process.cwd()): Promise<OnlyOneConfig> => {
     const globalConfig = await loadGlobalConfig();
-    let localConfig: HybridIndexConfig = {};
+    let localConfig: OnlyOneConfig = {};
     const localConfigPath = resolveLocalConfigPathForProject(cwd);
     if (localConfigPath) {
         try {
@@ -221,26 +221,26 @@ export const validateBulkConfig = (config: ResolvedBulkConfig): string[] => {
     return errors;
 };
 
-export const writeConfig = async (config: HybridIndexConfig, cwd = process.cwd(), options: { force?: boolean } = {}): Promise<void> => {
-    const outputDir = join(cwd, HYBRID_INDEX_DIR);
+export const writeConfig = async (config: OnlyOneConfig, cwd = process.cwd(), options: { force?: boolean } = {}): Promise<void> => {
+    const outputDir = join(cwd, ONLY_ONE_DIR);
     await ensureIndexOutputDir(outputDir);
     const target = resolveLocalConfigPath(cwd);
     if (!options.force && (await exists(target))) {
-        throw new Error(`${HYBRID_INDEX_DIR}/${HYBRID_INDEX_CONFIG_FILE} already exists; pass --force to overwrite`);
+        throw new Error(`${ONLY_ONE_DIR}/${ONLY_ONE_CONFIG_FILE} already exists; pass --force to overwrite`);
     }
 
-    await writeFile(target, dumpHybridIndexConfig(config));
+    await writeFile(target, dumpOnlyOneConfig(config));
 };
 
 export const persistConfigAgentTools = async (cwd: string, agentTools: string[]): Promise<void> => {
     const configPath = resolveLocalConfigPathForProject(cwd);
     if (!configPath) {
-        throw new Error(`${HYBRID_INDEX_DIR}/${HYBRID_INDEX_CONFIG_FILE} not found`);
+        throw new Error(`${ONLY_ONE_DIR}/${ONLY_ONE_CONFIG_FILE} not found`);
     }
 
     const config = parseConfigYaml(await readFile(configPath, 'utf-8'));
     config.agent_tools = agentTools;
-    await writeFile(configPath, dumpHybridIndexConfig(config));
+    await writeFile(configPath, dumpOnlyOneConfig(config));
 };
 
 export const persistConfigProjectId = async (cwd: string, projectId: string): Promise<boolean> => {
@@ -260,7 +260,7 @@ export const persistConfigProjectId = async (cwd: string, projectId: string): Pr
     }
 
     config.project_id = normalizedProjectId;
-    await writeFile(configPath, dumpHybridIndexConfig(config));
+    await writeFile(configPath, dumpOnlyOneConfig(config));
     return true;
 };
 
@@ -289,14 +289,14 @@ export const formatSearchSectionYaml = (search?: SearchConfig): string => {
     return lines.join('\n');
 };
 
-const dumpHybridIndexConfig = (config: HybridIndexConfig): string => {
+const dumpOnlyOneConfig = (config: OnlyOneConfig): string => {
     const serialized = serializeConfig(config);
     const { search, ...rest } = serialized;
     const body = yaml.dump(rest, { lineWidth: -1, noRefs: true }).trimEnd();
     return `${body}\n${formatSearchSectionYaml(search as SearchConfig)}\n`;
 };
 
-const serializeConfig = (config: HybridIndexConfig): Record<string, unknown> => ({
+const serializeConfig = (config: OnlyOneConfig): Record<string, unknown> => ({
     ...(config.agent_tools !== undefined ? { agent_tools: config.agent_tools } : {}),
     server: config.server ?? 'http://localhost:3000',
     ...(config.project_name ? { project_name: config.project_name } : {}),
@@ -324,7 +324,7 @@ export const parseIndexMode = (value?: string): IndexMode => {
     return value;
 };
 
-export const resolveIndexMode = (config: HybridIndexConfig, cliOverride?: string): ResolvedIndexMode => {
+export const resolveIndexMode = (config: OnlyOneConfig, cliOverride?: string): ResolvedIndexMode => {
     if (cliOverride) {
         return { mode: parseIndexMode(cliOverride), source: 'cli' };
     }
@@ -341,12 +341,12 @@ export const hasLocalConfig = async (cwd = process.cwd()): Promise<boolean> => {
 };
 
 export const localConfigDisplayPath = (): string => {
-    return `${HYBRID_INDEX_DIR}/${HYBRID_INDEX_CONFIG_FILE}`;
+    return `${ONLY_ONE_DIR}/${ONLY_ONE_CONFIG_FILE}`;
 };
 
 export const resolveGlobals = async (
     options: GlobalOptions,
-    config: HybridIndexConfig,
+    config: OnlyOneConfig,
     env: Record<string, string | undefined>,
 ): Promise<ResolvedGlobals> => {
     const legacyProjectId = config.project && isUuidV4(config.project) ? config.project : undefined;

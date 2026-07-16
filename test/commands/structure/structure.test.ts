@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createProgram } from '@src/index.js';
 import { installAgentArtifacts } from '@src/core/agent/install.js';
-import { HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
+import { ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
 import { readBlueprintStatus, STRUCTURE_SECTION_HEADINGS } from '@src/core/structure/status.js';
 import { LEGACY_STRUCTURAL_BLUEPRINT_FILENAME } from '@src/core/structure/paths.js';
 
@@ -13,8 +13,8 @@ vi.mock('@src/utils/git-project-name.js', () => ({
 }));
 
 const writeProjectConfig = async (projectDir: string, yaml: string): Promise<void> => {
-    await mkdir(join(projectDir, HYBRID_INDEX_DIR), { recursive: true });
-    await writeFile(join(projectDir, HYBRID_INDEX_DIR, HYBRID_INDEX_CONFIG_FILE), yaml, 'utf-8');
+    await mkdir(join(projectDir, ONLY_ONE_DIR), { recursive: true });
+    await writeFile(join(projectDir, ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE), yaml, 'utf-8');
 };
 
 describe('installAgentArtifacts', () => {
@@ -86,7 +86,7 @@ describe('structure command', () => {
 
             await program.parseAsync(['structure-generate', '--no-install-skill', '--status'], { from: 'user' });
 
-            const structuralsDir = join(cwd, HYBRID_INDEX_DIR, 'structure');
+            const structuralsDir = join(cwd, ONLY_ONE_DIR, 'structure');
             const { access } = await import('node:fs/promises');
             await expect(access(structuralsDir)).resolves.toBeUndefined();
         } finally {
@@ -106,15 +106,15 @@ describe('readBlueprintStatus', () => {
         const projectDir = await mkdtemp(join(tmpdir(), 'hybrid-structural-legacy-'));
 
         try {
-            await mkdir(join(projectDir, HYBRID_INDEX_DIR), { recursive: true });
-            await writeFile(join(projectDir, HYBRID_INDEX_DIR, LEGACY_STRUCTURAL_BLUEPRINT_FILENAME), '# legacy', 'utf-8');
+            await mkdir(join(projectDir, ONLY_ONE_DIR), { recursive: true });
+            await writeFile(join(projectDir, ONLY_ONE_DIR, LEGACY_STRUCTURAL_BLUEPRINT_FILENAME), '# legacy', 'utf-8');
 
-            const newPath = join(projectDir, HYBRID_INDEX_DIR, 'structure', 'acme-demo-structural.md');
+            const newPath = join(projectDir, ONLY_ONE_DIR, 'structure', 'acme-demo-structural.md');
             const status = readBlueprintStatus(newPath, { projectDir });
 
             expect(status.exists).toBe(false);
             expect(status.legacyExists).toBe(true);
-            expect(status.legacyPath).toBe(join(projectDir, HYBRID_INDEX_DIR, LEGACY_STRUCTURAL_BLUEPRINT_FILENAME));
+            expect(status.legacyPath).toBe(join(projectDir, ONLY_ONE_DIR, LEGACY_STRUCTURAL_BLUEPRINT_FILENAME));
         } finally {
             await rm(projectDir, { recursive: true, force: true });
         }

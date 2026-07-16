@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ports OpenSpec command adapters into hybrid-index CLI adapters.
+ * Ports OpenSpec command adapters into only-one CLI adapters.
  * Adds getInvokeLabel and normalizes ESM paths.
  */
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
@@ -43,4 +43,4 @@ for (const file of readdirSync(srcDir).filter((f) => f.endsWith('.ts') && !SKIP.
     console.log('ported', file);
 }
 
-console.log('done (cursor.ts kept as hybrid-index variant)');
+console.log('done (cursor.ts kept as only-one variant)');
