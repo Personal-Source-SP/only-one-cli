@@ -7,8 +7,13 @@ vi.mock('@src/core/vs/index.js', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@src/core/vs/index.js')>();
     return {
         ...actual,
-        syncVsExtensions: vi.fn().mockResolvedValue({ installed: 2 }),
-        syncVsSettings: vi.fn().mockResolvedValue({ changed: 2 }),
+        syncVsExtensions: vi
+            .fn()
+            .mockResolvedValue({ installed: 2, results: [{ editorName: 'VSCode', installedExtensions: ['ext1', 'ext2'] }] }),
+        syncVsSettings: vi.fn().mockResolvedValue({
+            changed: 2,
+            results: [{ editorName: 'VSCode', newKeys: { 'some.new': true }, changedKeys: { 'some.changed': { old: 1, new: 2 } } }],
+        }),
     };
 });
 
@@ -42,7 +47,7 @@ describe('VS sync commands', () => {
                 platform: expect.stringMatching(`${VsPlatform.Darwin}|${VsPlatform.Win32}`),
             }),
         );
-        expect(writes).toContain('Settings synced: 2');
+        expect(writes).toContain('\nSync Summary:');
     });
 
     it('uses checkbox selection for setting-vs when editors option is omitted', async () => {
@@ -75,7 +80,7 @@ describe('VS sync commands', () => {
         expect(syncVsExtensions).toHaveBeenCalledWith(
             expect.objectContaining({ cwd: '/repo', editorIds: [VsEditorId.VSCode, VsEditorId.Antigravity] }),
         );
-        expect(writes).toContain('Extensions installed: 2');
+        expect(writes).toContain('\nSync Summary:');
     });
 
     it('uses checkbox selection for extensions-vs when editors option is omitted', async () => {

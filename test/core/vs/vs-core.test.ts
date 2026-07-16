@@ -126,7 +126,7 @@ describe('VS core sync helpers', () => {
         reporter.start(2, 'start');
         reporter.step('one');
         reporter.step('two');
-        expect(writes).toEqual(['[0%] start', '[50%] one', '[100%] two']);
+        expect(writes).toEqual(['✓ start', '✓ one', '✓ two']);
     });
 
     it('rolls settings back when a later editor write fails', async () => {

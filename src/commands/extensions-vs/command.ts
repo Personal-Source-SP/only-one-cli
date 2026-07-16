@@ -4,6 +4,7 @@ import { parseVsEditorIds, syncVsExtensions, vsEditors, type VsEditorId } from '
 
 interface ExtensionsVsOptions {
     editors?: string;
+    force?: boolean;
 }
 
 const selectEditors = async (deps: ProgramDeps, options: ExtensionsVsOptions): Promise<VsEditorId[]> => {
@@ -23,11 +24,13 @@ export const createExtensionsVsCommand = (deps: ProgramDeps): Command => {
         .description('Install missing editor extensions from the libraries/vs library for local editors.')
         .helpOption('-h, --help', 'display help for command')
         .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: vscode, cursor, antigravity)')
+        .option('--force', 'Force install all extensions, bypassing merge', false)
         .addHelpText(
             'after',
             '\nExamples:\n' +
                 '  $ only-one extensions-vs\n' +
-                '  $ only-one extensions-vs --editors cursor\n\n' +
+                '  $ only-one extensions-vs --editors cursor\n' +
+                '  $ only-one extensions-vs --force\n\n' +
                 'Notes:\n' +
                 '  - If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).\n' +
                 '  - Requires the corresponding editor CLI tool (e.g. `code` or `cursor`) to be installed and available in the system PATH.',
@@ -35,8 +38,20 @@ export const createExtensionsVsCommand = (deps: ProgramDeps): Command => {
 
     cmd.action(async (options: ExtensionsVsOptions) => {
         const editorIds = await selectEditors(deps, options);
-        const result = await syncVsExtensions({ cwd: deps.cwd, editorIds, write: deps.stdout });
-        deps.stdout(`Extensions installed: ${result.installed}`);
+        const result = await syncVsExtensions({ cwd: deps.cwd, editorIds, write: deps.stdout, force: options.force });
+
+        deps.stdout(`\nSync Summary:`);
+        for (const res of result.results) {
+            deps.stdout(`${res.editorName}:`);
+            if (res.installedExtensions.length > 0) {
+                deps.stdout(`  Installed extensions:`);
+                for (const ext of res.installedExtensions) {
+                    deps.stdout(`    - ${ext}`);
+                }
+            } else {
+                deps.stdout(`  No new extensions installed.`);
+            }
+        }
     });
 
     return cmd;

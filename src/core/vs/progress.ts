@@ -27,6 +27,6 @@ export class PercentProgressReporter implements VsProgressReporter {
         const next = Math.max(this.last, Math.min(100, percent));
         if (next === this.last && next !== 100) return;
         this.last = next;
-        this.write(`[${next}%] ${label}`);
+        this.write(`✓ ${label}`);
     }
 }

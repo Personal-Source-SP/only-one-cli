@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { input, confirm, select, checkbox } from '@inquirer/prompts';
 import { createProgram } from './cli/index.js';
 
 export { createProgram } from './cli/index.js';
@@ -21,6 +22,12 @@ if (isCliEntrypoint(import.meta.url) || process.env.ONLY_ONE_CLI_BYPASS_ENTRYPOI
         cwd: process.cwd(),
         env: process.env,
         fetcher: fetch,
+        prompts: {
+            input,
+            confirm,
+            select,
+            checkbox,
+        },
         stdout: (line) => console.log(line),
         stderr: (line) => console.error(line),
     });

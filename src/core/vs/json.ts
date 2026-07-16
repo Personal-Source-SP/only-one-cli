@@ -43,7 +43,8 @@ const stripJsonComments = (input: string): string => {
 const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
 export const parseJsoncObject = (content: string): Record<string, unknown> => {
-    const parsed = JSON.parse(stripJsonComments(content)) as unknown;
+    const stripped = stripJsonComments(content).replace(/,(\s*[}\]])/g, '$1');
+    const parsed = JSON.parse(stripped) as unknown;
     if (!isRecord(parsed)) throw new Error('Expected JSON object');
     return parsed;
 };

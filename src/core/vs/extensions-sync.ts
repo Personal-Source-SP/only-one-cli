@@ -9,6 +9,7 @@ export interface VsExtensionsSyncRequest {
     cwd: string;
     editorIds: VsEditorId[];
     write: (line: string) => void;
+    force?: boolean;
     fs?: VsFileSystem;
     libraryDir?: string;
     runner?: VsProcessRunner;
@@ -16,6 +17,10 @@ export interface VsExtensionsSyncRequest {
 
 export interface VsExtensionsSyncResponse {
     installed: number;
+    results: Array<{
+        editorName: string;
+        installedExtensions: string[];
+    }>;
 }
 
 const listInstalledExtensions = async (runner: VsProcessRunner, command: string): Promise<string[]> => {
@@ -42,7 +47,7 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
         plans.push({
             command,
             editorName: editor.name,
-            extensionIds: manifest.extensions.filter((id) => !installed.has(id.toLowerCase())),
+            extensionIds: request.force ? manifest.extensions : manifest.extensions.filter((id) => !installed.has(id.toLowerCase())),
         });
     }
 
@@ -57,22 +62,29 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
     process.once('SIGTERM', handleSignal);
     progress.step('backup ready');
     let installedCount = 0;
+    const results: VsExtensionsSyncResponse['results'] = [];
 
     try {
         for (const plan of plans) {
+            const installedExtensions: string[] = [];
             for (const extensionId of plan.extensionIds) {
                 const result = await runner.run(plan.command, ['--install-extension', extensionId]);
                 if (result.code !== 0) throw new Error(result.stderr || `Failed to install ${extensionId}`);
                 await transaction.recordInstalledExtension(plan.command, extensionId);
                 installedCount += 1;
+                installedExtensions.push(extensionId);
                 progress.step(`${plan.editorName}: ${extensionId}`);
             }
+            results.push({
+                editorName: plan.editorName,
+                installedExtensions,
+            });
         }
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
         await transaction.commit();
         progress.step('extensions committed');
-        return { installed: installedCount };
+        return { installed: installedCount, results };
     } catch (error) {
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);

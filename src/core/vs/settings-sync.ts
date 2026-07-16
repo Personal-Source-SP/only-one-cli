@@ -13,6 +13,7 @@ export interface VsSettingsSyncRequest {
     homeDir: string;
     platform: VsPlatform;
     write: (line: string) => void;
+    force?: boolean;
     fs?: VsFileSystem;
     libraryDir?: string;
     runner?: VsProcessRunner;
@@ -20,7 +21,25 @@ export interface VsSettingsSyncRequest {
 
 export interface VsSettingsSyncResponse {
     changed: number;
+    results: Array<{
+        editorName: string;
+        newKeys: Record<string, unknown>;
+        changedKeys: Record<string, { old: unknown; new: unknown }>;
+    }>;
 }
+
+const flattenSettings = (obj: Record<string, unknown>, prefix = ''): Record<string, unknown> => {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+            Object.assign(result, flattenSettings(value as Record<string, unknown>, fullKey));
+        } else {
+            result[fullKey] = value;
+        }
+    }
+    return result;
+};
 
 export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<VsSettingsSyncResponse> => {
     const fs = request.fs ?? nodeVsFileSystem;
@@ -42,6 +61,8 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
     process.once('SIGTERM', handleSignal);
     progress.step('backup ready');
 
+    const results: VsSettingsSyncResponse['results'] = [];
+
     try {
         for (const editor of editors) {
             if (!editor) continue;
@@ -54,14 +75,40 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
                 target = {};
             }
             await transaction.backupFile(targetPath);
-            await transaction.atomicWrite(targetPath, stringifySettings(mergeSettings(target, manifest.settings)));
-            progress.step(`${editor.name} settings`);
+
+            const nextSettings = request.force ? manifest.settings : mergeSettings(target, manifest.settings);
+
+            // Compute diff
+            const oldFlat = flattenSettings(target);
+            const newFlat = flattenSettings(nextSettings);
+            const newKeys: Record<string, unknown> = {};
+            const changedKeys: Record<string, { old: unknown; new: unknown }> = {};
+
+            for (const [key, newValue] of Object.entries(newFlat)) {
+                if (!(key in oldFlat)) {
+                    newKeys[key] = newValue;
+                } else {
+                    const oldValue = oldFlat[key];
+                    if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+                        changedKeys[key] = { old: oldValue, new: newValue };
+                    }
+                }
+            }
+
+            results.push({
+                editorName: editor.name,
+                newKeys,
+                changedKeys,
+            });
+
+            await transaction.atomicWrite(targetPath, stringifySettings(nextSettings));
+            progress.step(`${editor.name} settings synced`);
         }
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
         await transaction.commit();
         progress.step('settings committed');
-        return { changed: editors.length };
+        return { changed: editors.length, results };
     } catch (error) {
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
