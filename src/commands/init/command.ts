@@ -1,7 +1,65 @@
+import { homedir } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { mcpIdeAdapters } from '@/core/mcp/adapters.js';
+import { readMcpManifests } from '@/core/mcp/registry.js';
+import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
 import { executeInitCommand, printInitResult } from '@/core/init/init-command.js';
 import type { InitCommandOptions } from './types.js';
+
+const parseCsv = (value?: string): string[] =>
+    value
+        ?.split(',')
+        .map((entry) => entry.trim())
+        .filter(Boolean) ?? [];
+
+const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: string; yes?: boolean }): Promise<void> => {
+    const { manifests, warnings } = await readMcpManifests();
+    for (const warning of warnings) deps.stdout(`Warning: skipped ${warning.file}: ${warning.message}`);
+    if (!manifests.length) throw new Error('No MCP manifests available');
+
+    const requestedMcpIds = parseCsv(names);
+    let selectedMcpIds = requestedMcpIds;
+    if (!selectedMcpIds.length && deps.prompts?.checkbox) {
+        selectedMcpIds = await deps.prompts.checkbox({
+            message: 'Select MCP servers to configure',
+            choices: manifests.map((manifest) => ({ name: manifest.id, value: manifest.id })),
+        });
+    }
+    if (!selectedMcpIds.length) throw new Error('Select at least one MCP server');
+
+    const selectedManifests = selectedMcpIds.map((id) => {
+        const manifest = manifests.find((entry) => entry.id === id);
+        if (!manifest) throw new Error(`Unknown MCP '${id}'`);
+        return manifest;
+    });
+
+    let selectedIdeIds = parseCsv(options?.ide);
+    if (!selectedIdeIds.length && deps.prompts?.checkbox) {
+        selectedIdeIds = await deps.prompts.checkbox({
+            message: 'Select IDEs for global MCP config',
+            choices: mcpIdeAdapters.map((adapter) => ({ name: adapter.name, value: adapter.id })),
+        });
+    }
+    if (!selectedIdeIds.length) selectedIdeIds = mcpIdeAdapters.map((adapter) => adapter.id);
+
+    const response = await syncMcpGlobalConfig({
+        cwd: deps.cwd,
+        homeDir: homedir(),
+        ideIds: selectedIdeIds,
+        manifests: selectedManifests,
+        platform: process.platform,
+        write: deps.stdout,
+    });
+
+    for (const result of response.results) {
+        deps.stdout(`${result.ideName}: ${result.configPath}`);
+        for (const entry of result.results) {
+            const keys = entry.credentialKeys.length ? `; fill manually: ${entry.credentialKeys.join(', ')}` : '';
+            deps.stdout(`  ${entry.id}: ${entry.status}${keys}`);
+        }
+    }
+};
 
 export function createInitCommand(deps: ProgramDeps): Command {
     const cmd = new Command('init')
@@ -149,6 +207,26 @@ export function createInitCommand(deps: ProgramDeps): Command {
             });
             if (!result) return;
             printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
+        });
+
+    cmd.command('mcp')
+        .description('🔌 Merge selected MCP servers into global Cursor or Antigravity config')
+        .helpOption('-h, --help', 'display help for command')
+        .argument('[names]', 'Comma-separated list of MCP server IDs to configure')
+        .option('--ide <ids>', 'Comma-separated IDE IDs to configure (cursor, antigravity)')
+        .option('--yes', 'Automatically use defaults when prompts are unavailable')
+        .addHelpText(
+            'after',
+            '\nExamples:\n' +
+                '  $ only-one init mcp github,clockify --ide cursor,antigravity\n' +
+                '  $ only-one init mcp\n\n' +
+                'Notes:\n' +
+                '  - MCP config is global and currently supports Cursor and Antigravity.\n' +
+                '  - Existing MCP server IDs are skipped, not overwritten.\n' +
+                '  - Secret placeholders are left empty for manual editing.',
+        )
+        .action(async (names: string | undefined, options: { ide?: string; yes?: boolean }) => {
+            await runInitMcp(deps, names, options);
         });
 
     return cmd;

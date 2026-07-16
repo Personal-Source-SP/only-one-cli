@@ -1,0 +1,7 @@
+{
+  "command": "npx",
+  "args": ["-y", "@yikizi/clockify-mcp"],
+  "env": {
+    "CLOCKIFY_API_KEY": ""
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "command": "npx",
+  "args": ["-y", "@ramidecodes/mcp-server-notion@latest", "--api-key", ""],
+  "env": {
+    "NOTION_API_KEY": ""
+  }
+}
