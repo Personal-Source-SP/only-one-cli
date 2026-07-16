@@ -42,7 +42,14 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
     const plans: Array<{ command: string; editorName: string; extensionIds: string[] }> = [];
     for (const editor of editors) {
         if (!editor) continue;
-        const command = editor.commandCandidates[0];
+        let command = editor.commandCandidates[0];
+        for (const candidate of editor.commandCandidates) {
+            const check = await runner.run(candidate, ['--version']);
+            if (check.code === 0) {
+                command = candidate;
+                break;
+            }
+        }
         const installed = new Set((await listInstalledExtensions(runner, command)).map((id) => id.toLowerCase()));
         plans.push({
             command,

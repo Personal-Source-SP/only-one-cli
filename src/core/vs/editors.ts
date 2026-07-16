@@ -21,7 +21,7 @@ export const vsEditors: VsEditorDescriptor[] = [
     {
         id: VsEditorId.Antigravity,
         name: 'Antigravity',
-        commandCandidates: ['antigravity'],
+        commandCandidates: ['antigravity-ide', 'antigravity'],
         resolveSettingsPath: (homeDir, platform) =>
             platform === VsPlatform.Win32 ? winUser(homeDir, 'Antigravity IDE') : macUser(homeDir, 'Antigravity IDE'),
     },
