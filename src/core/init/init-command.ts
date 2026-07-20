@@ -722,6 +722,77 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                     deps.stdout(`    ✗ OpenSpec CLI initialization failed: ${error instanceof Error ? error.message : String(error)}`);
                 }
             }
+
+            if (installedPackages.includes('ui-ux-pro-max-cli')) {
+                deps.stdout('\nInitializing UI/UX Pro Max...');
+                const mapToolToUiproAi = (toolId: string): string | null => {
+                    switch (toolId) {
+                        case 'claude':
+                            return 'claude';
+                        case 'cursor':
+                            return 'cursor';
+                        case 'windsurf':
+                            return 'windsurf';
+                        case 'antigravity':
+                            return 'antigravity';
+                        case 'github-copilot':
+                            return 'copilot';
+                        case 'roocode':
+                            return 'roocode';
+                        case 'kiro':
+                            return 'kiro';
+                        case 'codex':
+                            return 'codex';
+                        case 'qoder':
+                            return 'qoder';
+                        case 'gemini':
+                            return 'gemini';
+                        case 'trae':
+                            return 'trae';
+                        case 'opencode':
+                            return 'opencode';
+                        case 'continue':
+                            return 'continue';
+                        case 'codebuddy':
+                            return 'codebuddy';
+                        case 'factory':
+                            return 'droid';
+                        case 'kilocode':
+                            return 'kilocode';
+                        case 'auggie':
+                            return 'augment';
+                        default:
+                            return null;
+                    }
+                };
+
+                let targetTools = selectedTools.map((t) => mapToolToUiproAi(t.value)).filter(Boolean) as string[];
+
+                if (targetTools.length === 0) {
+                    const tools = getInstallableAgentTools();
+                    const detectedTools = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+                    targetTools = detectedTools.map((t) => mapToolToUiproAi(t.value)).filter(Boolean) as string[];
+                }
+
+                if (targetTools.length === 0) {
+                    deps.stdout('  No matching agent tools found to configure UI/UX Pro Max for.');
+                } else {
+                    for (const aiType of targetTools) {
+                        try {
+                            deps.stdout(`  Running: npx ui-ux-pro-max-cli init --ai ${aiType} --force`);
+                            await execFileAsync('npx', ['ui-ux-pro-max-cli', 'init', '--ai', aiType, '--force'], {
+                                cwd: projectDir,
+                                shell: true,
+                            });
+                            deps.stdout(`    ✓ UI/UX Pro Max initialized successfully for ${aiType}`);
+                        } catch (error) {
+                            deps.stdout(
+                                `    ✗ UI/UX Pro Max initialization failed for ${aiType}: ${error instanceof Error ? error.message : String(error)}`,
+                            );
+                        }
+                    }
+                }
+            }
         }
 
         // 3. Skills execution

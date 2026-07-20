@@ -103,6 +103,33 @@ describe('init command', () => {
         }
     });
 
+    it('executes ui-ux-pro-max-cli package post-install hook', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'init-test-uiux-'));
+        const writes: string[] = [];
+
+        try {
+            const { mkdir } = await import('node:fs/promises');
+            // Create dummy .cursor directory so the tool is detected as configured
+            await mkdir(join(cwd, '.cursor'), { recursive: true });
+
+            const program = createProgram({
+                cwd,
+                env: {},
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: (line) => writes.push(line),
+            });
+
+            await program.parseAsync(['init', 'package', cwd, 'ui-ux-pro-max-cli', '--yes'], { from: 'user' });
+
+            const output = writes.join('\n');
+            expect(output).toContain('Installing ui-ux-pro-max-cli...');
+            expect(output).toContain('Initializing UI/UX Pro Max...');
+            expect(output).toContain('npx ui-ux-pro-max-cli init --ai cursor --force');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
+
     it('runs subcommand skill and updates .gitignore', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'init-test-sub-skill-'));
         const writes: string[] = [];
