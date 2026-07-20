@@ -2,6 +2,8 @@ import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { parseVsEditorIds, syncVsExtensions, vsEditors, type VsEditorId } from '@/core/vs/index.js';
 
+import { COLORS } from '@/constants/index.js';
+
 interface ExtensionsVsOptions {
     editors?: string;
     force?: boolean;
@@ -27,29 +29,29 @@ export const createExtensionsVsCommand = (deps: ProgramDeps): Command => {
         .option('--force', 'Force install all extensions, bypassing merge', false)
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one extensions-vs\n' +
-                '  $ only-one extensions-vs --editors cursor\n' +
-                '  $ only-one extensions-vs --force\n\n' +
-                'Notes:\n' +
-                '  - If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).\n' +
-                '  - Requires the corresponding editor CLI tool (e.g. `code` or `cursor`) to be installed and available in the system PATH.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one extensions-vs')}\n` +
+                `  ${COLORS.cli.command('$ only-one extensions-vs --editors cursor')}\n` +
+                `  ${COLORS.cli.command('$ only-one extensions-vs --force')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).')}\n` +
+                `  - ${COLORS.dim('Requires the corresponding editor CLI tool (e.g. `code` or `cursor`) to be installed and available in the system PATH.')}`,
         );
 
     cmd.action(async (options: ExtensionsVsOptions) => {
         const editorIds = await selectEditors(deps, options);
         const result = await syncVsExtensions({ cwd: deps.cwd, editorIds, write: deps.stdout, force: options.force });
 
-        deps.stdout(`\nSync Summary:`);
+        deps.stdout(COLORS.cli.header('\nSync Summary:'));
         for (const res of result.results) {
-            deps.stdout(`${res.editorName}:`);
+            deps.stdout(COLORS.secondary(`${res.editorName}:`));
             if (res.installedExtensions.length > 0) {
-                deps.stdout(`  Installed extensions:`);
+                deps.stdout(COLORS.success(`  Installed extensions:`));
                 for (const ext of res.installedExtensions) {
-                    deps.stdout(`    - ${ext}`);
+                    deps.stdout(`    - ${COLORS.cli.option(ext)}`);
                 }
             } else {
-                deps.stdout(`  No new extensions installed.`);
+                deps.stdout(COLORS.dim(`  No new extensions installed.`));
             }
         }
     });

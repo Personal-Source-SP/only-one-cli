@@ -3,6 +3,7 @@ import type { ProgramDeps } from '@/cli/deps.js';
 import { formatUpdateHumanLines, updateAgentArtifacts } from '@/core/agent/update.js';
 import { printJson } from '@/core/output/index.js';
 import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
+import { COLORS } from '@/constants/index.js';
 
 export function createUpdateCommand(deps: ProgramDeps): Command {
     return new Command('update')
@@ -12,12 +13,12 @@ export function createUpdateCommand(deps: ProgramDeps): Command {
         .option('--force', 'Overwrite agent skill and workflow files even if local and remote versions match')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one update\n' +
-                '  $ only-one update /path/to/project --force\n\n' +
-                'Notes:\n' +
-                '  - Looks up installed agent tools in the project configurations and pulls the latest definitions from the source registry.\n' +
-                '  - Useful when updating CLI versions or retrieving upstream template improvements.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one update')}\n` +
+                `  ${COLORS.cli.command('$ only-one update /path/to/project --force')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('Looks up installed agent tools in the project configurations and pulls the latest definitions from the source registry.')}\n` +
+                `  - ${COLORS.dim('Useful when updating CLI versions or retrieving upstream template improvements.')}`,
         )
         .action(async (path: string | undefined, options: { force?: boolean }, command) => {
             const projectDir = resolveProjectDir(deps, path);
@@ -31,8 +32,17 @@ export function createUpdateCommand(deps: ProgramDeps): Command {
                 return;
             }
 
-            for (const line of formatUpdateHumanLines(result)) {
-                deps.stdout(line);
+            const lines = formatUpdateHumanLines(result);
+            if (lines.length > 0) {
+                deps.stdout(COLORS.success(lines[0]));
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i];
+                    if (line.includes('skill:') || line.includes('command:')) {
+                        deps.stdout(`  ${COLORS.primary(line.trim())}`);
+                    } else {
+                        deps.stdout(COLORS.dim(line));
+                    }
+                }
             }
         });
 }

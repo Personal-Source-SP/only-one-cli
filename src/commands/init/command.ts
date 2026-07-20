@@ -6,6 +6,7 @@ import { readMcpManifests } from '@/core/mcp/registry.js';
 import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
 import { executeInitCommand, printInitResult } from '@/core/init/init-command.js';
 import type { InitCommandOptions } from './types.js';
+import { COLORS } from '@/constants/index.js';
 
 const parseCsv = (value?: string): string[] =>
     value
@@ -15,7 +16,7 @@ const parseCsv = (value?: string): string[] =>
 
 const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: string; yes?: boolean }): Promise<void> => {
     const { manifests, warnings } = await readMcpManifests();
-    for (const warning of warnings) deps.stdout(`Warning: skipped ${warning.file}: ${warning.message}`);
+    for (const warning of warnings) deps.stdout(COLORS.warning(`Warning: skipped ${warning.file}: ${warning.message}`));
     if (!manifests.length) throw new Error('No MCP manifests available');
 
     const requestedMcpIds = parseCsv(names);
@@ -57,10 +58,11 @@ const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: s
     });
 
     for (const result of response.results) {
-        deps.stdout(`${result.ideName}: ${result.configPath}`);
+        deps.stdout(`${COLORS.primary(result.ideName)}: ${COLORS.dim(result.configPath)}`);
         for (const entry of result.results) {
             const keys = entry.credentialKeys.length ? `; fill manually: ${entry.credentialKeys.join(', ')}` : '';
-            deps.stdout(`  ${entry.id}: ${entry.status}${keys}`);
+            const statusColor = entry.status === 'added' || entry.status === 'unchanged' ? COLORS.success : COLORS.warning;
+            deps.stdout(`  ${COLORS.secondary(entry.id)}: ${statusColor(entry.status)}${COLORS.warning(keys)}`);
         }
     }
 };
@@ -77,13 +79,13 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .option('--combo <names>', 'Comma-separated names of predefined packages and skills combinations to install')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one init\n' +
-                '  $ only-one init --step skills --yes\n' +
-                '  $ only-one init --skip configs,packages /path/to/project\n\n' +
-                'Notes:\n' +
-                '  - Modifies project configurations and installs custom agent skills.\n' +
-                '  - Appends only-one patterns to your .gitignore unless --no-ignore is passed.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one init')}\n` +
+                `  ${COLORS.cli.command('$ only-one init --step skills --yes')}\n` +
+                `  ${COLORS.cli.command('$ only-one init --skip configs,packages /path/to/project')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('Modifies project configurations and installs custom agent skills.')}\n` +
+                `  - ${COLORS.dim('Appends only-one patterns to your .gitignore unless --no-ignore is passed.')}`,
         );
 
     cmd.action(async (path: string | undefined, options: InitCommandOptions, command) => {
@@ -114,11 +116,11 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one init package\n' +
-                '  $ only-one init package /path/to/project lodash,typescript --yes\n\n' +
-                'Notes:\n' +
-                '  - Only executes the "packages" step of the initialization process.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one init package')}\n` +
+                `  ${COLORS.cli.command('$ only-one init package /path/to/project lodash,typescript --yes')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('Only executes the "packages" step of the initialization process.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
             const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
@@ -141,11 +143,11 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one init skill\n' +
-                '  $ only-one init skill /path/to/project custom-prompt,git-helper\n\n' +
-                'Notes:\n' +
-                '  - Merges skill definitions into the workspace without altering other configurations.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one init skill')}\n` +
+                `  ${COLORS.cli.command('$ only-one init skill /path/to/project custom-prompt,git-helper')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('Merges skill definitions into the workspace without altering other configurations.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
             const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
@@ -168,11 +170,11 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one init configs\n' +
-                '  $ only-one init configs /path/to/project eslint,tsconfig\n\n' +
-                'Notes:\n' +
-                '  - Useful when you want to reset or pull the latest config boilerplate.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one init configs')}\n` +
+                `  ${COLORS.cli.command('$ only-one init configs /path/to/project eslint,tsconfig')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('Useful when you want to reset or pull the latest config boilerplate.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
             const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
@@ -195,11 +197,11 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one init combo\n' +
-                '  $ only-one init combo /path/to/project web-starter,node-ts\n\n' +
-                'Notes:\n' +
-                '  - A combo is a shorthand to install multiple skills and packages in one command.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one init combo')}\n` +
+                `  ${COLORS.cli.command('$ only-one init combo /path/to/project web-starter,node-ts')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('A combo is a shorthand to install multiple skills and packages in one command.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
             const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
@@ -221,13 +223,13 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .option('--yes', 'Automatically use defaults when prompts are unavailable')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one init mcp github,clockify --ide cursor,antigravity\n' +
-                '  $ only-one init mcp\n\n' +
-                'Notes:\n' +
-                '  - MCP config is global and currently supports Cursor and Antigravity.\n' +
-                '  - Existing MCP server IDs are skipped, not overwritten.\n' +
-                '  - Secret placeholders are left empty for manual editing.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one init mcp github,clockify --ide cursor,antigravity')}\n` +
+                `  ${COLORS.cli.command('$ only-one init mcp')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('MCP config is global and currently supports Cursor and Antigravity.')}\n` +
+                `  - ${COLORS.dim('Existing MCP server IDs are skipped, not overwritten.')}\n` +
+                `  - ${COLORS.dim('Secret placeholders are left empty for manual editing.')}`,
         )
         .action(async (names: string | undefined, options: { ide?: string; yes?: boolean }) => {
             await runInitMcp(deps, names, options);

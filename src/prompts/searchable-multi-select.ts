@@ -3,6 +3,8 @@
  * (chalk removed — plain terminal output)
  */
 
+import { COLORS } from '@/constants/index.js';
+
 interface Choice {
     configured?: boolean;
     detected?: boolean;
@@ -101,19 +103,21 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
 
         if (status === 'done') {
             const names = selectedValues.map((v) => choiceMap.get(v)?.name ?? v).join(', ');
-            return `${prefix} ${message} ${names || '(none)'}`;
+            return `${prefix} ${message} ${COLORS.success(names || '(none)')}`;
         }
 
         const lines: string[] = [];
         lines.push(`${prefix} ${message}`);
         const chips =
-            selectedValues.length > 0 ? selectedValues.map((v) => `[${choiceMap.get(v)?.name ?? v}]`).join(' ') : '(none selected)';
-        lines.push(`  Selected: ${chips}`);
-        lines.push(`  Search: [${searchText || 'type to filter'}]`);
-        lines.push(`  ↑↓ navigate • Space toggle • Backspace remove • Enter confirm`);
+            selectedValues.length > 0
+                ? selectedValues.map((v) => COLORS.success(`[${choiceMap.get(v)?.name ?? v}]`)).join(' ')
+                : COLORS.dim('(none selected)');
+        lines.push(`  ${COLORS.primary('Selected:')} ${chips}`);
+        lines.push(`  ${COLORS.primary('Search:')} ${COLORS.cli.accent(`[${searchText || 'type to filter'}]`)}`);
+        lines.push(COLORS.dim(`  ↑↓ navigate • Space toggle • Backspace remove • Enter confirm`));
 
         if (!filteredChoices.length) {
-            lines.push('  No matches');
+            lines.push(COLORS.dim('  No matches'));
         } else {
             const startIndex = Math.max(0, Math.min(cursor - Math.floor(pageSize / 2), filteredChoices.length - pageSize));
             const endIndex = Math.min(startIndex + pageSize, filteredChoices.length);
@@ -124,16 +128,18 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
                 const actualIndex = startIndex + i;
                 const isActive = actualIndex === cursor;
                 const selected = selectedSet.has(item.value);
-                const icon = selected ? '◉' : '○';
-                const arrow = isActive ? '›' : ' ';
+                const itemColor = isActive ? COLORS.primary : selected ? COLORS.success : COLORS.dim;
+                const iconColor = selected ? COLORS.success : COLORS.dim;
+                const icon = selected ? iconColor('◉') : iconColor('○');
+                const arrow = isActive ? COLORS.cli.accent('›') : ' ';
                 const statusLabel = !selected ? (item.configured ? ' (configured)' : item.detected ? ' (detected)' : '') : '';
                 const suffix = selected ? (item.configured ? ' (refresh)' : ' (selected)') : statusLabel;
-                lines.push(`  ${arrow} ${icon} ${item.name}${suffix}`);
+                lines.push(`  ${arrow} ${icon} ${itemColor(item.name)}${COLORS.dim(suffix)}`);
             }
         }
 
         if (error) {
-            lines.push(`  ${error}`);
+            lines.push(`  ${COLORS.error(error)}`);
         }
         return lines.join('\n');
     });

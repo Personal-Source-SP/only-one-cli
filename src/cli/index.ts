@@ -30,7 +30,9 @@ export function createProgram(deps: ProgramDeps) {
                     .replace(/^Usage:/m, COLORS.cli.header('Usage:'))
                     .replace(/^Options:/m, COLORS.cli.header('Options:'))
                     .replace(/^Commands:/m, COLORS.cli.header('Commands:'))
-                    .replace(/^Arguments:/m, COLORS.cli.header('Arguments:'));
+                    .replace(/^Arguments:/m, COLORS.cli.header('Arguments:'))
+                    .replace(/^Examples:/m, COLORS.cli.header('Examples:'))
+                    .replace(/^Notes:/m, COLORS.cli.header('Notes:'));
             },
         });
         for (const sub of cmd.commands) {

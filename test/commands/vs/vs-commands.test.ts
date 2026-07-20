@@ -47,7 +47,7 @@ describe('VS sync commands', () => {
                 platform: expect.stringMatching(`${VsPlatform.Darwin}|${VsPlatform.Win32}`),
             }),
         );
-        expect(writes).toContain('\nSync Summary:');
+        expect(writes.map((w) => w.replace(/\u001b\[\d+m/g, ''))).toContain('\nSync Summary:');
     });
 
     it('uses checkbox selection for setting-vs when editors option is omitted', async () => {
@@ -80,7 +80,7 @@ describe('VS sync commands', () => {
         expect(syncVsExtensions).toHaveBeenCalledWith(
             expect.objectContaining({ cwd: '/repo', editorIds: [VsEditorId.VSCode, VsEditorId.Antigravity] }),
         );
-        expect(writes).toContain('\nSync Summary:');
+        expect(writes.map((w) => w.replace(/\u001b\[\d+m/g, ''))).toContain('\nSync Summary:');
     });
 
     it('uses checkbox selection for extensions-vs when editors option is omitted', async () => {

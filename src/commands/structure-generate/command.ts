@@ -13,6 +13,7 @@ import { scaffoldStructureOutput } from '@/core/structure/scaffold.js';
 import { readBlueprintStatus } from '@/core/structure/status.js';
 import { getStructurePlaybookSteps, STRUCTURE_BLUEPRINT_NAMING_HINT, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
 import type { AgentArtifactSummary, StructureGenerateCommandJson, StructureGenerateCommandOptions } from './types.js';
+import { COLORS } from '@/constants/index.js';
 
 export function createStructureGenerateCommand(deps: ProgramDeps): Command {
     return new Command('structure-generate')
@@ -32,14 +33,14 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
         .option('--status', 'Report existence and path details of the current structural blueprint only')
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one structure-generate\n' +
-                '  $ only-one structure-generate --tools cursor,windsurf\n' +
-                '  $ only-one structure-generate --output ./custom-blueprint.md\n' +
-                '  $ only-one structure-generate --status\n\n' +
-                'Notes:\n' +
-                '  - Unless --no-install-skill is set, this command will automatically download and set up structural agent skills.\n' +
-                '  - If the organization name is not configured, a default "default" organization value is fallback.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one structure-generate')}\n` +
+                `  ${COLORS.cli.command('$ only-one structure-generate --tools cursor,windsurf')}\n` +
+                `  ${COLORS.cli.command('$ only-one structure-generate --output ./custom-blueprint.md')}\n` +
+                `  ${COLORS.cli.command('$ only-one structure-generate --status')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('Unless --no-install-skill is set, this command will automatically download and set up structural agent skills.')}\n` +
+                `  - ${COLORS.dim('If the organization name is not configured, a default "default" organization value is fallback.')}`,
         )
         .action(async (path: string | undefined, options: StructureGenerateCommandOptions, command) => {
             const projectDir = resolveProjectDir(deps, path);
@@ -81,7 +82,9 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
 
             if (scaffold.usesDefaultOrganization) {
                 deps.stdout(
-                    '  Note: organization not set in config; using "default" in blueprint filename. Run only-one init to set organization.',
+                    COLORS.warning(
+                        '  Note: organization not set in config; using "default" in blueprint filename. Run only-one init to set organization.',
+                    ),
                 );
             }
 
@@ -101,13 +104,15 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
                     printJson(payload, deps.stdout);
                     return;
                 }
-                deps.stdout(`Blueprint: ${scaffold.relativeBlueprintPath}`);
-                deps.stdout(`  Exists: ${blueprintStatus.exists ? 'yes' : 'no'}`);
+                deps.stdout(`${COLORS.primary('Blueprint:')} ${COLORS.cli.accent(scaffold.relativeBlueprintPath)}`);
+                deps.stdout(`  ${COLORS.primary('Exists:')} ${blueprintStatus.exists ? COLORS.success('yes') : COLORS.error('no')}`);
                 if (blueprintStatus.legacyExists && blueprintStatus.legacyPath) {
-                    deps.stdout(`  Legacy: ${relative(projectDir, blueprintStatus.legacyPath)} (migrate to structure/ layout)`);
+                    deps.stdout(
+                        `  ${COLORS.warning('Legacy:')} ${COLORS.dim(relative(projectDir, blueprintStatus.legacyPath))} (migrate to structure/ layout)`,
+                    );
                 }
                 if (blueprintStatus.missingSections.length) {
-                    deps.stdout(`  Missing sections: ${blueprintStatus.missingSections.join(', ')}`);
+                    deps.stdout(`  ${COLORS.error('Missing sections:')} ${COLORS.warning(blueprintStatus.missingSections.join(', '))}`);
                 }
                 return;
             }
@@ -137,40 +142,45 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
 
             const relProject = relative(deps.cwd, projectDir) || '.';
 
-            deps.stdout('┌────────────────────────────────────────────────────────────────────────┐');
-            deps.stdout('│  STRUCTURAL BLUEPRINT GENERATION                                       │');
-            deps.stdout('├────────────────────────────────────────────────────────────────────────┤');
-            deps.stdout(`│  Project:   ${relProject.padEnd(59)}│`);
-            deps.stdout(`│  Folder:    ${scaffold.relativeOutputDir.padEnd(59)}│`);
-            deps.stdout(`│  Blueprint: ${scaffold.relativeBlueprintPath.padEnd(59)}│`);
-            deps.stdout('└────────────────────────────────────────────────────────────────────────┘');
+            const border = (text: string) => COLORS.dim(text);
+            deps.stdout(border('┌────────────────────────────────────────────────────────────────────────┐'));
+            deps.stdout(border('│  ') + COLORS.cli.header('STRUCTURAL BLUEPRINT GENERATION'.padEnd(70)) + border('│'));
+            deps.stdout(border('├────────────────────────────────────────────────────────────────────────┤'));
+            deps.stdout(border('│  ') + COLORS.primary('Project:   ') + COLORS.cli.accent(relProject.padEnd(59)) + border('│'));
+            deps.stdout(
+                border('│  ') + COLORS.primary('Folder:    ') + COLORS.cli.accent(scaffold.relativeOutputDir.padEnd(59)) + border('│'),
+            );
+            deps.stdout(
+                border('│  ') + COLORS.primary('Blueprint: ') + COLORS.cli.accent(scaffold.relativeBlueprintPath.padEnd(59)) + border('│'),
+            );
+            deps.stdout(border('└────────────────────────────────────────────────────────────────────────┘'));
             deps.stdout('');
-            deps.stdout('  How to run this skill inside your AI agent chat:');
+            deps.stdout(`  ${COLORS.bold('How to run this skill inside your AI agent chat:')}`);
             if (agentArtifacts.length) {
                 for (const artifact of agentArtifacts) {
                     const toolName = getAgentToolDisplayName(artifact.toolId);
-                    deps.stdout(`  • ${toolName}:`);
+                    deps.stdout(`  ${COLORS.success('•')} ${COLORS.secondary(toolName)}:`);
                     for (const line of formatAgentToolInstruction(artifact.toolId, artifact.invokeLabel)) {
-                        deps.stdout(line);
+                        deps.stdout(COLORS.dim(line));
                     }
                     deps.stdout('');
                 }
             } else {
-                deps.stdout('  • Tell your agent:');
-                deps.stdout('    "Generate the structural blueprint for this codebase"');
+                deps.stdout(`  ${COLORS.warning('•')} ${COLORS.warning('Tell your agent:')}`);
+                deps.stdout(`    ${COLORS.dim('"Generate the structural blueprint for this codebase"')}`);
                 deps.stdout('');
             }
 
             if (options.installSkill === false) {
-                deps.stdout('  Agent skills: skipped (--no-install-skill)');
+                deps.stdout(`  ${COLORS.warning('Agent skills: skipped (--no-install-skill)')}`);
                 deps.stdout('');
             }
 
-            deps.stdout('  Next Steps:');
-            deps.stdout('  1. Open your AI agent/IDE chat window.');
-            deps.stdout('  2. Type the slash command, tag the file, or run the command shown above.');
-            deps.stdout('  3. Upload the generated index to the backend server:');
-            deps.stdout('     only-one push-index --skip-gitnexus --skip-cocoindex');
-            deps.stdout('──────────────────────────────────────────────────────────────────────────');
+            deps.stdout(`  ${COLORS.bold('Next Steps:')}`);
+            deps.stdout(`  1. ${COLORS.dim('Open your AI agent/IDE chat window.')}`);
+            deps.stdout(`  2. ${COLORS.dim('Type the slash command, tag the file, or run the command shown above.')}`);
+            deps.stdout(`  3. ${COLORS.dim('Upload the generated index to the backend server:')}`);
+            deps.stdout(`     ${COLORS.cli.command('only-one push-index --skip-gitnexus --skip-cocoindex')}`);
+            deps.stdout(COLORS.dim('──────────────────────────────────────────────────────────────────────────'));
         });
 }

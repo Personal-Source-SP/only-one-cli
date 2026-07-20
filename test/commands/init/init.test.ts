@@ -210,7 +210,7 @@ describe('init command', () => {
 
             await program.parseAsync(['init', 'mcp', '--yes', '--ide', 'cursor'], { from: 'user' });
 
-            const output = writes.join('\n');
+            const output = writes.join('\n').replace(/\u001b\[\d+m/g, '');
             expect(output).toContain('Cursor:');
             expect(output).toContain('github: added');
             expect(output).toContain('clockify: added');
@@ -263,7 +263,7 @@ describe('init command', () => {
             await program.parseAsync(['init', 'mcp', '--ide', 'cursor'], { from: 'user' });
 
             expect(mockCheckbox).toHaveBeenCalled();
-            const output = writes.join('\n');
+            const output = writes.join('\n').replace(/\u001b\[\d+m/g, '');
             expect(output).toContain('github: skipped');
             expect(output).toContain('clockify: added');
 

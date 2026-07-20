@@ -9,7 +9,7 @@ export const COLORS = {
     error: (text: string) => pc.red(text),
     info: (text: string) => pc.blue(text),
     dim: (text: string) => pc.dim(text),
-    bold: (text: string) => pc.bold(text),
+    bold: (text: string) => pc.bold(pc.cyan(text)),
 
     // 2. Màu sắc cụ thể cho CLI Elements (CLI-specific colors)
     cli: {

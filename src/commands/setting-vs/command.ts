@@ -3,6 +3,8 @@ import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { parseVsEditorIds, syncVsSettings, vsEditors, VsPlatform, type VsEditorId } from '@/core/vs/index.js';
 
+import { COLORS } from '@/constants/index.js';
+
 interface SettingVsOptions {
     editors?: string;
     force?: boolean;
@@ -34,13 +36,13 @@ export const createSettingVsCommand = (deps: ProgramDeps): Command => {
         .option('--force', 'Force overwrite settings, bypassing merging', false)
         .addHelpText(
             'after',
-            '\nExamples:\n' +
-                '  $ only-one setting-vs\n' +
-                '  $ only-one setting-vs --editors vscode,cursor\n' +
-                '  $ only-one setting-vs --force\n\n' +
-                'Notes:\n' +
-                '  - If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).\n' +
-                '  - Modifies the global user settings.json of the selected editor applications on your OS.',
+            `\n${COLORS.cli.header('Examples:')}\n` +
+                `  ${COLORS.cli.command('$ only-one setting-vs')}\n` +
+                `  ${COLORS.cli.command('$ only-one setting-vs --editors vscode,cursor')}\n` +
+                `  ${COLORS.cli.command('$ only-one setting-vs --force')}\n\n` +
+                `${COLORS.cli.header('Notes:')}\n` +
+                `  - ${COLORS.dim('If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).')}\n` +
+                `  - ${COLORS.dim('Modifies the global user settings.json of the selected editor applications on your OS.')}`,
         );
 
     cmd.action(async (options: SettingVsOptions) => {
@@ -54,25 +56,27 @@ export const createSettingVsCommand = (deps: ProgramDeps): Command => {
             force: options.force,
         });
 
-        deps.stdout(`\nSync Summary:`);
+        deps.stdout(COLORS.cli.header('\nSync Summary:'));
         for (const res of result.results) {
-            deps.stdout(`${res.editorName}:`);
+            deps.stdout(COLORS.secondary(`${res.editorName}:`));
             const newKeysEntries = Object.entries(res.newKeys);
             if (newKeysEntries.length > 0) {
-                deps.stdout(`  New fields:`);
+                deps.stdout(COLORS.success(`  New fields:`));
                 for (const [key, val] of newKeysEntries) {
-                    deps.stdout(`    - ${key} (value: ${JSON.stringify(val)})`);
+                    deps.stdout(`    - ${COLORS.cli.option(key)} (value: ${COLORS.dim(JSON.stringify(val))})`);
                 }
             }
             const changedKeysEntries = Object.entries(res.changedKeys);
             if (changedKeysEntries.length > 0) {
-                deps.stdout(`  Changed fields:`);
+                deps.stdout(COLORS.warning(`  Changed fields:`));
                 for (const [key, change] of changedKeysEntries) {
-                    deps.stdout(`    - ${key} (${JSON.stringify(change.old)} -> ${JSON.stringify(change.new)})`);
+                    deps.stdout(
+                        `    - ${COLORS.cli.option(key)} (${COLORS.dim(JSON.stringify(change.old))} -> ${COLORS.warning(JSON.stringify(change.new))})`,
+                    );
                 }
             }
             if (newKeysEntries.length === 0 && changedKeysEntries.length === 0) {
-                deps.stdout(`  No changes.`);
+                deps.stdout(COLORS.dim(`  No changes.`));
             }
         }
     });
