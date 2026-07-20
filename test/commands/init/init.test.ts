@@ -194,4 +194,103 @@ describe('init command', () => {
             await rm(cwd, { recursive: true, force: true });
         }
     });
+
+    it('runs init mcp with --yes and configured IDEs', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'init-test-mcp-'));
+        const tempHome = join(cwd, 'home');
+        const writes: string[] = [];
+
+        try {
+            const program = createProgram({
+                cwd,
+                env: { HOME: tempHome, USERPROFILE: tempHome },
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: (line) => writes.push(line),
+            });
+
+            await program.parseAsync(['init', 'mcp', '--yes', '--ide', 'cursor'], { from: 'user' });
+
+            const output = writes.join('\n');
+            expect(output).toContain('Cursor:');
+            expect(output).toContain('github: added');
+            expect(output).toContain('clockify: added');
+
+            const cursorConfigPath = join(tempHome, '.cursor', 'mcp.json');
+            const { existsSync } = await import('node:fs');
+            expect(existsSync(cursorConfigPath)).toBe(true);
+
+            const cursorConfig = JSON.parse(await import('node:fs/promises').then((fs) => fs.readFile(cursorConfigPath, 'utf-8')));
+            expect(cursorConfig.mcpServers.github.command).toBe('npx');
+            expect(cursorConfig.mcpServers.github.env.GITHUB_PERSONAL_ACCESS_TOKEN).toBe('');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
+
+    it('runs init mcp interactively, prompts for selection, and skips existing mcp', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'init-test-mcp-interactive-'));
+        const tempHome = join(cwd, 'home');
+        const writes: string[] = [];
+
+        const { mkdir, writeFile } = await import('node:fs/promises');
+        const cursorMcpDir = join(tempHome, '.cursor');
+        await mkdir(cursorMcpDir, { recursive: true });
+        const cursorMcpPath = join(cursorMcpDir, 'mcp.json');
+        await writeFile(
+            cursorMcpPath,
+            JSON.stringify({
+                mcpServers: {
+                    github: { command: 'existing-command', env: { GITHUB_PERSONAL_ACCESS_TOKEN: 'existing-token' } },
+                },
+            }),
+        );
+
+        try {
+            const mockCheckbox = vi.fn().mockResolvedValue(['github', 'clockify']);
+            const program = createProgram({
+                cwd,
+                env: { HOME: tempHome, USERPROFILE: tempHome },
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                prompts: {
+                    checkbox: mockCheckbox,
+                    confirm: vi.fn().mockResolvedValue(true),
+                    select: vi.fn().mockResolvedValue('custom'),
+                    input: vi.fn().mockResolvedValue(''),
+                },
+                stdout: (line) => writes.push(line),
+            });
+
+            await program.parseAsync(['init', 'mcp', '--ide', 'cursor'], { from: 'user' });
+
+            expect(mockCheckbox).toHaveBeenCalled();
+            const output = writes.join('\n');
+            expect(output).toContain('github: skipped');
+            expect(output).toContain('clockify: added');
+
+            const cursorConfig = JSON.parse(await import('node:fs/promises').then((fs) => fs.readFile(cursorMcpPath, 'utf-8')));
+            expect(cursorConfig.mcpServers.github.command).toBe('existing-command');
+            expect(cursorConfig.mcpServers.github.env.GITHUB_PERSONAL_ACCESS_TOKEN).toBe('existing-token');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
+
+    it('fails when unsupported IDE is selected for mcp init', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'init-test-mcp-unsupported-'));
+        const writes: string[] = [];
+
+        try {
+            const program = createProgram({
+                cwd,
+                env: {},
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: (line) => writes.push(line),
+                stderr: (line) => writes.push(line),
+            });
+
+            await expect(program.parseAsync(['init', 'mcp', 'github', '--ide', 'invalid-ide'], { from: 'user' })).rejects.toThrow();
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
 });

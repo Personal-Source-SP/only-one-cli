@@ -1,9 +1,10 @@
-import { existsSync } from 'node:fs';
-import { mkdir, cp, readdir, readFile, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { mkdir, cp, readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+import { homedir } from 'node:os';
 import yaml from 'js-yaml';
 import { confirm, select } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
@@ -12,6 +13,14 @@ import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/global
 import { getInstallableAgentTools, getAgentToolById } from '@/core/agent/tools.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
 import { updateGitignore } from './gitignore.js';
+import { readMcpManifests } from '@/core/mcp/registry.js';
+import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
+import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
+import { generateCommand } from '@/core/command-generation/generator.js';
+import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
+import { buildPrGitCommandContent, buildClockifyCommandContent } from '@/core/templates/agent-workflows.js';
+import { parseJsoncObject } from '@/core/vs/json.js';
+import { cursorMcpAdapter, antigravityMcpAdapter } from '@/core/mcp/adapters.js';
 import type {
     InitCommandRequest,
     InitCommandResponse,
@@ -19,6 +28,7 @@ import type {
     PackagesStepResult,
     SkillsStepResult,
     ConfigsStepResult,
+    McpStepResult,
     PackageManifest,
     ComboManifest,
 } from './types.js';
@@ -370,6 +380,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         let selectedPackageNames: string[] = [];
         let selectedSkillNames: string[] = [];
         let selectedConfigNames: string[] = [];
+        let selectedMcpNames: string[] = [];
 
         let isComboFlow = false;
         let selectedCombos: (ComboManifest & { id: string })[] = [];
@@ -491,13 +502,56 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             }
         }
 
+        // Step 5: Prompt MCP selection
+        if (!skip.includes('mcp') && (!step || step === 'mcp')) {
+            deps.stdout('\n── Step 5: MCP Configuration ──');
+            const { manifests } = await readMcpManifests();
+            if (manifests.length === 0) {
+                deps.stdout('  No MCP manifests available');
+            } else {
+                const preSelectedMcps = new Set<string>();
+                if (selectedSkillNames.includes('ak-pr-git')) {
+                    preSelectedMcps.add('github');
+                }
+                if (selectedSkillNames.includes('ak-clockify')) {
+                    preSelectedMcps.add('clockify');
+                }
+
+                if (yes || !deps.prompts?.checkbox) {
+                    selectedMcpNames = preSelectedMcps.size > 0 ? Array.from(preSelectedMcps) : [];
+                } else {
+                    const choices = manifests.map((m) => {
+                        return {
+                            name: m.id,
+                            value: m.id,
+                            checked: preSelectedMcps.has(m.id),
+                        };
+                    });
+
+                    selectedMcpNames = await deps.prompts.checkbox({
+                        message: 'Select MCP servers to configure:',
+                        choices,
+                    });
+                }
+
+                // Dependency checking & opt-out warning
+                if (selectedSkillNames.includes('ak-pr-git') && !selectedMcpNames.includes('github')) {
+                    deps.stdout('  Warning: Skill ak-pr-git requires the github MCP server. Opting out may break its functionality.');
+                }
+                if (selectedSkillNames.includes('ak-clockify') && !selectedMcpNames.includes('clockify')) {
+                    deps.stdout('  Warning: Skill ak-clockify requires the clockify MCP server. Opting out may break its functionality.');
+                }
+            }
+        }
+
         const hasTools = selectedTools.length > 0;
         const hasPackages = selectedPackageNames.length > 0;
         const hasSkills = selectedSkillNames.length > 0;
         const hasConfigs = selectedConfigNames.length > 0;
+        const hasMcps = selectedMcpNames.length > 0;
 
-        if (!hasTools && !hasPackages && !hasSkills && !hasConfigs) {
-            deps.stdout('\nNo tools, packages, skills, or configs selected. Exiting.');
+        if (!hasTools && !hasPackages && !hasSkills && !hasConfigs && !hasMcps) {
+            deps.stdout('\nNo tools, packages, skills, configs, or MCPs selected. Exiting.');
             return {};
         }
 
@@ -559,6 +613,13 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 const alreadyExists = existsSync(join(projectDir, name));
                 const statusBadge = alreadyExists ? '[⚠️ Already exists - will overwrite]' : '[New]';
                 deps.stdout(`  - ${name} ${statusBadge}`);
+            }
+        }
+
+        if (hasMcps) {
+            deps.stdout('\nMCP Servers to Configure:');
+            for (const name of selectedMcpNames) {
+                deps.stdout(`  - ${name} [Will merge into global IDE configuration]`);
             }
         }
 
@@ -684,6 +745,28 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                         await mkdir(toolSkillsDir, { recursive: true });
                         await cp(srcPath, destPath, { recursive: true, force: true });
                         deps.stdout(`    ✓ Copied to ${tool.name}`);
+
+                        let commandContent = null;
+                        let commandId = '';
+                        if (skillName === 'ak-pr-git') {
+                            commandContent = buildPrGitCommandContent();
+                            commandId = 'pr-git';
+                        } else if (skillName === 'ak-clockify') {
+                            commandContent = buildClockifyCommandContent();
+                            commandId = 'clockify';
+                        }
+
+                        if (commandContent && commandId) {
+                            const commandAdapter = CommandAdapterRegistry.get(tool.value);
+                            if (commandAdapter) {
+                                const generated = generateCommand(commandContent, commandAdapter);
+                                const relativePath = normalizeStructureCommandPath(generated.path, commandId);
+                                const commandPath = join(projectDir, relativePath);
+                                await mkdir(dirname(commandPath), { recursive: true });
+                                await writeFile(commandPath, generated.content, 'utf-8');
+                                deps.stdout(`    ✓ Generated command ${commandId} for ${tool.name}`);
+                            }
+                        }
                     } catch (error) {
                         deps.stdout(`    ✗ Failed to copy to ${tool.name}: ${error instanceof Error ? error.message : String(error)}`);
                     }
@@ -739,6 +822,39 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             configsStepResult = { selectedConfigs: selectedConfigNames };
         }
 
+        // MCP execution
+        let mcpStepResult: McpStepResult | undefined = undefined;
+        if (selectedMcpNames.length > 0) {
+            deps.stdout('\nSyncing MCP global configurations...');
+            const { manifests } = await readMcpManifests();
+            const selectedManifests = manifests.filter((m) => selectedMcpNames.includes(m.id));
+            if (selectedManifests.length > 0) {
+                try {
+                    let targetIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');
+                    if (targetIdeIds.length === 0) {
+                        const tools = getInstallableAgentTools();
+                        const configuredTools = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+                        targetIdeIds = configuredTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');
+                    }
+                    if (targetIdeIds.length === 0) {
+                        targetIdeIds = ['cursor', 'antigravity'];
+                    }
+
+                    await syncMcpGlobalConfig({
+                        cwd: projectDir,
+                        homeDir: homedir(),
+                        ideIds: targetIdeIds,
+                        manifests: selectedManifests,
+                        platform: process.platform,
+                        write: deps.stdout,
+                    });
+                    mcpStepResult = { selectedMcps: selectedMcpNames };
+                } catch (error) {
+                    deps.stdout(`  ✗ Failed to sync MCP configurations: ${error instanceof Error ? error.message : String(error)}`);
+                }
+            }
+        }
+
         // 5. Update Gitignore
         if (!noIgnore) {
             const gitignorePaths: string[] = [];
@@ -774,6 +890,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             packagesStep: packagesStepResult,
             skillsStep: skillsStepResult,
             configsStep: configsStepResult,
+            mcpStep: mcpStepResult,
+            projectDir,
         };
     } catch (error: any) {
         if (error?.name === 'ExitPromptError' || error?.message?.includes('force closed')) {
@@ -794,6 +912,7 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                 packages: result.packagesStep?.installedPackages,
                 skills: result.skillsStep?.installedSkills,
                 configs: result.configsStep?.selectedConfigs,
+                mcps: result.mcpStep?.selectedMcps,
             },
             deps.stdout,
         );
@@ -813,5 +932,93 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
     }
     if (result.configsStep && result.configsStep.selectedConfigs.length > 0) {
         deps.stdout(`  Configs: ${result.configsStep.selectedConfigs.join(', ')}`);
+    }
+    if (result.mcpStep && result.mcpStep.selectedMcps.length > 0) {
+        deps.stdout(`  MCPs: ${result.mcpStep.selectedMcps.join(', ')}`);
+    }
+
+    const projectDir = result.projectDir;
+    if (projectDir) {
+        const activeTools = getInstallableAgentTools().filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+        if (activeTools.length > 0) {
+            deps.stdout('\n==================================================');
+            deps.stdout('                READINESS REPORT');
+            deps.stdout('==================================================');
+
+            const workflows = [
+                {
+                    id: 'pr-git',
+                    skillName: 'ak-pr-git',
+                    mcpId: 'github',
+                    secretKey: 'GITHUB_PERSONAL_ACCESS_TOKEN',
+                },
+                {
+                    id: 'clockify',
+                    skillName: 'ak-clockify',
+                    mcpId: 'clockify',
+                    secretKey: 'CLOCKIFY_API_KEY',
+                },
+            ];
+
+            for (const workflow of workflows) {
+                const hasSkillInAny = activeTools.some((t) => existsSync(join(projectDir, t.skillsDir!, 'skills', workflow.skillName)));
+                if (!hasSkillInAny) continue;
+
+                deps.stdout(`\n  ${workflow.id} workflow:`);
+
+                let isCommandReady = true;
+                let isSkillReady = true;
+                for (const tool of activeTools) {
+                    const adapter = CommandAdapterRegistry.get(tool.value);
+                    const commandPath = adapter
+                        ? join(projectDir, normalizeStructureCommandPath(adapter.getFilePath(workflow.id), workflow.id))
+                        : '';
+                    if (!commandPath || !existsSync(commandPath)) {
+                        isCommandReady = false;
+                    }
+                    if (!existsSync(join(projectDir, tool.skillsDir!, 'skills', workflow.skillName))) {
+                        isSkillReady = false;
+                    }
+                }
+
+                deps.stdout(`    - Command (${workflow.id}): ${isCommandReady ? 'Ready' : 'Not configured'}`);
+                deps.stdout(`    - Skill (${workflow.skillName}): ${isSkillReady ? 'Ready' : 'Not configured'}`);
+
+                const configuredIdes: string[] = [];
+                const incompleteIdes: { name: string; path: string }[] = [];
+
+                for (const adapter of [cursorMcpAdapter, antigravityMcpAdapter]) {
+                    try {
+                        const path = adapter.getConfigPath(homedir(), process.platform);
+                        if (existsSync(path)) {
+                            const config = parseJsoncObject(readFileSync(path, 'utf8')) as any;
+                            const mcpConfig = config?.mcpServers?.[workflow.mcpId] as any;
+                            if (mcpConfig) {
+                                configuredIdes.push(adapter.name);
+                                const credentialValue = mcpConfig.env?.[workflow.secretKey];
+                                if (credentialValue === undefined || credentialValue === '') {
+                                    incompleteIdes.push({ name: adapter.name, path });
+                                }
+                            }
+                        }
+                    } catch {}
+                }
+
+                if (configuredIdes.length > 0) {
+                    deps.stdout(`    - MCP Server (${workflow.mcpId}): Configured in ${configuredIdes.join(', ')}`);
+                    if (incompleteIdes.length > 0) {
+                        deps.stdout(`    - Credentials: Setup incomplete`);
+                        for (const ide of incompleteIdes) {
+                            deps.stdout(`      ⚠️ ${ide.name}: ${ide.path} -> ${workflow.secretKey} requires manual editing`);
+                        }
+                    } else {
+                        deps.stdout(`    - Credentials: Ready`);
+                    }
+                } else {
+                    deps.stdout(`    - MCP Server (${workflow.mcpId}): Not configured`);
+                }
+            }
+            deps.stdout('\n==================================================');
+        }
     }
 };

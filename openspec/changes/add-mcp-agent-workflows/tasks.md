@@ -20,26 +20,26 @@
 - [x] 3.2 Implement JSON/JSONC read and add-only merge that preserves unrelated fields, unselected servers, and complete existing definitions.
 - [x] 3.3 Generalize the existing VS sync transaction primitive for MCP file backup, journal, atomic write, rollback, signal handling, and interrupted-run recovery while preserving existing VS behavior.
 - [x] 3.4 Implement multi-IDE MCP sync orchestration and result reporting for added, skipped-already-configured, unchanged, and manual credential keys.
-- [ ] 3.5 Add path/schema fixtures and merge tests for Cursor and Antigravity on macOS/Windows, including existing MCP preservation and second-write rollback.
+- [x] 3.5 Add path/schema fixtures and merge tests for Cursor and Antigravity on macOS/Windows, including existing MCP preservation and second-write rollback.
 
 ## 4. Init Integration and Dependencies
 
-- [ ] 4.1 Add `init mcp` with interactive IDE/MCP multi-select and non-interactive MCP names, restricted to Cursor and Antigravity adapters.
-- [ ] 4.2 Extend main init orchestration with MCP selection after OpenSpec tool setup without duplicating OpenSpec tool selection, honoring ADR 0001.
-- [ ] 4.3 Add fixed dependency mapping from `pr-git` to `ak-pr-git`/`github` and from `clockify` to `ak-clockify`/`clockify`, with preselected dependencies and opt-out warning.
-- [ ] 4.4 Add final readiness reporting for command, skill, MCP, target global config, and credential placeholders requiring manual edits.
-- [ ] 4.5 Add init/subcommand tests for interactive selection, `--yes`, missing libraries, unsupported IDE, existing MCP skip, and no secret prompting/logging.
+- [x] 4.1 Add `init mcp` with interactive IDE/MCP multi-select and non-interactive MCP names, restricted to Cursor and Antigravity adapters.
+- [x] 4.2 Extend main init orchestration with MCP selection after OpenSpec tool setup without duplicating OpenSpec tool selection, honoring ADR 0001.
+- [x] 4.3 Add fixed dependency mapping from `pr-git` to `ak-pr-git`/`github` and from `clockify` to `ak-clockify`/`clockify`, with preselected dependencies and opt-out warning.
+- [x] 4.4 Add final readiness reporting for command, skill, MCP, target global config, and credential placeholders requiring manual edits.
+- [x] 4.5 Add init/subcommand tests for interactive selection, `--yes`, missing libraries, unsupported IDE, existing MCP skip, and no secret prompting/logging.
 
 ## 5. Skill Contract Verification
 
-- [ ] 5.1 Add static validation tests for `pr-git` Conventional Commit types, required confirmation, English-only GitHub body, Vietnamese chat summary, clean/pushed branch guardrails, and existing PR update flow.
-- [ ] 5.2 Add static validation tests for Clockify required `DD/MM/YYYY` date/project, default positive `tasks-per-day`, task grammar, GMT+7 slots, weekday allocation, and weekend adjustment.
-- [ ] 5.3 Add static validation tests proving `--validate` never mutates, log preview requires confirmation, matching scope is workspace/project/date/slot, all entries are billable, and restore failure stops the batch.
-- [ ] 5.4 Add tests for exact project matching, similar-name suggestions, interactive workspace disambiguation, and non-interactive ambiguity failure.
+- [x] 5.1 Add static validation tests for `pr-git` Conventional Commit types, required confirmation, English-only GitHub body, Vietnamese chat summary, clean/pushed branch guardrails, and existing PR update flow.
+- [x] 5.2 Add static validation tests for Clockify required `DD/MM/YYYY` date/project, default positive `tasks-per-day`, task grammar, GMT+7 slots, weekday allocation, and weekend adjustment.
+- [x] 5.3 Add static validation tests proving `--validate` never mutates, log preview requires confirmation, matching scope is workspace/project/date/slot, all entries are billable, and restore failure stops the batch.
+- [x] 5.4 Add tests for exact project matching, similar-name suggestions, interactive workspace disambiguation, and non-interactive ambiguity failure.
 
 ## 6. Documentation and Final Validation
 
-- [ ] 6.1 Update root README and `libraries/README.md` with command examples, required options, task format, optimized skill layout, MCP selection, supported IDEs, global scope, add-only semantics, and manual secret setup.
-- [ ] 6.2 Run unit/integration tests, `npm run format:check`, and TypeScript build/type checks required by the repository.
-- [ ] 6.3 Run `openspec validate add-mcp-agent-workflows --type change --strict` and resolve all validation errors before implementation completion.
-- [ ] 6.4 Manually verify generated command/skill paths and MCP global merge against temporary Cursor and Antigravity configs without writing real credentials.
+- [x] 6.1 Update root README and `libraries/README.md` with command examples, required options, task format, optimized skill layout, MCP selection, supported IDEs, global scope, add-only semantics, and manual secret setup.
+- [x] 6.2 Run unit/integration tests, `npm run format:check`, and TypeScript build/type checks required by the repository.
+- [x] 6.3 Run `openspec validate add-mcp-agent-workflows --type change --strict` and resolve all validation errors before implementation completion.
+- [x] 6.4 Manually verify generated command/skill paths and MCP global merge against temporary Cursor and Antigravity configs without writing real credentials.

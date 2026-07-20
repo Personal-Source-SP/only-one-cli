@@ -57,6 +57,43 @@ only-one init --no-install-skill
 only-one init --tools cursor,claude
 ```
 
+### `init mcp`
+
+Merge global MCP configurations into Cursor or Antigravity settings.
+
+```bash
+only-one init mcp [names] [options]
+```
+
+| Option         | Description                                                                 |
+| -------------- | --------------------------------------------------------------------------- |
+| `--ide <ides>` | Comma-separated target IDEs: `cursor`, `antigravity` (default: both if active)|
+| `--yes`        | Non-interactive mode, select all available MCPs                             |
+
+**Examples**
+
+```bash
+# Configure all available MCPs for Cursor only
+only-one init mcp --ide cursor --yes
+
+# Configure github MCP for Cursor and Antigravity
+only-one init mcp github
+```
+
+### Workflows
+
+The CLI includes pre-built agent workflows:
+
+1. **`pr-git` Workflow (GitHub PR creation)**
+   - Requires `ak-pr-git` skill and `github` MCP server.
+   - Requires setting `GITHUB_PERSONAL_ACCESS_TOKEN` in the IDE's MCP environment config file (e.g. Cursor's `mcp.json`).
+   - Standardizes PR titles, formats body to `references/pr-template.md`, and requests explicit confirmation.
+
+2. **`clockify` Workflow (Clockify time entry logging)**
+   - Requires `ak-clockify` skill and `clockify` MCP server.
+   - Requires setting `CLOCKIFY_API_KEY` in the IDE's MCP environment config file.
+   - Parses task format `[Label] Description | start-endh`, validates overlapping slots in GMT+7, and logs to Clockify.
+
 ### `structure-generate`
 
 Generate a structural blueprint markdown file for the project.
@@ -64,7 +101,6 @@ Generate a structural blueprint markdown file for the project.
 ```bash
 only-one structure-generate [path] [options]
 ```
-
 
 ### `update`
 

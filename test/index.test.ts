@@ -26,7 +26,16 @@ describe('only-one CLI', () => {
         const targetPath = join(cwd, 'dist-index.js');
         const symlinkPath = join(cwd, 'only-one');
         await writeFile(targetPath, '');
-        await symlink(targetPath, symlinkPath);
+
+        try {
+            await symlink(targetPath, symlinkPath);
+        } catch (err: any) {
+            if (err.code === 'EPERM' || err.code === 'EACCES') {
+                await rm(cwd, { recursive: true, force: true });
+                return; // Skip if symlinks are not allowed on this system (Windows without dev mode)
+            }
+            throw err;
+        }
 
         try {
             expect(isCliEntrypoint(pathToFileURL(targetPath).href, symlinkPath)).toBe(true);

@@ -2,10 +2,11 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { antigravityMcpAdapter, cursorMcpAdapter } from '@src/core/mcp/adapters.js';
 import { mergeMcpServers } from '@src/core/mcp/merge.js';
+import { resolveMcpJournalPath, syncMcpGlobalConfig } from '@src/core/mcp/sync.js';
 
 describe('MCP IDE adapters', () => {
     it('resolves Cursor global config path', () => {
-        expect(cursorMcpAdapter.getConfigPath('/Users/test', 'darwin')).toBe('/Users/test/.cursor/mcp.json');
+        expect(cursorMcpAdapter.getConfigPath('/Users/test', 'darwin').replace(/\\/g, '/')).toBe('/Users/test/.cursor/mcp.json');
     });
 
     it('resolves Antigravity global config paths', () => {
@@ -35,5 +36,166 @@ describe('mergeMcpServers', () => {
         expect(result.changed).toBe(false);
         expect(result.servers.github).toBe(existing);
         expect(result.results).toEqual([{ credentialKeys: ['TOKEN'], id: 'github', status: 'skipped' }]);
+    });
+});
+
+class MemoryFs implements VsFileSystem {
+    public readonly files = new Map<string, string>();
+    public readonly dirs = new Set<string>();
+
+    public async copyFile(source: string, target: string): Promise<void> {
+        const content = this.files.get(source);
+        if (content === undefined) throw new Error('ENOENT');
+        this.files.set(target, content);
+    }
+
+    public async mkdir(path: string): Promise<void> {
+        this.dirs.add(path);
+    }
+
+    public async readFile(path: string): Promise<string> {
+        const content = this.files.get(path);
+        if (content === undefined) throw new Error('ENOENT');
+        return content;
+    }
+
+    public async rename(source: string, target: string): Promise<void> {
+        const content = this.files.get(source);
+        if (content === undefined) throw new Error('ENOENT');
+        this.files.set(target, content);
+        this.files.delete(source);
+    }
+
+    public async rm(path: string): Promise<void> {
+        this.files.delete(path);
+    }
+
+    public async stat(path: string): Promise<{ isFile: () => boolean }> {
+        if (!this.files.has(path)) throw new Error('ENOENT');
+        return { isFile: () => true };
+    }
+
+    public async writeFile(path: string, content: string): Promise<void> {
+        this.files.set(path, content);
+    }
+}
+
+class MemoryRunner implements VsProcessRunner {
+    public async run(): Promise<{ code: number; stderr: string; stdout: string }> {
+        return { code: 0, stderr: '', stdout: '' };
+    }
+}
+
+describe('syncMcpGlobalConfig', () => {
+    it('syncs global config on Windows and macOS platforms', async () => {
+        const fs = new MemoryFs();
+        const runner = new MemoryRunner();
+        const writes: string[] = [];
+
+        // Sync Cursor on win32
+        const resultWin = await syncMcpGlobalConfig({
+            cwd: '/repo',
+            homeDir: 'C:/Users/test',
+            ideIds: ['cursor'],
+            manifests: [{ id: 'tavily', server: { command: 'npx', args: ['tavily'] } }],
+            platform: 'win32',
+            write: (l) => writes.push(l),
+            fs,
+            runner,
+        });
+
+        expect(resultWin.changed).toBe(1);
+        const winPath = join('C:/Users/test', '.cursor', 'mcp.json');
+        const winContent = JSON.parse(fs.files.get(winPath) ?? '{}');
+        expect(winContent.mcpServers.tavily.command).toBe('npx');
+
+        // Sync Antigravity on darwin
+        const resultMac = await syncMcpGlobalConfig({
+            cwd: '/repo',
+            homeDir: '/Users/test',
+            ideIds: ['antigravity'],
+            manifests: [{ id: 'github', server: { command: 'node', args: ['github'] } }],
+            platform: 'darwin',
+            write: (l) => writes.push(l),
+            fs,
+            runner,
+        });
+
+        expect(resultMac.changed).toBe(1);
+        const macPath = join('/Users/test', 'Library', 'Application Support', 'Antigravity IDE', 'User', 'mcp.json');
+        const macContent = JSON.parse(fs.files.get(macPath) ?? '{}');
+        expect(macContent.mcpServers.github.command).toBe('node');
+    });
+
+    it('preserves existing configs and adds new ones', async () => {
+        const fs = new MemoryFs();
+        const runner = new MemoryRunner();
+        const cursorPath = join('/Users/test', '.cursor', 'mcp.json');
+
+        // Seed existing config with a preset server
+        fs.files.set(
+            cursorPath,
+            JSON.stringify({
+                mcpServers: {
+                    existing: { command: 'custom-cmd' },
+                },
+            }),
+        );
+
+        await syncMcpGlobalConfig({
+            cwd: '/repo',
+            homeDir: '/Users/test',
+            ideIds: ['cursor'],
+            manifests: [
+                { id: 'existing', server: { command: 'npx' } }, // Should skip
+                { id: 'tavily', server: { command: 'node' } }, // Should add
+            ],
+            platform: 'darwin',
+            write: () => {},
+            fs,
+            runner,
+        });
+
+        const content = JSON.parse(fs.files.get(cursorPath) ?? '{}');
+        expect(content.mcpServers.existing.command).toBe('custom-cmd'); // Preserved
+        expect(content.mcpServers.tavily.command).toBe('node'); // Added
+    });
+
+    it('rolls back Cursor configuration if Antigravity sync fails', async () => {
+        const fs = new MemoryFs();
+        const runner = new MemoryRunner();
+        const cursorPath = join('/Users/test', '.cursor', 'mcp.json');
+        const antigravityPath = join('/Users/test', 'Library', 'Application Support', 'Antigravity IDE', 'User', 'mcp.json');
+
+        // Seed Cursor
+        fs.files.set(cursorPath, JSON.stringify({ mcpServers: {} }));
+
+        // Mock rename to fail specifically on Antigravity path
+        const originalRename = fs.rename.bind(fs);
+        fs.rename = async (source, target) => {
+            if (target.includes('Antigravity')) {
+                throw new Error('Atomic write failure');
+            }
+            return originalRename(source, target);
+        };
+
+        await expect(
+            syncMcpGlobalConfig({
+                cwd: '/repo',
+                homeDir: '/Users/test',
+                ideIds: ['cursor', 'antigravity'],
+                manifests: [{ id: 'fetch', server: { command: 'npx' } }],
+                platform: 'darwin',
+                write: () => {},
+                fs,
+                runner,
+            }),
+        ).rejects.toThrow('Atomic write failure');
+
+        // Verify Cursor config was rolled back and did not keep the change
+        const cursorContent = JSON.parse(fs.files.get(cursorPath) ?? '{}');
+        expect(cursorContent.mcpServers.fetch).toBeUndefined();
+        // Verify journal was cleaned up
+        expect(fs.files.has(resolveMcpJournalPath('/repo'))).toBe(false);
     });
 });

@@ -50,7 +50,7 @@ describe('agent workflow command adapter naming', () => {
     it('uses direct cursor slash command names', () => {
         const generated = generateCommand(buildPrGitCommandContent(), cursorCommandAdapter);
 
-        expect(generated.path).toBe('.cursor/commands/pr-git.md');
+        expect(generated.path.replace(/\\/g, '/')).toBe('.cursor/commands/pr-git.md');
         expect(generated.content).toContain('name: /pr-git');
     });
 
@@ -58,7 +58,7 @@ describe('agent workflow command adapter naming', () => {
         const raw = antigravityCommandAdapter.getFilePath(AgentWorkflowCommandId.PrGit);
         const normalized = normalizeStructureCommandPath(raw, AgentWorkflowCommandId.PrGit);
 
-        expect(raw).toBe('.agent/workflows/opsx-pr-git.md');
-        expect(normalized).toBe('.agent/workflows/pr-git.md');
+        expect(raw.replace(/\\/g, '/')).toBe('.agent/workflows/opsx-pr-git.md');
+        expect(normalized.replace(/\\/g, '/')).toBe('.agent/workflows/pr-git.md');
     });
 });

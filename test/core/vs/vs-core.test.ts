@@ -1,4 +1,4 @@
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { VsEditorId, VsPlatform, mergeSettings, normalizeExtensionIds, parseVsEditorIds, vsEditors } from '@src/core/vs/index.js';
 import { PercentProgressReporter } from '@src/core/vs/progress.js';
@@ -65,10 +65,10 @@ class MemoryRunner implements VsProcessRunner {
     }
 }
 
-const seedLibrary = (fs: MemoryFs, libraryDir = '/library/vs'): void => {
-    fs.files.set(`${libraryDir}/settings.json`, JSON.stringify({ editor: { tabSize: 4 }, sourceOnly: true }));
+const seedLibrary = (fs: MemoryFs, libraryDir = join('/library', 'vs')): void => {
+    fs.files.set(join(libraryDir, 'settings.json'), JSON.stringify({ editor: { tabSize: 4 }, sourceOnly: true }));
     fs.files.set(
-        `${libraryDir}/extensions.json`,
+        join(libraryDir, 'extensions.json'),
         JSON.stringify({ extensions: ['Existing.Keep', 'Missing.One', 'Missing.One', 'fail.ext'] }),
     );
 };
@@ -106,10 +106,12 @@ describe('VS core sync helpers', () => {
 
     it('resolves supported editor settings paths by platform', () => {
         const vscode = vsEditors.find((editor) => editor.id === VsEditorId.VSCode);
-        expect(vscode?.resolveSettingsPath('/Users/me', VsPlatform.Darwin)).toContain(
+        expect(vscode?.resolveSettingsPath('/Users/me', VsPlatform.Darwin).replace(/\\/g, '/')).toContain(
             'Library/Application Support/Code/User/settings.json',
         );
-        expect(vscode?.resolveSettingsPath('C:/Users/me', VsPlatform.Win32)).toContain('AppData/Roaming/Code/User/settings.json');
+        expect(vscode?.resolveSettingsPath('C:/Users/me', VsPlatform.Win32).replace(/\\/g, '/')).toContain(
+            'AppData/Roaming/Code/User/settings.json',
+        );
     });
 
     it('parses comma-separated editor ids and ignores unsupported ids', () => {
@@ -149,7 +151,7 @@ describe('VS core sync helpers', () => {
                 editorIds: [VsEditorId.VSCode, VsEditorId.Antigravity],
                 fs,
                 homeDir: '/Users/me',
-                libraryDir: '/library/vs',
+                libraryDir: join('/library', 'vs'),
                 platform: VsPlatform.Darwin,
                 runner: new MemoryRunner(),
                 write: () => undefined,
@@ -164,7 +166,8 @@ describe('VS core sync helpers', () => {
     it('recovers unfinished journals before settings sync starts', async () => {
         const fs = new MemoryFs();
         seedLibrary(fs);
-        const targetPath = '/Users/me/Library/Application Support/Code/User/settings.json';
+        const targetPath =
+            vsEditors.find((editor) => editor.id === VsEditorId.VSCode)?.resolveSettingsPath('/Users/me', VsPlatform.Darwin) ?? '';
         const journalPath = resolveVsJournalPath('/repo');
         const backupPath = `${journalPath}.${Buffer.from(targetPath).toString('hex')}.bak`;
         fs.files.set(targetPath, JSON.stringify({ broken: true }));
@@ -176,7 +179,7 @@ describe('VS core sync helpers', () => {
             editorIds: [VsEditorId.VSCode],
             fs,
             homeDir: '/Users/me',
-            libraryDir: '/library/vs',
+            libraryDir: join('/library', 'vs'),
             platform: VsPlatform.Darwin,
             runner: new MemoryRunner(),
             write: () => undefined,
@@ -211,7 +214,7 @@ describe('VS core sync helpers', () => {
                 cwd: '/repo',
                 editorIds: [VsEditorId.VSCode],
                 fs,
-                libraryDir: '/library/vs',
+                libraryDir: join('/library', 'vs'),
                 runner,
                 write: () => undefined,
             }),

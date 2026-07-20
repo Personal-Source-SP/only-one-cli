@@ -9,7 +9,7 @@ describe('normalizeStructureCommandPath', () => {
         const raw = windsurfCommandAdapter.getFilePath(STRUCTURE_COMMAND_ID);
         expect(raw).toContain('opsx-');
         const normalized = normalizeStructureCommandPath(raw, STRUCTURE_COMMAND_ID);
-        expect(normalized).toBe('.windsurf/workflows/only-one-structure-generate.md');
+        expect(normalized.replace(/\\/g, '/')).toBe('.windsurf/workflows/only-one-structure-generate.md');
     });
 
     it('strips opsx folder from claude-style paths', () => {

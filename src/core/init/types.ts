@@ -41,11 +41,17 @@ export interface InitCommandRequest {
     options: InitCommandOptions;
 }
 
+export interface McpStepResult {
+    selectedMcps: string[];
+}
+
 export interface InitCommandResponse {
     toolsStep?: ToolsStepResult;
     packagesStep?: PackagesStepResult;
     skillsStep?: SkillsStepResult;
     configsStep?: ConfigsStepResult;
+    mcpStep?: McpStepResult;
+    projectDir?: string;
 }
 
 export interface ComboManifest {

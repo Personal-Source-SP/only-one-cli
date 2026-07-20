@@ -20,11 +20,15 @@ const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: s
 
     const requestedMcpIds = parseCsv(names);
     let selectedMcpIds = requestedMcpIds;
-    if (!selectedMcpIds.length && deps.prompts?.checkbox) {
-        selectedMcpIds = await deps.prompts.checkbox({
-            message: 'Select MCP servers to configure',
-            choices: manifests.map((manifest) => ({ name: manifest.id, value: manifest.id })),
-        });
+    if (!selectedMcpIds.length) {
+        if (options?.yes || !deps.prompts?.checkbox) {
+            selectedMcpIds = manifests.map((manifest) => manifest.id);
+        } else {
+            selectedMcpIds = await deps.prompts.checkbox({
+                message: 'Select MCP servers to configure',
+                choices: manifests.map((manifest) => ({ name: manifest.id, value: manifest.id })),
+            });
+        }
     }
     if (!selectedMcpIds.length) throw new Error('Select at least one MCP server');
 
@@ -45,7 +49,7 @@ const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: s
 
     const response = await syncMcpGlobalConfig({
         cwd: deps.cwd,
-        homeDir: homedir(),
+        homeDir: deps.env.HOME || deps.env.USERPROFILE || homedir(),
         ideIds: selectedIdeIds,
         manifests: selectedManifests,
         platform: process.platform,

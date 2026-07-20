@@ -17,10 +17,12 @@ libraries/
 ## Sử dụng
 
 Init command đọc các manifest trong thư mục này để hiển thị danh sách cho user chọn:
-1. **skills/**: Mỗi subdir là 1 skill. Copy vào tool's skillsDir khi user chọn.
-2. **packages/**: Mỗi file `.yaml` là 1 package. Install via `npm install -g` khi user chọn.
+1. **skills/**: Mỗi subdir là 1 skill. Copy vào tool's skillsDir khi user chọn. Các skill workflows mới gồm `ak-pr-git` và `ak-clockify`.
+2. **packages/**: Mỗi file `.yaml` là 1 package. Install khi user chọn.
 3. **templates/**: Sử dụng cho scaffolding (WIP).
-4. **vs/**: `setting-vs` merge `settings.json`; `extensions-vs` cài extension ID còn thiếu qua CLI editor.
+4. **configs/**: Các template cấu hình cho project.
+5. **mcps/**: Các file manifest cấu hình MCP servers (ví dụ: `github.json`, `clockify.json`). Được dùng bởi `init mcp` hoặc bước đồng bộ MCP của `init` để merge cấu hình global vào Cursor/Antigravity.
+6. **vs/**: `setting-vs` merge `settings.json`; `extensions-vs` cài extension ID còn thiếu qua CLI editor.
 
 ## VS sync
 
