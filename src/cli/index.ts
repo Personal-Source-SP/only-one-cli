@@ -32,6 +32,7 @@ export function createProgram(deps: ProgramDeps) {
                 return rawHelp
                     .replace(/^Usage:/m, COLORS.cli.header('Usage:'))
                     .replace(/^Options:/m, COLORS.cli.header('Options:'))
+                    .replace(/^Global Options:/m, COLORS.cli.header('Global Options:'))
                     .replace(/^Commands:/m, COLORS.cli.header('Commands:'))
                     .replace(/^Arguments:/m, COLORS.cli.header('Arguments:'))
                     .replace(/^Examples:/m, COLORS.cli.header('Examples:'))
@@ -50,8 +51,16 @@ export function createProgram(deps: ProgramDeps) {
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
-                `  ${COLORS.cli.command('$ only-one doctor')}\n` +
-                `  ${COLORS.cli.command('$ only-one init --step skills --yes')}\n\n` +
+                `  ${COLORS.cli.command('$ only-one init')}                             # Initialize project workspace configs & templates\n` +
+                `  ${COLORS.cli.command('$ only-one init --step skills --yes')}          # Initialize skills step non-interactively\n` +
+                `  ${COLORS.cli.command('$ only-one combo idsd-flow')}                   # Install pre-defined tool, package, & skill combos\n` +
+                `  ${COLORS.cli.command('$ only-one skill --tool cursor')}               # Manage/sync custom agent skills for Cursor\n` +
+                `  ${COLORS.cli.command('$ only-one mcp github,clockify')}               # Configure global Model Context Protocol servers\n` +
+                `  ${COLORS.cli.command('$ only-one structure-generate')}                # Scaffold structural blueprint files for agents\n` +
+                `  ${COLORS.cli.command('$ only-one setting-vs --editors vscode')}       # Sync and merge settings between VS Code/Cursor\n` +
+                `  ${COLORS.cli.command('$ only-one extensions-vs')}                     # Sync and merge VS Code extension profiles\n` +
+                `  ${COLORS.cli.command('$ only-one doctor')}                            # Verify git and Node.js environment readiness\n` +
+                `  ${COLORS.cli.command('$ only-one update')}                            # Refresh installed agent skills/templates\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - Run ${COLORS.cli.command('only-one <command> --help')} for detailed option descriptions on each command.`,
         );
