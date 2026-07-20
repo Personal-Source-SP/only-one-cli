@@ -21,6 +21,8 @@ import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
 import { buildPrGitCommandContent, buildClockifyCommandContent } from '@/core/templates/agent-workflows.js';
 import { parseJsoncObject } from '@/core/vs/json.js';
 import { cursorMcpAdapter, antigravityMcpAdapter } from '@/core/mcp/adapters.js';
+import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
+import { checkExistingMcps } from '@/core/mcp/index.js';
 import type {
     InitCommandRequest,
     InitCommandResponse,
@@ -731,49 +733,47 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
             }
 
-            const installedSkills: string[] = [];
-            for (const skillName of selectedSkillNames) {
-                deps.stdout(`  Syncing ${skillName}...`);
-                for (const tool of toolsForSkills) {
-                    if (!tool.skillsDir) continue;
-
-                    const toolSkillsDir = join(projectDir, tool.skillsDir, 'skills');
-                    const destPath = join(toolSkillsDir, skillName);
-                    const srcPath = join(skillsDir, skillName);
-
-                    try {
-                        await mkdir(toolSkillsDir, { recursive: true });
-                        await cp(srcPath, destPath, { recursive: true, force: true });
-                        deps.stdout(`    ✓ Copied to ${tool.name}`);
-
-                        let commandContent = null;
-                        let commandId = '';
-                        if (skillName === 'ak-pr-git') {
-                            commandContent = buildPrGitCommandContent();
-                            commandId = 'pr-git';
-                        } else if (skillName === 'ak-clockify') {
-                            commandContent = buildClockifyCommandContent();
-                            commandId = 'clockify';
-                        }
-
-                        if (commandContent && commandId) {
-                            const commandAdapter = CommandAdapterRegistry.get(tool.value);
-                            if (commandAdapter) {
-                                const generated = generateCommand(commandContent, commandAdapter);
-                                const relativePath = normalizeStructureCommandPath(generated.path, commandId);
-                                const commandPath = join(projectDir, relativePath);
-                                await mkdir(dirname(commandPath), { recursive: true });
-                                await writeFile(commandPath, generated.content, 'utf-8');
-                                deps.stdout(`    ✓ Generated command ${commandId} for ${tool.name}`);
-                            }
-                        }
-                    } catch (error) {
-                        deps.stdout(`    ✗ Failed to copy to ${tool.name}: ${error instanceof Error ? error.message : String(error)}`);
-                    }
+            const existingSkills = await checkExistingSkills(projectDir, toolsForSkills, selectedSkillNames);
+            const alreadyExisting = existingSkills.filter((s) => s.exists);
+            let overwriteList: string[] = [];
+            if (alreadyExisting.length > 0) {
+                if (yes || !deps.prompts?.checkbox) {
+                    overwriteList = alreadyExisting.map((s) => `${s.toolId}:${s.skillName}`);
+                } else {
+                    overwriteList = await deps.prompts.checkbox({
+                        message: 'The following skills already exist. Select which ones you want to overwrite/reinstall:',
+                        choices: alreadyExisting.map((s) => ({
+                            name: `${s.skillName} in ${s.toolName} (${s.destPath})`,
+                            value: `${s.toolId}:${s.skillName}`,
+                            checked: true,
+                        })),
+                    });
                 }
-                installedSkills.push(skillName);
             }
-            skillsStepResult = { installedSkills };
+
+            const installResults = await installSkills({
+                deps,
+                projectDir,
+                selectedTools: toolsForSkills,
+                skillNames: selectedSkillNames,
+                overwriteList,
+                noIgnore,
+            });
+
+            for (const result of installResults) {
+                if (result.status === 'success' || result.status === 'overwritten') {
+                    deps.stdout(`  ✓ Synced skill ${result.skillName} to ${result.toolName} (${result.status})`);
+                } else if (result.status === 'skipped') {
+                    deps.stdout(`  - Skipped skill ${result.skillName} for ${result.toolName}`);
+                } else {
+                    deps.stdout(`  ✗ Failed skill ${result.skillName} for ${result.toolName}: ${result.error}`);
+                }
+            }
+
+            const installedSkills = installResults
+                .filter((r) => r.status === 'success' || r.status === 'overwritten')
+                .map((r) => r.skillName);
+            skillsStepResult = { installedSkills: Array.from(new Set(installedSkills)) };
         }
 
         // 4. Configs execution
@@ -840,14 +840,46 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                         targetIdeIds = ['cursor', 'antigravity'];
                     }
 
-                    await syncMcpGlobalConfig({
+                    const existingMcps = await checkExistingMcps(homedir(), process.platform, targetIdeIds, selectedMcpNames);
+                    const alreadyExistingMcps = existingMcps.filter((m) => m.exists);
+                    let mcpOverwriteList: string[] = [];
+                    if (alreadyExistingMcps.length > 0) {
+                        if (yes || !deps.prompts?.checkbox) {
+                            mcpOverwriteList = alreadyExistingMcps.map((m) => `${m.ideId}:${m.mcpId}`);
+                        } else {
+                            mcpOverwriteList = await deps.prompts.checkbox({
+                                message:
+                                    'The following MCP configurations already exist. Select which ones you want to overwrite/reconfigure:',
+                                choices: alreadyExistingMcps.map((m) => ({
+                                    name: `${m.mcpId} in ${m.ideName}`,
+                                    value: `${m.ideId}:${m.mcpId}`,
+                                    checked: true,
+                                })),
+                            });
+                        }
+                    }
+
+                    const response = await syncMcpGlobalConfig({
                         cwd: projectDir,
                         homeDir: homedir(),
                         ideIds: targetIdeIds,
                         manifests: selectedManifests,
                         platform: process.platform,
                         write: deps.stdout,
+                        overwriteList: mcpOverwriteList,
                     });
+
+                    // Show skips/successes/overwrites
+                    for (const result of response.results) {
+                        for (const entry of result.results) {
+                            if (entry.status === 'skipped') {
+                                deps.stdout(`  - Skipped MCP ${entry.id} in ${result.ideName}`);
+                            } else {
+                                deps.stdout(`  ✓ Configured MCP ${entry.id} in ${result.ideName} (${entry.status})`);
+                            }
+                        }
+                    }
+
                     mcpStepResult = { selectedMcps: selectedMcpNames };
                 } catch (error) {
                     deps.stdout(`  ✗ Failed to sync MCP configurations: ${error instanceof Error ? error.message : String(error)}`);

@@ -36,5 +36,12 @@ if (isCliEntrypoint(import.meta.url) || process.env.ONLY_ONE_CLI_BYPASS_ENTRYPOI
         process.argv.push('--help');
     }
 
-    await program.parseAsync(process.argv);
+    try {
+        await program.parseAsync(process.argv);
+    } catch (error: any) {
+        if (error && (error.name === 'ExitPromptError' || error.message?.includes('User force closed the prompt with SIGINT'))) {
+            process.exit(0);
+        }
+        throw error;
+    }
 }

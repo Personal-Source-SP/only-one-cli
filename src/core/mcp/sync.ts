@@ -17,6 +17,7 @@ export type SyncMcpGlobalConfigRequest = {
     write: (line: string) => void;
     fs?: VsFileSystem;
     runner?: VsProcessRunner;
+    overwriteList?: string[];
 };
 
 export type SyncMcpGlobalConfigResult = {
@@ -70,7 +71,7 @@ export const syncMcpGlobalConfig = async (request: SyncMcpGlobalConfigRequest): 
                 config = {};
             }
 
-            const merge = mergeMcpServers(adapter.getMcpServers(config), request.manifests);
+            const merge = mergeMcpServers(adapter.getMcpServers(config), request.manifests, adapter.id, request.overwriteList);
             const nextConfig = adapter.setMcpServers(config, merge.servers);
             results.push({ configPath, ideId: adapter.id, ideName: adapter.name, results: merge.results });
 

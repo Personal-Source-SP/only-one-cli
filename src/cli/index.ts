@@ -7,6 +7,9 @@ import {
     createStructureGenerateCommand,
     createUpdateCommand,
     createSettingVsCommand,
+    createSkillCommand,
+    createMcpCommand,
+    createComboCommand,
 } from '@/commands/index.js';
 import { COLORS, VERSION } from '@/constants/index.js';
 import type { ProgramDeps } from './deps.js';
@@ -57,6 +60,9 @@ export function createProgram(deps: ProgramDeps) {
      * SETUP & AGENTS — project config and Cursor workflow artifacts
      * ═══════════════════════════════════════════════════════════════════ */
     program.addCommand(createInitCommand(deps));
+    program.addCommand(createSkillCommand(deps));
+    program.addCommand(createMcpCommand(deps));
+    program.addCommand(createComboCommand(deps));
     program.addCommand(createStructureGenerateCommand(deps));
 
     program.addCommand(createUpdateCommand(deps));

@@ -19,7 +19,7 @@ export type ReadMcpManifestsResponse = {
     warnings: McpManifestWarning[];
 };
 
-export type McpMergeStatus = 'added' | 'skipped' | 'unchanged';
+export type McpMergeStatus = 'added' | 'skipped' | 'unchanged' | 'overwritten';
 
 export type McpMergeResult = {
     id: string;
