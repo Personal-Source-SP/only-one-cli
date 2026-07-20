@@ -3,7 +3,7 @@
 ### Requirement: Selective add-only merge
 Rule: The sync SHALL check if selected MCP servers already exist in the target IDE's `mcp.json` config. If they do not exist, they are added. If they already exist, they require user verification before being overwritten or reconfigured.
 
-#### Scenario: MCP already configured with user verification
+#### Scenario: MCP already configured
 - **GIVEN** target config already contains selected server ID `github`
 - **WHEN** the check runs
 - **THEN** it displays a verification checkbox prompt listing the existing MCP configurations to reconfigure

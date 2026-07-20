@@ -1,8 +1,5 @@
-# init-combo-flow Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change init-combo-option. Update Purpose after archive.
-## Requirements
 ### Requirement: Init Combo Selection Flow
 Rule: The `combo` command SHALL support initializing a project using one or more predefined configuration combos by:
 1. Selecting target IDEs.
@@ -48,4 +45,3 @@ Rule: The `combo` command SHALL support initializing a project using one or more
 - **AND** it overwrites/reinstalls the `grill-me` skill in Cursor
 - **AND** it copies/initializes the `openspec` configuration templates
 - **AND** it displays a detailed report showing package skipped, skill overwritten, and configs created
-

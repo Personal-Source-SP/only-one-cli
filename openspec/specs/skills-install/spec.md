@@ -4,7 +4,7 @@
 TBD - created by archiving change improve-init-flow. Update Purpose after archive.
 ## Requirements
 ### Requirement: Select Skills
-SHALL allow user to pick skills from `libraries/skills/` subdirectories via multi-select prompt.
+The CLI SHALL allow the user to pick skills from `libraries/skills/` subdirectories via a multi-select prompt, defaulting to selecting all skills.
 
 #### Scenario: Display all available skills
 - **GIVEN** `libraries/skills/` contains `grill-me/`, `c4-diagrams/`, `gherkin-authoring/`
@@ -51,21 +51,22 @@ SHALL copy each selected skill's directory into each selected tool's `skillsDir/
 - **THEN** `.cursor/skills/` is created before copying
 
 ### Requirement: Skill Existence Check
-SHALL check if the target skill directory already exists in the tool's skills dir before copying.
+The CLI SHALL check if the target skill directory already exists in the selected IDE's skills dir before copying, and require a verification confirmation checklist to overwrite them.
 
 #### Scenario: Skill already exists in tool dir
 - **GIVEN** `.cursor/skills/grill-me/` already exists
-- **WHEN** user selected "Cursor" and "grill-me" skill
-- **THEN** a confirmation asks: "grill-me already exists in Cursor. Overwrite?"
-- **WHEN** user confirms
-- **THEN** the skill is overwritten via recursive copy
-- **WHEN** user declines
-- **THEN** the skill is skipped for that tool
+- **AND** the user selected "Cursor" IDE and "grill-me" skill
+- **WHEN** the checks run
+- **THEN** it displays a verification checkbox prompt listing the existing skills to overwrite
+- **AND** the checkbox choice for `grill-me in Cursor` is ticked by default
+- **WHEN** the user unchecks `grill-me in Cursor` and proceeds
+- **THEN** the copy/overwrite of `grill-me` in `.cursor` is skipped
+- **AND** the skipped item is logged in the final summary report
 
 #### Scenario: --yes auto-overwrites
 - **GIVEN** `--yes` flag is passed
 - **WHEN** a skill already exists in a tool dir
-- **THEN** no confirmation prompt is shown
+- **THEN** no verification confirmation prompt is shown
 - **AND** the skill is overwritten
 
 ### Requirement: Install only supported structural agent artifacts
