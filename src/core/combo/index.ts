@@ -15,7 +15,9 @@ import { CONFIGS } from '@assets/configs/index.js';
 
 const execFileAsync = promisify(execFile);
 
-const configsDir = fileURLToPath(new URL('../../../assets/configs', import.meta.url));
+import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+
+const configsDir = join(resolvePackageRoot(import.meta.url), 'assets/configs');
 
 export interface ExtendedComboManifest extends ComboManifest {
     id: string;

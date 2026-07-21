@@ -49,8 +49,10 @@ const readComboManifests = async (): Promise<(ComboManifest & { id: string })[]>
 
 // ─── Package manifest helpers ─────────────────────────────────────────
 
-const skillsDir = fileURLToPath(new URL('../../../assets/skills', import.meta.url));
-const configsDir = fileURLToPath(new URL('../../../assets/configs', import.meta.url));
+import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+
+const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/skills');
+const configsDir = join(resolvePackageRoot(import.meta.url), 'assets/configs');
 
 const readPackageManifests = async (): Promise<PackageManifest[]> => {
     return PACKAGES;

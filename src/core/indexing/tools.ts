@@ -13,12 +13,14 @@ export const DEFAULT_COCOINDEX_IMAGE = 'cocoindex/cocoindex-code:latest';
  * Source: `cli/scripts/cocoindex_documents.py` → npm publish `scripts/cocoindex_documents.py`
  * (sibling to `dist/` when installed as `only-one`).
  */
+import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+
 export function resolveCocoindexScript(): string {
     if (process.env.COCOINDEX_SCRIPT) {
         return process.env.COCOINDEX_SCRIPT;
     }
 
-    return join(dirname(fileURLToPath(import.meta.url)), '../../../scripts/cocoindex_documents.py');
+    return join(resolvePackageRoot(import.meta.url), 'scripts/cocoindex_documents.py');
 }
 
 export function assertCocoindexScriptExists(scriptPath = resolveCocoindexScript()): string {

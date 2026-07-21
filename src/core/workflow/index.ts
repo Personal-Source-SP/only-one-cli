@@ -7,7 +7,9 @@ import type { ProgramDeps } from '@/cli/deps.js';
 import { WORKFLOWS } from '@assets/workflows/index.js';
 import { installSkills, type SkillInstallResult } from '@/core/skill/index.js';
 
-const workflowsDir = fileURLToPath(new URL('../../../assets/workflows', import.meta.url));
+import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+
+const workflowsDir = join(resolvePackageRoot(import.meta.url), 'assets/workflows');
 
 export interface ExistingWorkflow {
     toolId: string;
