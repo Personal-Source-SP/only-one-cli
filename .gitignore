@@ -72,3 +72,10 @@ temp/
 
 # Local config
 .onlyonecli.yml
+
+# AI ignores
+.agent/
+openspec/
+adr
+openspec
+.agents/

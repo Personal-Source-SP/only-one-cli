@@ -5,14 +5,14 @@ import type { CommandContent, ToolCommandAdapter } from '@/core/command-generati
 
 /**
  * Antigravity adapter for command generation.
- * File path: .agent/workflows/opsx-<id>.md
+ * File path: .agents/workflows/opsx-<id>.md
  * Frontmatter: description
  */
 export const antigravityCommandAdapter: ToolCommandAdapter = {
     toolId: 'antigravity',
 
     getFilePath(commandId: string): string {
-        return join('.agent', 'workflows', `opsx-${commandId}.md`);
+        return join('.agents', 'workflows', `opsx-${commandId}.md`);
     },
 
     getInvokeLabel(commandId: string): string {

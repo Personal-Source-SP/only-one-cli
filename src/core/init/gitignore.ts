@@ -23,7 +23,7 @@ export async function updateGitignore(projectDir: string, pathsToIgnore: string[
     const sectionStartIndex = lines.findIndex((line) => line.trim() === sectionHeader);
 
     // Default ignores as requested by the user
-    const defaultIgnores = ['.agent/', 'openspec/', 'adr', 'openspec'];
+    const defaultIgnores = ['.agent/', '.agents/', 'openspec/', 'adr', 'openspec'];
 
     // Format all input directories to ensure they end with a slash for safety
     const formattedInputPaths = (pathsToIgnore || []).map((p) => {

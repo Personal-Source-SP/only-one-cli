@@ -10,7 +10,7 @@ export type AgentToolOption = {
 
 export const AI_TOOLS: AgentToolOption[] = [
     { available: true, name: 'Amazon Q Developer', skillsDir: '.amazonq', successLabel: 'Amazon Q Developer', value: 'amazon-q' },
-    { available: true, name: 'Antigravity', skillsDir: '.agent', successLabel: 'Antigravity', value: 'antigravity' },
+    { available: true, name: 'Antigravity', skillsDir: '.agents', successLabel: 'Antigravity', value: 'antigravity' },
     { available: true, name: 'Auggie (Augment CLI)', skillsDir: '.augment', successLabel: 'Auggie', value: 'auggie' },
     { available: true, name: 'Bob Shell', skillsDir: '.bob', successLabel: 'Bob Shell', value: 'bob' },
     { available: true, name: 'Claude Code', skillsDir: '.claude', successLabel: 'Claude Code', value: 'claude' },
