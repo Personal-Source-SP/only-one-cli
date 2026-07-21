@@ -10,9 +10,9 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const SRC = join(ROOT, 'src');
-const LIBS = join(ROOT, 'libraries');
+const ASSETS = join(ROOT, 'assets');
 const ALIAS = '@/';
-const LIB_ALIAS = '@library/';
+const ASSET_ALIAS = '@assets/';
 
 const IMPORT_RE = /(?<=from\s+['"])\.\.\/[^'"]+(?=['"])/g;
 
@@ -38,17 +38,17 @@ function toAlias(absolutePath, originalImport) {
         const rel = relative(SRC, absolutePath);
         return ALIAS + rel.replace(/\.(js|ts)$/, ext === '.js' ? '.js' : '');
     }
-    if (absolutePath.startsWith(LIBS + '/')) {
-        const rel = relative(LIBS, absolutePath);
-        return LIB_ALIAS + rel.replace(/\.(js|ts)$/, ext === '.js' ? '.js' : '');
+    if (absolutePath.startsWith(ASSETS + '/')) {
+        const rel = relative(ASSETS, absolutePath);
+        return ASSET_ALIAS + rel.replace(/\.(js|ts)$/, ext === '.js' ? '.js' : '');
     }
-    return null; // outside src/libraries — leave as is
+    return null; // outside src/assets — leave as is
 }
 
 async function main() {
     const allFiles = [];
     for await (const f of walk(SRC)) allFiles.push(f);
-    for await (const f of walk(LIBS)) allFiles.push(f);
+    for await (const f of walk(ASSETS)) allFiles.push(f);
 
     let changed = 0;
     let totalChanges = 0;

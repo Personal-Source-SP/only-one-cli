@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 
 const repoRoot = process.cwd();
-const skillsDir = join(repoRoot, 'libraries', 'skills');
+const skillsDir = join(repoRoot, 'assets', 'skills');
 
 describe('agent workflow skills', () => {
     it('ships only-one-pr-git-skill with referenced PR template', async () => {

@@ -24,7 +24,7 @@ export function createMcpCommand(deps: ProgramDeps): Command {
             }
 
             if (manifests.length === 0) {
-                throw new Error('No MCP manifests available in libraries/mcps');
+                throw new Error('No MCP manifests available');
             }
 
             // 1. Select IDEs

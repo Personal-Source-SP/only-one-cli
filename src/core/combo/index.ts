@@ -1,21 +1,21 @@
 import { existsSync } from 'node:fs';
-import { readdir, readFile, mkdir, cp } from 'node:fs/promises';
+import { cp } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import yaml from 'js-yaml';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { ComboManifest, PackageManifest } from '@/core/init/types.js';
 import { checkExistingSkills, installSkills, type SkillInstallResult } from '@/core/skill/index.js';
 import { checkExistingMcps, syncMcpGlobalConfig, readMcpManifests } from '@/core/mcp/index.js';
+import { COMBOS } from '@assets/combos/index.js';
+import { PACKAGES } from '@assets/packages/index.js';
+import { CONFIGS } from '@assets/configs/index.js';
 
 const execFileAsync = promisify(execFile);
 
-const combosDir = fileURLToPath(new URL('../../../libraries/combos', import.meta.url));
-const packagesDir = fileURLToPath(new URL('../../../libraries/packages', import.meta.url));
-const configsDir = fileURLToPath(new URL('../../../libraries/configs', import.meta.url));
+const configsDir = fileURLToPath(new URL('../../../assets/configs', import.meta.url));
 
 export interface ExtendedComboManifest extends ComboManifest {
     id: string;
@@ -40,44 +40,11 @@ export interface ComboInstallResult {
 }
 
 export const readComboManifests = async (): Promise<ExtendedComboManifest[]> => {
-    if (!existsSync(combosDir)) return [];
-    const entries = await readdir(combosDir);
-    const yamlFiles = entries.filter((e) => e.endsWith('.yaml') || e.endsWith('.yml'));
-    const combos: ExtendedComboManifest[] = [];
-
-    for (const file of yamlFiles) {
-        try {
-            const raw = await readFile(join(combosDir, file), 'utf-8');
-            const parsed = yaml.load(raw) as ExtendedComboManifest | null;
-            if (parsed?.name) {
-                const id = file.replace(/\.(yaml|yml)$/, '');
-                combos.push({ ...parsed, id });
-            }
-        } catch {
-            // skip invalid combo
-        }
-    }
-    return combos;
+    return COMBOS;
 };
 
 export const readPackageManifests = async (): Promise<PackageManifest[]> => {
-    if (!existsSync(packagesDir)) return [];
-    const entries = await readdir(packagesDir);
-    const yamlFiles = entries.filter((e) => e.endsWith('.yaml') || e.endsWith('.yml'));
-    const manifests: PackageManifest[] = [];
-
-    for (const file of yamlFiles) {
-        try {
-            const raw = await readFile(join(packagesDir, file), 'utf-8');
-            const parsed = yaml.load(raw) as PackageManifest | null;
-            if (parsed?.name) {
-                manifests.push(parsed);
-            }
-        } catch {
-            // skip invalid
-        }
-    }
-    return manifests;
+    return PACKAGES;
 };
 
 export const isPackageInstalled = async (name: string, scope: 'global' | 'local', projectDir: string): Promise<boolean> => {
@@ -252,48 +219,41 @@ export const installCombo = async (params: {
 
     // 2. Configs
     if (combo.configs && existsSync(configsDir)) {
-        const indexYamlPath = join(configsDir, 'index.yaml');
-        if (existsSync(indexYamlPath)) {
-            try {
-                const indexRaw = await readFile(indexYamlPath, 'utf-8');
-                const index = yaml.load(indexRaw) as Record<string, { files?: { src: string; dest: string }[] }> | null;
-                if (index) {
-                    for (const configName of combo.configs) {
-                        const check = checks.find((c) => c.type === 'config' && c.name === configName);
-                        const exists = check ? check.exists : false;
+        try {
+            for (const configName of combo.configs) {
+                const check = checks.find((c) => c.type === 'config' && c.name === configName);
+                const exists = check ? check.exists : false;
 
-                        if (exists && !overwriteList.includes(`config:${configName}`)) {
-                            results.configs.push({ name: configName, status: 'skipped' });
-                            continue;
-                        }
+                if (exists && !overwriteList.includes(`config:${configName}`)) {
+                    results.configs.push({ name: configName, status: 'skipped' });
+                    continue;
+                }
 
-                        const configEntry = index[configName];
-                        if (configEntry?.files) {
-                            let success = true;
-                            let errorMsg = '';
-                            for (const fileEntry of configEntry.files) {
-                                const srcPath = join(configsDir, fileEntry.src);
-                                const destPath = join(projectDir, fileEntry.dest);
-                                if (existsSync(srcPath)) {
-                                    try {
-                                        const isDir = await cp(srcPath, destPath, { recursive: true, force: true });
-                                    } catch (err: any) {
-                                        success = false;
-                                        errorMsg = err.message;
-                                    }
-                                }
+                const configEntry = CONFIGS[configName];
+                if (configEntry?.files) {
+                    let success = true;
+                    let errorMsg = '';
+                    for (const fileEntry of configEntry.files) {
+                        const srcPath = join(configsDir, fileEntry.src);
+                        const destPath = join(projectDir, fileEntry.dest);
+                        if (existsSync(srcPath)) {
+                            try {
+                                await cp(srcPath, destPath, { recursive: true, force: true });
+                            } catch (err: any) {
+                                success = false;
+                                errorMsg = err.message;
                             }
-                            results.configs.push({
-                                name: configName,
-                                status: success ? 'success' : 'failed',
-                                ...(success ? {} : { error: errorMsg }),
-                            });
                         }
                     }
+                    results.configs.push({
+                        name: configName,
+                        status: success ? 'success' : 'failed',
+                        ...(success ? {} : { error: errorMsg }),
+                    });
                 }
-            } catch (err: any) {
-                deps.stdout(`Warning: Failed to load config templates: ${err.message}`);
             }
+        } catch (err: any) {
+            deps.stdout(`Warning: Failed to load config templates: ${err.message}`);
         }
     }
 

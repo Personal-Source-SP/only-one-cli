@@ -10,7 +10,7 @@ import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import { generateCommand } from '@/core/command-generation/generator.js';
 import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
 
-const skillsDir = fileURLToPath(new URL('../../../libraries/skills', import.meta.url));
+const skillsDir = fileURLToPath(new URL('../../../assets/skills', import.meta.url));
 
 export interface ExistingSkill {
     toolId: string;

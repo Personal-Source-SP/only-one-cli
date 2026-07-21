@@ -124,9 +124,9 @@ for (const file of ['README.md', 'LICENSE']) {
   }
 }
 
-const librariesDir = path.join(ROOT, 'libraries');
-if (fs.existsSync(librariesDir)) {
-  copyRecursive(librariesDir, path.join(packRoot, 'libraries'));
+const assetsDir = path.join(ROOT, 'assets');
+if (fs.existsSync(assetsDir)) {
+  copyRecursive(assetsDir, path.join(packRoot, 'assets'));
 }
 
 // Update package.json in packRoot

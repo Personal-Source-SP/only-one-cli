@@ -10,19 +10,12 @@ import { resolveProjectDir, assertProjectDirectory } from '@/core/runtime/global
 import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
 
-const skillsDir = fileURLToPath(new URL('../../../libraries/skills', import.meta.url));
+import { SKILLS } from '@assets/skills/index.js';
+import { installWorkflows, checkExistingWorkflows } from '@/core/workflow/index.js';
+import { confirm } from '@inquirer/prompts';
 
-const getAvailableSkillNames = async (): Promise<string[]> => {
-    if (!existsSync(skillsDir)) return [];
-    const entries = await readdir(skillsDir);
-    const names: string[] = [];
-    for (const name of entries) {
-        try {
-            const s = await stat(join(skillsDir, name));
-            if (s.isDirectory()) names.push(name);
-        } catch {}
-    }
-    return names;
+const getAvailableSkillNames = (): string[] => {
+    return SKILLS.map((s) => s.name);
 };
 
 const parseCsv = (val?: string): string[] =>
@@ -185,6 +178,56 @@ export function createSkillCommand(deps: ProgramDeps): Command {
                 }
 
                 deps.stdout('\n==================================================\n');
+
+                // 7. Associated Workflows Check
+                const installedSkillNames = [...successes, ...overwrites].map((r) => r.skillName);
+                const workflowsToPrompt = new Set<string>();
+
+                for (const skillName of installedSkillNames) {
+                    const skillMeta = SKILLS.find((s) => s.name === skillName);
+                    if (skillMeta?.associatedWorkflows) {
+                        for (const wf of skillMeta.associatedWorkflows) {
+                            workflowsToPrompt.add(wf);
+                        }
+                    }
+                }
+
+                if (workflowsToPrompt.size > 0 && !options.yes) {
+                    const wfList = Array.from(workflowsToPrompt);
+                    const checks = await checkExistingWorkflows(projectDir, targetTools, wfList);
+                    const missingWorkflows = Array.from(new Set(checks.filter((w) => !w.exists).map((w) => w.workflowName)));
+
+                    if (missingWorkflows.length > 0) {
+                        const installWfs = await confirm({
+                            message: `The installed skills are associated with workflow(s): ${missingWorkflows.join(', ')}. Would you like to install them?`,
+                            default: true,
+                        });
+
+                        if (installWfs) {
+                            deps.stdout('\nSyncing workflows...');
+                            const wfResults = await installWorkflows({
+                                deps,
+                                projectDir,
+                                selectedTools: targetTools,
+                                workflowNames: missingWorkflows,
+                                overwriteList: missingWorkflows.map((w) => targetTools.map((t) => `${t.value}:${w}`)).flat(),
+                                noIgnore: options.ignore === false,
+                            });
+
+                            deps.stdout('\n==================================================');
+                            deps.stdout('               WORKFLOWS SYNC REPORT');
+                            deps.stdout('==================================================');
+                            for (const r of wfResults) {
+                                const statusColor =
+                                    r.status === 'success' ? COLORS.success : r.status === 'skipped' ? COLORS.dim : COLORS.error;
+                                deps.stdout(
+                                    `  - ${COLORS.secondary(r.workflowName)} -> ${COLORS.primary(r.toolName)}: ${statusColor(r.status)}${r.error ? ` (${r.error})` : ''}`,
+                                );
+                            }
+                            deps.stdout('==================================================\n');
+                        }
+                    }
+                }
             },
         );
 

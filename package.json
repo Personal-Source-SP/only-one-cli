@@ -3,15 +3,15 @@
     "version": "0.0.2",
     "type": "module",
     "bin": {
-        "only-one": "./dist/index.js"
+        "only-one": "./dist/src/index.js"
     },
     "files": [
         "dist",
         "scripts",
-        "libraries"
+        "assets"
     ],
     "scripts": {
-        "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node scripts/postbuild-paths.cjs && node -e \"if (process.platform !== 'win32') require('node:fs').chmodSync('dist/index.js', 0o755)\"",
+        "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node scripts/postbuild-paths.cjs && node -e \"if (process.platform !== 'win32') require('node:fs').chmodSync('dist/src/index.js', 0o755)\"",
         "dev": "tsx src/index.ts",
         "prepare": "npm run build",
         "test": "npm run format && vitest run",

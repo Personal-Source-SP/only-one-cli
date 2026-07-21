@@ -1,11 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { mkdir, cp, readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, cp, readdir, stat, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
-import yaml from 'js-yaml';
 import { confirm, select } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { printJson } from '@/core/output/index.js';
@@ -23,6 +22,11 @@ import { parseJsoncObject } from '@/core/vs/json.js';
 import { cursorMcpAdapter, antigravityMcpAdapter } from '@/core/mcp/adapters.js';
 import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
 import { checkExistingMcps } from '@/core/mcp/index.js';
+import { COMBOS } from '@assets/combos/index.js';
+import { PACKAGES } from '@assets/packages/index.js';
+import { CONFIGS } from '@assets/configs/index.js';
+import { SKILLS } from '@assets/skills/index.js';
+import { installWorkflows, checkExistingWorkflows } from '@/core/workflow/index.js';
 import type {
     InitCommandRequest,
     InitCommandResponse,
@@ -39,59 +43,17 @@ const execFileAsync = promisify(execFile);
 
 // ─── Combo manifests helper ──────────────────────────────────────────
 
-const combosDir = fileURLToPath(new URL('../../../libraries/combos', import.meta.url));
-
 const readComboManifests = async (): Promise<(ComboManifest & { id: string })[]> => {
-    if (!existsSync(combosDir)) return [];
-
-    const entries = await readdir(combosDir);
-    const yamlFiles = entries.filter((e) => e.endsWith('.yaml') || e.endsWith('.yml'));
-
-    const combos: (ComboManifest & { id: string })[] = [];
-
-    for (const file of yamlFiles) {
-        try {
-            const raw = await readFile(join(combosDir, file), 'utf-8');
-            const parsed = yaml.load(raw) as ComboManifest | null;
-            if (parsed?.name) {
-                const id = file.replace(/\.(yaml|yml)$/, '');
-                combos.push({ ...parsed, id });
-            }
-        } catch {
-            // skip invalid combo
-        }
-    }
-
-    return combos;
+    return COMBOS;
 };
 
-// ─── Package manfiest helpers ─────────────────────────────────────────
+// ─── Package manifest helpers ─────────────────────────────────────────
 
-const packagesDir = fileURLToPath(new URL('../../../libraries/packages', import.meta.url));
-const skillsDir = fileURLToPath(new URL('../../../libraries/skills', import.meta.url));
-const configsDir = fileURLToPath(new URL('../../../libraries/configs', import.meta.url));
+const skillsDir = fileURLToPath(new URL('../../../assets/skills', import.meta.url));
+const configsDir = fileURLToPath(new URL('../../../assets/configs', import.meta.url));
 
 const readPackageManifests = async (): Promise<PackageManifest[]> => {
-    if (!existsSync(packagesDir)) return [];
-
-    const entries = await readdir(packagesDir);
-    const yamlFiles = entries.filter((e) => e.endsWith('.yaml') || e.endsWith('.yml'));
-
-    const manifests: PackageManifest[] = [];
-
-    for (const file of yamlFiles) {
-        try {
-            const raw = await readFile(join(packagesDir, file), 'utf-8');
-            const parsed = yaml.load(raw) as PackageManifest | null;
-            if (parsed?.name) {
-                manifests.push(parsed);
-            }
-        } catch {
-            // skip invalid manifest
-        }
-    }
-
-    return manifests;
+    return PACKAGES;
 };
 
 const isPackageInstalled = async (name: string, scope: 'global' | 'local', projectDir: string): Promise<boolean> => {
@@ -189,7 +151,7 @@ export const executePackagesStep = async (
         for (const name of selectedNamesOverride) {
             const found = manifests.find((m) => m.name === name);
             if (!found) {
-                throw new Error(`Package '${name}' not found in libraries/packages`);
+                throw new Error(`Package '${name}' not found in assets/packages`);
             }
         }
         selectedNames = selectedNamesOverride;
@@ -252,7 +214,7 @@ export const executeSkillsStep = async (
     if (selectedSkillNamesOverride) {
         for (const name of selectedSkillNamesOverride) {
             if (!skillNames.includes(name)) {
-                throw new Error(`Skill '${name}' not found in libraries/skills`);
+                throw new Error(`Skill '${name}' not found in assets/skills`);
             }
         }
         selectedSkillNames = selectedSkillNamesOverride;
@@ -288,30 +250,22 @@ export const executeConfigsStep = async (
     projectDir: string,
     selectedConfigNamesOverride?: string[],
 ): Promise<ConfigsStepResult | null> => {
-    const indexYamlPath = join(configsDir, 'index.yaml');
-    if (!existsSync(indexYamlPath)) {
+    if (Object.keys(CONFIGS).length === 0) {
         deps.stdout('  No config templates available');
         return null;
     }
 
     try {
-        const indexRaw = await readFile(indexYamlPath, 'utf-8');
-        const index = yaml.load(indexRaw) as Record<string, { description?: string }> | null;
-        if (!index) {
-            deps.stdout('  No config templates available');
-            return null;
-        }
-
         let selectedConfigNames: string[] = [];
         if (selectedConfigNamesOverride) {
             for (const name of selectedConfigNamesOverride) {
-                if (!index[name]) {
-                    throw new Error(`Config template '${name}' not found in libraries/configs`);
+                if (!CONFIGS[name]) {
+                    throw new Error(`Config template '${name}' not found in assets/configs`);
                 }
             }
             selectedConfigNames = selectedConfigNamesOverride;
         } else {
-            const choices = Object.entries(index).map(([name, config]) => {
+            const choices = Object.entries(CONFIGS).map(([name, config]) => {
                 const alreadyExists = existsSync(join(projectDir, name));
                 return {
                     name: config.description ? `${name} — ${config.description}` : name,
@@ -394,7 +348,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             for (const name of comboNames) {
                 const found = availableCombos.find((c) => c.id.toLowerCase() === name || c.name.toLowerCase() === name);
                 if (!found) {
-                    throw new Error(`Combo '${name}' not found in libraries/combos`);
+                    throw new Error(`Combo '${name}' not found in assets/combos`);
                 }
                 selectedCombos.push(found);
             }
@@ -849,45 +803,81 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 .filter((r) => r.status === 'success' || r.status === 'overwritten')
                 .map((r) => r.skillName);
             skillsStepResult = { installedSkills: Array.from(new Set(installedSkills)) };
+
+            // Install associated workflows
+            const workflowsToInstall = new Set<string>();
+            for (const skillName of installedSkills) {
+                const skillMeta = SKILLS.find((s) => s.name === skillName);
+                if (skillMeta?.associatedWorkflows) {
+                    for (const wf of skillMeta.associatedWorkflows) {
+                        workflowsToInstall.add(wf);
+                    }
+                }
+            }
+            if (workflowsToInstall.size > 0) {
+                const wfList = Array.from(workflowsToInstall);
+                const checks = await checkExistingWorkflows(projectDir, toolsForSkills, wfList);
+                const missingWorkflows = Array.from(new Set(checks.filter((w) => !w.exists).map((w) => w.workflowName)));
+
+                if (missingWorkflows.length > 0) {
+                    let installWfs = yes;
+                    if (!yes) {
+                        deps.stdout('\n');
+                        installWfs = await confirm({
+                            message: `The selected skills are associated with workflow(s): ${missingWorkflows.join(', ')}. Would you like to install them as well?`,
+                            default: true,
+                        });
+                    }
+                    if (installWfs) {
+                        deps.stdout('\nSyncing workflows...');
+                        const wfResults = await installWorkflows({
+                            deps,
+                            projectDir,
+                            selectedTools: toolsForSkills,
+                            workflowNames: missingWorkflows,
+                            overwriteList: missingWorkflows.map((w) => toolsForSkills.map((t) => `${t.value}:${w}`)).flat(),
+                            noIgnore,
+                        });
+                        for (const r of wfResults) {
+                            if (r.status === 'success') {
+                                deps.stdout(`  ✓ Synced workflow ${r.workflowName} to ${r.toolName} (success)`);
+                            } else if (r.status === 'skipped') {
+                                deps.stdout(`  - Skipped workflow ${r.workflowName} for ${r.toolName}`);
+                            } else {
+                                deps.stdout(`  ✗ Failed workflow ${r.workflowName} for ${r.toolName}: ${r.error}`);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // 4. Configs execution
         if (selectedConfigNames?.length && existsSync(configsDir)) {
-            const indexYamlPath = join(configsDir, 'index.yaml');
-            if (existsSync(indexYamlPath)) {
-                try {
-                    const indexRaw = await readFile(indexYamlPath, 'utf-8');
-                    const index = yaml.load(indexRaw) as Record<string, { files?: { src: string; dest: string }[] }> | null;
-                    if (index) {
-                        deps.stdout('\nSyncing configuration templates...');
-                        for (const configName of selectedConfigNames) {
-                            const configEntry = index[configName];
-                            if (configEntry?.files) {
-                                for (const fileEntry of configEntry.files) {
-                                    const srcPath = join(configsDir, fileEntry.src);
-                                    const destPath = join(projectDir, fileEntry.dest);
-                                    if (existsSync(srcPath)) {
-                                        try {
-                                            const isDir = (await stat(srcPath)).isDirectory();
-                                            if (!isDir) {
-                                                await mkdir(join(destPath, '..'), { recursive: true });
-                                            } else {
-                                                await mkdir(destPath, { recursive: true });
-                                            }
-                                            await cp(srcPath, destPath, { recursive: true, force: true });
-                                            deps.stdout(`  ✓ Copied ${fileEntry.src} -> ${fileEntry.dest}`);
-                                        } catch (error) {
-                                            deps.stdout(
-                                                `  ✗ Failed to copy ${fileEntry.src}: ${error instanceof Error ? error.message : String(error)}`,
-                                            );
-                                        }
-                                    }
+            deps.stdout('\nSyncing configuration templates...');
+            for (const configName of selectedConfigNames) {
+                const configEntry = CONFIGS[configName];
+                if (configEntry?.files) {
+                    for (const fileEntry of configEntry.files) {
+                        const srcPath = join(configsDir, fileEntry.src);
+                        const destPath = join(projectDir, fileEntry.dest);
+                        if (existsSync(srcPath)) {
+                            try {
+                                const isDir = (await stat(srcPath)).isDirectory();
+                                if (!isDir) {
+                                    await mkdir(join(destPath, '..'), { recursive: true });
+                                } else {
+                                    await mkdir(destPath, { recursive: true });
                                 }
+                                await cp(srcPath, destPath, { recursive: true, force: true });
+                                deps.stdout(`  ✓ Copied ${fileEntry.src} -> ${fileEntry.dest}`);
+                            } catch (error) {
+                                deps.stdout(
+                                    `  ✗ Failed to copy ${fileEntry.src}: ${error instanceof Error ? error.message : String(error)}`,
+                                );
                             }
                         }
                     }
-                } catch (error) {
-                    deps.stdout(`\n✗ Failed to load configuration index: ${error instanceof Error ? error.message : String(error)}`);
                 }
             }
         }

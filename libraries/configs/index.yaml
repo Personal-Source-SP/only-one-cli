@@ -1,5 +1,0 @@
-openspec:
-  description: "OpenSpec default rules configuration"
-  files:
-    - src: "openspec"
-      dest: "openspec"

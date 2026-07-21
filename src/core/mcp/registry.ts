@@ -1,10 +1,8 @@
 import { existsSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { MCPS } from '@assets/mcps/index.js';
 import type { McpManifest, McpManifestWarning, McpServerConfig, ReadMcpManifestsResponse } from './types.js';
-
-export const mcpsDir = fileURLToPath(new URL('../../../libraries/mcps', import.meta.url));
 
 const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
@@ -46,32 +44,36 @@ export const validateMcpServerConfig = (id: string, value: unknown): McpServerCo
     return server;
 };
 
-export const readMcpManifests = async (directory: string = mcpsDir): Promise<ReadMcpManifestsResponse> => {
-    if (!existsSync(directory)) {
-        return { manifests: [], warnings: [] };
-    }
-
-    const files = (await readdir(directory)).filter((file) => file.endsWith('.json')).sort((a, b) => a.localeCompare(b));
-    const manifests: McpManifest[] = [];
-    const warnings: McpManifestWarning[] = [];
-    const seen = new Set<string>();
-
-    for (const file of files) {
-        const id = file.replace(/\.json$/, '');
-        const path = join(directory, file);
-
+export const readMcpManifests = async (directory?: string): Promise<ReadMcpManifestsResponse> => {
+    if (directory && existsSync(directory)) {
         try {
-            if (seen.has(id)) {
-                throw new Error(`Duplicate MCP id '${id}'`);
+            const files = (await readdir(directory)).filter((file) => file.endsWith('.json')).sort((a, b) => a.localeCompare(b));
+            const manifests: McpManifest[] = [];
+            const warnings: McpManifestWarning[] = [];
+            const seen = new Set<string>();
+
+            for (const file of files) {
+                const id = file.replace(/\.json$/, '');
+                const path = join(directory, file);
+
+                try {
+                    if (seen.has(id)) {
+                        throw new Error(`Duplicate MCP id '${id}'`);
+                    }
+                    const parsed = JSON.parse(await readFile(path, 'utf-8')) as unknown;
+                    const server = validateMcpServerConfig(id, parsed);
+                    manifests.push({ id, server });
+                    seen.add(id);
+                } catch (error) {
+                    warnings.push({ file, message: error instanceof Error ? error.message : String(error) });
+                }
             }
-            const parsed = JSON.parse(await readFile(path, 'utf-8')) as unknown;
-            const server = validateMcpServerConfig(id, parsed);
-            manifests.push({ id, server });
-            seen.add(id);
-        } catch (error) {
-            warnings.push({ file, message: error instanceof Error ? error.message : String(error) });
+
+            return { manifests, warnings };
+        } catch {
+            // fall back
         }
     }
 
-    return { manifests, warnings };
+    return { manifests: MCPS, warnings: [] };
 };

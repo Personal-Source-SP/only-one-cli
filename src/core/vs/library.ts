@@ -1,6 +1,6 @@
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { parseJsoncObject } from './json.js';
+import { VS_LIBRARY } from '@assets/vs/index.js';
 import type { VsFileSystem } from './types.js';
 
 export interface VsLibraryManifest {
@@ -8,16 +8,20 @@ export interface VsLibraryManifest {
     settings: Record<string, unknown>;
 }
 
-export const resolveVsLibraryDir = (): string => join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'libraries', 'vs');
-
-export const loadVsLibraryManifest = async (fs: VsFileSystem, libraryDir = resolveVsLibraryDir()): Promise<VsLibraryManifest> => {
-    const settings = parseJsoncObject(await fs.readFile(join(libraryDir, 'settings.json')));
-    const parsed = parseJsoncObject(await fs.readFile(join(libraryDir, 'extensions.json')));
-    const extensions = parsed.extensions;
-    if (!Array.isArray(extensions) || extensions.some((item) => typeof item !== 'string')) {
-        throw new Error('libraries/vs/extensions.json must contain string[] field "extensions"');
+export const loadVsLibraryManifest = async (fs?: VsFileSystem, libraryDir?: string): Promise<VsLibraryManifest> => {
+    if (fs && libraryDir) {
+        try {
+            const settings = parseJsoncObject(await fs.readFile(join(libraryDir, 'settings.json')));
+            const parsed = parseJsoncObject(await fs.readFile(join(libraryDir, 'extensions.json')));
+            const extensions = parsed.extensions;
+            if (Array.isArray(extensions) && extensions.every((item) => typeof item === 'string')) {
+                return { extensions: normalizeExtensionIds(extensions), settings };
+            }
+        } catch {
+            // fall back
+        }
     }
-    return { extensions: normalizeExtensionIds(extensions), settings };
+    return { extensions: normalizeExtensionIds(VS_LIBRARY.extensions), settings: VS_LIBRARY.settings };
 };
 
 export const normalizeExtensionIds = (extensions: string[]): string[] =>
