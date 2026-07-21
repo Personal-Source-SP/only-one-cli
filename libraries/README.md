@@ -17,7 +17,7 @@ libraries/
 ## Sử dụng
 
 Init command đọc các manifest trong thư mục này để hiển thị danh sách cho user chọn:
-1. **skills/**: Mỗi subdir là 1 skill. Copy vào tool's skillsDir khi user chọn. Các skill workflows mới gồm `ak-pr-git` và `ak-clockify`.
+1. **skills/**: Mỗi subdir là 1 skill. Copy vào tool's skillsDir khi user chọn. Các skill workflows mới gồm `only-one-pr-git-skill` và `only-one-clockify-skill`.
 2. **packages/**: Mỗi file `.yaml` là 1 package. Install khi user chọn.
 3. **templates/**: Sử dụng cho scaffolding (WIP).
 4. **configs/**: Các template cấu hình cho project.

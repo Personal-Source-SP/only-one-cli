@@ -165,8 +165,8 @@ export const checkExistingComboComponents = async (params: {
     // 4. MCPs (Explicit + Inferred from skills)
     const mcps = new Set<string>(combo.mcps || []);
     if (combo.skills) {
-        if (combo.skills.includes('ak-pr-git')) mcps.add('github');
-        if (combo.skills.includes('ak-clockify')) mcps.add('clockify');
+        if (combo.skills.includes('only-one-pr-git-skill')) mcps.add('github');
+        if (combo.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
     }
 
     if (mcps.size > 0 && selectedTools.length > 0) {
@@ -316,8 +316,8 @@ export const installCombo = async (params: {
     // 4. MCPs
     const mcps = new Set<string>(combo.mcps || []);
     if (combo.skills) {
-        if (combo.skills.includes('ak-pr-git')) mcps.add('github');
-        if (combo.skills.includes('ak-clockify')) mcps.add('clockify');
+        if (combo.skills.includes('only-one-pr-git-skill')) mcps.add('github');
+        if (combo.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
     }
 
     if (mcps.size > 0 && selectedTools.length > 0) {

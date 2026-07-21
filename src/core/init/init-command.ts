@@ -512,10 +512,10 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 deps.stdout('  No MCP manifests available');
             } else {
                 const preSelectedMcps = new Set<string>();
-                if (selectedSkillNames.includes('ak-pr-git')) {
+                if (selectedSkillNames.includes('only-one-pr-git-skill')) {
                     preSelectedMcps.add('github');
                 }
-                if (selectedSkillNames.includes('ak-clockify')) {
+                if (selectedSkillNames.includes('only-one-clockify-skill')) {
                     preSelectedMcps.add('clockify');
                 }
 
@@ -537,11 +537,15 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 }
 
                 // Dependency checking & opt-out warning
-                if (selectedSkillNames.includes('ak-pr-git') && !selectedMcpNames.includes('github')) {
-                    deps.stdout('  Warning: Skill ak-pr-git requires the github MCP server. Opting out may break its functionality.');
+                if (selectedSkillNames.includes('only-one-pr-git-skill') && !selectedMcpNames.includes('github')) {
+                    deps.stdout(
+                        '  Warning: Skill only-one-pr-git-skill requires the github MCP server. Opting out may break its functionality.',
+                    );
                 }
-                if (selectedSkillNames.includes('ak-clockify') && !selectedMcpNames.includes('clockify')) {
-                    deps.stdout('  Warning: Skill ak-clockify requires the clockify MCP server. Opting out may break its functionality.');
+                if (selectedSkillNames.includes('only-one-clockify-skill') && !selectedMcpNames.includes('clockify')) {
+                    deps.stdout(
+                        '  Warning: Skill only-one-clockify-skill requires the clockify MCP server. Opting out may break its functionality.',
+                    );
                 }
             }
         }
@@ -1050,14 +1054,14 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
 
             const workflows = [
                 {
-                    id: 'pr-git',
-                    skillName: 'ak-pr-git',
+                    id: 'only-one-pr-git',
+                    skillName: 'only-one-pr-git-skill',
                     mcpId: 'github',
                     secretKey: 'GITHUB_PERSONAL_ACCESS_TOKEN',
                 },
                 {
-                    id: 'clockify',
-                    skillName: 'ak-clockify',
+                    id: 'only-one-clockify',
+                    skillName: 'only-one-clockify-skill',
                     mcpId: 'clockify',
                     secretKey: 'CLOCKIFY_API_KEY',
                 },

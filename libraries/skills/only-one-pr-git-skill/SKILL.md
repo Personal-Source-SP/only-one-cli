@@ -1,5 +1,5 @@
 ---
-name: ak-pr-git
+name: only-one-pr-git-skill
 description: Create or update a GitHub Pull Request from the current branch using Git analysis and the GitHub MCP. Use when running the pr-git workflow or when asked to draft and create a PR.
 ---
 

@@ -8,25 +8,25 @@ const repoRoot = process.cwd();
 const skillsDir = join(repoRoot, 'libraries', 'skills');
 
 describe('agent workflow skills', () => {
-    it('ships ak-pr-git with referenced PR template', async () => {
-        const skillDir = join(skillsDir, 'ak-pr-git');
+    it('ships only-one-pr-git-skill with referenced PR template', async () => {
+        const skillDir = join(skillsDir, 'only-one-pr-git-skill');
         const skill = await readFile(join(skillDir, 'SKILL.md'), 'utf-8');
         const template = await readFile(join(skillDir, 'references', 'pr-template.md'), 'utf-8');
 
-        expect(skill).toContain('name: ak-pr-git');
+        expect(skill).toContain('name: only-one-pr-git-skill');
         expect(skill).toContain('GitHub MCP');
         expect(skill).toContain('references/pr-template.md');
         expect(template).toContain('## 🎯 Objective');
         expect(template).toContain('Vietnamese Summary Rule');
     });
 
-    it('ships ak-clockify with task format and validation references', async () => {
-        const skillDir = join(skillsDir, 'ak-clockify');
+    it('ships only-one-clockify-skill with task format and validation references', async () => {
+        const skillDir = join(skillsDir, 'only-one-clockify-skill');
         const skill = await readFile(join(skillDir, 'SKILL.md'), 'utf-8');
         const format = await readFile(join(skillDir, 'references', 'task-format.md'), 'utf-8');
         const rules = await readFile(join(skillDir, 'references', 'validation-rules.md'), 'utf-8');
 
-        expect(skill).toContain('name: ak-clockify');
+        expect(skill).toContain('name: only-one-clockify-skill');
         expect(skill).toContain('Clockify MCP');
         expect(skill).toContain('references/task-format.md');
         expect(skill).toContain('references/validation-rules.md');
@@ -36,8 +36,8 @@ describe('agent workflow skills', () => {
 
     it('can be copied recursively with references intact', async () => {
         const target = await mkdtemp(join(tmpdir(), 'only-one-skills-'));
-        const source = join(skillsDir, 'ak-clockify');
-        const destination = join(target, 'ak-clockify');
+        const source = join(skillsDir, 'only-one-clockify-skill');
+        const destination = join(target, 'only-one-clockify-skill');
 
         await cp(source, destination, { recursive: true, force: true });
 
@@ -47,9 +47,9 @@ describe('agent workflow skills', () => {
     });
 });
 
-describe('ak-pr-git static validations', () => {
+describe('only-one-pr-git-skill static validations', () => {
     it('verifies Conventional Commit tag requirements, English PR body, Vietnamese summary, Git preflights, and confirmation rules', async () => {
-        const skillDir = join(skillsDir, 'ak-pr-git');
+        const skillDir = join(skillsDir, 'only-one-pr-git-skill');
         const skillContent = await readFile(join(skillDir, 'SKILL.md'), 'utf-8');
 
         // Conventional Commit types
@@ -83,9 +83,9 @@ describe('ak-pr-git static validations', () => {
     });
 });
 
-describe('ak-clockify static validations', () => {
+describe('only-one-clockify-skill static validations', () => {
     it('verifies required options, weekday allocation, weekend shifting, and timezone rules', async () => {
-        const skillDir = join(skillsDir, 'ak-clockify');
+        const skillDir = join(skillsDir, 'only-one-clockify-skill');
         const skillContent = await readFile(join(skillDir, 'SKILL.md'), 'utf-8');
         const rulesContent = await readFile(join(skillDir, 'references', 'validation-rules.md'), 'utf-8');
         const formatContent = await readFile(join(skillDir, 'references', 'task-format.md'), 'utf-8');
@@ -112,7 +112,7 @@ describe('ak-clockify static validations', () => {
     });
 
     it('verifies dry run, confirmation, replacement matching, billable status, and batch recovery rules', async () => {
-        const skillDir = join(skillsDir, 'ak-clockify');
+        const skillDir = join(skillsDir, 'only-one-clockify-skill');
         const skillContent = await readFile(join(skillDir, 'SKILL.md'), 'utf-8');
         const rulesContent = await readFile(join(skillDir, 'references', 'validation-rules.md'), 'utf-8');
 
@@ -142,7 +142,7 @@ describe('ak-clockify static validations', () => {
     });
 
     it('verifies exact project matching, suggestions, and workspace ambiguity resolution rules', async () => {
-        const skillDir = join(skillsDir, 'ak-clockify');
+        const skillDir = join(skillsDir, 'only-one-clockify-skill');
         const skillContent = await readFile(join(skillDir, 'SKILL.md'), 'utf-8');
         const rulesContent = await readFile(join(skillDir, 'references', 'validation-rules.md'), 'utf-8');
 

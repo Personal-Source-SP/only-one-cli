@@ -1,8 +1,8 @@
 import type { CommandContent } from '@/core/command-generation/types.js';
 
 export enum AgentWorkflowCommandId {
-    Clockify = 'clockify',
-    PrGit = 'pr-git',
+    Clockify = 'only-one-clockify',
+    PrGit = 'only-one-pr-git',
 }
 
 export enum PrGitTag {
@@ -12,8 +12,8 @@ export enum PrGitTag {
     Style = 'style',
 }
 
-export const PR_GIT_SKILL_NAME = 'ak-pr-git';
-export const CLOCKIFY_SKILL_NAME = 'ak-clockify';
+export const PR_GIT_SKILL_NAME = 'only-one-pr-git-skill';
+export const CLOCKIFY_SKILL_NAME = 'only-one-clockify-skill';
 
 export const PR_GIT_DEFAULT_BRANCH = 'main';
 export const PR_GIT_DEFAULT_TAG = PrGitTag.Feat;
@@ -38,7 +38,7 @@ const buildPrGitCommandBody =
 ## Input
 
 \`\`\`text
-/pr-git --branch <base-branch> --tag <conventional-type>
+/only-one-pr-git --branch <base-branch> --tag <conventional-type>
 \`\`\`
 
 - \`--branch\` is optional. Default: \`${PR_GIT_DEFAULT_BRANCH}\`.
@@ -64,7 +64,7 @@ const buildClockifyCommandBody =
 ## Input
 
 \`\`\`text
-/clockify --date <DD/MM/YYYY> --project <project-name> [--tasks-per-day <number>] [--validate]
+/only-one-clockify --date <DD/MM/YYYY> --project <project-name> [--tasks-per-day <number>] [--validate]
 
 [Carwash API] Implement task description | 9-13h
 [Carwash Portal] Implement task description | 13-17h
@@ -90,7 +90,7 @@ If skill \`${CLOCKIFY_SKILL_NAME}\` or MCP \`clockify\` is unavailable, stop and
 export const buildPrGitCommandContent = (): CommandContent => ({
     body: buildPrGitCommandBody(),
     category: 'Workflow',
-    description: 'Create or update a GitHub PR from current branch using ak-pr-git and GitHub MCP.',
+    description: 'Create or update a GitHub PR from current branch using only-one-pr-git-skill and GitHub MCP.',
     id: AgentWorkflowCommandId.PrGit,
     name: AgentWorkflowCommandId.PrGit,
     tags: ['only-one', 'github', 'mcp', 'pr'],
@@ -99,7 +99,7 @@ export const buildPrGitCommandContent = (): CommandContent => ({
 export const buildClockifyCommandContent = (): CommandContent => ({
     body: buildClockifyCommandBody(),
     category: 'Workflow',
-    description: 'Validate and log Clockify tasks using ak-clockify and Clockify MCP.',
+    description: 'Validate and log Clockify tasks using only-one-clockify-skill and Clockify MCP.',
     id: AgentWorkflowCommandId.Clockify,
     name: AgentWorkflowCommandId.Clockify,
     tags: ['only-one', 'clockify', 'mcp', 'time-tracking'],

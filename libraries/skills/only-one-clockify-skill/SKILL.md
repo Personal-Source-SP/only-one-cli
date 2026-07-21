@@ -1,5 +1,5 @@
 ---
-name: ak-clockify
+name: only-one-clockify-skill
 description: Validate and log Clockify time entries from task lines using the Clockify MCP. Use when running the clockify workflow or when asked to log tasks to Clockify.
 ---
 

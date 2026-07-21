@@ -97,12 +97,12 @@ export const installSkills = async (request: {
 
                 let commandContent = null;
                 let commandId = '';
-                if (skillName === 'ak-pr-git') {
+                if (skillName === 'only-one-pr-git-skill') {
                     commandContent = buildPrGitCommandContent();
-                    commandId = 'pr-git';
-                } else if (skillName === 'ak-clockify') {
+                    commandId = 'only-one-pr-git';
+                } else if (skillName === 'only-one-clockify-skill') {
                     commandContent = buildClockifyCommandContent();
-                    commandId = 'clockify';
+                    commandId = 'only-one-clockify';
                 }
 
                 if (commandContent && commandId) {

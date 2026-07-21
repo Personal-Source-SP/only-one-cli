@@ -25,7 +25,7 @@ describe('agent workflow command sources', () => {
         expect(command.body).toContain(PR_GIT_DEFAULT_TAG);
         expect(SUPPORTED_PR_GIT_TAGS).toEqual(['feat', 'fix', 'refactor', 'style']);
         expect(command.body).toContain('Reject bracketed or uppercase tags');
-        expect(command.body).toContain('ak-pr-git');
+        expect(command.body).toContain('only-one-pr-git-skill');
         expect(command.body).toContain('github');
     });
 
@@ -37,12 +37,12 @@ describe('agent workflow command sources', () => {
         expect(command.body).toContain('--project <project-name>');
         expect(command.body).toContain(`Default: \`${CLOCKIFY_DEFAULT_TASKS_PER_DAY}\``);
         expect(command.body).toContain('--validate');
-        expect(command.body).toContain('ak-clockify');
+        expect(command.body).toContain('only-one-clockify-skill');
         expect(command.body).toContain('clockify');
     });
 
     it('exports both workflow commands in deterministic order', () => {
-        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual(['pr-git', 'clockify']);
+        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual(['only-one-pr-git', 'only-one-clockify']);
     });
 });
 
@@ -50,15 +50,15 @@ describe('agent workflow command adapter naming', () => {
     it('uses direct cursor slash command names', () => {
         const generated = generateCommand(buildPrGitCommandContent(), cursorCommandAdapter);
 
-        expect(generated.path.replace(/\\/g, '/')).toBe('.cursor/commands/pr-git.md');
-        expect(generated.content).toContain('name: /pr-git');
+        expect(generated.path.replace(/\\/g, '/')).toBe('.cursor/commands/only-one-pr-git.md');
+        expect(generated.content).toContain('name: /only-one-pr-git');
     });
 
     it('normalizes antigravity opsx prefix for non-openspec workflow commands', () => {
         const raw = antigravityCommandAdapter.getFilePath(AgentWorkflowCommandId.PrGit);
         const normalized = normalizeStructureCommandPath(raw, AgentWorkflowCommandId.PrGit);
 
-        expect(raw.replace(/\\/g, '/')).toBe('.agent/workflows/opsx-pr-git.md');
-        expect(normalized.replace(/\\/g, '/')).toBe('.agent/workflows/pr-git.md');
+        expect(raw.replace(/\\/g, '/')).toBe('.agents/workflows/opsx-only-one-pr-git.md');
+        expect(normalized.replace(/\\/g, '/')).toBe('.agents/workflows/only-one-pr-git.md');
     });
 });
