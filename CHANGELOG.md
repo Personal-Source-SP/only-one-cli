@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Breaking Changes
+
+- Command-facing agent targets now support only Antigravity, Claude, Cursor, and Codex. Explicit unsupported target IDs fail before side effects.
+- `setting-vs` and `extensions-vs` now support only Antigravity and Cursor. VS Code is no longer selectable.
+- MCP synchronization now fails before writes when an existing selected configuration is malformed.
+
+### Features
+
+- MCP sync supports Claude JSON and Codex TOML configuration files, in addition to Antigravity and Cursor.
+
+### Notes
+
+- Codex TOML writes preserve configuration semantics, but may rewrite comments and formatting.
+
 ## 0.0.1 (2026-06-16)
 
 ### Features

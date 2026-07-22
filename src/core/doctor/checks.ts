@@ -543,11 +543,11 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
             description: 'Generate structural blueprint and supported agent workflow artifacts',
         },
         {
-            command: 'only-one setting-vs --editors vscode,cursor,antigravity',
+            command: 'only-one setting-vs --editors antigravity,cursor',
             description: 'Merge shared editor settings from libraries/vs',
         },
         {
-            command: 'only-one extensions-vs --editors vscode,cursor,antigravity',
+            command: 'only-one extensions-vs --editors antigravity,cursor',
             description: 'Install missing editor extensions from libraries/vs',
         },
     ];

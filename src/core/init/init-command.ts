@@ -9,7 +9,8 @@ import { confirm, select } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { printJson } from '@/core/output/index.js';
 import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
-import { getInstallableAgentTools, getAgentToolById } from '@/core/agent/tools.js';
+import { getAllowedAgentTargets } from '@/core/target-selection/index.js';
+import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
 import { updateGitignore } from './gitignore.js';
 import { readMcpManifests } from '@/core/mcp/registry.js';
@@ -90,21 +91,22 @@ export const executeToolsStep = async (
     projectDir: string,
     selectedValuesOverride?: string[],
 ): Promise<ToolsStepResult | null> => {
-    const tools = getInstallableAgentTools();
+    const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
 
-    if (tools.length === 0) {
+    if (!tools.length) {
         deps.stdout('  No installable agent tools found');
         return null;
     }
 
     let selectedValues: string[] = [];
     if (selectedValuesOverride) {
-        for (const val of selectedValuesOverride) {
-            if (!getAgentToolById(val)) {
-                throw new Error(`Agent tool '${val}' not found in AI_TOOLS`);
-            }
-        }
-        selectedValues = selectedValuesOverride;
+        const selected = await selectAllowedAgentTargets({
+            automatic: false,
+            emptyMessage: 'Select at least one tool',
+            explicit: selectedValuesOverride.join(','),
+            message: 'Select agent tools to initialize:',
+        });
+        selectedValues = selected.map((tool) => tool.value);
     } else {
         const choices = tools.map((t) => {
             const configured = t.skillsDir ? existsSync(join(projectDir, t.skillsDir)) : false;
@@ -121,15 +123,15 @@ export const executeToolsStep = async (
             message: 'Select agent tools to initialize:',
             choices,
             validate: (selected: string[]) => {
-                if (selected.length === 0) return 'Select at least one tool';
+                if (!selected.length) return 'Select at least one tool';
                 return true;
             },
         });
     }
 
-    if (selectedValues.length === 0) return null;
+    if (!selectedValues.length) return null;
 
-    const selectedTools = selectedValues.map((v) => getAgentToolById(v)).filter(Boolean) as typeof tools;
+    const selectedTools = tools.filter((tool) => selectedValues.includes(tool.value));
 
     return { selectedTools };
 };
@@ -434,7 +436,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 let toolsForSkills = selectedTools;
                 if (toolsForSkills.length === 0) {
                     // Auto-detect configured tools in workspace if no tools selected in this session
-                    const tools = getInstallableAgentTools();
+                    const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
                     toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
                 }
 
@@ -553,7 +555,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             deps.stdout('\nSkills to Sync:');
             let toolsForSkills = selectedTools;
             if (toolsForSkills.length === 0) {
-                const tools = getInstallableAgentTools();
+                const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
                 toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
             }
 
@@ -595,7 +597,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             if (hasSkills) {
                 let toolsForSkills = selectedTools;
                 if (toolsForSkills.length === 0) {
-                    const tools = getInstallableAgentTools();
+                    const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
                     toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
                 }
                 for (const tool of toolsForSkills) {
@@ -729,7 +731,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 let targetTools = selectedTools.map((t) => mapToolToUiproAi(t.value)).filter(Boolean) as string[];
 
                 if (targetTools.length === 0) {
-                    const tools = getInstallableAgentTools();
+                    const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
                     const detectedTools = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
                     targetTools = detectedTools.map((t) => mapToolToUiproAi(t.value)).filter(Boolean) as string[];
                 }
@@ -760,7 +762,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             deps.stdout('\nSyncing skills...');
             let toolsForSkills = selectedTools;
             if (toolsForSkills.length === 0) {
-                const tools = getInstallableAgentTools();
+                const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
                 toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
             }
 
@@ -897,14 +899,14 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             const selectedManifests = manifests.filter((m) => selectedMcpNames.includes(m.id));
             if (selectedManifests.length > 0) {
                 try {
-                    let targetIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');
+                    let targetIdeIds = selectedTools.map((tool) => tool.value);
                     if (targetIdeIds.length === 0) {
-                        const tools = getInstallableAgentTools();
+                        const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
                         const configuredTools = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
-                        targetIdeIds = configuredTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');
+                        targetIdeIds = configuredTools.map((tool) => tool.value);
                     }
                     if (targetIdeIds.length === 0) {
-                        targetIdeIds = ['cursor', 'antigravity'];
+                        targetIdeIds = getAllowedAgentTargets().map((target) => target.id);
                     }
 
                     const existingMcps = await checkExistingMcps(homedir(), process.platform, targetIdeIds, selectedMcpNames);
@@ -965,7 +967,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             if (hasSkills) {
                 let toolsForSkills = selectedTools;
                 if (toolsForSkills.length === 0) {
-                    const tools = getInstallableAgentTools();
+                    const tools = getAllowedAgentTargets().flatMap((target) => (target.agent ? [target.agent] : []));
                     toolsForSkills = tools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
                 }
                 for (const tool of toolsForSkills) {
@@ -1038,7 +1040,9 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
 
     const projectDir = result.projectDir;
     if (projectDir) {
-        const activeTools = getInstallableAgentTools().filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+        const activeTools = getAllowedAgentTargets()
+            .flatMap((target) => (target.agent ? [target.agent] : []))
+            .filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
         if (activeTools.length > 0) {
             deps.stdout('\n==================================================');
             deps.stdout('                READINESS REPORT');

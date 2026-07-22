@@ -47,7 +47,9 @@ export function createProgram(deps: ProgramDeps) {
     program
         .version(VERSION, '-v, --version', 'output the current version')
         .helpOption('-h, --help', 'display help for command')
-        .description('🚀 Only-one CLI - Developer environment setups, VS Code configuration syncing, and agent workspaces manager.')
+        .description(
+            '🚀 Only-one CLI - Developer environment setups, supported VS editor configuration syncing, and agent workspaces manager.',
+        )
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
@@ -57,8 +59,8 @@ export function createProgram(deps: ProgramDeps) {
                 `  ${COLORS.cli.command('$ only-one skill --tool cursor')}               # Manage/sync custom agent skills for Cursor\n` +
                 `  ${COLORS.cli.command('$ only-one mcp github,clockify')}               # Configure global Model Context Protocol servers\n` +
                 `  ${COLORS.cli.command('$ only-one structure-generate')}                # Scaffold structural blueprint files for agents\n` +
-                `  ${COLORS.cli.command('$ only-one setting-vs --editors vscode')}       # Sync and merge settings between VS Code/Cursor\n` +
-                `  ${COLORS.cli.command('$ only-one extensions-vs')}                     # Sync and merge VS Code extension profiles\n` +
+                `  ${COLORS.cli.command('$ only-one setting-vs --editors cursor')}       # Sync and merge supported editor settings\n` +
+                `  ${COLORS.cli.command('$ only-one extensions-vs')}                     # Sync and merge supported editor extensions\n` +
                 `  ${COLORS.cli.command('$ only-one doctor')}                            # Verify git and Node.js environment readiness\n` +
                 `  ${COLORS.cli.command('$ only-one update')}                            # Refresh installed agent skills/templates\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +

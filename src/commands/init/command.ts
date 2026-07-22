@@ -1,7 +1,7 @@
 import { homedir } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { mcpIdeAdapters } from '@/core/mcp/adapters.js';
+import { selectAllowedMcpTargets } from '@/core/target-selection/index.js';
 import { readMcpManifests } from '@/core/mcp/registry.js';
 import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
 import { executeInitCommand, printInitResult } from '@/core/init/init-command.js';
@@ -39,14 +39,15 @@ const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: s
         return manifest;
     });
 
-    let selectedIdeIds = parseCsv(options?.ide);
-    if (!selectedIdeIds.length && deps.prompts?.checkbox) {
-        selectedIdeIds = await deps.prompts.checkbox({
+    const selectedIdeIds = (
+        await selectAllowedMcpTargets({
+            automatic: Boolean(options?.yes || !deps.prompts?.checkbox),
+            emptyMessage: 'Select at least one target IDE',
+            explicit: options?.ide,
             message: 'Select IDEs for global MCP config',
-            choices: mcpIdeAdapters.map((adapter) => ({ name: adapter.name, value: adapter.id })),
-        });
-    }
-    if (!selectedIdeIds.length) selectedIdeIds = mcpIdeAdapters.map((adapter) => adapter.id);
+            prompts: deps.prompts,
+        })
+    ).map((adapter) => adapter.id);
 
     const response = await syncMcpGlobalConfig({
         cwd: deps.cwd,
@@ -216,18 +217,18 @@ export function createInitCommand(deps: ProgramDeps): Command {
         });
 
     cmd.command('mcp')
-        .description('🔌 Merge selected MCP servers into global Cursor or Antigravity config')
+        .description('🔌 Merge selected MCP servers into supported global configs')
         .helpOption('-h, --help', 'display help for command')
         .argument('[names]', 'Comma-separated list of MCP server IDs to configure')
-        .option('--ide <ids>', 'Comma-separated IDE IDs to configure (cursor, antigravity)')
+        .option('--ide <ids>', 'Comma-separated IDE IDs to configure (antigravity, claude, cursor, codex)')
         .option('--yes', 'Automatically use defaults when prompts are unavailable')
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
-                `  ${COLORS.cli.command('$ only-one init mcp github,clockify --ide cursor,antigravity')}\n` +
+                `  ${COLORS.cli.command('$ only-one init mcp github,clockify --ide antigravity,claude,cursor,codex')}\n` +
                 `  ${COLORS.cli.command('$ only-one init mcp')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
-                `  - ${COLORS.dim('MCP config is global and currently supports Cursor and Antigravity.')}\n` +
+                `  - ${COLORS.dim('MCP config is global and supports Antigravity, Claude, Cursor, and Codex.')}\n` +
                 `  - ${COLORS.dim('Existing MCP server IDs are skipped, not overwritten.')}\n` +
                 `  - ${COLORS.dim('Secret placeholders are left empty for manual editing.')}`,
         )

@@ -1,14 +1,13 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { mcpIdeAdapters, findMcpIdeAdapter } from './adapters.js';
-import { parseJsoncObject } from '@/core/vs/json.js';
 
-export interface ExistingMcp {
+export type ExistingMcp = {
+    configPath: string;
+    exists: boolean;
     ideId: string;
     ideName: string;
     mcpId: string;
-    configPath: string;
-    exists: boolean;
-}
+};
 
 export const checkExistingMcps = async (
     homeDir: string,
@@ -17,35 +16,23 @@ export const checkExistingMcps = async (
     mcpIds: string[],
 ): Promise<ExistingMcp[]> => {
     const results: ExistingMcp[] = [];
-    const adapters = ideIds.map((id) => findMcpIdeAdapter(id)).filter(Boolean) as typeof mcpIdeAdapters;
-
-    for (const adapter of adapters) {
+    for (const ideId of ideIds) {
+        const adapter = findMcpIdeAdapter(ideId);
+        if (!adapter) continue;
         const configPath = adapter.getConfigPath(homeDir, platform);
-        let config: Record<string, any> = {};
+        let config: Record<string, unknown> = {};
         if (existsSync(configPath)) {
-            try {
-                config = parseJsoncObject(readFileSync(configPath, 'utf8')) as Record<string, any>;
-            } catch {
-                config = {};
-            }
+            config = adapter.codec.parse(readFileSync(configPath, 'utf8'), configPath);
         }
-        const mcpServers = adapter.getMcpServers(config);
+        const servers = adapter.getMcpServers(config);
         for (const mcpId of mcpIds) {
-            const exists = Object.prototype.hasOwnProperty.call(mcpServers, mcpId);
-            results.push({
-                ideId: adapter.id,
-                ideName: adapter.name,
-                mcpId,
-                configPath,
-                exists,
-            });
+            results.push({ configPath, exists: Object.prototype.hasOwnProperty.call(servers, mcpId), ideId, ideName: adapter.name, mcpId });
         }
     }
     return results;
 };
 
-export { syncMcpGlobalConfig } from './sync.js';
-export { readMcpManifests } from './registry.js';
-export { mcpIdeAdapters } from './adapters.js';
-export type { SyncMcpGlobalConfigRequest, SyncMcpGlobalConfigResponse, SyncMcpGlobalConfigResult } from './sync.js';
-export type { McpManifest } from './types.js';
+export * from './types.js';
+export * from './adapters.js';
+export * from './registry.js';
+export * from './sync.js';

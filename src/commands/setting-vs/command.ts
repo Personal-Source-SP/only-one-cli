@@ -1,7 +1,8 @@
 import { homedir, platform } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { parseVsEditorIds, syncVsSettings, vsEditors, VsPlatform, type VsEditorId } from '@/core/vs/index.js';
+import { syncVsSettings, VsPlatform, type VsEditorId } from '@/core/vs/index.js';
+import { selectAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 
 import { COLORS } from '@/constants/index.js';
 
@@ -17,28 +18,27 @@ const resolvePlatform = (): VsPlatform => {
 };
 
 const selectEditors = async (deps: ProgramDeps, options: SettingVsOptions): Promise<VsEditorId[]> => {
-    const parsed = parseVsEditorIds(options.editors);
-    if (parsed.length) return parsed;
-    if (deps.prompts?.checkbox) {
-        return deps.prompts.checkbox({
-            message: 'Select editors to sync settings',
-            choices: vsEditors.map((editor) => ({ name: editor.name, value: editor.id, checked: true })),
-        });
-    }
-    return vsEditors.map((editor) => editor.id);
+    const editors = await selectAllowedVsSettingsTargets({
+        automatic: !deps.prompts?.checkbox,
+        emptyMessage: 'Select at least one supported editor',
+        explicit: options.editors,
+        message: 'Select editors to sync settings',
+        prompts: deps.prompts,
+    });
+    return editors.map((editor) => editor.id);
 };
 
 export const createSettingVsCommand = (deps: ProgramDeps): Command => {
     const cmd = new Command('setting-vs')
         .description('⚙️  Merge VS Code editor configurations')
         .helpOption('-h, --help', 'display help for command')
-        .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: vscode, cursor, antigravity)')
+        .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: antigravity, cursor)')
         .option('--force', 'Force overwrite settings, bypassing merging', false)
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
                 `  ${COLORS.cli.command('$ only-one setting-vs')}\n` +
-                `  ${COLORS.cli.command('$ only-one setting-vs --editors vscode,cursor')}\n` +
+                `  ${COLORS.cli.command('$ only-one setting-vs --editors antigravity,cursor')}\n` +
                 `  ${COLORS.cli.command('$ only-one setting-vs --force')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('If no --editors option is provided, an interactive prompt will allow you to select which editors to sync (if supported by terminal).')}\n` +

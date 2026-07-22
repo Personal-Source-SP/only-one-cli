@@ -367,8 +367,8 @@ describe('doctor checks (existing)', () => {
             const commands = buildSampleCommands('READY');
             expect(commands.map((item) => item.command)).toEqual([
                 'only-one structure-generate',
-                'only-one setting-vs --editors vscode,cursor,antigravity',
-                'only-one extensions-vs --editors vscode,cursor,antigravity',
+                'only-one setting-vs --editors antigravity,cursor',
+                'only-one extensions-vs --editors antigravity,cursor',
             ]);
             expect(commands[0].description).toContain('structural blueprint');
             expect(commands[1].description).toContain('settings');

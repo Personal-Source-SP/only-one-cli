@@ -38,12 +38,12 @@ describe('VS sync commands', () => {
             stdout: (line) => writes.push(line),
         });
 
-        await program.parseAsync(['setting-vs', '--editors', 'vscode,cursor'], { from: 'user' });
+        await program.parseAsync(['setting-vs', '--editors', 'antigravity,cursor'], { from: 'user' });
 
         expect(syncVsSettings).toHaveBeenCalledWith(
             expect.objectContaining({
                 cwd: '/repo',
-                editorIds: [VsEditorId.VSCode, VsEditorId.Cursor],
+                editorIds: [VsEditorId.Antigravity, VsEditorId.Cursor],
                 platform: expect.stringMatching(`${VsPlatform.Darwin}|${VsPlatform.Win32}`),
             }),
         );
@@ -75,27 +75,27 @@ describe('VS sync commands', () => {
             stdout: (line) => writes.push(line),
         });
 
-        await program.parseAsync(['extensions-vs', '--editors', 'vscode,antigravity'], { from: 'user' });
+        await program.parseAsync(['extensions-vs', '--editors', 'cursor,antigravity'], { from: 'user' });
 
         expect(syncVsExtensions).toHaveBeenCalledWith(
-            expect.objectContaining({ cwd: '/repo', editorIds: [VsEditorId.VSCode, VsEditorId.Antigravity] }),
+            expect.objectContaining({ cwd: '/repo', editorIds: [VsEditorId.Cursor, VsEditorId.Antigravity] }),
         );
         expect(writes.map((w) => w.replace(/\u001b\[\d+m/g, ''))).toContain('\nSync Summary:');
     });
 
-    it('uses checkbox selection for extensions-vs when editors option is omitted', async () => {
-        const checkbox = vi.fn().mockResolvedValue([VsEditorId.Cursor]);
+    it('rejects VS Code before either sync command has side effects', async () => {
         const program = createProgram({
             cwd: '/repo',
             env: {},
             fetcher: (() => Promise.resolve({})) as typeof fetch,
-            prompts: { checkbox },
             stdout: () => undefined,
         });
 
-        await program.parseAsync(['extensions-vs'], { from: 'user' });
-
-        expect(checkbox).toHaveBeenCalledWith(expect.objectContaining({ message: 'Select editors to sync extensions' }));
-        expect(syncVsExtensions).toHaveBeenLastCalledWith(expect.objectContaining({ editorIds: [VsEditorId.Cursor] }));
+        await expect(program.parseAsync(['setting-vs', '--editors', 'vscode'], { from: 'user' })).rejects.toThrow(
+            "Unsupported target 'vscode'. Valid targets: antigravity, cursor",
+        );
+        await expect(program.parseAsync(['extensions-vs', '--editors', 'vscode'], { from: 'user' })).rejects.toThrow(
+            "Unsupported target 'vscode'. Valid targets: antigravity, cursor",
+        );
     });
 });

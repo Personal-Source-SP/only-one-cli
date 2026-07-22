@@ -79,3 +79,4 @@ openspec/
 adr
 openspec
 .agents/
+.claude/

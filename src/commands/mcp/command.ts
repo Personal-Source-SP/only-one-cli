@@ -2,7 +2,8 @@ import { Command } from 'commander';
 import { homedir } from 'node:os';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { checkExistingMcps, syncMcpGlobalConfig, readMcpManifests, mcpIdeAdapters } from '@/core/mcp/index.js';
+import { checkExistingMcps, syncMcpGlobalConfig, readMcpManifests } from '@/core/mcp/index.js';
+import { selectAllowedMcpTargets } from '@/core/target-selection/index.js';
 
 const parseCsv = (val?: string): string[] =>
     val
@@ -15,7 +16,7 @@ export function createMcpCommand(deps: ProgramDeps): Command {
         .description('🔌 Configure and synchronize Model Context Protocol (MCP) servers globally')
         .helpOption('-h, --help', 'display help for command')
         .argument('[names]', 'Comma-separated list of MCP server IDs to configure')
-        .option('--ide <ides>', 'Comma-separated target IDE IDs (cursor, antigravity)')
+        .option('--ide <ides>', 'Comma-separated target IDs (antigravity, claude, cursor, codex)')
         .option('--yes', 'Automatically confirm prompts')
         .action(async (namesArg: string | undefined, options: { ide?: string; yes?: boolean }) => {
             const { manifests, warnings } = await readMcpManifests();
@@ -27,26 +28,15 @@ export function createMcpCommand(deps: ProgramDeps): Command {
                 throw new Error('No MCP manifests available');
             }
 
-            // 1. Select IDEs
-            let selectedIdeIds = parseCsv(options.ide);
-            if (selectedIdeIds.length === 0) {
-                if (options.yes || !deps.prompts?.checkbox) {
-                    selectedIdeIds = mcpIdeAdapters.map((a) => a.id);
-                } else {
-                    selectedIdeIds = await deps.prompts.checkbox({
-                        message: 'Select target IDEs for global MCP sync:',
-                        choices: mcpIdeAdapters.map((a) => ({
-                            name: a.name,
-                            value: a.id,
-                            checked: true,
-                        })),
-                    });
-                }
-            }
-
-            if (selectedIdeIds.length === 0) {
-                throw new Error('Select at least one target IDE');
-            }
+            const selectedIdeIds = (
+                await selectAllowedMcpTargets({
+                    automatic: Boolean(options.yes || !deps.prompts?.checkbox),
+                    emptyMessage: 'Select at least one target IDE',
+                    explicit: options.ide,
+                    message: 'Select target IDEs for global MCP sync:',
+                    prompts: deps.prompts,
+                })
+            ).map((adapter) => adapter.id);
 
             // 2. Select MCPs
             let selectedMcpIds = parseCsv(namesArg);

@@ -59,7 +59,7 @@ only-one init --tools cursor,claude
 
 ### `init mcp`
 
-Merge global MCP configurations into Cursor or Antigravity settings.
+Merge global MCP configurations into Antigravity, Claude, Cursor, and Codex settings.
 
 ```bash
 only-one init mcp [names] [options]
@@ -67,8 +67,8 @@ only-one init mcp [names] [options]
 
 | Option         | Description                                                                 |
 | -------------- | --------------------------------------------------------------------------- |
-| `--ide <ides>` | Comma-separated target IDEs: `cursor`, `antigravity` (default: both if active)|
-| `--yes`        | Non-interactive mode, select all available MCPs                             |
+| `--ide <ides>` | Comma-separated targets: `antigravity`, `claude`, `cursor`, `codex`       |
+| `--yes`        | Non-interactive mode, select all available MCPs and supported targets      |
 
 **Examples**
 
@@ -76,8 +76,8 @@ only-one init mcp [names] [options]
 # Configure all available MCPs for Cursor only
 only-one init mcp --ide cursor --yes
 
-# Configure github MCP for Cursor and Antigravity
-only-one init mcp github
+# Configure github MCP for all supported targets
+only-one init mcp github --ide antigravity,claude,cursor,codex
 ```
 
 ### Workflows
@@ -120,10 +120,10 @@ only-one doctor
 
 ### `setting-vs`
 
-Merge `libraries/vs/settings.json` into VS Code, Cursor, or Antigravity user settings on macOS/Windows.
+Merge `libraries/vs/settings.json` into Antigravity or Cursor user settings on macOS/Windows.
 
 ```bash
-only-one setting-vs --editors vscode,cursor,antigravity
+only-one setting-vs --editors antigravity,cursor
 ```
 
 - Source settings win when a key conflicts.
@@ -132,16 +132,24 @@ only-one setting-vs --editors vscode,cursor,antigravity
 
 ### `extensions-vs`
 
-Install missing extension IDs from `libraries/vs/extensions.json` through each editor CLI.
+Install missing extension IDs from `libraries/vs/extensions.json` through Antigravity or Cursor CLI.
 
 ```bash
-only-one extensions-vs --editors vscode,cursor,antigravity
+only-one extensions-vs --editors antigravity,cursor
 ```
 
 - Existing extensions are preserved.
 - Only missing source extensions are installed.
 - Progress is reported as monotonic percentages from 0 to 100.
 - Interrupted runs recover from `.only-one/vs-sync-journal.json` before starting new mutations.
+
+## Compatibility
+
+Command-facing agent targets are limited to Antigravity, Claude, Cursor, and Codex. Other explicit target IDs now fail before side effects.
+
+`setting-vs` and `extensions-vs` support only Antigravity and Cursor; VS Code is no longer selectable.
+
+MCP sync supports JSON and TOML configuration files. Existing malformed configurations fail before writes. Codex TOML writes preserve configuration semantics, but may rewrite comments and formatting.
 
 ## JSON Output
 

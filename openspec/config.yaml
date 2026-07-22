@@ -7,7 +7,7 @@ schema: intent-driven
 
 rules:
   proposal:
-    - Must use grill-me skill
+    - MUST execute the grill-me skill. Always interview the user to clarify exact context and requirements instead of autonomously deciding.
   design:
     - Must use c4-diagrams skill
   adr:

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import type { VsFileSystem, VsProcessRunner, VsProgressReporter } from './types.js';
 
@@ -52,7 +53,8 @@ export class VsSyncTransaction {
     }
 
     public async backupFile(targetPath: string): Promise<void> {
-        const backupPath = `${this.journalPath}.${Buffer.from(targetPath).toString('hex')}.bak`;
+        const targetHash = createHash('sha256').update(targetPath).digest('hex');
+        const backupPath = `${this.journalPath}.${targetHash}.bak`;
         try {
             await this.fs.copyFile(targetPath, backupPath);
         } catch {

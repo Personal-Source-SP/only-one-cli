@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { getInstallableAgentTools, getAgentToolById } from '@/core/agent/tools.js';
+import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { resolveProjectDir, assertProjectDirectory } from '@/core/runtime/globals.js';
 import { readComboManifests, checkExistingComboComponents, installCombo } from '@/core/combo/index.js';
 
@@ -32,37 +32,19 @@ export function createComboCommand(deps: ProgramDeps): Command {
                 const projectDir = resolveProjectDir(deps, pathArg);
                 assertProjectDirectory(projectDir);
 
-                const allTools = getInstallableAgentTools();
                 const availableCombos = await readComboManifests();
-
-                if (availableCombos.length === 0) {
+                if (!availableCombos.length) {
                     deps.stdout(COLORS.warning('No predefined combos available in libraries/combos.'));
                     return;
                 }
 
-                // 1. Choose IDEs
-                let selectedToolIds = parseCsv(options.tool);
-                if (selectedToolIds.length === 0) {
-                    if (options.yes || !deps.prompts?.checkbox) {
-                        const configured = allTools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
-                        selectedToolIds = configured.length > 0 ? configured.map((t) => t.value) : allTools.map((t) => t.value);
-                    } else {
-                        selectedToolIds = await deps.prompts.checkbox({
-                            message: 'Select target IDEs/Tools for combo setup:',
-                            choices: allTools.map((t) => ({
-                                name: t.name,
-                                value: t.value,
-                                checked: t.skillsDir ? existsSync(join(projectDir, t.skillsDir)) : false,
-                            })),
-                        });
-                    }
-                }
-
-                if (selectedToolIds.length === 0) {
-                    throw new Error('Select at least one target tool/IDE');
-                }
-
-                const targetTools = selectedToolIds.map((id) => getAgentToolById(id)).filter(Boolean) as typeof allTools;
+                const targetTools = await selectAllowedAgentTargets({
+                    automatic: Boolean(options.yes || !deps.prompts?.checkbox),
+                    emptyMessage: 'Select at least one target tool/IDE',
+                    explicit: options.tool,
+                    message: 'Select target IDEs/Tools for combo setup:',
+                    prompts: deps.prompts,
+                });
 
                 // 2. Select Combo
                 let selectedComboNames = parseCsv(namesArg);

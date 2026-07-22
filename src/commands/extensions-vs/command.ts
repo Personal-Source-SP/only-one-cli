@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { parseVsEditorIds, syncVsExtensions, vsEditors, type VsEditorId } from '@/core/vs/index.js';
+import { syncVsExtensions, type VsEditorId } from '@/core/vs/index.js';
+import { selectAllowedVsExtensionsTargets } from '@/core/target-selection/index.js';
 
 import { COLORS } from '@/constants/index.js';
 
@@ -10,22 +11,21 @@ interface ExtensionsVsOptions {
 }
 
 const selectEditors = async (deps: ProgramDeps, options: ExtensionsVsOptions): Promise<VsEditorId[]> => {
-    const parsed = parseVsEditorIds(options.editors);
-    if (parsed.length) return parsed;
-    if (deps.prompts?.checkbox) {
-        return deps.prompts.checkbox({
-            message: 'Select editors to sync extensions',
-            choices: vsEditors.map((editor) => ({ name: editor.name, value: editor.id, checked: true })),
-        });
-    }
-    return vsEditors.map((editor) => editor.id);
+    const editors = await selectAllowedVsExtensionsTargets({
+        automatic: !deps.prompts?.checkbox,
+        emptyMessage: 'Select at least one supported editor',
+        explicit: options.editors,
+        message: 'Select editors to sync extensions',
+        prompts: deps.prompts,
+    });
+    return editors.map((editor) => editor.id);
 };
 
 export const createExtensionsVsCommand = (deps: ProgramDeps): Command => {
     const cmd = new Command('extensions-vs')
         .description('🧩 Install missing VS Code extensions')
         .helpOption('-h, --help', 'display help for command')
-        .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: vscode, cursor, antigravity)')
+        .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: antigravity, cursor)')
         .option('--force', 'Force install all extensions, bypassing merge', false)
         .addHelpText(
             'after',

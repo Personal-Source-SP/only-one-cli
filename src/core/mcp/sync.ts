@@ -1,5 +1,4 @@
 import { dirname, join } from 'node:path';
-import { parseJsoncObject, stringifySettings } from '@/core/vs/json.js';
 import { PercentProgressReporter } from '@/core/vs/progress.js';
 import { nodeVsFileSystem, NodeVsProcessRunner } from '@/core/vs/runtime.js';
 import { VsSyncTransaction } from '@/core/vs/transaction.js';
@@ -66,9 +65,9 @@ export const syncMcpGlobalConfig = async (request: SyncMcpGlobalConfigRequest): 
 
             let config: Record<string, unknown> = {};
             try {
-                config = parseJsoncObject(await fs.readFile(configPath));
-            } catch {
-                config = {};
+                config = adapter.codec.parse(await fs.readFile(configPath), configPath);
+            } catch (error) {
+                if (!(error instanceof Error) || !error.message.includes('ENOENT')) throw error;
             }
 
             const merge = mergeMcpServers(adapter.getMcpServers(config), request.manifests, adapter.id, request.overwriteList);
@@ -77,7 +76,7 @@ export const syncMcpGlobalConfig = async (request: SyncMcpGlobalConfigRequest): 
 
             if (merge.changed) {
                 await transaction.backupFile(configPath);
-                await transaction.atomicWrite(configPath, stringifySettings(nextConfig));
+                await transaction.atomicWrite(configPath, adapter.codec.stringify(nextConfig));
             }
 
             progress.step(`${adapter.name} MCP config synced`);

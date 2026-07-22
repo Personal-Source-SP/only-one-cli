@@ -199,3 +199,35 @@ describe('syncMcpGlobalConfig', () => {
         expect(fs.files.has(resolveMcpJournalPath('/repo'))).toBe(false);
     });
 });
+
+it('rolls back JSON when a later TOML target write fails', async () => {
+    const fs = new MemoryFs();
+    const runner = new MemoryRunner();
+    const claudePath = join('/Users/test', '.claude.json');
+    const codexPath = join('/Users/test', '.codex', 'config.toml');
+    fs.files.set(claudePath, JSON.stringify({ retained: true, mcpServers: {} }));
+    fs.files.set(codexPath, 'model = "gpt-5"\n[mcp_servers]\n');
+
+    const originalRename = fs.rename.bind(fs);
+    fs.rename = async (source, target) => {
+        if (target === codexPath) throw new Error('Codex atomic write failure');
+        return originalRename(source, target);
+    };
+
+    await expect(
+        syncMcpGlobalConfig({
+            cwd: '/repo',
+            homeDir: '/Users/test',
+            ideIds: ['claude', 'codex'],
+            manifests: [{ id: 'fetch', server: { command: 'npx' } }],
+            platform: 'darwin',
+            write: () => {},
+            fs,
+            runner,
+        }),
+    ).rejects.toThrow('Codex atomic write failure');
+
+    expect(JSON.parse(fs.files.get(claudePath) ?? '{}')).toEqual({ retained: true, mcpServers: {} });
+    expect(fs.files.get(codexPath)).toBe('model = "gpt-5"\n[mcp_servers]\n');
+    expect(fs.files.has(resolveMcpJournalPath('/repo'))).toBe(false);
+});

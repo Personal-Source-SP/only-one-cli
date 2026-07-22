@@ -40,3 +40,47 @@ describe('mcp command', () => {
         }
     });
 });
+
+it('rejects unsupported targets before writing configuration', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'mcp-invalid-target-'));
+    const tempHome = join(cwd, 'home');
+
+    try {
+        const program = createProgram({
+            cwd,
+            env: { HOME: tempHome, USERPROFILE: tempHome },
+            fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+            stdout: () => undefined,
+        });
+
+        await expect(program.parseAsync(['mcp', 'github', '--ide', 'vscode'], { from: 'user' })).rejects.toThrow(
+            "Unsupported target 'vscode'. Valid targets: antigravity, claude, cursor, codex",
+        );
+        expect(existsSync(tempHome)).toBe(false);
+    } finally {
+        await rm(cwd, { recursive: true, force: true });
+    }
+});
+
+it('selects every MCP-capable target with --yes', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'mcp-all-targets-'));
+    const tempHome = join(cwd, 'home');
+
+    try {
+        const program = createProgram({
+            cwd,
+            env: { HOME: tempHome, USERPROFILE: tempHome },
+            fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+            stdout: () => undefined,
+        });
+
+        await program.parseAsync(['mcp', 'github', '--yes'], { from: 'user' });
+
+        expect(existsSync(join(tempHome, 'Library', 'Application Support', 'Antigravity IDE', 'User', 'mcp.json'))).toBe(true);
+        expect(existsSync(join(tempHome, '.claude.json'))).toBe(true);
+        expect(existsSync(join(tempHome, '.cursor', 'mcp.json'))).toBe(true);
+        expect(existsSync(join(tempHome, '.codex', 'config.toml'))).toBe(true);
+    } finally {
+        await rm(cwd, { recursive: true, force: true });
+    }
+});

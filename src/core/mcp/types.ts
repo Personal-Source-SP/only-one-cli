@@ -30,6 +30,7 @@ export type McpMergeResult = {
 export type McpIdeAdapter = {
     id: string;
     name: string;
+    codec: import('./codecs.js').McpConfigCodec;
     getConfigPath: (homeDir: string, platform: NodeJS.Platform) => string;
     getMcpServers: (config: Record<string, unknown>) => Record<string, unknown>;
     setMcpServers: (config: Record<string, unknown>, servers: Record<string, unknown>) => Record<string, unknown>;

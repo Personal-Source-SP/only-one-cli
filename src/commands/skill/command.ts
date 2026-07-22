@@ -3,16 +3,15 @@ import { existsSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { confirm } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { getInstallableAgentTools, getAgentToolById } from '@/core/agent/tools.js';
+import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { resolveProjectDir, assertProjectDirectory } from '@/core/runtime/globals.js';
 import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
-import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
-
-import { SKILLS } from '@assets/skills/index.js';
 import { installWorkflows, checkExistingWorkflows } from '@/core/workflow/index.js';
-import { confirm } from '@inquirer/prompts';
+import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
+import { SKILLS } from '@assets/skills/index.js';
 
 const getAvailableSkillNames = (): string[] => {
     return SKILLS.map((s) => s.name);
@@ -42,7 +41,6 @@ export function createSkillCommand(deps: ProgramDeps): Command {
                 const projectDir = resolveProjectDir(deps, pathArg);
                 assertProjectDirectory(projectDir);
 
-                const allTools = getInstallableAgentTools();
                 const availableSkills = await getAvailableSkillNames();
 
                 if (availableSkills.length === 0) {
@@ -50,30 +48,14 @@ export function createSkillCommand(deps: ProgramDeps): Command {
                     return;
                 }
 
-                // 1. Choose IDEs
-                let selectedToolIds = parseCsv(options.tool);
-                if (selectedToolIds.length === 0) {
-                    if (options.yes || !deps.prompts?.checkbox) {
-                        // Default to tools already detected/configured, or all tools
-                        const configured = allTools.filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
-                        selectedToolIds = configured.length > 0 ? configured.map((t) => t.value) : allTools.map((t) => t.value);
-                    } else {
-                        selectedToolIds = await deps.prompts.checkbox({
-                            message: 'Select target IDEs/Tools for skill installation:',
-                            choices: allTools.map((t) => ({
-                                name: t.name,
-                                value: t.value,
-                                checked: t.skillsDir ? existsSync(join(projectDir, t.skillsDir)) : false,
-                            })),
-                        });
-                    }
-                }
-
-                if (selectedToolIds.length === 0) {
-                    throw new Error('Select at least one target tool/IDE');
-                }
-
-                const targetTools = selectedToolIds.map((id) => getAgentToolById(id)).filter(Boolean) as typeof allTools;
+                const targetTools = await selectAllowedAgentTargets({
+                    automatic: Boolean(options.yes || !deps.prompts?.checkbox),
+                    emptyMessage: 'Select at least one target tool/IDE',
+                    explicit: options.tool,
+                    message: 'Select target IDEs/Tools for skill installation:',
+                    preselected: [],
+                    prompts: deps.prompts,
+                });
 
                 // 2. Select Skills
                 let selectedSkills = parseCsv(namesArg);
