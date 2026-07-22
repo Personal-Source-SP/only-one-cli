@@ -84,3 +84,36 @@ it('selects every MCP-capable target with --yes', async () => {
         await rm(cwd, { recursive: true, force: true });
     }
 });
+
+it('configures gitnexus via CLI without requiring manual credential instructions in report output', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'mcp-gitnexus-test-'));
+    const tempHome = join(cwd, 'home');
+    const writes: string[] = [];
+
+    try {
+        await mkdir(join(tempHome, '.cursor'), { recursive: true });
+
+        const program = createProgram({
+            cwd,
+            env: { HOME: tempHome, USERPROFILE: tempHome },
+            fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+            stdout: (line) => writes.push(line),
+        });
+
+        await program.parseAsync(['mcp', 'gitnexus', '--ide', 'cursor', '--yes'], { from: 'user' });
+
+        const output = writes.join('\n');
+        expect(output).toContain('MCP SYNC REPORT');
+        expect(output).toContain('gitnexus');
+        expect(output).not.toContain('fill manually');
+
+        const mcpJsonPath = join(tempHome, '.cursor', 'mcp.json');
+        expect(existsSync(mcpJsonPath)).toBe(true);
+
+        const mcpContent = await readFile(mcpJsonPath, 'utf-8');
+        expect(mcpContent).toContain('gitnexus@latest');
+        expect(mcpContent).toContain('GITNEXUS_MCP_READ_ONLY');
+    } finally {
+        await rm(cwd, { recursive: true, force: true });
+    }
+});

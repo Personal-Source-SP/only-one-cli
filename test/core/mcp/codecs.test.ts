@@ -38,4 +38,24 @@ describe('MCP codecs and adapters', () => {
             "Malformed TOML MCP configuration at '/Users/test/.codex/config.toml'",
         );
     });
+
+    it('serializes GitNexus arguments and policy environment across JSON and TOML codecs', () => {
+        const gitnexusServer = {
+            command: 'npx',
+            args: ['-y', 'gitnexus@latest', 'mcp'],
+            env: { GITNEXUS_MCP_READ_ONLY: '1' },
+        };
+
+        const jsonDoc = claudeMcpAdapter.setMcpServers({}, { gitnexus: gitnexusServer });
+        const serializedJson = claudeMcpAdapter.codec.stringify(jsonDoc);
+        const parsedJson = claudeMcpAdapter.getMcpServers(claudeMcpAdapter.codec.parse(serializedJson, '/Users/test/.claude.json'));
+
+        expect(parsedJson.gitnexus).toEqual(gitnexusServer);
+
+        const tomlDoc = codexMcpAdapter.setMcpServers({}, { gitnexus: gitnexusServer });
+        const serializedToml = codexMcpAdapter.codec.stringify(tomlDoc);
+        const parsedToml = codexMcpAdapter.getMcpServers(codexMcpAdapter.codec.parse(serializedToml, '/Users/test/.codex/config.toml'));
+
+        expect(parsedToml.gitnexus).toEqual(gitnexusServer);
+    });
 });

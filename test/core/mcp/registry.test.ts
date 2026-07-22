@@ -32,4 +32,19 @@ describe('MCP manifest registry', () => {
     it('rejects non-empty secret placeholders', () => {
         expect(() => validateMcpServerConfig('github', { command: 'npx', env: { TOKEN: 'secret' } })).toThrow(/placeholders must be empty/);
     });
+
+    it('includes GitNexus in packaged registry with correct launch args, read-only policy, and no credential placeholders', async () => {
+        const { manifests, warnings } = await readMcpManifests();
+        expect(warnings).toEqual([]);
+
+        const gitnexus = manifests.find((manifest) => manifest.id === 'gitnexus');
+        expect(gitnexus).toBeDefined();
+        expect(gitnexus?.server).toEqual({
+            command: 'npx',
+            args: ['-y', 'gitnexus@latest', 'mcp'],
+            env: {
+                GITNEXUS_MCP_READ_ONLY: '1',
+            },
+        });
+    });
 });

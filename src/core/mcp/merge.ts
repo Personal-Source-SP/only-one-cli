@@ -6,7 +6,10 @@ export type MergeMcpServersResponse = {
     servers: Record<string, unknown>;
 };
 
-export const getMcpCredentialKeys = (manifest: McpManifest): string[] => Object.keys(manifest.server.env ?? {});
+export const getMcpCredentialKeys = (manifest: McpManifest): string[] =>
+    Object.entries(manifest.server.env ?? {})
+        .filter(([, value]) => value === '')
+        .map(([key]) => key);
 
 export const mergeMcpServers = (
     existingServers: Record<string, unknown>,

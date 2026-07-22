@@ -78,7 +78,15 @@ only-one init mcp --ide cursor --yes
 
 # Configure github MCP for all supported targets
 only-one init mcp github --ide antigravity,claude,cursor,codex
+
+# Configure GitNexus MCP for code intelligence across target IDEs
+only-one mcp gitnexus
 ```
+
+> **Note on GitNexus MCP:**
+> - GitNexus runs `npx -y gitnexus@latest mcp` dynamically at runtime.
+> - Default configuration sets `GITNEXUS_MCP_READ_ONLY=1` to enforce read-only tool scope during agent code planning.
+> - Before agents can inspect code structure, run `npx gitnexus analyze` (or index your repository with GitNexus) locally so the index is available.
 
 ### Workflows
 

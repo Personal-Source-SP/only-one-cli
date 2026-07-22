@@ -19,6 +19,16 @@ export const MCPS: McpManifest[] = [
         },
     },
     {
+        id: 'gitnexus',
+        server: {
+            command: 'npx',
+            args: ['-y', 'gitnexus@latest', 'mcp'],
+            env: {
+                GITNEXUS_MCP_READ_ONLY: '1',
+            },
+        },
+    },
+    {
         id: 'github',
         server: {
             command: 'npx',

@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { antigravityMcpAdapter, cursorMcpAdapter } from '@src/core/mcp/adapters.js';
+import { antigravityMcpAdapter, codexMcpAdapter, cursorMcpAdapter } from '@src/core/mcp/adapters.js';
 import { mergeMcpServers } from '@src/core/mcp/merge.js';
 import { resolveMcpJournalPath, syncMcpGlobalConfig } from '@src/core/mcp/sync.js';
 
@@ -159,6 +159,86 @@ describe('syncMcpGlobalConfig', () => {
         const content = JSON.parse(fs.files.get(cursorPath) ?? '{}');
         expect(content.mcpServers.existing.command).toBe('custom-cmd'); // Preserved
         expect(content.mcpServers.tavily.command).toBe('node'); // Added
+    });
+
+    it('syncs GitNexus across Antigravity, Claude, Cursor, and Codex with read-only policy', async () => {
+        const fs = new MemoryFs();
+        const runner = new MemoryRunner();
+
+        const gitnexusManifest = {
+            id: 'gitnexus',
+            server: {
+                command: 'npx',
+                args: ['-y', 'gitnexus@latest', 'mcp'],
+                env: { GITNEXUS_MCP_READ_ONLY: '1' },
+            },
+        };
+
+        const syncResult = await syncMcpGlobalConfig({
+            cwd: '/repo',
+            homeDir: '/Users/test',
+            ideIds: ['antigravity', 'claude', 'cursor', 'codex'],
+            manifests: [gitnexusManifest],
+            platform: 'darwin',
+            write: () => {},
+            fs,
+            runner,
+        });
+
+        expect(syncResult.changed).toBe(4);
+
+        const antigravityPath = join('/Users/test', 'Library', 'Application Support', 'Antigravity IDE', 'User', 'mcp.json');
+        const claudePath = join('/Users/test', '.claude.json');
+        const cursorPath = join('/Users/test', '.cursor', 'mcp.json');
+        const codexPath = join('/Users/test', '.codex', 'config.toml');
+
+        const antigravityConfig = JSON.parse(fs.files.get(antigravityPath) ?? '{}');
+        const claudeConfig = JSON.parse(fs.files.get(claudePath) ?? '{}');
+        const cursorConfig = JSON.parse(fs.files.get(cursorPath) ?? '{}');
+        const codexConfig = codexMcpAdapter.codec.parse(fs.files.get(codexPath) ?? '', codexPath);
+
+        expect(antigravityConfig.mcpServers.gitnexus).toEqual(gitnexusManifest.server);
+        expect(claudeConfig.mcpServers.gitnexus).toEqual(gitnexusManifest.server);
+        expect(cursorConfig.mcpServers.gitnexus).toEqual(gitnexusManifest.server);
+        expect(codexMcpAdapter.getMcpServers(codexConfig).gitnexus).toEqual(gitnexusManifest.server);
+    });
+
+    it('preserves existing custom GitNexus configuration when reconfiguration is declined', async () => {
+        const fs = new MemoryFs();
+        const runner = new MemoryRunner();
+        const cursorPath = join('/Users/test', '.cursor', 'mcp.json');
+
+        const customGitnexus = {
+            command: 'custom-gitnexus-binary',
+            args: ['--custom-flag'],
+            env: { GITNEXUS_MCP_READ_ONLY: '0' },
+        };
+
+        fs.files.set(cursorPath, JSON.stringify({ mcpServers: { gitnexus: customGitnexus } }));
+
+        await syncMcpGlobalConfig({
+            cwd: '/repo',
+            homeDir: '/Users/test',
+            ideIds: ['cursor'],
+            manifests: [
+                {
+                    id: 'gitnexus',
+                    server: {
+                        command: 'npx',
+                        args: ['-y', 'gitnexus@latest', 'mcp'],
+                        env: { GITNEXUS_MCP_READ_ONLY: '1' },
+                    },
+                },
+            ],
+            platform: 'darwin',
+            write: () => {},
+            fs,
+            runner,
+            overwriteList: [], // Declined overwrite
+        });
+
+        const cursorConfig = JSON.parse(fs.files.get(cursorPath) ?? '{}');
+        expect(cursorConfig.mcpServers.gitnexus).toEqual(customGitnexus);
     });
 
     it('rolls back Cursor configuration if Antigravity sync fails', async () => {
