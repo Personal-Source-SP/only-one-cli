@@ -4,22 +4,22 @@
 TBD - created by archiving change improve-init-flow. Update Purpose after archive.
 ## Requirements
 ### Requirement: Tool Multi-Select
-Rule: User SHALL pick one or more agent tools from the full `AI_TOOLS` list using an interactive multi-select prompt, which displays clear configured and detected status badges for each tool.
+Rule: User SHALL pick one or more agent tools from Antigravity, Claude, Cursor, and Codex using shared target-selection behavior, with clear configured and detected status badges for each displayed tool.
 
 #### Scenario: Display all installable tools with status badges
 - **GIVEN** the `AI_TOOLS` list has multiple tools
-- **AND** some tools already have their configuration directories present
-- **WHEN** the init command reaches the tools step
-- **THEN** it displays each available tool as a selectable option
+- **AND** one or more allowed tools already have configuration directories present
+- **WHEN** the init command reaches an only-one-owned tools step
+- **THEN** it displays Antigravity, Claude, Cursor, and Codex as selectable options
 - **AND** it shows `(configured)` next to already initialized tools
 - **AND** the user can search/filter by tool name
+- **AND** no tool outside the allowed set is displayed
 
 #### Scenario: Select multiple tools
 - **GIVEN** the interactive prompt is shown
-- **WHEN** the user presses Space on "Cursor" and "Claude Code"
-- **THEN** both tools are marked as selected
-- **WHEN** the user presses Enter
-- **THEN** the selection is confirmed and stored for the summary step
+- **WHEN** the user selects Cursor and Claude
+- **AND** confirms the selection
+- **THEN** both tools are stored for the summary step
 
 #### Scenario: Skip tools step
 - **GIVEN** the `--skip tools` flag is passed
@@ -28,8 +28,14 @@ Rule: User SHALL pick one or more agent tools from the full `AI_TOOLS` list usin
 
 #### Scenario: Empty selection not allowed without --yes
 - **GIVEN** the tools prompt is shown
-- **WHEN** the user presses Enter with nothing selected
-- **THEN** the prompt shows a validation error: "Select at least one tool"
+- **WHEN** the user confirms with nothing selected
+- **THEN** the prompt shows a validation error requiring at least one tool
+
+#### Scenario: OpenSpec-owned tool selection
+- **GIVEN** init delegates standard tool initialization to OpenSpec
+- **WHEN** `openspec init` performs its own selection
+- **THEN** only-one does not replace or duplicate that external prompt
+- **AND** validates consumed tool IDs before project-specific artifact installation
 
 ### Requirement: Tool Existence Check
 Rule: The system SHALL check if the tool's config directory already exists in the project and mark it for warning in the final summary.

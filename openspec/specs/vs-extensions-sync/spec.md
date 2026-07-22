@@ -1,16 +1,23 @@
 # vs-extensions-sync Specification
 
+## Purpose
+Đồng bộ extension manifest nguồn sang editor VS-compatible đã chọn mà không xóa extension riêng.
 ## Requirements
-
 ### Requirement: Chọn editor để đồng bộ extensions
 
-Command `extensions-vs` MUST cho phép người dùng chọn một hoặc nhiều editor được hỗ trợ và chỉ thay đổi editor đã chọn.
+Command `extensions-vs` MUST cho phép người dùng chọn một hoặc nhiều editor thuộc tập Antigravity và Cursor, đồng thời chỉ thay đổi editor đã chọn.
 
 #### Scenario: Cài cho nhiều editor
-- **GIVEN** nhiều editor được hỗ trợ có CLI khả dụng
-- **WHEN** người dùng chạy `extensions-vs` và chọn nhiều editor
+- **GIVEN** Antigravity và Cursor có CLI khả dụng
+- **WHEN** người dùng chạy `extensions-vs` và chọn cả hai editor
 - **THEN** danh sách extension nguồn được áp dụng cho từng editor đã chọn
 - **AND** editor không được chọn không bị thay đổi
+
+#### Scenario: VS Code được chọn tường minh
+- **GIVEN** VS Code không thuộc allowlist
+- **WHEN** người dùng yêu cầu `extensions-vs` cho VS Code
+- **THEN** command dừng trước thao tác cài đầu tiên
+- **AND** báo rằng editor hợp lệ là Antigravity và Cursor
 
 ### Requirement: Giữ extension hiện có và cài phần còn thiếu
 
@@ -50,3 +57,4 @@ Command MUST hiển thị tiến độ phần trăm không giảm và chỉ báo
 - **THEN** command cập nhật phần trăm tiến độ không giảm theo số work unit hoàn thành
 - **AND** hiển thị editor và extension đang xử lý
 - **AND** chỉ hiển thị 100 sau khi transaction commit
+
