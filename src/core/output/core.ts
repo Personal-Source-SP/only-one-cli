@@ -1,11 +1,5 @@
 import type { BulkDryRunEntry, BulkSummaryStats, IndexVersionRow } from './types.js';
-
-const padCell = (value: string, width: number): string => {
-    if (value.length >= width) {
-        return value.slice(0, width);
-    }
-    return value.padEnd(width);
-};
+import { padCell } from '@/utils/index.js';
 
 export const printIndexVersions = (entries: IndexVersionRow[], write: (line: string) => void): void => {
     if (!entries?.length) {

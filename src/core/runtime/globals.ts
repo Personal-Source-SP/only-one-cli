@@ -23,14 +23,6 @@ export const globalsFor = async (command: Command, deps: ProgramDeps, configCwd 
 export const clientFor = (globals: Awaited<ReturnType<typeof globalsFor>>, deps: ProgramDeps) =>
     new HybridApiClient(globals.server, globals.key, deps.fetcher);
 
-export const inferName = (repoUrl: string) => {
-    const last = repoUrl.split('/').filter(Boolean).at(-1) ?? 'remote-repo';
-    return last.replace(/\.git$/i, '') || 'remote-repo';
-};
-
-export const inferArchiveName = (path: string) => {
-    const last = path.split(/[\\/]/).filter(Boolean).at(-1) ?? 'uploaded-repo';
-    return last.replace(/\.zip$/i, '') || 'uploaded-repo';
-};
+export { inferName, inferArchiveName } from '@/utils/index.js';
 
 export const isHybridNotFoundError = (error: unknown): boolean => error instanceof Error && error.message.includes('HYBRID_NOT_FOUND');

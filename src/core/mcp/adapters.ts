@@ -9,9 +9,11 @@ export enum McpIdeId {
     Codex = 'codex',
 }
 
+import { isRecord } from '@/utils/index.js';
+
 const getObject = (config: Record<string, unknown>, key: string): Record<string, unknown> => {
     const value = config[key];
-    return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+    return isRecord(value) ? value : {};
 };
 
 const getRootMcpServers = (config: Record<string, unknown>): Record<string, unknown> => getObject(config, 'mcpServers');

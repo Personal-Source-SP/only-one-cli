@@ -6,11 +6,13 @@ export type McpConfigCodec = {
     stringify: (config: Record<string, unknown>) => string;
 };
 
+import { isRecord } from '@/utils/index.js';
+
 const parseObject = (value: unknown, path: string, format: string): Record<string, unknown> => {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    if (!isRecord(value)) {
         throw new Error(`Malformed ${format} MCP configuration at '${path}': root must be an object`);
     }
-    return value as Record<string, unknown>;
+    return value;
 };
 
 const jsonCodec: McpConfigCodec = {

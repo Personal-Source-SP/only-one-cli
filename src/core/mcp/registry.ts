@@ -3,8 +3,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { MCPS } from '@assets/mcps/index.js';
 import type { McpManifest, McpManifestWarning, McpServerConfig, ReadMcpManifestsResponse } from './types.js';
-
-const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+import { isRecord } from '@/utils/index.js';
 
 const isStringArray = (value: unknown): value is string[] => Array.isArray(value) && value.every((entry) => typeof entry === 'string');
 
