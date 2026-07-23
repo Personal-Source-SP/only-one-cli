@@ -1,4 +1,5 @@
 import type { ProgramDeps } from '@/cli/deps.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import { installRules } from '@/core/rule/index.js';
 import type { AllowedTarget } from '@/core/target-selection/catalog.js';
@@ -9,6 +10,7 @@ export const executeAndReportRulesStep = async (
     targetTools: AllowedTarget[],
     selectedRuleIds: string[],
     overwriteList: string[],
+    ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
 ): Promise<void> => {
     deps.stdout('\nSyncing rules...');
 
@@ -66,4 +68,6 @@ export const executeAndReportRulesStep = async (
     }
 
     deps.stdout('\n==================================================\n');
+
+    await writeIgnoreTemplates(projectDir, ignoreTargets);
 };

@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { ComboCommandOptions } from './types.js';
 import {
@@ -32,6 +33,8 @@ export function createComboCommand(deps: ProgramDeps): Command {
                 return;
             }
 
+            const ignoreTargets = await selectIgnoreTargets(deps);
+
             for (const comboName of selectedComboNames) {
                 const combo = availableCombos.find(
                     (c) => c.id.toLowerCase() === comboName.toLowerCase() || c.name.toLowerCase() === comboName.toLowerCase(),
@@ -43,7 +46,7 @@ export function createComboCommand(deps: ProgramDeps): Command {
                 deps.stdout(`\nProcessing combo: ${COLORS.primary(combo.name)}...`);
 
                 const overwriteList = await confirmComboOverwriteStep(deps, projectDir, combo, targetTools);
-                await executeAndReportComboStep(deps, projectDir, combo, targetTools, overwriteList, options);
+                await executeAndReportComboStep(deps, projectDir, combo, targetTools, overwriteList, options, ignoreTargets);
             }
         });
 

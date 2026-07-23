@@ -1,0 +1,17 @@
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+
+# Version control and local settings
+.git/
+.env
+.env.*
+.agent/
+.agents/
+.claude/
+.cursor/
+
+# Logs
+*.log

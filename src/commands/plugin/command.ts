@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import { parseCsv } from '@/utils/index.js';
 import type { PluginCommandOptions } from './types.js';
 import { executeAndReportPluginsStep, loadPluginManifestsStep, selectPluginsStep, selectPluginTargetStep } from './actions/index.js';
@@ -25,7 +26,9 @@ export function createPluginCommand(deps: ProgramDeps): Command {
                 return;
             }
 
-            await executeAndReportPluginsStep(deps, projectDir, selectedPluginIds, targetIds, targetId);
+            const ignoreTargets = await selectIgnoreTargets(deps);
+
+            await executeAndReportPluginsStep(deps, projectDir, selectedPluginIds, targetIds, targetId, ignoreTargets);
         });
 
     return cmd;

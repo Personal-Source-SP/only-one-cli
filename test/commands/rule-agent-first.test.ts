@@ -34,7 +34,7 @@ describe('Rule Command Agent-First Selection & Per-Agent Choices (Tasks 2.3, 2.4
         const cmd = createRuleCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir]);
 
-        expect(checkboxCalls.length).toBe(2);
+        expect(checkboxCalls.length).toBe(3);
         expect(checkboxCalls[0].message).toContain('Select target IDEs/Tools');
         expect(checkboxCalls[1].message).toContain('Claude');
         expect(checkboxCalls[1].choices.every((c) => c.checked)).toBe(true);

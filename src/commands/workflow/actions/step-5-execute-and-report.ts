@@ -1,4 +1,5 @@
 import type { ProgramDeps } from '@/cli/deps.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { installWorkflows } from '@/core/workflow/index.js';
@@ -12,6 +13,7 @@ export const executeAndReportWorkflowsStep = async (
     selectedWorkflows: string[],
     overwriteList: string[],
     options: WorkflowCommandOptions,
+    ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
 ): Promise<void> => {
     deps.stdout('\nSyncing workflows...');
 
@@ -81,5 +83,7 @@ export const executeAndReportWorkflowsStep = async (
             deps.stdout(`  - ${COLORS.secondary(mcp)} (Run: 'only-one mcp ${mcp}' to configure)`);
         }
         deps.stdout('\n==================================================\n');
+
+        await writeIgnoreTemplates(projectDir, ignoreTargets);
     }
 };

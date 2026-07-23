@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import { parseCsv } from '@/utils/index.js';
 import type { RuleCommandOptions } from './types.js';
 import {
@@ -33,8 +34,10 @@ export function createRuleCommand(deps: ProgramDeps): Command {
                 return;
             }
 
+            const ignoreTargets = await selectIgnoreTargets(deps);
+
             const overwriteList = await confirmRuleOverwriteStep(deps, selectedRuleIds, allExistingRules);
-            await executeAndReportRulesStep(deps, projectDir, targetTools, selectedRuleIds, overwriteList);
+            await executeAndReportRulesStep(deps, projectDir, targetTools, selectedRuleIds, overwriteList, ignoreTargets);
         });
 
     return cmd;

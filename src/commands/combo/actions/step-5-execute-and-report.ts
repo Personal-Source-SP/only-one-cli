@@ -1,5 +1,6 @@
 import { homedir } from 'node:os';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { installCombo, type ExtendedComboManifest } from '@/core/combo/index.js';
@@ -12,6 +13,7 @@ export const executeAndReportComboStep = async (
     targetTools: AgentToolOption[],
     overwriteList: string[],
     options: ComboCommandOptions,
+    ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
 ): Promise<void> => {
     const results = await installCombo({
         deps,
@@ -68,4 +70,6 @@ export const executeAndReportComboStep = async (
     }
 
     deps.stdout('\n==================================================\n');
+
+    await writeIgnoreTemplates(projectDir, ignoreTargets);
 };

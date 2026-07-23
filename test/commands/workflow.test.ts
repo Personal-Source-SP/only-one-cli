@@ -28,7 +28,7 @@ describe('Workflow Command Unit & Integration Tests', () => {
         const cmd = createWorkflowCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir]);
 
-        expect(checkboxCalls.length).toBe(2);
+        expect(checkboxCalls.length).toBe(3);
         expect(checkboxCalls[0].message).toContain('Select target IDEs/Tools');
         expect(checkboxCalls[1].message).toContain('Select workflows to add');
 

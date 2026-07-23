@@ -1,5 +1,6 @@
 import { confirm } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { installSkills } from '@/core/skill/index.js';
@@ -14,6 +15,7 @@ export const executeAndReportSkillsStep = async (
     selectedSkills: string[],
     overwriteList: string[],
     options: SkillCommandOptions,
+    ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
 ): Promise<void> => {
     deps.stdout('\nSyncing skills...');
 
@@ -64,6 +66,8 @@ export const executeAndReportSkillsStep = async (
     }
 
     deps.stdout('\n==================================================\n');
+
+    await writeIgnoreTemplates(projectDir, ignoreTargets);
 
     const installedSkillNames = [...successes, ...overwrites].map((r) => r.skillName);
     const workflowsToPrompt = new Set<string>();

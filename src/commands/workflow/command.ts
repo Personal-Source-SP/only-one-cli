@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import type { WorkflowCommandOptions } from './types.js';
 import {
     confirmWorkflowOverwriteStep,
@@ -38,8 +39,10 @@ export function createWorkflowCommand(deps: ProgramDeps): Command {
                 return;
             }
 
+            const ignoreTargets = await selectIgnoreTargets(deps);
+
             const overwriteList = await confirmWorkflowOverwriteStep(deps, selectedWorkflows, allExistingWorkflows);
-            await executeAndReportWorkflowsStep(deps, projectDir, targetTools, selectedWorkflows, overwriteList, options);
+            await executeAndReportWorkflowsStep(deps, projectDir, targetTools, selectedWorkflows, overwriteList, options, ignoreTargets);
         });
 
     return cmd;

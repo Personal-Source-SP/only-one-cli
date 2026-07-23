@@ -31,7 +31,7 @@ describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5
         const cmd = createSkillCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir]);
 
-        expect(checkboxCalls.length).toBe(2);
+        expect(checkboxCalls.length).toBe(3);
         expect(checkboxCalls[0].message).toContain('Select target IDEs/Tools');
         expect(checkboxCalls[1].message).toContain('Select custom skills to add');
         expect(checkboxCalls[1].choices.every((c) => c.checked)).toBe(true);

@@ -1,4 +1,5 @@
 import type { ProgramDeps } from '@/cli/deps.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import type { AllowedToolId } from '@/constants/allowed-tools.js';
 import { COLORS } from '@/constants/index.js';
 import { executePluginActions } from '@/core/plugin/index.js';
@@ -10,6 +11,7 @@ export const executeAndReportPluginsStep = async (
     selectedPluginIds: string[],
     targetIds: AllowedToolId[],
     targetId: AllowedToolId,
+    ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
 ): Promise<void> => {
     const perTargetPluginIds: Record<AllowedToolId, string[]> = {
         [targetId]: selectedPluginIds,
@@ -59,4 +61,6 @@ export const executeAndReportPluginsStep = async (
     }
 
     deps.stdout('\n==================================================\n');
+
+    await writeIgnoreTemplates(projectDir, ignoreTargets);
 };

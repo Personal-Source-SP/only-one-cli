@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import type { SkillCommandOptions } from './types.js';
 import {
     confirmSkillOverwriteStep,
@@ -38,8 +39,10 @@ export function createSkillCommand(deps: ProgramDeps): Command {
                 return;
             }
 
+            const ignoreTargets = await selectIgnoreTargets(deps);
+
             const overwriteList = await confirmSkillOverwriteStep(deps, selectedSkills, allExistingSkills);
-            await executeAndReportSkillsStep(deps, projectDir, targetTools, selectedSkills, overwriteList, options);
+            await executeAndReportSkillsStep(deps, projectDir, targetTools, selectedSkills, overwriteList, options, ignoreTargets);
         });
 
     return cmd;

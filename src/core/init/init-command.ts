@@ -8,6 +8,7 @@ import { homedir } from 'node:os';
 import { confirm, select } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { printJson } from '@/core/output/index.js';
+import { selectIgnoreTargets, writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
 import { getAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
@@ -321,6 +322,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             explicitSkills: options.skills,
         });
 
+        const ignoreTargets = await selectIgnoreTargets(deps);
+
         // Build aggregate plan (pure planning, zero side effects)
         const plan = await buildInitPlan({
             projectDir,
@@ -356,6 +359,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             plan,
             noIgnore: options.noIgnore,
         });
+
+        await writeIgnoreTemplates(projectDir, ignoreTargets);
 
         if (!isJson) {
             const reportText = renderFinalReport(result);
