@@ -127,7 +127,8 @@ export const executeToolsStep = async (
             };
         });
 
-        selectedValues = await searchableMultiSelect({
+        const selectCheckbox = (deps.prompts?.checkbox ?? searchableMultiSelect) as (config: any) => Promise<string[]>;
+        selectedValues = await selectCheckbox({
             message: 'Select agent tools to initialize:',
             choices,
             validate: (selected: string[]) => {
@@ -179,7 +180,8 @@ export const executePackagesStep = async (
             }),
         );
 
-        selectedNames = await searchableMultiSelect({
+        const selectCheckbox = (deps.prompts?.checkbox ?? searchableMultiSelect) as (config: any) => Promise<string[]>;
+        selectedNames = await selectCheckbox({
             message: 'Select packages to install:',
             choices,
         });
@@ -245,7 +247,8 @@ export const executeSkillsStep = async (
             };
         });
 
-        selectedSkillNames = await searchableMultiSelect({
+        const selectCheckbox = (deps.prompts?.checkbox ?? searchableMultiSelect) as (config: any) => Promise<string[]>;
+        selectedSkillNames = await selectCheckbox({
             message: 'Select skills to install:',
             choices,
         });
@@ -285,7 +288,8 @@ export const executeConfigsStep = async (
                 };
             });
 
-            selectedConfigNames = await searchableMultiSelect({
+            const selectCheckbox = (deps.prompts?.checkbox ?? searchableMultiSelect) as (config: any) => Promise<string[]>;
+            selectedConfigNames = await selectCheckbox({
                 message: 'Select configuration templates to copy:',
                 choices,
             });
@@ -338,7 +342,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
 
         // Final confirmation
         if (deps.prompts?.checkbox) {
-            const proceed = await confirm({
+            const confirmFn = deps.prompts?.confirm ?? confirm;
+            const proceed = await confirmFn({
                 message: 'Proceed with the above initialization plan?',
                 default: true,
             });

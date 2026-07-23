@@ -6,7 +6,7 @@ export interface PromptDeps {
     select?: <T>(config: { message: string; choices: Array<{ name: string; value: T }>; default?: T }) => Promise<T>;
     checkbox?: <T>(config: {
         message: string;
-        choices: Array<{ name: string; value: T; checked?: boolean }>;
+        choices: Array<{ name: string; value: T; checked?: boolean; preSelected?: boolean; configured?: boolean; detected?: boolean }>;
         default?: T[];
     }) => Promise<T[]>;
 }

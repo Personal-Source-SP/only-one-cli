@@ -119,11 +119,12 @@ export const promptAgentSkillSetup = async (deps: ProgramDeps, request: AgentSki
         deps.stdout(`Active agent detected: ${getAgentToolDisplayName(activeAgentId)} (pre-selected).`);
     }
 
-    const selectedTools = await searchableMultiSelect({
+    const selectCheckbox = (deps.prompts?.checkbox ?? searchableMultiSelect) as (config: any) => Promise<string[]>;
+    const selectedTools: string[] = await selectCheckbox({
         choices: buildToolChoices(request.projectDir, configuredToolIds, request.preSelectedTools ?? []),
         message: `Select agents/IDEs to install structure skills (${getInstallableAgentTools().length} available)`,
         pageSize: 15,
-        validate: (selected) => selected.length > 0 || 'Select at least one tool',
+        validate: (selected: string[]) => selected.length > 0 || 'Select at least one tool',
     });
 
     const artifacts = await installAgentArtifacts(request.projectDir, {

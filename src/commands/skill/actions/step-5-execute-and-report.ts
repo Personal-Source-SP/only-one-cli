@@ -87,7 +87,8 @@ export const executeAndReportSkillsStep = async (
         const missingWorkflows = Array.from(new Set(checks.filter((w) => !w.exists).map((w) => w.workflowName)));
 
         if (missingWorkflows.length > 0) {
-            const installWfs = await confirm({
+            const confirmFn = deps.prompts?.confirm ?? confirm;
+            const installWfs = await confirmFn({
                 message: `The installed skills are associated with workflow(s): ${missingWorkflows.join(', ')}. Would you like to install them?`,
                 default: true,
             });
