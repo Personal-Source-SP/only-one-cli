@@ -59,6 +59,8 @@ export function createProgram(deps: ProgramDeps) {
                 `  ${COLORS.cli.command('$ only-one init --step skills --yes')}          # Initialize skills step non-interactively\n` +
                 `  ${COLORS.cli.command('$ only-one combo idsd-flow')}                   # Install pre-defined tool, package, & skill combos\n` +
                 `  ${COLORS.cli.command('$ only-one skill --tool cursor')}               # Manage/sync custom agent skills for Cursor\n` +
+                `  ${COLORS.cli.command('$ only-one plugin')}                            # Manage and install target-specific agent plugins\n` +
+                `  ${COLORS.cli.command('$ only-one rule')}                              # Manage and copy persistent agent rules\n` +
                 `  ${COLORS.cli.command('$ only-one mcp github,clockify')}               # Configure global Model Context Protocol servers\n` +
                 `  ${COLORS.cli.command('$ only-one structure-generate')}                # Scaffold structural blueprint files for agents\n` +
                 `  ${COLORS.cli.command('$ only-one setting-vs --editors cursor')}       # Sync and merge supported editor settings\n` +
