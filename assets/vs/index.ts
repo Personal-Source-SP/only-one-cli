@@ -3,6 +3,7 @@ import type { VsLibraryManifest } from '../types.js';
 export const VS_LIBRARY: VsLibraryManifest = {
     extensions: [
         'aaron-bond.better-comments',
+        'anthropic.claude-code',
         'anysphere.cursorpyright',
         'anysphere.remote-ssh',
         'bradlc.vscode-tailwindcss',
@@ -18,6 +19,7 @@ export const VS_LIBRARY: VsLibraryManifest = {
         'firsttris.vscode-jest-runner',
         'formulahendry.auto-rename-tag',
         'golang.go',
+        'jdinhlife.gruvbox',
         'johnpapa.vscode-peacock',
         'llvm-vs-code-extensions.vscode-clangd',
         'meta.pyrefly',
@@ -38,6 +40,7 @@ export const VS_LIBRARY: VsLibraryManifest = {
         'streetsidesoftware.code-spell-checker',
         'streetsidesoftware.code-spell-checker-vietnamese',
         'usernamehw.errorlens',
+        'vscode-icons-team.vscode-icons',
         'wix.vscode-import-cost',
         'xabikos.javascriptsnippets',
     ],
