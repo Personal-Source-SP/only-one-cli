@@ -34,12 +34,23 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
         }
     });
 
-    it('context-minimization rule manifest declares required dependencies correctly', () => {
-        const rule = RULES.find((r) => r.id === 'context-minimization');
-        expect(rule).toBeDefined();
-        expect(rule?.requiredPackages).toEqual(['@fission-ai/openspec']);
-        expect(rule?.requiredPlugins).toEqual(['superpowers']);
-        expect(rule?.requiredMcps).toEqual(['gitnexus']);
-        expect(rule?.supportedTargets).toEqual([AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor]);
+    it('rule manifests declare expected dependencies and supported targets', () => {
+        const supportedTargets = [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor];
+        const expectedDependencies = [
+            { id: 'bug-fix', packages: ['@fission-ai/openspec'], plugins: ['superpowers'], mcps: ['gitnexus'] },
+            { id: 'context-minimization', packages: ['@fission-ai/openspec'], plugins: ['superpowers'], mcps: ['gitnexus'] },
+            { id: 'framework', packages: undefined, plugins: undefined, mcps: undefined },
+            { id: 'typescript', packages: undefined, plugins: undefined, mcps: undefined },
+            { id: 'ui', packages: undefined, plugins: undefined, mcps: undefined },
+        ];
+
+        for (const expected of expectedDependencies) {
+            const rule = RULES.find((item) => item.id === expected.id);
+            expect(rule).toBeDefined();
+            expect(rule?.requiredPackages).toEqual(expected.packages);
+            expect(rule?.requiredPlugins).toEqual(expected.plugins);
+            expect(rule?.requiredMcps).toEqual(expected.mcps);
+            expect(rule?.supportedTargets).toEqual(supportedTargets);
+        }
     });
 });
