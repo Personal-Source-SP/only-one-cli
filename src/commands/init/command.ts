@@ -7,12 +7,7 @@ import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
 import { executeInitCommand, printInitResult } from '@/core/init/init-command.js';
 import type { InitCommandOptions } from './types.js';
 import { COLORS } from '@/constants/index.js';
-
-const parseCsv = (value?: string): string[] =>
-    value
-        ?.split(',')
-        .map((entry) => entry.trim())
-        .filter(Boolean) ?? [];
+import { parseCsv } from '@/utils/index.js';
 
 const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: string }): Promise<void> => {
     const { manifests, warnings } = await readMcpManifests();

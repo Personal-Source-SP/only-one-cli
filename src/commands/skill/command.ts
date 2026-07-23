@@ -16,12 +16,7 @@ import { SKILLS } from '@assets/skills/index.js';
 const getAvailableSkillNames = (): string[] => {
     return SKILLS.map((s) => s.name);
 };
-
-const parseCsv = (val?: string): string[] =>
-    val
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [];
+import { parseCsv } from '@/utils/index.js';
 
 export function createSkillCommand(deps: ProgramDeps): Command {
     const cmd = new Command('skill')

@@ -1,8 +1,9 @@
-import { homedir, platform } from 'node:os';
+import { homedir } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { syncVsSettings, VsPlatform, type VsEditorId } from '@/core/vs/index.js';
+import { syncVsSettings, type VsEditorId } from '@/core/vs/index.js';
 import { selectAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
+import { resolveVsPlatform } from '@/utils/index.js';
 
 import { COLORS } from '@/constants/index.js';
 
@@ -10,12 +11,6 @@ interface SettingVsOptions {
     editors?: string;
     force?: boolean;
 }
-
-const resolvePlatform = (): VsPlatform => {
-    const current = platform();
-    if (current === 'win32') return VsPlatform.Win32;
-    return VsPlatform.Darwin;
-};
 
 const selectEditors = async (deps: ProgramDeps, options: SettingVsOptions): Promise<VsEditorId[]> => {
     const editors = await selectAllowedVsSettingsTargets({
@@ -51,7 +46,7 @@ export const createSettingVsCommand = (deps: ProgramDeps): Command => {
             cwd: deps.cwd,
             editorIds,
             homeDir: homedir(),
-            platform: resolvePlatform(),
+            platform: resolveVsPlatform(),
             write: deps.stdout,
             force: options.force,
         });

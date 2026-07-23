@@ -6,12 +6,7 @@ import { selectAllowedRuleTargets } from '@/core/target-selection/index.js';
 import { resolveProjectDir, assertProjectDirectory } from '@/core/runtime/globals.js';
 import { checkExistingRules, installRules } from '@/core/rule/index.js';
 import { RULES } from '@assets/rules/index.js';
-
-const parseCsv = (val?: string): string[] =>
-    val
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [];
+import { parseCsv } from '@/utils/index.js';
 
 export function createRuleCommand(deps: ProgramDeps): Command {
     const cmd = new Command('rule')

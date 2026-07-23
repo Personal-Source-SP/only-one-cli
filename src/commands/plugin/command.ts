@@ -6,12 +6,7 @@ import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { resolveProjectDir, assertProjectDirectory } from '@/core/runtime/globals.js';
 import { executePluginActions } from '@/core/plugin/index.js';
 import { PLUGINS } from '@assets/plugins/index.js';
-
-const parseCsv = (val?: string): string[] =>
-    val
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [];
+import { parseCsv } from '@/utils/index.js';
 
 export function createPluginCommand(deps: ProgramDeps): Command {
     const cmd = new Command('plugin')

@@ -7,12 +7,7 @@ import { COLORS } from '@/constants/index.js';
 import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { resolveProjectDir, assertProjectDirectory } from '@/core/runtime/globals.js';
 import { readComboManifests, checkExistingComboComponents, installCombo } from '@/core/combo/index.js';
-
-const parseCsv = (val?: string): string[] =>
-    val
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [];
+import { parseCsv } from '@/utils/index.js';
 
 export function createComboCommand(deps: ProgramDeps): Command {
     const cmd = new Command('combo')

@@ -4,12 +4,7 @@ import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
 import { checkExistingMcps, syncMcpGlobalConfig, readMcpManifests } from '@/core/mcp/index.js';
 import { selectAllowedMcpTargets } from '@/core/target-selection/index.js';
-
-const parseCsv = (val?: string): string[] =>
-    val
-        ?.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean) ?? [];
+import { parseCsv } from '@/utils/index.js';
 
 export function createMcpCommand(deps: ProgramDeps): Command {
     const cmd = new Command('mcp')
