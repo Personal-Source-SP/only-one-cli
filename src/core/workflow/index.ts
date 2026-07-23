@@ -28,6 +28,15 @@ export interface WorkflowInstallResult {
     installedSkills?: SkillInstallResult[];
 }
 
+export interface WorkflowInstallRequest {
+    deps: ProgramDeps;
+    projectDir: string;
+    selectedTools: AgentToolOption[];
+    workflowNames: string[];
+    overwriteList?: string[];
+    noIgnore?: boolean;
+}
+
 export const checkExistingWorkflows = async (
     projectDir: string,
     selectedTools: AgentToolOption[],
@@ -52,14 +61,7 @@ export const checkExistingWorkflows = async (
     return results;
 };
 
-export const installWorkflows = async (request: {
-    deps: ProgramDeps;
-    projectDir: string;
-    selectedTools: AgentToolOption[];
-    workflowNames: string[];
-    overwriteList?: string[]; // array of "toolId:workflowName"
-    noIgnore?: boolean;
-}): Promise<WorkflowInstallResult[]> => {
+export const installWorkflows = async (request: WorkflowInstallRequest): Promise<WorkflowInstallResult[]> => {
     const { deps, projectDir, selectedTools, workflowNames, overwriteList = [], noIgnore = false } = request;
     const results: WorkflowInstallResult[] = [];
 
@@ -125,7 +127,7 @@ export const installWorkflows = async (request: {
                     status: 'success',
                     installedSkills: skillResults,
                 });
-            } catch (error: any) {
+            } catch (error: unknown) {
                 results.push({
                     toolId: tool.value,
                     toolName: tool.name,

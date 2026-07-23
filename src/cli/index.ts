@@ -8,6 +8,7 @@ import {
     createUpdateCommand,
     createSettingVsCommand,
     createSkillCommand,
+    createWorkflowCommand,
     createPluginCommand,
     createRuleCommand,
     createMcpCommand,
@@ -59,6 +60,7 @@ export function createProgram(deps: ProgramDeps) {
                 `  ${COLORS.cli.command('$ only-one init --step skills --yes')}          # Initialize skills step non-interactively\n` +
                 `  ${COLORS.cli.command('$ only-one combo idsd-flow')}                   # Install pre-defined tool, package, & skill combos\n` +
                 `  ${COLORS.cli.command('$ only-one skill --tool cursor')}               # Manage/sync custom agent skills for Cursor\n` +
+                `  ${COLORS.cli.command('$ only-one workflow --tool cursor')}            # Manage/sync custom agent workflows for Cursor\n` +
                 `  ${COLORS.cli.command('$ only-one plugin')}                            # Manage and install target-specific agent plugins\n` +
                 `  ${COLORS.cli.command('$ only-one rule')}                              # Manage and copy persistent agent rules\n` +
                 `  ${COLORS.cli.command('$ only-one mcp github,clockify')}               # Configure global Model Context Protocol servers\n` +
@@ -76,6 +78,7 @@ export function createProgram(deps: ProgramDeps) {
      * ═══════════════════════════════════════════════════════════════════ */
     program.addCommand(createInitCommand(deps));
     program.addCommand(createSkillCommand(deps));
+    program.addCommand(createWorkflowCommand(deps));
     program.addCommand(createPluginCommand(deps));
     program.addCommand(createRuleCommand(deps));
     program.addCommand(createMcpCommand(deps));

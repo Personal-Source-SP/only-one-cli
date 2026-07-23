@@ -18,6 +18,9 @@ export type * from './extensions-vs/types.js';
 export { createSkillCommand } from './skill/index.js';
 export type * from './skill/types.js';
 
+export { createWorkflowCommand } from './workflow/index.js';
+export type * from './workflow/types.js';
+
 export { createPluginCommand } from './plugin/index.js';
 export type * from './plugin/types.js';
 
