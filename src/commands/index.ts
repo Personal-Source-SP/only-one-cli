@@ -9,5 +9,7 @@ export { createSettingVsCommand } from './setting-vs/index.js';
 export { createExtensionsVsCommand } from './extensions-vs/index.js';
 
 export { createSkillCommand } from './skill/index.js';
+export { createPluginCommand } from './plugin/index.js';
+export { createRuleCommand } from './rule/index.js';
 export { createMcpCommand } from './mcp/index.js';
 export { createComboCommand } from './combo/index.js';

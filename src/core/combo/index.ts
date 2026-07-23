@@ -86,8 +86,8 @@ export const checkExistingComboComponents = async (params: {
     if (combo.packages) {
         const pkgManifests = await readPackageManifests();
         for (const pkgName of combo.packages) {
-            const pkg = pkgManifests.find((m) => m.name === pkgName) || { name: pkgName, scope: 'global' as const };
-            const scope = pkg.scope ?? 'global';
+            const pkg = pkgManifests.find((m) => m.id === pkgName);
+            const scope = pkg?.installer.kind === 'npm' ? (pkg.installer.scope ?? 'global') : 'global';
             const exists = await isPackageInstalled(pkgName, scope, projectDir);
             results.push({
                 type: 'package',
@@ -187,8 +187,8 @@ export const installCombo = async (params: {
             }
 
             const pkgManifests = await readPackageManifests();
-            const pkg = pkgManifests.find((m) => m.name === pkgName) || { name: pkgName, scope: 'global' as const };
-            const scope = pkg.scope ?? 'global';
+            const pkg = pkgManifests.find((m) => m.id === pkgName);
+            const scope = pkg?.installer.kind === 'npm' ? (pkg.installer.scope ?? 'global') : 'global';
 
             deps.stdout(`  Installing package ${pkgName}...`);
             try {

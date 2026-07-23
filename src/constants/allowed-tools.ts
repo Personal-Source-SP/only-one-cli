@@ -15,6 +15,7 @@ export const ALLOWED_TOOL_IDS: readonly AllowedToolId[] = [
 export enum AllowedToolCapability {
     AgentArtifacts = 'agent-artifacts',
     Mcp = 'mcp',
+    Rules = 'rules',
     VsExtensions = 'vs-extensions',
     VsSettings = 'vs-settings',
 }

@@ -135,9 +135,29 @@ Check environment readiness and CLI configuration.
 only-one doctor
 ```
 
+### `init package`
+
+Install packages from the typed `assets/packages` package registry.
+
+```bash
+only-one init package [path] [names] [options]
+```
+
+| Option         | Description                                                                 |
+| -------------- | --------------------------------------------------------------------------- |
+| `--target <ids>` | Target agent IDs for plugin packages: `antigravity`, `claude`, `cursor`, `codex` |
+| `--yes`        | Non-interactive mode, confirm prompts automatically                         |
+
+Supported packages:
+- **`@fission-ai/openspec`** (npm package, global)
+- **`ui-ux-pro-max-cli`** (npm package, global)
+- **`superpowers`** (agent-plugin package): Installs Superpowers framework.
+  - Automatically executes `agy plugin install https://github.com/obra/superpowers` for **Antigravity**.
+  - Prints exact official manual commands for **Claude** (`/plugin install superpowers@claude-plugins-official`), **Cursor** (`/add-plugin superpowers`), and **Codex** (`/plugins` -> `superpowers` -> `Install Plugin`).
+
 ### `setting-vs`
 
-Merge `libraries/vs/settings.json` into Antigravity or Cursor user settings on macOS/Windows.
+Merge `assets/vs/settings.json` into Antigravity or Cursor user settings on macOS/Windows.
 
 ```bash
 only-one setting-vs --editors antigravity,cursor
@@ -149,7 +169,7 @@ only-one setting-vs --editors antigravity,cursor
 
 ### `extensions-vs`
 
-Install missing extension IDs from `libraries/vs/extensions.json` through Antigravity or Cursor CLI.
+Install missing extension IDs from `assets/vs/extensions.json` through Antigravity or Cursor CLI.
 
 ```bash
 only-one extensions-vs --editors antigravity,cursor

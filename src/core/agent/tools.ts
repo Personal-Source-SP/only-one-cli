@@ -4,16 +4,24 @@ export type AgentToolOption = {
     detectionPaths?: string[];
     name: string;
     skillsDir?: string;
+    rulesDir?: string;
     successLabel?: string;
     value: string;
 };
 
 export const AI_TOOLS: AgentToolOption[] = [
     { available: true, name: 'Amazon Q Developer', skillsDir: '.amazonq', successLabel: 'Amazon Q Developer', value: 'amazon-q' },
-    { available: true, name: 'Antigravity', skillsDir: '.agents', successLabel: 'Antigravity', value: 'antigravity' },
+    {
+        available: true,
+        name: 'Antigravity',
+        skillsDir: '.agents',
+        rulesDir: '.agents/rules',
+        successLabel: 'Antigravity',
+        value: 'antigravity',
+    },
     { available: true, name: 'Auggie (Augment CLI)', skillsDir: '.augment', successLabel: 'Auggie', value: 'auggie' },
     { available: true, name: 'Bob Shell', skillsDir: '.bob', successLabel: 'Bob Shell', value: 'bob' },
-    { available: true, name: 'Claude Code', skillsDir: '.claude', successLabel: 'Claude Code', value: 'claude' },
+    { available: true, name: 'Claude Code', skillsDir: '.claude', rulesDir: '.claude/rules', successLabel: 'Claude Code', value: 'claude' },
     { available: true, name: 'Cline', skillsDir: '.cline', successLabel: 'Cline', value: 'cline' },
     { available: true, name: 'Codex', skillsDir: '.codex', successLabel: 'Codex', value: 'codex' },
     { available: true, name: 'ForgeCode', skillsDir: '.forge', successLabel: 'ForgeCode', value: 'forgecode' },
@@ -27,7 +35,7 @@ export const AI_TOOLS: AgentToolOption[] = [
     },
     { available: true, name: 'CoStrict', skillsDir: '.cospec', successLabel: 'CoStrict', value: 'costrict' },
     { available: true, name: 'Crush', skillsDir: '.crush', successLabel: 'Crush', value: 'crush' },
-    { available: true, name: 'Cursor', skillsDir: '.cursor', successLabel: 'Cursor', value: 'cursor' },
+    { available: true, name: 'Cursor', skillsDir: '.cursor', rulesDir: '.cursor/rules', successLabel: 'Cursor', value: 'cursor' },
     { available: true, name: 'Factory Droid', skillsDir: '.factory', successLabel: 'Factory Droid', value: 'factory' },
     { available: true, name: 'Gemini CLI', skillsDir: '.gemini', successLabel: 'Gemini CLI', value: 'gemini' },
     {

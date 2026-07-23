@@ -5,6 +5,7 @@ import type { VsEditorDescriptor } from '@/core/vs/types.js';
 import {
     getAllowedAgentTargets,
     getAllowedMcpTargets,
+    getAllowedRuleTargets,
     getAllowedVsExtensionsTargets,
     getAllowedVsSettingsTargets,
     type AllowedTarget,
@@ -46,6 +47,10 @@ export const selectAllowedMcpTargets = async (request: AllowedTargetSelectionReq
         if (!target.mcp) throw new Error(`Missing MCP backing for allowed target '${target.id}'`);
         return target.mcp;
     });
+};
+
+export const selectAllowedRuleTargets = async (request: AllowedTargetSelectionRequest): Promise<AllowedTarget[]> => {
+    return selectAllowed(getAllowedRuleTargets(), request);
 };
 
 const selectAllowedVsTargets = async (

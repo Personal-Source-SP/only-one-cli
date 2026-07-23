@@ -8,6 +8,8 @@ import {
     createUpdateCommand,
     createSettingVsCommand,
     createSkillCommand,
+    createPluginCommand,
+    createRuleCommand,
     createMcpCommand,
     createComboCommand,
 } from '@/commands/index.js';
@@ -72,6 +74,8 @@ export function createProgram(deps: ProgramDeps) {
      * ═══════════════════════════════════════════════════════════════════ */
     program.addCommand(createInitCommand(deps));
     program.addCommand(createSkillCommand(deps));
+    program.addCommand(createPluginCommand(deps));
+    program.addCommand(createRuleCommand(deps));
     program.addCommand(createMcpCommand(deps));
     program.addCommand(createComboCommand(deps));
     program.addCommand(createStructureGenerateCommand(deps));

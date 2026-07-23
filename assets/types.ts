@@ -1,9 +1,45 @@
-import type { AgentToolOption } from '@/core/agent/tools.js';
+import { AllowedToolId } from '../src/constants/allowed-tools.js';
+
+export type TargetAction =
+    | {
+          type: 'command';
+          executable: string;
+          args?: string[];
+      }
+    | {
+          type: 'manual';
+          instruction: string;
+          docUrl?: string;
+      };
+
+export interface PluginManifest {
+    id: string;
+    description?: string;
+    supportedTargets: AllowedToolId[];
+    actions: Record<AllowedToolId, TargetAction>;
+}
+
+export interface RuleManifest {
+    id: string;
+    description?: string;
+    sourceFile: string;
+    supportedTargets: AllowedToolId[];
+    requiredPackages?: string[];
+    requiredPlugins?: string[];
+    requiredMcps?: string[];
+    requiredSkills?: string[];
+}
+
+export type PackageInstaller = {
+    kind: 'npm';
+    packageName: string;
+    scope?: 'global' | 'local';
+};
 
 export interface PackageManifest {
-    name: string;
+    id: string;
     description?: string;
-    scope?: 'global' | 'local';
+    installer: PackageInstaller;
 }
 
 export interface McpServerConfig {

@@ -113,27 +113,35 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of package names to install')
+        .option('--target <ids>', 'Comma-separated target agent IDs for plugin packages (antigravity, claude, cursor, codex)')
         .option('--yes', 'Automatically confirm prompts')
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
                 `  ${COLORS.cli.command('$ only-one init package')}\n` +
-                `  ${COLORS.cli.command('$ only-one init package /path/to/project lodash,typescript --yes')}\n\n` +
+                `  ${COLORS.cli.command('$ only-one init package /path/to/project superpowers --target antigravity,claude --yes')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('Only executes the "packages" step of the initialization process.')}`,
         )
-        .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
-            const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
-            const result = await executeInitCommand(deps, {
+        .action(
+            async (
+                path: string | undefined,
+                names: string | undefined,
+                options: { target?: string; yes?: boolean; ignore?: boolean },
                 command,
-                json: Boolean(command.parent?.parent?.opts()?.json),
-                path,
-                options: { yes: options.yes, noIgnore, step: 'packages', packages: names },
-            });
-            if (!result) return;
-            printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
-        });
+            ) => {
+                const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
+                const result = await executeInitCommand(deps, {
+                    command,
+                    json: Boolean(command.parent?.parent?.opts()?.json),
+                    path,
+                    options: { yes: options.yes, noIgnore, step: 'packages', packages: names, target: options.target },
+                });
+                if (!result) return;
+                printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
+            },
+        );
 
     cmd.command('skill')
         .description('🤖 Synchronize or install custom agent skills only')

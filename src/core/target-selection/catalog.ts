@@ -12,19 +12,27 @@ export type AllowedTarget = AllowedTargetDescriptor & {
 const capabilities = [AllowedToolCapability.AgentArtifacts, AllowedToolCapability.Mcp] as const;
 const vsCapabilities = [...capabilities, AllowedToolCapability.VsExtensions, AllowedToolCapability.VsSettings] as const;
 
-export const ALLOWED_TARGETS: readonly AllowedTarget[] = ALLOWED_TOOL_IDS.map((id) => ({
-    id,
-    capabilities: id === AllowedToolId.Antigravity || id === AllowedToolId.Cursor ? vsCapabilities : capabilities,
-    agent: AI_TOOLS.find((tool) => tool.value === id),
-    mcp: findMcpIdeAdapter(id),
-    vs: findVsEditor(id as unknown as VsEditorId),
-}));
+export const ALLOWED_TARGETS: readonly AllowedTarget[] = ALLOWED_TOOL_IDS.map((id) => {
+    const isRuleCapable = id === AllowedToolId.Antigravity || id === AllowedToolId.Claude || id === AllowedToolId.Cursor;
+    const baseCaps = isRuleCapable ? [...capabilities, AllowedToolCapability.Rules] : [...capabilities];
+    return {
+        id,
+        capabilities:
+            id === AllowedToolId.Antigravity || id === AllowedToolId.Cursor
+                ? [...baseCaps, AllowedToolCapability.VsExtensions, AllowedToolCapability.VsSettings]
+                : baseCaps,
+        agent: AI_TOOLS.find((tool) => tool.value === id),
+        mcp: findMcpIdeAdapter(id),
+        vs: findVsEditor(id as unknown as VsEditorId),
+    };
+});
 
 export const getAllowedTargets = (capability: AllowedToolCapability): AllowedTarget[] =>
     ALLOWED_TARGETS.filter((target) => target.capabilities.includes(capability));
 
 export const getAllowedAgentTargets = (): AllowedTarget[] => getAllowedTargets(AllowedToolCapability.AgentArtifacts);
 export const getAllowedMcpTargets = (): AllowedTarget[] => getAllowedTargets(AllowedToolCapability.Mcp);
+export const getAllowedRuleTargets = (): AllowedTarget[] => getAllowedTargets(AllowedToolCapability.Rules);
 export const getAllowedVsSettingsTargets = (): AllowedTarget[] => getAllowedTargets(AllowedToolCapability.VsSettings);
 export const getAllowedVsExtensionsTargets = (): AllowedTarget[] => getAllowedTargets(AllowedToolCapability.VsExtensions);
 

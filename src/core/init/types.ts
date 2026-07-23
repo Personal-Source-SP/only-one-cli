@@ -10,17 +10,14 @@ export interface InitCommandOptions {
     packages?: string;
     skills?: string;
     configs?: string;
+    target?: string;
 }
 
 export interface ToolsStepResult {
     selectedTools: AgentToolOption[];
 }
 
-export interface PackageManifest {
-    name: string;
-    description?: string;
-    scope?: 'global' | 'local';
-}
+export type { PackageManifest, PackageInstaller, TargetAction, PluginManifest } from '@assets/types.js';
 
 export interface PackagesStepResult {
     installedPackages: string[];

@@ -60,15 +60,19 @@ const readPackageManifests = async (): Promise<PackageManifest[]> => {
     return PACKAGES;
 };
 
-const isPackageInstalled = async (name: string, scope: 'global' | 'local', projectDir: string): Promise<boolean> => {
-    try {
-        const args = ['list', name, '--depth=0'];
-        if (scope === 'global') args.push('-g');
-        await execFileAsync('npm', args, { cwd: projectDir, shell: true });
-        return true;
-    } catch {
-        return false;
+const isPackageInstalled = async (pkg: PackageManifest, projectDir: string): Promise<boolean> => {
+    if (pkg.installer.kind === 'npm') {
+        const { packageName, scope = 'global' } = pkg.installer;
+        try {
+            const args = ['list', packageName, '--depth=0'];
+            if (scope === 'global') args.push('-g');
+            await execFileAsync('npm', args, { cwd: projectDir, shell: true });
+            return true;
+        } catch {
+            return false;
+        }
     }
+    return false;
 };
 
 const npmInstall = async (name: string, scope: 'global' | 'local', projectDir: string): Promise<boolean> => {
@@ -154,7 +158,7 @@ export const executePackagesStep = async (
     let selectedNames: string[] = [];
     if (selectedNamesOverride) {
         for (const name of selectedNamesOverride) {
-            const found = manifests.find((m) => m.name === name);
+            const found = manifests.find((m) => m.id === name);
             if (!found) {
                 throw new Error(`Package '${name}' not found in assets/packages`);
             }
@@ -163,11 +167,10 @@ export const executePackagesStep = async (
     } else {
         const choices = await Promise.all(
             manifests.map(async (pkg) => {
-                const scope = pkg.scope ?? 'global';
-                const configured = await isPackageInstalled(pkg.name, scope, projectDir);
+                const configured = await isPackageInstalled(pkg, projectDir);
                 return {
-                    name: pkg.description ? `${pkg.name} — ${pkg.description}` : pkg.name,
-                    value: pkg.name,
+                    name: pkg.description ? `${pkg.id} — ${pkg.description}` : pkg.id,
+                    value: pkg.id,
                     configured,
                 };
             }),
@@ -313,9 +316,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         const comboOption = options.combo;
         const noIgnore = options.noIgnore ?? false;
 
-        const isOpenSpecInstalled =
-            (await isPackageInstalled('@fission-ai/openspec', 'global', projectDir)) ||
-            (await isPackageInstalled('@fission-ai/openspec', 'local', projectDir));
+        const openspecPkg = (await readPackageManifests()).find((m) => m.id === '@fission-ai/openspec');
+        const isOpenSpecInstalled = openspecPkg ? await isPackageInstalled(openspecPkg, projectDir) : false;
         if (!isOpenSpecInstalled && !isJson) {
             if (yes) {
                 deps.stdout('\nOpenSpec CLI (@fission-ai/openspec) is not installed. Installing globally...');
@@ -556,12 +558,16 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             deps.stdout('\nPackages to Install:');
             const manifests = await readPackageManifests();
             for (const name of selectedPackageNames) {
-                const pkg = manifests.find((m) => m.name === name);
+                const pkg = manifests.find((m) => m.id === name);
                 if (pkg) {
-                    const scope = pkg.scope ?? 'global';
-                    const alreadyInstalled = await isPackageInstalled(name, scope, projectDir);
-                    const statusBadge = alreadyInstalled ? '[⚠️ Already installed - will reinstall]' : '[New installation]';
-                    deps.stdout(`  - ${name} (${scope}) ${statusBadge}`);
+                    if (pkg.installer.kind === 'npm') {
+                        const scope = pkg.installer.scope ?? 'global';
+                        const alreadyInstalled = await isPackageInstalled(pkg, projectDir);
+                        const statusBadge = alreadyInstalled ? '[⚠️ Already installed - will reinstall]' : '[New installation]';
+                        deps.stdout(`  - ${pkg.id} (${scope}) ${statusBadge}`);
+                    } else {
+                        deps.stdout(`  - ${pkg.id} (agent-plugin) [New installation / action required]`);
+                    }
                 }
             }
         }
@@ -669,23 +675,21 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         if (hasPackages) {
             deps.stdout('\nInstalling packages...');
             const manifests = await readPackageManifests();
-            const installedPackages: string[] = [];
+            const { executePackageActions } = await import('./package-installer.js');
+            const targetIdsOverride =
+                selectedTools.length > 0
+                    ? selectedTools.map((t) => t.value as import('@/constants/allowed-tools.js').AllowedToolId)
+                    : undefined;
 
-            for (const name of selectedPackageNames) {
-                const pkg = manifests.find((m) => m.name === name);
-                if (!pkg) continue;
+            const packageActionResult = await executePackageActions({
+                deps,
+                projectDir,
+                packageManifests: manifests,
+                selectedPackageIds: selectedPackageNames,
+            });
 
-                const scope = pkg.scope ?? 'global';
-                deps.stdout(`  Installing ${name}...`);
-                try {
-                    await npmInstall(name, scope, projectDir);
-                    installedPackages.push(name);
-                    deps.stdout(`    ✓ Installed ${name}`);
-                } catch (error) {
-                    deps.stdout(`    ✗ Failed to install ${name}: ${error instanceof Error ? error.message : String(error)}`);
-                }
-            }
-            packagesStepResult = { installedPackages };
+            packagesStepResult = { installedPackages: packageActionResult.installedPackages };
+            const installedPackages = packageActionResult.installedPackages;
 
             if (installedPackages.includes('@fission-ai/openspec')) {
                 deps.stdout('\nInitializing OpenSpec CLI...');
