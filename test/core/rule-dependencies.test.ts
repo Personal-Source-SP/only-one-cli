@@ -35,6 +35,19 @@ describe('Rule Dependency Resolution & Preflight Validation (Tasks 3.1, 3.2, 3.7
         expect(plan.skills).toEqual([]);
     });
 
+    it('resolves all registered Next.js skills for react-nextjs', () => {
+        const result = validateRuleDependenciesPreflight(['react-nextjs'], [AllowedToolId.Antigravity]);
+        const plan = buildDeduplicatedDependencyPlan(['react-nextjs']);
+
+        expect(result).toEqual({ valid: true, errors: [] });
+        expect(plan.skills).toEqual([
+            'next-dev-loop',
+            'next-cache-components-adoption',
+            'next-cache-components-optimizer',
+            'next-partial-prefetching-adoption',
+        ]);
+    });
+
     it('deduplicates shared dependencies across multiple selected rules', () => {
         const customRules = [
             {

@@ -18,6 +18,22 @@ export const SKILLS: SkillManifest[] = [
         description: 'Interview the user relentlessly about a plan or design.',
     },
     {
+        name: 'next-dev-loop',
+        description: 'Verify Next.js runtime behavior through the development server and browser.',
+    },
+    {
+        name: 'next-cache-components-adoption',
+        description: 'Enable Cache Components and resolve blocking routes in Next.js applications.',
+    },
+    {
+        name: 'next-cache-components-optimizer',
+        description: 'Optimize Next.js Cache Components boundaries and cache behavior.',
+    },
+    {
+        name: 'next-partial-prefetching-adoption',
+        description: 'Adopt partial prefetching in eligible Next.js applications.',
+    },
+    {
         name: 'only-one-clockify-skill',
         description: 'Validate and log Clockify time entries from task lines.',
         associatedWorkflows: ['only-one-clockify'],

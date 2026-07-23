@@ -11,9 +11,21 @@ export const RULES: RuleManifest[] = [
         requiredMcps: ['gitnexus'],
     },
     {
-        id: 'framework',
-        description: 'Framework Detection — detect project framework before applying framework-specific conventions',
-        sourceFile: 'framework.md',
+        id: 'react-nextjs',
+        description: 'ReactJS and Next.js — component, hook, rendering boundary, i18n, and responsive conventions',
+        sourceFile: 'react-nextjs.md',
+        supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
+        requiredSkills: [
+            'next-dev-loop',
+            'next-cache-components-adoption',
+            'next-cache-components-optimizer',
+            'next-partial-prefetching-adoption',
+        ],
+    },
+    {
+        id: 'nestjs',
+        description: 'NestJS — module, service, repository, error handling, and contract conventions',
+        sourceFile: 'nestjs.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
     },
     {

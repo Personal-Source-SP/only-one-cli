@@ -37,11 +37,29 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
     it('rule manifests declare expected dependencies and supported targets', () => {
         const supportedTargets = [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor];
         const expectedDependencies = [
-            { id: 'bug-fix', packages: undefined, plugins: ['superpowers'], mcps: ['gitnexus'] },
-            { id: 'context-minimization', packages: ['@fission-ai/openspec'], plugins: ['superpowers'], mcps: ['gitnexus'] },
-            { id: 'framework', packages: undefined, plugins: undefined, mcps: undefined },
-            { id: 'typescript', packages: undefined, plugins: undefined, mcps: undefined },
-            { id: 'ui', packages: undefined, plugins: undefined, mcps: undefined },
+            { id: 'bug-fix', packages: undefined, plugins: ['superpowers'], mcps: ['gitnexus'], skills: undefined },
+            {
+                id: 'context-minimization',
+                packages: ['@fission-ai/openspec'],
+                plugins: ['superpowers'],
+                mcps: ['gitnexus'],
+                skills: undefined,
+            },
+            {
+                id: 'react-nextjs',
+                packages: undefined,
+                plugins: undefined,
+                mcps: undefined,
+                skills: [
+                    'next-dev-loop',
+                    'next-cache-components-adoption',
+                    'next-cache-components-optimizer',
+                    'next-partial-prefetching-adoption',
+                ],
+            },
+            { id: 'nestjs', packages: undefined, plugins: undefined, mcps: undefined, skills: undefined },
+            { id: 'typescript', packages: undefined, plugins: undefined, mcps: undefined, skills: undefined },
+            { id: 'ui', packages: undefined, plugins: undefined, mcps: undefined, skills: undefined },
         ];
 
         for (const expected of expectedDependencies) {
@@ -50,6 +68,7 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
             expect(rule?.requiredPackages).toEqual(expected.packages);
             expect(rule?.requiredPlugins).toEqual(expected.plugins);
             expect(rule?.requiredMcps).toEqual(expected.mcps);
+            expect(rule?.requiredSkills).toEqual(expected.skills);
             expect(rule?.supportedTargets).toEqual(supportedTargets);
         }
     });
