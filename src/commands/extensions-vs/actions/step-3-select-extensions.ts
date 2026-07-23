@@ -26,30 +26,38 @@ export const selectExtensionsStep = async (
         if (!deps.prompts?.checkbox) {
             selectedExtensions = [...availableExtensions];
         } else {
+            const choices = availableExtensions.map((ext) => {
+                const editorChecks = existingChecks.filter((c) => c.extensionId.toLowerCase() === ext.toLowerCase());
+                const allExist = editorChecks.length > 0 && editorChecks.every((c) => c.exists);
+                const someExist = editorChecks.some((c) => c.exists);
+
+                let name = ext;
+                if (allExist) {
+                    name = `${ext} (already exists)`;
+                } else if (someExist) {
+                    const existingEditors = editorChecks
+                        .filter((c) => c.exists)
+                        .map((c) => c.editorName)
+                        .join(', ');
+                    name = `${ext} (already exists in ${existingEditors})`;
+                }
+
+                return {
+                    checked: !allExist,
+                    name,
+                    value: ext,
+                    allExist,
+                    someExist,
+                };
+            });
+            choices.sort((a, b) => {
+                if (a.allExist !== b.allExist) return Number(a.allExist) - Number(b.allExist);
+                return Number(a.someExist) - Number(b.someExist);
+            });
+
             selectedExtensions = await deps.prompts.checkbox({
                 message: 'Select VS Code extensions to install:',
-                choices: availableExtensions.map((ext) => {
-                    const editorChecks = existingChecks.filter((c) => c.extensionId.toLowerCase() === ext.toLowerCase());
-                    const allExist = editorChecks.length > 0 && editorChecks.every((c) => c.exists);
-                    const someExist = editorChecks.some((c) => c.exists);
-
-                    let name = ext;
-                    if (allExist) {
-                        name = `${ext} (already exists)`;
-                    } else if (someExist) {
-                        const existingEditors = editorChecks
-                            .filter((c) => c.exists)
-                            .map((c) => c.editorName)
-                            .join(', ');
-                        name = `${ext} (already exists in ${existingEditors})`;
-                    }
-
-                    return {
-                        checked: !allExist,
-                        name,
-                        value: ext,
-                    };
-                }),
+                choices: choices.map(({ allExist, someExist, ...choice }) => choice),
             });
         }
     }

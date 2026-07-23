@@ -24,16 +24,20 @@ export const selectMcpsStep = async (
         if (!deps.prompts?.checkbox) {
             throw new Error('MCP server selection is required in non-interactive mode. Pass server names positionally.');
         } else {
+            const choices = manifests.map((m) => {
+                const isExisting = allExisting.some((e) => e.mcpId === m.id && e.exists);
+                return {
+                    name: isExisting ? `${m.id} (already exists)` : m.id,
+                    value: m.id,
+                    checked: !isExisting,
+                    isExisting,
+                };
+            });
+            choices.sort((a, b) => Number(a.isExisting) - Number(b.isExisting));
+
             selectedMcpIds = await deps.prompts.checkbox({
                 message: `Select MCP servers to configure for ${selectedIde.name}:`,
-                choices: manifests.map((m) => {
-                    const isExisting = allExisting.some((e) => e.mcpId === m.id && e.exists);
-                    return {
-                        name: isExisting ? `${m.id} (already exists)` : m.id,
-                        value: m.id,
-                        checked: !isExisting,
-                    };
-                }),
+                choices: choices.map(({ isExisting, ...choice }) => choice),
             });
         }
     }

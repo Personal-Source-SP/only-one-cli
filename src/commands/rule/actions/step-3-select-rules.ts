@@ -26,16 +26,20 @@ export const selectRulesStep = async (
         if (!deps.prompts?.checkbox) {
             throw new Error('Rule selection is required in non-interactive mode. Pass rule IDs positionally.');
         } else {
+            const choices = RULES.map((r) => {
+                const isExisting = allExistingRules.some((e) => e.ruleId === r.id && e.exists);
+                return {
+                    name: isExisting ? `${r.id} (already exists)` : r.id,
+                    value: r.id,
+                    checked: !isExisting,
+                    isExisting,
+                };
+            });
+            choices.sort((a, b) => Number(a.isExisting) - Number(b.isExisting));
+
             selectedRuleIds = await deps.prompts.checkbox({
                 message: `Select rules to sync for ${agentName}:`,
-                choices: RULES.map((r) => {
-                    const isExisting = allExistingRules.some((e) => e.ruleId === r.id && e.exists);
-                    return {
-                        name: isExisting ? `${r.id} (already exists)` : r.id,
-                        value: r.id,
-                        checked: !isExisting,
-                    };
-                }),
+                choices: choices.map(({ isExisting, ...choice }) => choice),
             });
         }
     } else {

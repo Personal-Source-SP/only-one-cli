@@ -18,16 +18,20 @@ export const selectSkillsStep = async (
         if (!deps.prompts?.checkbox) {
             throw new Error('Skill selection is required in non-interactive mode. Pass skill names positionally.');
         } else {
+            const choices = availableSkills.map((name) => {
+                const isExisting = allExistingSkills.some((s) => s.skillName === name && s.exists);
+                return {
+                    name: isExisting ? `${name} (already exists)` : name,
+                    value: name,
+                    checked: !isExisting,
+                    isExisting,
+                };
+            });
+            choices.sort((a, b) => Number(a.isExisting) - Number(b.isExisting));
+
             selectedSkills = await deps.prompts.checkbox({
                 message: `Select custom skills to add for ${targetTool.name}:`,
-                choices: availableSkills.map((name) => {
-                    const isExisting = allExistingSkills.some((s) => s.skillName === name && s.exists);
-                    return {
-                        name: isExisting ? `${name} (already exists)` : name,
-                        value: name,
-                        checked: !isExisting,
-                    };
-                }),
+                choices: choices.map(({ isExisting, ...choice }) => choice),
             });
         }
     } else {

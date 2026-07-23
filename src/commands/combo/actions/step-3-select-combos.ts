@@ -31,15 +31,17 @@ export const selectCombosStep = async (
         if (!deps.prompts?.checkbox) {
             throw new Error('Combo selection is required in non-interactive mode. Pass combo names positionally.');
         } else {
+            const choices = comboChecks.map(({ combo: c, hasExisting }) => ({
+                name: hasExisting ? `${c.id} — ${c.description || c.name} (some components exist)` : `${c.id} — ${c.description || c.name}`,
+                value: c.id,
+                checked: !hasExisting,
+                hasExisting,
+            }));
+            choices.sort((a, b) => Number(a.hasExisting) - Number(b.hasExisting));
+
             selectedComboNames = await deps.prompts.checkbox({
                 message: `Select combos to install for ${targetTool.name}:`,
-                choices: comboChecks.map(({ combo: c, hasExisting }) => ({
-                    name: hasExisting
-                        ? `${c.id} — ${c.description || c.name} (some components exist)`
-                        : `${c.id} — ${c.description || c.name}`,
-                    value: c.id,
-                    checked: !hasExisting,
-                })),
+                choices: choices.map(({ hasExisting, ...choice }) => choice),
             });
         }
     }
