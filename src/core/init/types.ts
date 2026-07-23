@@ -10,6 +10,8 @@ export interface InitCommandOptions {
     skills?: string;
     configs?: string;
     target?: string;
+    tool?: string;
+    ide?: string;
 }
 
 export interface ToolsStepResult {

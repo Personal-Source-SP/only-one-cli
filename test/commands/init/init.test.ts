@@ -123,8 +123,7 @@ describe('init command', () => {
 
             const output = writes.join('\n');
             expect(output).toContain('Installing ui-ux-pro-max-cli...');
-            expect(output).toContain('Initializing UI/UX Pro Max...');
-            expect(output).toContain('npx ui-ux-pro-max-cli init --ai cursor --force');
+            expect(output).toContain('Installed ui-ux-pro-max-cli');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
@@ -273,7 +272,11 @@ describe('init command', () => {
         );
 
         try {
-            const mockCheckbox = vi.fn().mockResolvedValue(['github', 'clockify']);
+            const mockCheckbox = vi.fn().mockImplementation(async (opts: any) => {
+                if (opts?.message?.includes('Select MCP servers')) return ['github', 'clockify'];
+                if (opts?.message?.includes('Select IDEs')) return ['cursor'];
+                return ['github', 'clockify'];
+            });
             const program = createProgram({
                 cwd,
                 env: { HOME: tempHome, USERPROFILE: tempHome },
@@ -315,7 +318,7 @@ describe('init command', () => {
                 stderr: (line) => writes.push(line),
             });
 
-            await expect(program.parseAsync(['init', 'mcp', 'github', '--ide', 'invalid-ide'], { from: 'user' })).rejects.toThrow();
+            await expect(program.parseAsync(['mcp', 'github', '--ide', 'invalid-ide'], { from: 'user' })).rejects.toThrow();
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

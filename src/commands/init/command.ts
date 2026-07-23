@@ -41,7 +41,7 @@ const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: s
 
     const selectedIdeIds = (
         await selectAllowedMcpTargets({
-            automatic: false,
+            automatic: !options?.ide && !deps.prompts?.checkbox,
             emptyMessage: 'Select at least one target IDE',
             explicit: options?.ide,
             message: 'Select IDEs for global MCP config',
@@ -73,6 +73,8 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .description('🚀 Initialize project with tools, packages, and configurations')
         .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
+        .option('--tool <ids>', 'Comma-separated target agent IDs (antigravity, claude, cursor, codex)')
+        .option('--ide <ids>', 'Comma-separated target IDE IDs (alias for --tool)')
         .option('--no-ignore', 'Skip updating the project .gitignore file with only-one directories')
         .option('--step <name>', 'Run only a single specific initialization step (choices: tools, packages, skills, configs)')
         .option('--skip <names>', 'Comma-separated list of steps to skip (choices: tools, packages, skills, configs)')
@@ -94,6 +96,8 @@ export function createInitCommand(deps: ProgramDeps): Command {
             json: Boolean(command.parent?.opts()?.json),
             path,
             options: {
+                tool: options.tool,
+                ide: options.ide,
                 step: options.step,
                 skip: options.skip,
                 combo: options.combo,
