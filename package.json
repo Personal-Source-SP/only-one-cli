@@ -1,9 +1,47 @@
 {
     "name": "only-one",
+    "displayName": "Only One AI",
     "version": "0.0.3",
+    "publisher": "only-one",
+    "description": "Developer environment setups, AI agent workspace management, and VS Code configuration syncing.",
+    "icon": "assets/icon.png",
     "type": "module",
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "main": "./dist/src/vs-extension/extension.js",
     "bin": {
         "only-one": "./dist/src/index.js"
+    },
+    "activationEvents": [],
+    "contributes": {
+        "commands": [
+            {
+                "command": "only-one.openDashboard",
+                "title": "Open Dashboard (Tab Bar)",
+                "category": "Only One AI"
+            },
+            {
+                "command": "only-one.init",
+                "title": "Initialize Workspace",
+                "category": "Only One AI"
+            },
+            {
+                "command": "only-one.doctor",
+                "title": "Run Environment Doctor",
+                "category": "Only One AI"
+            },
+            {
+                "command": "only-one.syncSkills",
+                "title": "Sync Agent Skills",
+                "category": "Only One AI"
+            },
+            {
+                "command": "only-one.syncMcp",
+                "title": "Configure MCP Servers",
+                "category": "Only One AI"
+            }
+        ]
     },
     "files": [
         "dist",
@@ -12,6 +50,7 @@
     ],
     "scripts": {
         "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node scripts/postbuild-paths.cjs && node -e \"if (process.platform !== 'win32') require('node:fs').chmodSync('dist/src/index.js', 0o755)\"",
+        "build:vsix": "node scripts/build-vsix.js",
         "dev": "tsx src/index.ts",
         "prepare": "npm run build",
         "test": "npm run format && vitest run",
@@ -23,6 +62,7 @@
     "dependencies": {
         "@iarna/toml": "^2.2.5",
         "@inquirer/prompts": "^7.10.1",
+        "@vscode/webview-ui-toolkit": "^1.4.0",
         "commander": "^14.0.2",
         "js-yaml": "^4.1.0",
         "lodash": "^4.18.1",
@@ -32,6 +72,7 @@
         "@types/js-yaml": "^4.0.9",
         "@types/lodash": "^4.17.24",
         "@types/node": "^24.10.1",
+        "@types/vscode": "^1.85.0",
         "prettier": "^3.8.3",
         "tsx": "^4.20.6",
         "typescript": "^5.9.3",
