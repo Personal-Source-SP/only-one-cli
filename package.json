@@ -1,6 +1,6 @@
 {
     "name": "only-one",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "module",
     "bin": {
         "only-one": "./dist/src/index.js"

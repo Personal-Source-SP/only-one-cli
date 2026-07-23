@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.0.3 (2026-07-23)
+
 ### Breaking Changes
 
 - Command-facing agent targets now support only Antigravity, Claude, Cursor, and Codex. Explicit unsupported target IDs fail before side effects.
@@ -13,6 +15,10 @@ All notable changes to this project will be documented in this file.
 ### Features
 
 - MCP sync supports Claude JSON and Codex TOML configuration files, in addition to Antigravity and Cursor.
+- Added `workflow` management for installing and synchronizing bundled agent workflows.
+- Added `claude-code`, `gruvbox`, and `vscode-icons` to the VS extension manifest.
+- Added interactive setting selection and overwrite confirmation to `setting-vs`.
+- Added optional Git, Docker, and npm ignore templates to sync commands; existing ignore rules remain unchanged.
 
 ### Notes
 
