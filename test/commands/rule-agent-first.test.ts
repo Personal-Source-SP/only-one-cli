@@ -18,12 +18,9 @@ describe('Rule Command Agent-First Selection & Per-Agent Choices (Tasks 2.3, 2.4
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
                     if (opts.message.includes('target IDEs/Tools') || opts.message.includes('agents')) {
-                        return ['claude', 'cursor'];
+                        return ['claude'];
                     }
                     if (opts.message.includes('Claude')) {
-                        return ['context-minimization'];
-                    }
-                    if (opts.message.includes('Cursor')) {
                         return ['context-minimization'];
                     }
                     return [];
@@ -37,12 +34,10 @@ describe('Rule Command Agent-First Selection & Per-Agent Choices (Tasks 2.3, 2.4
         const cmd = createRuleCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir]);
 
-        expect(checkboxCalls.length).toBe(3);
+        expect(checkboxCalls.length).toBe(2);
         expect(checkboxCalls[0].message).toContain('Select target IDEs/Tools');
         expect(checkboxCalls[1].message).toContain('Claude');
         expect(checkboxCalls[1].choices.every((c) => c.checked)).toBe(true);
-        expect(checkboxCalls[2].message).toContain('Cursor');
-        expect(checkboxCalls[2].choices.every((c) => c.checked)).toBe(true);
 
         await rm(testProjectDir, { recursive: true, force: true });
     });

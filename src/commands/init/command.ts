@@ -1,67 +1,8 @@
-import { homedir } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { selectAllowedMcpTargets } from '@/core/target-selection/index.js';
-import { readMcpManifests } from '@/core/mcp/registry.js';
-import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
-import { executeInitCommand, printInitResult } from '@/core/init/init-command.js';
-import type { InitCommandOptions } from './types.js';
 import { COLORS } from '@/constants/index.js';
-import { parseCsv } from '@/utils/index.js';
-
-const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: string }): Promise<void> => {
-    const { manifests, warnings } = await readMcpManifests();
-    for (const warning of warnings) deps.stdout(COLORS.warning(`Warning: skipped ${warning.file}: ${warning.message}`));
-    if (!manifests.length) throw new Error('No MCP manifests available');
-
-    const requestedMcpIds = parseCsv(names);
-    let selectedMcpIds = requestedMcpIds;
-    if (!selectedMcpIds.length) {
-        if (!deps.prompts?.checkbox) {
-            throw new Error('MCP server selection is required in non-interactive mode. Pass server names positionally.');
-        } else {
-            selectedMcpIds = await deps.prompts.checkbox({
-                message: 'Select MCP servers to configure',
-                choices: manifests.map((manifest) => ({ name: manifest.id, value: manifest.id })),
-            });
-        }
-    }
-    if (!selectedMcpIds.length) throw new Error('Select at least one MCP server');
-
-    const selectedManifests = selectedMcpIds.map((id) => {
-        const manifest = manifests.find((entry) => entry.id === id);
-        if (!manifest) throw new Error(`Unknown MCP '${id}'`);
-        return manifest;
-    });
-
-    const selectedIdeIds = (
-        await selectAllowedMcpTargets({
-            automatic: !options?.ide && !deps.prompts?.checkbox,
-            emptyMessage: 'Select at least one target IDE',
-            explicit: options?.ide,
-            message: 'Select IDEs for global MCP config',
-            prompts: deps.prompts,
-        })
-    ).map((adapter) => adapter.id);
-
-    const response = await syncMcpGlobalConfig({
-        cwd: deps.cwd,
-        homeDir: deps.env.HOME || deps.env.USERPROFILE || homedir(),
-        ideIds: selectedIdeIds,
-        manifests: selectedManifests,
-        platform: process.platform,
-        write: deps.stdout,
-    });
-
-    for (const result of response.results) {
-        deps.stdout(`${COLORS.primary(result.ideName)}: ${COLORS.dim(result.configPath)}`);
-        for (const entry of result.results) {
-            const keys = entry.credentialKeys.length ? `; fill manually: ${entry.credentialKeys.join(', ')}` : '';
-            const statusColor = entry.status === 'added' || entry.status === 'unchanged' ? COLORS.success : COLORS.warning;
-            deps.stdout(`  ${COLORS.secondary(entry.id)}: ${statusColor(entry.status)}${COLORS.warning(keys)}`);
-        }
-    }
-};
+import type { InitCommandOptions } from './types.js';
+import { executeInitStep, executeInitSubcommandStep, runInitMcpStep } from './actions/index.js';
 
 export function createInitCommand(deps: ProgramDeps): Command {
     const cmd = new Command('init')
@@ -83,27 +24,10 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('Modifies project configurations and installs custom agent skills.')}\n` +
                 `  - ${COLORS.dim('Appends only-one patterns to your .gitignore unless --no-ignore is passed.')}`,
-        );
-
-    cmd.action(async (path: string | undefined, options: InitCommandOptions, command) => {
-        const result = await executeInitCommand(deps, {
-            command,
-            json: Boolean(command.parent?.opts()?.json),
-            path,
-            options: {
-                tool: options.tool,
-                ide: options.ide,
-                step: options.step,
-                skip: options.skip,
-                combo: options.combo,
-                noIgnore: options.ignore === false,
-            },
+        )
+        .action(async (path: string | undefined, options: InitCommandOptions, command) => {
+            await executeInitStep(deps, path, options, command);
         });
-
-        if (!result) return;
-
-        printInitResult(deps, Boolean(command.parent?.opts()?.json), result);
-    });
 
     cmd.command('package')
         .description('📦 Install dependency packages only')
@@ -121,15 +45,11 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Only executes the "packages" step of the initialization process.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { target?: string; ignore?: boolean }, command) => {
-            const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
-            const result = await executeInitCommand(deps, {
+            await executeInitSubcommandStep(
+                deps,
+                { path, step: 'packages', packages: names, target: options.target, ignore: options.ignore },
                 command,
-                json: Boolean(command.parent?.parent?.opts()?.json),
-                path,
-                options: { noIgnore, step: 'packages', packages: names, target: options.target },
-            });
-            if (!result) return;
-            printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
+            );
         });
 
     cmd.command('skill')
@@ -147,15 +67,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Merges skill definitions into the workspace without altering other configurations.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { ignore?: boolean }, command) => {
-            const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
-            const result = await executeInitCommand(deps, {
-                command,
-                json: Boolean(command.parent?.parent?.opts()?.json),
-                path,
-                options: { noIgnore, step: 'skills', skills: names },
-            });
-            if (!result) return;
-            printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
+            await executeInitSubcommandStep(deps, { path, step: 'skills', skills: names, ignore: options.ignore }, command);
         });
 
     cmd.command('configs')
@@ -173,15 +85,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Useful when you want to reset or pull the latest config boilerplate.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { ignore?: boolean }, command) => {
-            const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
-            const result = await executeInitCommand(deps, {
-                command,
-                json: Boolean(command.parent?.parent?.opts()?.json),
-                path,
-                options: { noIgnore, step: 'configs', configs: names },
-            });
-            if (!result) return;
-            printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
+            await executeInitSubcommandStep(deps, { path, step: 'configs', configs: names, ignore: options.ignore }, command);
         });
 
     cmd.command('combo')
@@ -199,15 +103,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('A combo is a shorthand to install multiple skills and packages in one command.')}`,
         )
         .action(async (path: string | undefined, names: string | undefined, options: { ignore?: boolean }, command) => {
-            const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
-            const result = await executeInitCommand(deps, {
-                command,
-                json: Boolean(command.parent?.parent?.opts()?.json),
-                path,
-                options: { noIgnore, combo: names },
-            });
-            if (!result) return;
-            printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
+            await executeInitSubcommandStep(deps, { path, combo: names, ignore: options.ignore }, command);
         });
 
     cmd.command('mcp')
@@ -226,7 +122,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Secret placeholders are left empty for manual editing.')}`,
         )
         .action(async (names: string | undefined, options: { ide?: string }) => {
-            await runInitMcp(deps, names, options);
+            await runInitMcpStep(deps, names, options);
         });
 
     return cmd;

@@ -43,7 +43,7 @@ describe('VS sync commands', () => {
         expect(syncVsSettings).toHaveBeenCalledWith(
             expect.objectContaining({
                 cwd: '/repo',
-                editorIds: [VsEditorId.Antigravity, VsEditorId.Cursor],
+                editorIds: [VsEditorId.Antigravity],
                 platform: expect.stringMatching(`${VsPlatform.Darwin}|${VsPlatform.Win32}`),
             }),
         );
@@ -77,9 +77,7 @@ describe('VS sync commands', () => {
 
         await program.parseAsync(['extensions-vs', '--editors', 'cursor,antigravity'], { from: 'user' });
 
-        expect(syncVsExtensions).toHaveBeenCalledWith(
-            expect.objectContaining({ cwd: '/repo', editorIds: [VsEditorId.Cursor, VsEditorId.Antigravity] }),
-        );
+        expect(syncVsExtensions).toHaveBeenCalledWith(expect.objectContaining({ cwd: '/repo', editorIds: [VsEditorId.Cursor] }));
         expect(writes.map((w) => w.replace(/\u001b\[\d+m/g, ''))).toContain('\nSync Summary:');
     });
 

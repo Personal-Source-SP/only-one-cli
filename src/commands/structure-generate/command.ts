@@ -1,19 +1,15 @@
 import { Command } from 'commander';
-import { basename, relative } from 'node:path';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { buildAgentArtifactSummaries, formatAgentToolInstruction } from '@/core/agent/artifact-summary.js';
-import { ensureStructureAgentSkills } from '@/core/agent/ensure-skills.js';
-import { getAgentToolDisplayName } from '@/core/agent/prompt-setup.js';
-import { loadConfig, persistConfigAgentTools } from '@/core/config/index.js';
-import { printJson } from '@/core/output/index.js';
-import { readCliVersion } from '@/core/runtime/read-cli-version.js';
-import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
-import { STRUCTURALS_DIR, StructurePathResolutionError } from '@/core/structure/paths.js';
-import { scaffoldStructureOutput } from '@/core/structure/scaffold.js';
-import { readBlueprintStatus } from '@/core/structure/status.js';
-import { getStructurePlaybookSteps, STRUCTURE_BLUEPRINT_NAMING_HINT, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
-import type { AgentArtifactSummary, StructureGenerateCommandJson, StructureGenerateCommandOptions } from './types.js';
 import { COLORS } from '@/constants/index.js';
+import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
+import { STRUCTURALS_DIR } from '@/core/structure/paths.js';
+import type { StructureGenerateCommandOptions } from './types.js';
+import {
+    ensureStructureSkillsStep,
+    generatePayloadAndReportStep,
+    reportStructureStatusStep,
+    scaffoldBlueprintStep,
+} from './actions/index.js';
 
 export function createStructureGenerateCommand(deps: ProgramDeps): Command {
     return new Command('structure-generate')
@@ -47,140 +43,30 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
             assertProjectDirectory(projectDir);
 
             const parent = command.parent?.opts() ?? {};
-            const cliVersion = readCliVersion();
+            const isJsonOutput = Boolean(parent.json);
 
-            if (!options.status && options.installSkill !== false) {
-                const gate = await ensureStructureAgentSkills(deps, {
-                    force: Boolean(options.force),
-                    noInstallSkill: false,
-                    projectDir,
-                    toolsArg: options.tools,
-                });
-
-                if (!gate.ok) {
-                    deps.stderr?.(gate.message) ?? deps.stdout(gate.message);
-                    process.exitCode = gate.exitCode;
-                    return;
-                }
-
-                if (gate.setupRan && gate.agentTools.length) {
-                    await persistConfigAgentTools(projectDir, gate.agentTools);
-                }
+            const skillsResult = await ensureStructureSkillsStep(deps, projectDir, options);
+            if (!skillsResult.ok) {
+                return;
             }
 
-            let scaffold;
-            try {
-                scaffold = await scaffoldStructureOutput(projectDir, options.output);
-            } catch (error) {
-                if (error instanceof StructurePathResolutionError) {
-                    deps.stderr?.(error.message) ?? deps.stdout(error.message);
-                    process.exitCode = 1;
-                    return;
-                }
-                throw error;
+            const scaffoldResult = await scaffoldBlueprintStep(deps, projectDir, options);
+            if (!scaffoldResult.ok || !scaffoldResult.scaffold || !scaffoldResult.blueprintStatus) {
+                return;
             }
-
-            if (scaffold.usesDefaultOrganization) {
-                deps.stdout(
-                    COLORS.warning(
-                        '  Note: organization not set in config; using "default" in blueprint filename. Run only-one init to set organization.',
-                    ),
-                );
-            }
-
-            const blueprintStatus = readBlueprintStatus(scaffold.blueprintPath, {
-                output: options.output,
-                projectDir,
-            });
 
             if (options.status) {
-                const payload = {
-                    blueprint: blueprintStatus,
-                    outputPath: scaffold.blueprintPath,
-                    projectDir,
-                    relativeBlueprintPath: scaffold.relativeBlueprintPath,
-                };
-                if (parent.json) {
-                    printJson(payload, deps.stdout);
-                    return;
-                }
-                deps.stdout(`${COLORS.primary('Blueprint:')} ${COLORS.cli.accent(scaffold.relativeBlueprintPath)}`);
-                deps.stdout(`  ${COLORS.primary('Exists:')} ${blueprintStatus.exists ? COLORS.success('yes') : COLORS.error('no')}`);
-                if (blueprintStatus.legacyExists && blueprintStatus.legacyPath) {
-                    deps.stdout(
-                        `  ${COLORS.warning('Legacy:')} ${COLORS.dim(relative(projectDir, blueprintStatus.legacyPath))} (migrate to structure/ layout)`,
-                    );
-                }
-                if (blueprintStatus.missingSections.length) {
-                    deps.stdout(`  ${COLORS.error('Missing sections:')} ${COLORS.warning(blueprintStatus.missingSections.join(', '))}`);
-                }
+                reportStructureStatusStep(deps, projectDir, scaffoldResult.scaffold, scaffoldResult.blueprintStatus, isJsonOutput);
                 return;
             }
 
-            const config = await loadConfig(projectDir);
-            const agentTools = config.agent_tools ?? [];
-            const agentArtifacts = buildAgentArtifactSummaries(projectDir, agentTools);
-
-            const payload: StructureGenerateCommandJson = {
-                agentArtifacts,
-                blueprint: blueprintStatus,
-                blueprintFile: basename(scaffold.blueprintPath),
-                cliVersion,
-                folderCreated: scaffold.created,
-                outputDir: scaffold.outputDir,
-                outputPath: scaffold.blueprintPath,
+            await generatePayloadAndReportStep(
+                deps,
                 projectDir,
-                relativeBlueprintPath: scaffold.relativeBlueprintPath,
-                relativeOutputDir: scaffold.relativeOutputDir,
-                steps: getStructurePlaybookSteps(),
-            };
-
-            if (parent.json) {
-                printJson({ ...payload, skillName: STRUCTURE_SKILL_NAME }, deps.stdout);
-                return;
-            }
-
-            const relProject = relative(deps.cwd, projectDir) || '.';
-
-            const border = (text: string) => COLORS.dim(text);
-            deps.stdout(border('┌────────────────────────────────────────────────────────────────────────┐'));
-            deps.stdout(border('│  ') + COLORS.cli.header('STRUCTURAL BLUEPRINT GENERATION'.padEnd(70)) + border('│'));
-            deps.stdout(border('├────────────────────────────────────────────────────────────────────────┤'));
-            deps.stdout(border('│  ') + COLORS.primary('Project:   ') + COLORS.cli.accent(relProject.padEnd(59)) + border('│'));
-            deps.stdout(
-                border('│  ') + COLORS.primary('Folder:    ') + COLORS.cli.accent(scaffold.relativeOutputDir.padEnd(59)) + border('│'),
+                scaffoldResult.scaffold,
+                scaffoldResult.blueprintStatus,
+                options,
+                isJsonOutput,
             );
-            deps.stdout(
-                border('│  ') + COLORS.primary('Blueprint: ') + COLORS.cli.accent(scaffold.relativeBlueprintPath.padEnd(59)) + border('│'),
-            );
-            deps.stdout(border('└────────────────────────────────────────────────────────────────────────┘'));
-            deps.stdout('');
-            deps.stdout(`  ${COLORS.bold('How to run this skill inside your AI agent chat:')}`);
-            if (agentArtifacts.length) {
-                for (const artifact of agentArtifacts) {
-                    const toolName = getAgentToolDisplayName(artifact.toolId);
-                    deps.stdout(`  ${COLORS.success('•')} ${COLORS.secondary(toolName)}:`);
-                    for (const line of formatAgentToolInstruction(artifact.toolId, artifact.invokeLabel)) {
-                        deps.stdout(COLORS.dim(line));
-                    }
-                    deps.stdout('');
-                }
-            } else {
-                deps.stdout(`  ${COLORS.warning('•')} ${COLORS.warning('Tell your agent:')}`);
-                deps.stdout(`    ${COLORS.dim('"Generate the structural blueprint for this codebase"')}`);
-                deps.stdout('');
-            }
-
-            if (options.installSkill === false) {
-                deps.stdout(`  ${COLORS.warning('Agent skills: skipped (--no-install-skill)')}`);
-                deps.stdout('');
-            }
-
-            deps.stdout(`  ${COLORS.bold('Next Steps:')}`);
-            deps.stdout(`  1. ${COLORS.dim('Open your AI agent/IDE chat window.')}`);
-            deps.stdout(`  2. ${COLORS.dim('Type the slash command, tag the file, or run the command shown above.')}`);
-            deps.stdout(`  3. ${COLORS.dim('Upload the generated index to the backend server:')}`);
-            deps.stdout(`     ${COLORS.cli.command('only-one push-index --skip-gitnexus --skip-cocoindex')}`);
-            deps.stdout(COLORS.dim('──────────────────────────────────────────────────────────────────────────'));
         });
 }

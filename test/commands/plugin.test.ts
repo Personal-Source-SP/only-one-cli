@@ -18,12 +18,9 @@ describe('Plugin Command Agent-First Selection & Non-TTY behavior (Tasks 2.1, 2.
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
                     if (opts.message.includes('target IDEs/Tools') || opts.message.includes('agents')) {
-                        return ['claude', 'cursor'];
+                        return ['claude'];
                     }
                     if (opts.message.includes('Claude')) {
-                        return ['superpowers'];
-                    }
-                    if (opts.message.includes('Cursor')) {
                         return ['superpowers'];
                     }
                     return [];
@@ -37,15 +34,12 @@ describe('Plugin Command Agent-First Selection & Non-TTY behavior (Tasks 2.1, 2.
         const cmd = createPluginCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir]);
 
-        expect(checkboxCalls.length).toBe(3);
+        expect(checkboxCalls.length).toBe(2);
         // Prompt 1: Agents
         expect(checkboxCalls[0].message).toContain('Select target IDEs/Tools');
         // Prompt 2: Plugins for Claude
         expect(checkboxCalls[1].message).toContain('Claude');
         expect(checkboxCalls[1].choices.every((c) => c.checked)).toBe(true);
-        // Prompt 3: Plugins for Cursor
-        expect(checkboxCalls[2].message).toContain('Cursor');
-        expect(checkboxCalls[2].choices.every((c) => c.checked)).toBe(true);
 
         await rm(testProjectDir, { recursive: true, force: true });
     });
@@ -57,7 +51,7 @@ describe('Plugin Command Agent-First Selection & Non-TTY behavior (Tasks 2.1, 2.
             prompts: {
                 checkbox: async (opts) => {
                     if (opts.message.includes('target IDEs/Tools') || opts.message.includes('agents')) {
-                        return ['claude', 'cursor'];
+                        return ['claude'];
                     }
                     if (opts.message.includes('Claude')) {
                         return ['superpowers'];

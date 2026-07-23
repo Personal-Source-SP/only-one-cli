@@ -1,9 +1,8 @@
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { formatUpdateHumanLines, updateAgentArtifacts } from '@/core/agent/update.js';
-import { printJson } from '@/core/output/index.js';
-import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
 import { COLORS } from '@/constants/index.js';
+import type { UpdateCommandOptions } from './types.js';
+import { resolveProjectStep, updateArtifactsStep } from './actions/index.js';
 
 export function createUpdateCommand(deps: ProgramDeps): Command {
     return new Command('update')
@@ -20,29 +19,9 @@ export function createUpdateCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Looks up installed agent tools in the project configurations and pulls the latest definitions from the source registry.')}\n` +
                 `  - ${COLORS.dim('Useful when updating CLI versions or retrieving upstream template improvements.')}`,
         )
-        .action(async (path: string | undefined, options: { force?: boolean }, command) => {
-            const projectDir = resolveProjectDir(deps, path);
-            assertProjectDirectory(projectDir);
+        .action(async (path: string | undefined, options: UpdateCommandOptions, command) => {
+            const projectDir = resolveProjectStep(deps, path);
             const parent = command.parent?.opts() ?? {};
-
-            const result = await updateAgentArtifacts({ force: options.force, projectDir });
-
-            if (parent.json) {
-                printJson(result, deps.stdout);
-                return;
-            }
-
-            const lines = formatUpdateHumanLines(result);
-            if (lines.length > 0) {
-                deps.stdout(COLORS.success(lines[0]));
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i];
-                    if (line.includes('skill:') || line.includes('command:')) {
-                        deps.stdout(`  ${COLORS.primary(line.trim())}`);
-                    } else {
-                        deps.stdout(COLORS.dim(line));
-                    }
-                }
-            }
+            await updateArtifactsStep(deps, projectDir, options, Boolean(parent.json));
         });
 }
