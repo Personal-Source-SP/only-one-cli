@@ -17,9 +17,9 @@ export async function maybeInstallMissing(request: DoctorInstallMissingRequest):
         return { report, installResults: [] };
     }
 
-    let shouldInstall = Boolean(options.yes);
+    let shouldInstall = false;
 
-    if (!shouldInstall && !options.json && (options.installMissing || canPrompt(request))) {
+    if (!options.json && (options.installMissing || canPrompt(request))) {
         const confirm = deps.prompts?.confirm ?? confirmPrompt;
         shouldInstall = await confirm({
             default: true,

@@ -68,19 +68,18 @@ only-one init mcp [names] [options]
 | Option         | Description                                                                 |
 | -------------- | --------------------------------------------------------------------------- |
 | `--ide <ides>` | Comma-separated targets: `antigravity`, `claude`, `cursor`, `codex`       |
-| `--yes`        | Non-interactive mode, select all available MCPs and supported targets      |
 
 **Examples**
 
 ```bash
-# Configure all available MCPs for Cursor only
-only-one init mcp --ide cursor --yes
+# Configure all available MCPs for Cursor explicitly
+only-one init mcp github,clockify,gitnexus --ide cursor
 
 # Configure github MCP for all supported targets
 only-one init mcp github --ide antigravity,claude,cursor,codex
 
 # Configure GitNexus MCP for code intelligence across target IDEs
-only-one mcp gitnexus
+only-one mcp gitnexus --ide antigravity,claude,cursor
 ```
 
 > **Note on GitNexus MCP:**
@@ -146,7 +145,6 @@ only-one init package [path] [names] [options]
 | Option         | Description                                                                 |
 | -------------- | --------------------------------------------------------------------------- |
 | `--target <ids>` | Target agent IDs for plugin packages: `antigravity`, `claude`, `cursor`, `codex` |
-| `--yes`        | Non-interactive mode, confirm prompts automatically                         |
 
 Supported packages:
 - **`@fission-ai/openspec`** (npm package, global)

@@ -16,6 +16,7 @@ export interface ExecutePluginActionsOptions {
     pluginManifests?: PluginManifest[];
     selectedPluginIds: string[];
     targetIds: AllowedToolId[];
+    perTargetPluginIds?: Record<string, string[]>;
     execFileAsync?: (file: string, args: string[], options: any) => Promise<{ stdout: string; stderr: string }>;
 }
 
@@ -43,6 +44,9 @@ export const executePluginActions = async (
     for (const plugin of selectedManifests) {
         deps.stdout(`  Configuring plugin ${plugin.id}...`);
         for (const targetId of targetIds) {
+            if (options.perTargetPluginIds && !options.perTargetPluginIds[targetId]?.includes(plugin.id)) {
+                continue;
+            }
             if (!plugin.supportedTargets.includes(targetId)) {
                 skipped.push(`${plugin.id} (${targetId})`);
                 deps.stdout(`    - ${targetId}: skipped (unsupported target)`);

@@ -14,7 +14,7 @@ const parseCsv = (value?: string): string[] =>
         .map((entry) => entry.trim())
         .filter(Boolean) ?? [];
 
-const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: string; yes?: boolean }): Promise<void> => {
+const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: string }): Promise<void> => {
     const { manifests, warnings } = await readMcpManifests();
     for (const warning of warnings) deps.stdout(COLORS.warning(`Warning: skipped ${warning.file}: ${warning.message}`));
     if (!manifests.length) throw new Error('No MCP manifests available');
@@ -22,8 +22,8 @@ const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: s
     const requestedMcpIds = parseCsv(names);
     let selectedMcpIds = requestedMcpIds;
     if (!selectedMcpIds.length) {
-        if (options?.yes || !deps.prompts?.checkbox) {
-            selectedMcpIds = manifests.map((manifest) => manifest.id);
+        if (!deps.prompts?.checkbox) {
+            throw new Error('MCP server selection is required in non-interactive mode. Pass server names positionally.');
         } else {
             selectedMcpIds = await deps.prompts.checkbox({
                 message: 'Select MCP servers to configure',
@@ -41,7 +41,7 @@ const runInitMcp = async (deps: ProgramDeps, names?: string, options?: { ide?: s
 
     const selectedIdeIds = (
         await selectAllowedMcpTargets({
-            automatic: Boolean(options?.yes || !deps.prompts?.checkbox),
+            automatic: false,
             emptyMessage: 'Select at least one target IDE',
             explicit: options?.ide,
             message: 'Select IDEs for global MCP config',
@@ -73,7 +73,6 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .description('🚀 Initialize project with tools, packages, and configurations')
         .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
-        .option('--yes', 'Automatically confirm existence checks and overwrite prompts')
         .option('--no-ignore', 'Skip updating the project .gitignore file with only-one directories')
         .option('--step <name>', 'Run only a single specific initialization step (choices: tools, packages, skills, configs)')
         .option('--skip <names>', 'Comma-separated list of steps to skip (choices: tools, packages, skills, configs)')
@@ -82,7 +81,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
                 `  ${COLORS.cli.command('$ only-one init')}\n` +
-                `  ${COLORS.cli.command('$ only-one init --step skills --yes')}\n` +
+                `  ${COLORS.cli.command('$ only-one init --step skills --tool antigravity,claude')}\n` +
                 `  ${COLORS.cli.command('$ only-one init --skip configs,packages /path/to/project')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('Modifies project configurations and installs custom agent skills.')}\n` +
@@ -95,7 +94,6 @@ export function createInitCommand(deps: ProgramDeps): Command {
             json: Boolean(command.parent?.opts()?.json),
             path,
             options: {
-                yes: options.yes,
                 step: options.step,
                 skip: options.skip,
                 combo: options.combo,
@@ -114,41 +112,32 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of package names to install')
         .option('--target <ids>', 'Comma-separated target agent IDs for plugin packages (antigravity, claude, cursor, codex)')
-        .option('--yes', 'Automatically confirm prompts')
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
                 `  ${COLORS.cli.command('$ only-one init package')}\n` +
-                `  ${COLORS.cli.command('$ only-one init package /path/to/project superpowers --target antigravity,claude --yes')}\n\n` +
+                `  ${COLORS.cli.command('$ only-one init package /path/to/project superpowers --target antigravity,claude')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('Only executes the "packages" step of the initialization process.')}`,
         )
-        .action(
-            async (
-                path: string | undefined,
-                names: string | undefined,
-                options: { target?: string; yes?: boolean; ignore?: boolean },
+        .action(async (path: string | undefined, names: string | undefined, options: { target?: string; ignore?: boolean }, command) => {
+            const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
+            const result = await executeInitCommand(deps, {
                 command,
-            ) => {
-                const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
-                const result = await executeInitCommand(deps, {
-                    command,
-                    json: Boolean(command.parent?.parent?.opts()?.json),
-                    path,
-                    options: { yes: options.yes, noIgnore, step: 'packages', packages: names, target: options.target },
-                });
-                if (!result) return;
-                printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
-            },
-        );
+                json: Boolean(command.parent?.parent?.opts()?.json),
+                path,
+                options: { noIgnore, step: 'packages', packages: names, target: options.target },
+            });
+            if (!result) return;
+            printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
+        });
 
     cmd.command('skill')
         .description('🤖 Synchronize or install custom agent skills only')
         .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of specific skill names to sync')
-        .option('--yes', 'Automatically confirm prompts')
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
@@ -158,13 +147,13 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('Merges skill definitions into the workspace without altering other configurations.')}`,
         )
-        .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
+        .action(async (path: string | undefined, names: string | undefined, options: { ignore?: boolean }, command) => {
             const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
             const result = await executeInitCommand(deps, {
                 command,
                 json: Boolean(command.parent?.parent?.opts()?.json),
                 path,
-                options: { yes: options.yes, noIgnore, step: 'skills', skills: names },
+                options: { noIgnore, step: 'skills', skills: names },
             });
             if (!result) return;
             printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
@@ -175,7 +164,6 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of configuration template names to copy')
-        .option('--yes', 'Automatically confirm prompts')
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
@@ -185,13 +173,13 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('Useful when you want to reset or pull the latest config boilerplate.')}`,
         )
-        .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
+        .action(async (path: string | undefined, names: string | undefined, options: { ignore?: boolean }, command) => {
             const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
             const result = await executeInitCommand(deps, {
                 command,
                 json: Boolean(command.parent?.parent?.opts()?.json),
                 path,
-                options: { yes: options.yes, noIgnore, step: 'configs', configs: names },
+                options: { noIgnore, step: 'configs', configs: names },
             });
             if (!result) return;
             printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
@@ -202,7 +190,6 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[names]', 'Comma-separated list of combo names to apply')
-        .option('--yes', 'Automatically confirm prompts')
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .addHelpText(
             'after',
@@ -212,13 +199,13 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('A combo is a shorthand to install multiple skills and packages in one command.')}`,
         )
-        .action(async (path: string | undefined, names: string | undefined, options: { yes?: boolean; ignore?: boolean }, command) => {
+        .action(async (path: string | undefined, names: string | undefined, options: { ignore?: boolean }, command) => {
             const noIgnore = options.ignore === false || command.parent?.opts()?.ignore === false;
             const result = await executeInitCommand(deps, {
                 command,
                 json: Boolean(command.parent?.parent?.opts()?.json),
                 path,
-                options: { yes: options.yes, noIgnore, combo: names },
+                options: { noIgnore, combo: names },
             });
             if (!result) return;
             printInitResult(deps, Boolean(command.parent?.parent?.opts()?.json), result);
@@ -229,7 +216,6 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .helpOption('-h, --help', 'display help for command')
         .argument('[names]', 'Comma-separated list of MCP server IDs to configure')
         .option('--ide <ids>', 'Comma-separated IDE IDs to configure (antigravity, claude, cursor, codex)')
-        .option('--yes', 'Automatically use defaults when prompts are unavailable')
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
@@ -240,7 +226,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Existing MCP server IDs are skipped, not overwritten.')}\n` +
                 `  - ${COLORS.dim('Secret placeholders are left empty for manual editing.')}`,
         )
-        .action(async (names: string | undefined, options: { ide?: string; yes?: boolean }) => {
+        .action(async (names: string | undefined, options: { ide?: string }) => {
             await runInitMcp(deps, names, options);
         });
 

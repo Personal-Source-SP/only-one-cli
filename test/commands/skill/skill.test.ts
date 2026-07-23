@@ -23,7 +23,7 @@ describe('skill command', () => {
                 },
             });
 
-            await program.parseAsync(['skill', cwd, 'grill-me', '--yes'], { from: 'user' });
+            await program.parseAsync(['skill', cwd, 'grill-me', '--tool', 'cursor'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('SKILLS SYNC REPORT');

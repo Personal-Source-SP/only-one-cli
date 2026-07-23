@@ -13,6 +13,7 @@ export interface ExecutePackageActionsOptions {
     projectDir: string;
     packageManifests: PackageManifest[];
     selectedPackageIds: string[];
+    overwriteList?: string[];
     execFileAsync?: (file: string, args: string[], options: any) => Promise<{ stdout: string; stderr: string }>;
 }
 
@@ -22,7 +23,7 @@ export const executePackageActions = async (
     installedPackages: string[];
     summary: PackageActionResult;
 }> => {
-    const { deps, projectDir, packageManifests, selectedPackageIds } = options;
+    const { deps, projectDir, packageManifests, selectedPackageIds, overwriteList } = options;
 
     const selectedManifests = selectedPackageIds
         .map((id) => packageManifests.find((m) => m.id === id))
@@ -38,6 +39,11 @@ export const executePackageActions = async (
     const runExecFile = options.execFileAsync ?? promisify(execFile);
 
     for (const pkg of selectedManifests) {
+        if (overwriteList && !overwriteList.includes(pkg.id)) {
+            skipped.push(pkg.id);
+            deps.stdout(`  - Skipped ${pkg.id} (already installed)`);
+            continue;
+        }
         const { packageName, scope = 'global' } = pkg.installer;
         deps.stdout(`  Installing ${pkg.id}...`);
         const args = ['install', packageName];

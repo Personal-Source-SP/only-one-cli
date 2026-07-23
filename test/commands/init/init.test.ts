@@ -23,7 +23,7 @@ vi.mock('node:child_process', () => ({
 }));
 
 describe('init command', () => {
-    it('runs init with --yes and skips all steps', async () => {
+    it('runs init and skips all steps', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'init-test-skipall-'));
         const writes: string[] = [];
 
@@ -35,7 +35,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
+            await program.parseAsync(['init', '--skip', 'tools,packages,skills'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
         } finally {
@@ -55,7 +55,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--yes', '--step', 'packages', '--skip', 'tools,skills'], { from: 'user' });
+            await program.parseAsync(['init', '--step', 'packages', '--skip', 'tools,skills'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
         } finally {
@@ -75,7 +75,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', cwd, '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
+            await program.parseAsync(['init', cwd, '--skip', 'tools,packages,skills'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
         } finally {
@@ -95,7 +95,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--yes', '--combo', 'idsd-flow', '--skip', 'tools'], { from: 'user' });
+            await program.parseAsync(['init', '--combo', 'idsd-flow', '--skip', 'tools'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
         } finally {
@@ -119,7 +119,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', 'package', cwd, 'ui-ux-pro-max-cli', '--yes'], { from: 'user' });
+            await program.parseAsync(['init', 'package', cwd, 'ui-ux-pro-max-cli'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('Installing ui-ux-pro-max-cli...');
@@ -149,7 +149,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', 'skill', cwd, '--yes'], { from: 'user' });
+            await program.parseAsync(['init', 'skill', cwd, 'grill-me'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
 
@@ -181,7 +181,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', 'skill', cwd, '--yes', '--no-ignore'], { from: 'user' });
+            await program.parseAsync(['init', 'skill', cwd, 'grill-me', '--no-ignore'], { from: 'user' });
 
             expect(writes.join('\n')).toContain('Init complete');
 
@@ -205,7 +205,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', 'skill', cwd, 'grill-me', '--yes'], { from: 'user' });
+            await program.parseAsync(['init', 'skill', cwd, 'grill-me'], { from: 'user' });
 
             const gitignorePath = join(cwd, '.gitignore');
             const { existsSync } = await import('node:fs');
@@ -222,7 +222,7 @@ describe('init command', () => {
         }
     });
 
-    it('runs init mcp with --yes and configured IDEs', async () => {
+    it('runs init mcp with explicit names and configured IDEs', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'init-test-mcp-'));
         const tempHome = join(cwd, 'home');
         const writes: string[] = [];
@@ -235,7 +235,7 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', 'mcp', '--yes', '--ide', 'cursor'], { from: 'user' });
+            await program.parseAsync(['init', 'mcp', 'github,clockify', '--ide', 'cursor'], { from: 'user' });
 
             const output = writes.join('\n').replace(/\u001b\[\d+m/g, '');
             expect(output).toContain('Cursor:');

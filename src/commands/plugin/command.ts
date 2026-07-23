@@ -20,48 +20,27 @@ export function createPluginCommand(deps: ProgramDeps): Command {
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[ids]', 'Comma-separated list of specific plugin IDs to install')
         .option('--tool <tools>', 'Comma-separated IDE/tool IDs to target')
-        .option('--yes', 'Automatically confirm prompts')
-        .action(async (pathArg: string | undefined, idsArg: string | undefined, options: { tool?: string; yes?: boolean }) => {
+        .action(async (pathArg: string | undefined, idsArg: string | undefined, options: { tool?: string }) => {
             const projectDir = resolveProjectDir(deps, pathArg);
             assertProjectDirectory(projectDir);
 
-            const availablePlugins = PLUGINS.map((p) => p.id);
-
-            if (availablePlugins.length === 0) {
+            if (PLUGINS.length === 0) {
                 deps.stdout(COLORS.warning('No plugins available in assets/plugins.'));
                 return;
             }
 
-            let selectedPluginIds = parseCsv(idsArg);
+            const explicitPluginIds = parseCsv(idsArg);
 
-            if (selectedPluginIds.length === 0) {
-                if (options.yes || !deps.prompts?.checkbox) {
-                    selectedPluginIds = [...availablePlugins];
-                } else {
-                    selectedPluginIds = await deps.prompts.checkbox({
-                        message: 'Select plugins to install (default all):',
-                        choices: availablePlugins.map((id) => ({
-                            name: id,
-                            value: id,
-                            checked: true,
-                        })),
-                    });
-                }
+            if (!options.tool && explicitPluginIds.length > 0 && !deps.prompts?.checkbox) {
+                throw new Error('Target selection is required in non-interactive mode. Specify target using --tool option.');
+            }
+            if (options.tool && explicitPluginIds.length === 0 && !deps.prompts?.checkbox) {
+                throw new Error('Plugin selection is required in non-interactive mode. Pass plugin IDs positionally.');
             }
 
-            if (selectedPluginIds.length === 0) {
-                deps.stdout('No plugins selected. Exiting.');
-                return;
-            }
-
-            for (const pluginId of selectedPluginIds) {
-                if (!availablePlugins.includes(pluginId)) {
-                    throw new Error(`Plugin '${pluginId}' not found in assets/plugins`);
-                }
-            }
-
+            // Step 1: Select agents first
             const targetTools = await selectAllowedAgentTargets({
-                automatic: Boolean(options.yes || !deps.prompts?.checkbox),
+                automatic: false,
                 emptyMessage: 'Select at least one target tool/IDE',
                 explicit: options.tool,
                 message: 'Select target IDEs/Tools for plugin installation:',
@@ -71,9 +50,15 @@ export function createPluginCommand(deps: ProgramDeps): Command {
 
             const targetIds = targetTools.map((t) => t.value as AllowedToolId);
 
-            for (const pluginId of selectedPluginIds) {
-                const plugin = PLUGINS.find((p) => p.id === pluginId);
-                if (plugin) {
+            // Step 2: Resolve per-agent plugin choices
+            const perTargetPluginIds: Record<AllowedToolId, string[]> = {} as Record<AllowedToolId, string[]>;
+
+            if (explicitPluginIds.length > 0) {
+                for (const pluginId of explicitPluginIds) {
+                    const plugin = PLUGINS.find((p) => p.id === pluginId);
+                    if (!plugin) {
+                        throw new Error(`Plugin '${pluginId}' not found in assets/plugins`);
+                    }
                     for (const targetId of targetIds) {
                         if (!plugin.supportedTargets.includes(targetId)) {
                             throw new Error(
@@ -82,6 +67,33 @@ export function createPluginCommand(deps: ProgramDeps): Command {
                         }
                     }
                 }
+                for (const targetId of targetIds) {
+                    perTargetPluginIds[targetId] = explicitPluginIds;
+                }
+            } else if (!deps.prompts?.checkbox) {
+                throw new Error('Plugin selection is required in non-interactive mode. Pass plugin IDs positionally.');
+            } else {
+                for (const targetId of targetIds) {
+                    const compatiblePlugins = PLUGINS.filter((p) => p.supportedTargets.includes(targetId));
+                    if (compatiblePlugins.length === 0) continue;
+
+                    const agentName = targetTools.find((t) => t.value === targetId)?.name ?? targetId;
+                    const selected = await deps.prompts.checkbox({
+                        message: `Select plugins to install for ${agentName}:`,
+                        choices: compatiblePlugins.map((p) => ({
+                            name: p.id,
+                            value: p.id,
+                            checked: true,
+                        })),
+                    });
+                    perTargetPluginIds[targetId] = selected;
+                }
+            }
+
+            const allSelectedPlugins = [...new Set(Object.values(perTargetPluginIds).flat())];
+            if (allSelectedPlugins.length === 0) {
+                deps.stdout('No plugins selected. Exiting.');
+                return;
             }
 
             deps.stdout('\nInstalling plugins...');
@@ -90,8 +102,9 @@ export function createPluginCommand(deps: ProgramDeps): Command {
                 deps,
                 projectDir,
                 pluginManifests: PLUGINS,
-                selectedPluginIds,
+                selectedPluginIds: allSelectedPlugins,
                 targetIds,
+                perTargetPluginIds,
             });
 
             deps.stdout('\n==================================================');

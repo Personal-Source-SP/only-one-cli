@@ -20,57 +20,33 @@ export function createRuleCommand(deps: ProgramDeps): Command {
         .argument('[path]', 'Target project directory path (default: current directory)')
         .argument('[ids]', 'Comma-separated list of specific rule IDs to sync')
         .option('--tool <tools>', 'Comma-separated IDE/tool IDs to target')
-        .option('--yes', 'Automatically confirm prompts')
-        .action(async (pathArg: string | undefined, idsArg: string | undefined, options: { tool?: string; yes?: boolean }) => {
+        .action(async (pathArg: string | undefined, idsArg: string | undefined, options: { tool?: string }) => {
             const projectDir = resolveProjectDir(deps, pathArg);
             assertProjectDirectory(projectDir);
 
-            const availableRules = RULES.map((r) => r.id);
-
-            if (availableRules.length === 0) {
+            if (RULES.length === 0) {
                 deps.stdout(COLORS.warning('No rules available in assets/rules.'));
                 return;
             }
 
-            // Parse selected rules
-            let selectedRuleIds = parseCsv(idsArg);
-            if (selectedRuleIds.length === 0) {
-                if (options.yes || !deps.prompts?.checkbox) {
-                    selectedRuleIds = [...availableRules];
-                } else {
-                    selectedRuleIds = await deps.prompts.checkbox({
-                        message: 'Select rules to sync (default all):',
-                        choices: availableRules.map((id) => ({
-                            name: id,
-                            value: id,
-                            checked: true,
-                        })),
-                    });
-                }
+            const explicitRuleIds = parseCsv(idsArg);
+
+            if (!options.tool && explicitRuleIds.length > 0 && !deps.prompts?.checkbox) {
+                throw new Error('Target selection is required in non-interactive mode. Specify target using --tool option.');
+            }
+            if (options.tool && explicitRuleIds.length === 0 && !deps.prompts?.checkbox) {
+                throw new Error('Rule selection is required in non-interactive mode. Pass rule IDs positionally.');
             }
 
-            if (selectedRuleIds.length === 0) {
-                deps.stdout('No rules selected. Exiting.');
-                return;
-            }
-
-            for (const ruleId of selectedRuleIds) {
-                if (!availableRules.includes(ruleId)) {
-                    throw new Error(`Rule '${ruleId}' not found in assets/rules`);
-                }
-            }
-
-            // Target selection routed through rule capability filtering
+            // Target selection routed through rule capability filtering first
             const targetTools = await selectAllowedRuleTargets({
-                automatic: Boolean(options.yes || !deps.prompts?.checkbox),
+                automatic: false,
                 emptyMessage: 'Select at least one target tool/IDE for rules',
                 explicit: options.tool,
                 message: 'Select target IDEs/Tools for rule installation:',
                 preselected: [],
                 prompts: deps.prompts,
             });
-
-            const targetIds = targetTools.map((t) => t.id as AllowedToolId);
 
             // Reject explicit unsupported targets (such as Codex)
             if (options.tool) {
@@ -80,15 +56,54 @@ export function createRuleCommand(deps: ProgramDeps): Command {
                 }
             }
 
+            const targetIds = targetTools.map((t) => t.id as AllowedToolId);
+
+            // Step 2: Per-agent rule selection
+            const perTargetRuleIds: Record<AllowedToolId, string[]> = {} as Record<AllowedToolId, string[]>;
+
+            if (explicitRuleIds.length > 0) {
+                for (const ruleId of explicitRuleIds) {
+                    const rule = RULES.find((r) => r.id === ruleId);
+                    if (!rule) {
+                        throw new Error(`Rule '${ruleId}' not found in assets/rules`);
+                    }
+                }
+                for (const targetId of targetIds) {
+                    perTargetRuleIds[targetId] = explicitRuleIds;
+                }
+            } else if (!deps.prompts?.checkbox) {
+                throw new Error('Rule selection is required in non-interactive mode. Pass rule IDs positionally.');
+            } else {
+                for (const targetTool of targetTools) {
+                    const targetId = targetTool.id as AllowedToolId;
+                    const compatibleRules = RULES; // All current rules support rule-capable targets
+                    const agentName = targetTool.agent?.name ?? targetTool.vs?.name ?? targetTool.id;
+
+                    const selected = await deps.prompts.checkbox({
+                        message: `Select rules to sync for ${agentName}:`,
+                        choices: compatibleRules.map((r) => ({
+                            name: r.id,
+                            value: r.id,
+                            checked: true,
+                        })),
+                    });
+                    perTargetRuleIds[targetId] = selected;
+                }
+            }
+
+            const allSelectedRuleIds = [...new Set(Object.values(perTargetRuleIds).flat())];
+            if (allSelectedRuleIds.length === 0) {
+                deps.stdout('No rules selected. Exiting.');
+                return;
+            }
+
             // Check duplicate existing rule files
-            const existing = await checkExistingRules(projectDir, targetTools, selectedRuleIds);
+            const existing = await checkExistingRules(projectDir, targetTools, allSelectedRuleIds);
             const alreadyExisting = existing.filter((r) => r.exists);
             let overwriteList: string[] = [];
 
             if (alreadyExisting.length > 0) {
-                if (options.yes || !deps.prompts?.checkbox) {
-                    overwriteList = alreadyExisting.map((r) => `${r.toolId}:${r.ruleId}`);
-                } else {
+                if (deps.prompts?.checkbox) {
                     overwriteList = await deps.prompts.checkbox({
                         message: 'The following rule files already exist. Select which ones you want to overwrite:',
                         choices: alreadyExisting.map((r) => ({
@@ -98,6 +113,7 @@ export function createRuleCommand(deps: ProgramDeps): Command {
                         })),
                     });
                 }
+                // In non-TTY mode, overwriteList remains empty -> existing items are skipped safely
             }
 
             deps.stdout('\nSyncing rules...');
@@ -106,7 +122,7 @@ export function createRuleCommand(deps: ProgramDeps): Command {
                 deps,
                 projectDir,
                 selectedTargets: targetTools,
-                ruleIds: selectedRuleIds,
+                ruleIds: allSelectedRuleIds,
                 overwriteList,
             });
 

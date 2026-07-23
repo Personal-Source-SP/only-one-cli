@@ -14,7 +14,6 @@ export interface InstallMissingOptions {
 }
 
 export interface DoctorCommandOptions {
-    yes?: boolean;
     mode?: string;
     noInstall?: boolean;
     installMissing?: boolean;
@@ -22,7 +21,6 @@ export interface DoctorCommandOptions {
 }
 
 export interface DoctorInstallFlowOptions {
-    yes?: boolean;
     json?: boolean;
     noInstall?: boolean;
     installMissing?: boolean;

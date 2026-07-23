@@ -32,7 +32,7 @@ describe('combo command', () => {
                 },
             });
 
-            await program.parseAsync(['combo', cwd, 'idsd-flow', '--tool', 'cursor', '--yes'], { from: 'user' });
+            await program.parseAsync(['combo', cwd, 'idsd-flow', '--tool', 'cursor'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('Processing combo:');

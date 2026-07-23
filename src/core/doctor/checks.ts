@@ -527,7 +527,7 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
     if (status === 'MISSING') {
         return [
             {
-                command: 'only-one doctor --yes',
+                command: 'only-one doctor --install-missing',
                 description: 'Install missing GitNexus/CocoIndex dependencies',
             },
             {

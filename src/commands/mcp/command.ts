@@ -17,8 +17,7 @@ export function createMcpCommand(deps: ProgramDeps): Command {
         .helpOption('-h, --help', 'display help for command')
         .argument('[names]', 'Comma-separated list of MCP server IDs to configure')
         .option('--ide <ides>', 'Comma-separated target IDs (antigravity, claude, cursor, codex)')
-        .option('--yes', 'Automatically confirm prompts')
-        .action(async (namesArg: string | undefined, options: { ide?: string; yes?: boolean }) => {
+        .action(async (namesArg: string | undefined, options: { ide?: string }) => {
             const { manifests, warnings } = await readMcpManifests();
             for (const warning of warnings) {
                 deps.stdout(COLORS.warning(`Warning: skipped ${warning.file}: ${warning.message}`));
@@ -30,7 +29,7 @@ export function createMcpCommand(deps: ProgramDeps): Command {
 
             const selectedIdeIds = (
                 await selectAllowedMcpTargets({
-                    automatic: Boolean(options.yes || !deps.prompts?.checkbox),
+                    automatic: false,
                     emptyMessage: 'Select at least one target IDE',
                     explicit: options.ide,
                     message: 'Select target IDEs for global MCP sync:',
@@ -41,8 +40,8 @@ export function createMcpCommand(deps: ProgramDeps): Command {
             // 2. Select MCPs
             let selectedMcpIds = parseCsv(namesArg);
             if (selectedMcpIds.length === 0) {
-                if (options.yes || !deps.prompts?.checkbox) {
-                    selectedMcpIds = manifests.map((m) => m.id);
+                if (!deps.prompts?.checkbox) {
+                    throw new Error('MCP server selection is required in non-interactive mode. Pass server names positionally.');
                 } else {
                     selectedMcpIds = await deps.prompts.checkbox({
                         message: 'Select MCP servers to configure (default all):',
@@ -75,9 +74,7 @@ export function createMcpCommand(deps: ProgramDeps): Command {
 
             // 4. Verification Checkbox Prompt
             if (alreadyExisting.length > 0) {
-                if (options.yes || !deps.prompts?.checkbox) {
-                    overwriteList = alreadyExisting.map((m) => `${m.ideId}:${m.mcpId}`);
-                } else {
+                if (deps.prompts?.checkbox) {
                     overwriteList = await deps.prompts.checkbox({
                         message: 'The following MCP configurations already exist. Select which ones you want to overwrite/reconfigure:',
                         choices: alreadyExisting.map((m) => ({

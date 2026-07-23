@@ -41,7 +41,12 @@ export const selectTargets = async <T extends string>(request: TargetSelectionRe
     const { choices, explicit, preselected = [] } = request;
     if (!choices.length) throw new Error('No supported targets are available');
     if (explicit?.trim()) return resolveExplicit(choices, explicit);
-    if (request.automatic || !request.prompts?.checkbox) return choices.map((choice) => choice.value);
+    if (request.automatic) return choices.map((choice) => choice.value);
+    if (!request.prompts?.checkbox) {
+        throw new Error(
+            `Target selection is required in non-interactive mode. Specify target using --tool or --ide options. Valid targets: ${getValidIds(choices)}`,
+        );
+    }
 
     const selected = await request.prompts.checkbox({
         message: request.message,

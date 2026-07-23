@@ -1,7 +1,6 @@
 import type { AgentToolOption } from '@/core/agent/tools.js';
 
 export interface InitCommandOptions {
-    yes?: boolean;
     step?: string;
     skip?: string;
     combo?: string;

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { selectTargets } from '@src/core/target-selection/index.js';
+import {
+    createTargetAssetPlan,
+    filterCompatibleAssets,
+    formatMissingArgumentError,
+    selectTargets,
+} from '@src/core/target-selection/index.js';
 
 const choices = [
     { name: 'Antigravity', value: 'antigravity' },
@@ -63,5 +68,67 @@ describe('selectTargets', () => {
                 prompts: { checkbox: async () => [] },
             }),
         ).rejects.toThrow('Choose at least one tool');
+    });
+
+    it('fails in non-interactive mode when prompts are unavailable and automatic is false', async () => {
+        await expect(
+            selectTargets({
+                automatic: false,
+                choices,
+                message: 'Select target',
+            }),
+        ).rejects.toThrow();
+    });
+});
+
+describe('createTargetAssetPlan & plan utilities', () => {
+    const assets = [
+        { id: 'p1', name: 'Plugin 1', supportedTargets: ['antigravity', 'claude'] },
+        { id: 'p2', name: 'Plugin 2', supportedTargets: ['claude', 'cursor'] },
+        { id: 'p3', name: 'Plugin 3' }, // supports all
+    ] as const;
+
+    it('filters compatible assets correctly', () => {
+        const antigravityAssets = filterCompatibleAssets(assets, 'antigravity');
+        expect(antigravityAssets.map((a) => a.id)).toEqual(['p1', 'p3']);
+    });
+
+    it('creates target asset plan preserving target and asset order', () => {
+        const plan = createTargetAssetPlan(['antigravity', 'claude'], assets, {
+            antigravity: ['p1', 'p3'],
+            claude: ['p2', 'p1'],
+        });
+
+        expect(plan).toEqual([
+            {
+                targetId: 'antigravity',
+                assetIds: ['p1', 'p3'],
+                assets: [assets[0], assets[2]],
+            },
+            {
+                targetId: 'claude',
+                assetIds: ['p2', 'p1'],
+                assets: [assets[1], assets[0]],
+            },
+        ]);
+    });
+
+    it('throws error when selecting an incompatible asset for a target', () => {
+        expect(() =>
+            createTargetAssetPlan(['antigravity'], assets, {
+                antigravity: ['p2'],
+            }),
+        ).toThrow("Asset 'p2' is not compatible with target 'antigravity'.");
+    });
+
+    it('formats missing argument error cleanly', () => {
+        const err = formatMissingArgumentError('target', {
+            requiredArg: 'PLUGIN_ID',
+            optionFlag: '--tool or --ide',
+            validValues: ['antigravity', 'claude'],
+        });
+        expect(err).toBe(
+            "Missing required positional argument 'PLUGIN_ID'. Specify using --tool or --ide. Valid values: antigravity, claude.",
+        );
     });
 });

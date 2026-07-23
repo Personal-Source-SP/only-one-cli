@@ -203,7 +203,7 @@ describe('only-one CLI', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--yes', '--skip', 'tools,packages,skills'], { from: 'user' });
+            await program.parseAsync(['init', '--skip', 'tools,packages,skills'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('Init complete');
@@ -224,7 +224,7 @@ describe('only-one CLI', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', '--yes', '--step', 'packages', '--skip', 'tools,skills'], { from: 'user' });
+            await program.parseAsync(['init', '--step', 'packages', '--skip', 'tools,skills'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('Init complete');

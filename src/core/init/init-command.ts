@@ -310,7 +310,6 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         assertProjectDirectory(projectDir);
 
         const options = request.options;
-        const yes = options.yes ?? false;
         const skip = options.skip ? options.skip.split(',').map((s) => s.trim()) : [];
         const step = options.step;
         const comboOption = options.combo;
@@ -319,9 +318,9 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         const openspecPkg = (await readPackageManifests()).find((m) => m.id === '@fission-ai/openspec');
         const isOpenSpecInstalled = openspecPkg ? await isPackageInstalled(openspecPkg, projectDir) : false;
         if (!isOpenSpecInstalled && !isJson) {
-            if (yes) {
-                deps.stdout('\nOpenSpec CLI (@fission-ai/openspec) is not installed. Installing globally...');
-                await npmInstall('@fission-ai/openspec', 'global', projectDir);
+            if (!deps.prompts?.checkbox) {
+                // Non-TTY mode: report OpenSpec CLI is missing rather than prompt
+                deps.stdout('\nOpenSpec CLI (@fission-ai/openspec) is not installed.');
             } else {
                 const installOpenSpec = await confirm({
                     message: 'OpenSpec CLI (@fission-ai/openspec) is not installed. Do you want to install it globally?',
@@ -487,7 +486,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                     }
                 }
 
-                if (yes || !deps.prompts?.checkbox) {
+                if (!deps.prompts?.checkbox) {
                     selectedMcpNames = preSelectedMcps.size > 0 ? Array.from(preSelectedMcps) : [];
                 } else {
                     const choices = manifests.map((m) => {
@@ -639,7 +638,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
         deps.stdout('\n==================================================');
 
         // Confirm execution
-        if (!yes) {
+        if (deps.prompts?.checkbox) {
             const proceed = await confirm({
                 message: 'Proceed with the above changes?',
                 default: true,
@@ -789,9 +788,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
             const alreadyExisting = existingSkills.filter((s) => s.exists);
             let overwriteList: string[] = [];
             if (alreadyExisting.length > 0) {
-                if (yes || !deps.prompts?.checkbox) {
-                    overwriteList = alreadyExisting.map((s) => `${s.toolId}:${s.skillName}`);
-                } else {
+                if (deps.prompts?.checkbox) {
                     overwriteList = await deps.prompts.checkbox({
                         message: 'The following skills already exist. Select which ones you want to overwrite/reinstall:',
                         choices: alreadyExisting.map((s) => ({
@@ -843,8 +840,8 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 const missingWorkflows = Array.from(new Set(checks.filter((w) => !w.exists).map((w) => w.workflowName)));
 
                 if (missingWorkflows.length > 0) {
-                    let installWfs = yes;
-                    if (!yes) {
+                    let installWfs = false;
+                    if (deps.prompts?.checkbox) {
                         deps.stdout('\n');
                         installWfs = await confirm({
                             message: `The selected skills are associated with workflow(s): ${missingWorkflows.join(', ')}. Would you like to install them as well?`,
@@ -932,9 +929,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                     const alreadyExistingMcps = existingMcps.filter((m) => m.exists);
                     let mcpOverwriteList: string[] = [];
                     if (alreadyExistingMcps.length > 0) {
-                        if (yes || !deps.prompts?.checkbox) {
-                            mcpOverwriteList = alreadyExistingMcps.map((m) => `${m.ideId}:${m.mcpId}`);
-                        } else {
+                        if (deps.prompts?.checkbox) {
                             mcpOverwriteList = await deps.prompts.checkbox({
                                 message:
                                     'The following MCP configurations already exist. Select which ones you want to overwrite/reconfigure:',

@@ -360,7 +360,10 @@ describe('doctor checks (existing)', () => {
 
         it('returns install commands when dependencies are missing', () => {
             const commands = buildSampleCommands('MISSING');
-            expect(commands.map((item) => item.command)).toEqual(['only-one doctor --yes', 'only-one doctor --print-install-script']);
+            expect(commands.map((item) => item.command)).toEqual([
+                'only-one doctor --install-missing',
+                'only-one doctor --print-install-script',
+            ]);
         });
 
         it('returns index lifecycle commands when ready', () => {

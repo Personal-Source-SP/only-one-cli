@@ -24,7 +24,7 @@ describe('mcp command', () => {
                 },
             });
 
-            await program.parseAsync(['mcp', 'github', '--ide', 'cursor', '--yes'], { from: 'user' });
+            await program.parseAsync(['mcp', 'github', '--ide', 'cursor'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('MCP SYNC REPORT');
@@ -62,7 +62,7 @@ it('rejects unsupported targets before writing configuration', async () => {
     }
 });
 
-it('selects every MCP-capable target with --yes', async () => {
+it('selects every MCP-capable target with --ide all', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'mcp-all-targets-'));
     const tempHome = join(cwd, 'home');
 
@@ -74,7 +74,7 @@ it('selects every MCP-capable target with --yes', async () => {
             stdout: () => undefined,
         });
 
-        await program.parseAsync(['mcp', 'github', '--yes'], { from: 'user' });
+        await program.parseAsync(['mcp', 'github', '--ide', 'all'], { from: 'user' });
 
         expect(existsSync(join(tempHome, 'Library', 'Application Support', 'Antigravity IDE', 'User', 'mcp.json'))).toBe(true);
         expect(existsSync(join(tempHome, '.claude.json'))).toBe(true);
@@ -100,7 +100,7 @@ it('configures gitnexus via CLI without requiring manual credential instructions
             stdout: (line) => writes.push(line),
         });
 
-        await program.parseAsync(['mcp', 'gitnexus', '--ide', 'cursor', '--yes'], { from: 'user' });
+        await program.parseAsync(['mcp', 'gitnexus', '--ide', 'cursor'], { from: 'user' });
 
         const output = writes.join('\n');
         expect(output).toContain('MCP SYNC REPORT');
