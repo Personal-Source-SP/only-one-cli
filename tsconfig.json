@@ -7,13 +7,14 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "outDir": "dist",
-        "types": ["node", "vscode"],
+        "jsx": "react-jsx",
+        "types": ["node"],
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"],
             "@assets/*": ["./assets/*"]
         }
     },
-    "include": ["src/**/*.ts", "assets/**/*.ts"],
+    "include": ["src/**/*.ts", "src/**/*.tsx", "assets/**/*.ts"],
     "exclude": ["test/**/*.ts"]
 }

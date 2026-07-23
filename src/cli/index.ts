@@ -13,6 +13,7 @@ import {
     createRuleCommand,
     createMcpCommand,
     createComboCommand,
+    createTuiCommand,
 } from '@/commands/index.js';
 import { COLORS, VERSION } from '@/constants/index.js';
 import type { ProgramDeps } from './deps.js';
@@ -87,6 +88,7 @@ export function createProgram(deps: ProgramDeps) {
 
     program.addCommand(createUpdateCommand(deps));
 
+    program.addCommand(createTuiCommand(deps));
     program.addCommand(createDoctorCommand(deps));
     program.addCommand(createSettingVsCommand(deps));
     program.addCommand(createExtensionsVsCommand(deps));

@@ -33,7 +33,7 @@ if (isCliEntrypoint(import.meta.url) || process.env.ONLY_ONE_CLI_BYPASS_ENTRYPOI
     });
 
     if (process.argv.length <= 2) {
-        process.argv.push('--help');
+        process.argv.push('tui');
     }
 
     try {
