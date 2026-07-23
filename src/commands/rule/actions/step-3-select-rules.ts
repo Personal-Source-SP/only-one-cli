@@ -1,6 +1,6 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import { checkExistingRules } from '@/core/rule/index.js';
-import type { RuleTargetOption } from '@/core/target-selection/types.js';
+import type { AllowedTarget } from '@/core/target-selection/catalog.js';
 import { RULES } from '@assets/rules/index.js';
 import { parseCsv } from '@/utils/index.js';
 import type { RuleCommandOptions } from '../types.js';
@@ -10,7 +10,7 @@ export const selectRulesStep = async (
     projectDir: string,
     idsArg: string | undefined,
     options: RuleCommandOptions,
-    targetTools: RuleTargetOption[],
+    targetTools: AllowedTarget[],
     agentName: string,
 ): Promise<{ selectedRuleIds: string[]; allExistingRules: Awaited<ReturnType<typeof checkExistingRules>> }> => {
     const explicitRuleIds = parseCsv(idsArg);

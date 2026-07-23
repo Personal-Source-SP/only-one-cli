@@ -1,12 +1,12 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
 import { installRules } from '@/core/rule/index.js';
-import type { RuleTargetOption } from '@/core/target-selection/types.js';
+import type { AllowedTarget } from '@/core/target-selection/catalog.js';
 
 export const executeAndReportRulesStep = async (
     deps: ProgramDeps,
     projectDir: string,
-    targetTools: RuleTargetOption[],
+    targetTools: AllowedTarget[],
     selectedRuleIds: string[],
     overwriteList: string[],
 ): Promise<void> => {

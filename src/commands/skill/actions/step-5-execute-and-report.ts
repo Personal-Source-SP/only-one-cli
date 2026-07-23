@@ -1,8 +1,8 @@
 import { confirm } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
+import type { AgentToolOption } from '@/core/agent/tools.js';
 import { installSkills } from '@/core/skill/index.js';
-import type { TargetSelectionOption } from '@/core/target-selection/types.js';
 import { checkExistingWorkflows, installWorkflows } from '@/core/workflow/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import type { SkillCommandOptions } from '../types.js';
@@ -10,7 +10,7 @@ import type { SkillCommandOptions } from '../types.js';
 export const executeAndReportSkillsStep = async (
     deps: ProgramDeps,
     projectDir: string,
-    targetTools: TargetSelectionOption[],
+    targetTools: AgentToolOption[],
     selectedSkills: string[],
     overwriteList: string[],
     options: SkillCommandOptions,

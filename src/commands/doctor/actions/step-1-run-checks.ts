@@ -1,5 +1,5 @@
-import { checkGit, checkNode, type DoctorCheckResult } from '@/core/doctor/checks.js';
+import { checkGit, checkNode, type CheckResult } from '@/core/doctor/checks.js';
 
-export const runDoctorChecksStep = async (): Promise<DoctorCheckResult[]> => {
+export const runDoctorChecksStep = async (): Promise<CheckResult[]> => {
     return Promise.all([checkGit(), checkNode()]);
 };

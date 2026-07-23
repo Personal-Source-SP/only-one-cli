@@ -1,13 +1,13 @@
 import { homedir } from 'node:os';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { checkExistingComboComponents, type ComboManifest } from '@/core/combo/index.js';
-import type { TargetSelectionOption } from '@/core/target-selection/types.js';
+import type { AgentToolOption } from '@/core/agent/tools.js';
+import { checkExistingComboComponents, type ExtendedComboManifest } from '@/core/combo/index.js';
 
 export const confirmComboOverwriteStep = async (
     deps: ProgramDeps,
     projectDir: string,
-    combo: ComboManifest,
-    targetTools: TargetSelectionOption[],
+    combo: ExtendedComboManifest,
+    targetTools: AgentToolOption[],
 ): Promise<string[]> => {
     const checks = await checkExistingComboComponents({
         projectDir,

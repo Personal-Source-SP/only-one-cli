@@ -1,16 +1,16 @@
 import { homedir } from 'node:os';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { checkExistingComboComponents, type ComboManifest } from '@/core/combo/index.js';
-import type { TargetSelectionOption } from '@/core/target-selection/types.js';
+import type { AgentToolOption } from '@/core/agent/tools.js';
+import { checkExistingComboComponents, type ExtendedComboManifest } from '@/core/combo/index.js';
 import { parseCsv } from '@/utils/index.js';
 
 export const selectCombosStep = async (
     deps: ProgramDeps,
     projectDir: string,
     namesArg: string | undefined,
-    availableCombos: ComboManifest[],
-    targetTool: TargetSelectionOption,
-    targetTools: TargetSelectionOption[],
+    availableCombos: ExtendedComboManifest[],
+    targetTool: AgentToolOption,
+    targetTools: AgentToolOption[],
 ): Promise<string[]> => {
     const comboChecks = await Promise.all(
         availableCombos.map(async (c) => {

@@ -1,14 +1,14 @@
 import { homedir } from 'node:os';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { checkExistingMcps, type McpManifest } from '@/core/mcp/index.js';
-import type { TargetSelectionOption } from '@/core/target-selection/types.js';
+import type { McpIdeAdapter } from '@/core/mcp/types.js';
 import { parseCsv } from '@/utils/index.js';
 
 export const selectMcpsStep = async (
     deps: ProgramDeps,
     namesArg: string | undefined,
     manifests: McpManifest[],
-    selectedIde: TargetSelectionOption,
+    selectedIde: McpIdeAdapter,
 ): Promise<{ selectedMcpIds: string[]; selectedManifests: McpManifest[]; allExisting: Awaited<ReturnType<typeof checkExistingMcps>> }> => {
     const homeDir = deps.env.HOME || deps.env.USERPROFILE || homedir();
     const selectedIdeIds = [selectedIde.id];

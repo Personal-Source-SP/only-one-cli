@@ -1,13 +1,13 @@
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { AllowedTarget } from '@/core/target-selection/catalog.js';
 import { selectSingleAllowedRuleTarget } from '@/core/target-selection/index.js';
-import type { RuleTargetOption } from '@/core/target-selection/types.js';
 import type { RuleCommandOptions } from '../types.js';
 
 export const selectRuleTargetStep = async (
     deps: ProgramDeps,
     options: RuleCommandOptions,
     explicitRuleIds: string[],
-): Promise<{ selectedTarget: RuleTargetOption; targetTools: RuleTargetOption[]; agentName: string }> => {
+): Promise<{ selectedTarget: AllowedTarget; targetTools: AllowedTarget[]; agentName: string }> => {
     if (!options.tool && explicitRuleIds.length > 0 && !deps.prompts?.checkbox) {
         throw new Error('Target selection is required in non-interactive mode. Specify target using --tool option.');
     }

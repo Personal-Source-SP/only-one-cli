@@ -3,7 +3,14 @@ import { PercentProgressReporter } from './progress.js';
 import { nodeVsFileSystem, NodeVsProcessRunner } from './runtime.js';
 import { resolveVsJournalPath, VsSyncTransaction } from './transaction.js';
 import { findVsEditor } from './editors.js';
-import type { VsEditorId, VsFileSystem, VsProcessRunner } from './types.js';
+import type { VsEditorDescriptor, VsEditorId, VsFileSystem, VsProcessRunner } from './types.js';
+
+export interface ExistingVsExtensionCheck {
+    editorId: VsEditorId;
+    editorName: string;
+    extensionId: string;
+    exists: boolean;
+}
 
 export interface VsExtensionsSyncRequest {
     cwd: string;
@@ -13,6 +20,8 @@ export interface VsExtensionsSyncRequest {
     fs?: VsFileSystem;
     libraryDir?: string;
     runner?: VsProcessRunner;
+    extensionIds?: string[];
+    extensionIdsPerEditor?: Record<VsEditorId, string[]>;
 }
 
 export interface VsExtensionsSyncResponse {
@@ -23,10 +32,53 @@ export interface VsExtensionsSyncResponse {
     }>;
 }
 
-const listInstalledExtensions = async (runner: VsProcessRunner, command: string): Promise<string[]> => {
+export const resolveVsEditorCommand = async (runner: VsProcessRunner, editor: VsEditorDescriptor): Promise<string> => {
+    for (const candidate of editor.commandCandidates) {
+        const check = await runner.run(candidate, ['--version']);
+        if (check.code === 0) {
+            return candidate;
+        }
+    }
+    return editor.commandCandidates[0];
+};
+
+export const getVsInstalledExtensions = async (runner: VsProcessRunner, command: string): Promise<string[]> => {
     const result = await runner.run(command, ['--list-extensions']);
     if (result.code !== 0) throw new Error(result.stderr || `Failed to list extensions with ${command}`);
     return normalizeExtensionIds(result.stdout.split(/\r?\n/));
+};
+
+export const checkExistingVsExtensions = async (options: {
+    editorIds: VsEditorId[];
+    extensionIds: string[];
+    runner?: VsProcessRunner;
+}): Promise<ExistingVsExtensionCheck[]> => {
+    const runner = options.runner ?? new NodeVsProcessRunner();
+    const checks: ExistingVsExtensionCheck[] = [];
+
+    for (const editorId of options.editorIds) {
+        const editor = findVsEditor(editorId);
+        if (!editor) continue;
+        const command = await resolveVsEditorCommand(runner, editor);
+        let installedList: string[] = [];
+        try {
+            installedList = await getVsInstalledExtensions(runner, command);
+        } catch {
+            installedList = [];
+        }
+        const installedSet = new Set(installedList.map((id) => id.toLowerCase()));
+
+        for (const extensionId of options.extensionIds) {
+            checks.push({
+                editorId,
+                editorName: editor.name,
+                extensionId,
+                exists: installedSet.has(extensionId.toLowerCase()),
+            });
+        }
+    }
+
+    return checks;
 };
 
 export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promise<VsExtensionsSyncResponse> => {
@@ -42,20 +94,25 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
     const plans: Array<{ command: string; editorName: string; extensionIds: string[] }> = [];
     for (const editor of editors) {
         if (!editor) continue;
-        let command = editor.commandCandidates[0];
-        for (const candidate of editor.commandCandidates) {
-            const check = await runner.run(candidate, ['--version']);
-            if (check.code === 0) {
-                command = candidate;
-                break;
-            }
+        const command = await resolveVsEditorCommand(runner, editor);
+        const targetExtensions = request.extensionIdsPerEditor?.[editor.id] ?? request.extensionIds ?? manifest.extensions;
+
+        const isExplicitSelection = Boolean(request.extensionIdsPerEditor || request.extensionIds);
+
+        if (request.force || isExplicitSelection) {
+            plans.push({
+                command,
+                editorName: editor.name,
+                extensionIds: targetExtensions,
+            });
+        } else {
+            const installed = new Set((await getVsInstalledExtensions(runner, command)).map((id) => id.toLowerCase()));
+            plans.push({
+                command,
+                editorName: editor.name,
+                extensionIds: targetExtensions.filter((id) => !installed.has(id.toLowerCase())),
+            });
         }
-        const installed = new Set((await listInstalledExtensions(runner, command)).map((id) => id.toLowerCase()));
-        plans.push({
-            command,
-            editorName: editor.name,
-            extensionIds: request.force ? manifest.extensions : manifest.extensions.filter((id) => !installed.has(id.toLowerCase())),
-        });
     }
 
     const total = plans.reduce((sum, plan) => sum + plan.extensionIds.length, 0) + 2;

@@ -1,8 +1,8 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import type { DoctorCheckResult } from '@/core/doctor/checks.js';
+import type { CheckResult } from '@/core/doctor/checks.js';
 
-export const reportDoctorResultsStep = (deps: ProgramDeps, checks: DoctorCheckResult[]): void => {
+export const reportDoctorResultsStep = (deps: ProgramDeps, checks: CheckResult[]): void => {
     let hasFailure = false;
     for (const check of checks) {
         if (check.ok) {

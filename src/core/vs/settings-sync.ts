@@ -7,6 +7,15 @@ import { resolveVsJournalPath, VsSyncTransaction } from './transaction.js';
 import { findVsEditor } from './editors.js';
 import { VsPlatform, type VsEditorId, type VsFileSystem, type VsProcessRunner } from './types.js';
 
+export interface ExistingVsSettingCheck {
+    editorId: VsEditorId;
+    editorName: string;
+    key: string;
+    exists: boolean;
+    currentValue?: unknown;
+    newValue?: unknown;
+}
+
 export interface VsSettingsSyncRequest {
     cwd: string;
     editorIds: VsEditorId[];
@@ -17,6 +26,8 @@ export interface VsSettingsSyncRequest {
     fs?: VsFileSystem;
     libraryDir?: string;
     runner?: VsProcessRunner;
+    settingKeys?: string[];
+    settingKeysPerEditor?: Record<VsEditorId, string[]>;
 }
 
 export interface VsSettingsSyncResponse {
@@ -28,7 +39,7 @@ export interface VsSettingsSyncResponse {
     }>;
 }
 
-const flattenSettings = (obj: Record<string, unknown>, prefix = ''): Record<string, unknown> => {
+export const flattenSettings = (obj: Record<string, unknown>, prefix = ''): Record<string, unknown> => {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
@@ -39,6 +50,72 @@ const flattenSettings = (obj: Record<string, unknown>, prefix = ''): Record<stri
         }
     }
     return result;
+};
+
+export const filterSettingsByKeyList = (settingsObj: Record<string, unknown>, allowedKeys: string[]): Record<string, unknown> => {
+    const flat = flattenSettings(settingsObj);
+    const allowedSet = new Set(allowedKeys);
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(flat)) {
+        if (!allowedSet.has(key)) continue;
+
+        const parts = key.split('.');
+        let current = result;
+        for (let i = 0; i < parts.length - 1; i += 1) {
+            const part = parts[i];
+            if (!current[part] || typeof current[part] !== 'object') {
+                current[part] = {};
+            }
+            current = current[part] as Record<string, unknown>;
+        }
+        current[parts[parts.length - 1]] = value;
+    }
+
+    return result;
+};
+
+export const checkExistingVsSettings = async (options: {
+    editorIds: VsEditorId[];
+    homeDir: string;
+    platform: VsPlatform;
+    fs?: VsFileSystem;
+    libraryDir?: string;
+}): Promise<ExistingVsSettingCheck[]> => {
+    const fs = options.fs ?? nodeVsFileSystem;
+    const manifest = await loadVsLibraryManifest(fs, options.libraryDir);
+    const manifestFlat = flattenSettings(manifest.settings);
+    const manifestKeys = Object.keys(manifestFlat);
+    const checks: ExistingVsSettingCheck[] = [];
+
+    for (const editorId of options.editorIds) {
+        const editor = findVsEditor(editorId);
+        if (!editor) continue;
+
+        const targetPath = editor.resolveSettingsPath(options.homeDir, options.platform);
+        let target: Record<string, unknown> = {};
+        try {
+            target = parseJsoncObject(await fs.readFile(targetPath));
+        } catch {
+            target = {};
+        }
+
+        const targetFlat = flattenSettings(target);
+
+        for (const key of manifestKeys) {
+            const exists = key in targetFlat;
+            checks.push({
+                currentValue: targetFlat[key],
+                editorId,
+                editorName: editor.name,
+                exists,
+                key,
+                newValue: manifestFlat[key],
+            });
+        }
+    }
+
+    return checks;
 };
 
 export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<VsSettingsSyncResponse> => {
@@ -76,7 +153,10 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
             }
             await transaction.backupFile(targetPath);
 
-            const nextSettings = request.force ? manifest.settings : mergeSettings(target, manifest.settings);
+            const allowedKeys = request.settingKeysPerEditor?.[editor.id] ?? request.settingKeys;
+            const settingsToMerge = allowedKeys ? filterSettingsByKeyList(manifest.settings, allowedKeys) : manifest.settings;
+
+            const nextSettings = request.force ? settingsToMerge : mergeSettings(target, settingsToMerge);
 
             // Compute diff
             const oldFlat = flattenSettings(target);
@@ -96,9 +176,9 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
             }
 
             results.push({
+                changedKeys,
                 editorName: editor.name,
                 newKeys,
-                changedKeys,
             });
 
             await transaction.atomicWrite(targetPath, stringifySettings(nextSettings));

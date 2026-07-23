@@ -1,6 +1,6 @@
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { AgentToolOption } from '@/core/agent/tools.js';
 import { checkExistingSkills } from '@/core/skill/index.js';
-import type { TargetSelectionOption } from '@/core/target-selection/types.js';
 import { parseCsv } from '@/utils/index.js';
 
 export const selectSkillsStep = async (
@@ -8,8 +8,8 @@ export const selectSkillsStep = async (
     projectDir: string,
     namesArg: string | undefined,
     availableSkills: string[],
-    targetTool: TargetSelectionOption,
-    targetTools: TargetSelectionOption[],
+    targetTool: AgentToolOption,
+    targetTools: AgentToolOption[],
 ): Promise<{ selectedSkills: string[]; allExistingSkills: Awaited<ReturnType<typeof checkExistingSkills>> }> => {
     const allExistingSkills = await checkExistingSkills(projectDir, targetTools, availableSkills);
 

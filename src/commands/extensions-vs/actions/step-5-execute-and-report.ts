@@ -3,12 +3,19 @@ import { syncVsExtensions, type VsEditorId } from '@/core/vs/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { ExtensionsVsCommandOptions } from '../types.js';
 
-export const syncExtensionsStep = async (
+export const executeAndReportStep = async (
     deps: ProgramDeps,
     editorIds: VsEditorId[],
+    extensionIdsPerEditor: Record<VsEditorId, string[]>,
     options: ExtensionsVsCommandOptions,
 ): Promise<void> => {
-    const result = await syncVsExtensions({ cwd: deps.cwd, editorIds, write: deps.stdout, force: options.force });
+    const result = await syncVsExtensions({
+        cwd: deps.cwd,
+        editorIds,
+        extensionIdsPerEditor,
+        force: options.force,
+        write: deps.stdout,
+    });
 
     deps.stdout(COLORS.cli.header('\nSync Summary:'));
     for (const res of result.results) {

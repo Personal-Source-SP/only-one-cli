@@ -1,6 +1,6 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { AllowedToolId } from '@/constants/allowed-tools.js';
-import type { TargetSelectionOption } from '@/core/target-selection/index.js';
+import type { AgentToolOption } from '@/core/agent/tools.js';
 import { PLUGINS } from '@assets/plugins/index.js';
 import { parseCsv } from '@/utils/index.js';
 import type { PluginCommandOptions } from '../types.js';
@@ -9,7 +9,7 @@ export const selectPluginsStep = async (
     deps: ProgramDeps,
     idsArg: string | undefined,
     options: PluginCommandOptions,
-    targetTool: TargetSelectionOption,
+    targetTool: AgentToolOption,
     targetId: AllowedToolId,
 ): Promise<string[]> => {
     const explicitPluginIds = parseCsv(idsArg);

@@ -1,14 +1,14 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { AllowedToolId } from '@/constants/allowed-tools.js';
+import type { AgentToolOption } from '@/core/agent/tools.js';
 import { selectSingleAllowedAgentTarget } from '@/core/target-selection/index.js';
-import type { TargetSelectionOption } from '@/core/target-selection/types.js';
 import type { PluginCommandOptions } from '../types.js';
 
 export const selectPluginTargetStep = async (
     deps: ProgramDeps,
     options: PluginCommandOptions,
     explicitPluginIds: string[],
-): Promise<{ targetTool: TargetSelectionOption; targetId: AllowedToolId; targetIds: AllowedToolId[] }> => {
+): Promise<{ targetTool: AgentToolOption; targetId: AllowedToolId; targetIds: AllowedToolId[] }> => {
     if (!options.tool && explicitPluginIds.length > 0 && !deps.prompts?.checkbox) {
         throw new Error('Target selection is required in non-interactive mode. Specify target using --tool option.');
     }
