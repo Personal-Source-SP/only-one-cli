@@ -101,15 +101,6 @@ The CLI includes pre-built agent workflows:
    - Requires setting `CLOCKIFY_API_KEY` in the IDE's MCP environment config file.
    - Parses task format `[Label] Description | start-endh`, validates overlapping slots in GMT+7, and logs to Clockify.
 
-3. **`only-one-plan`**: Perform grounded codebase discovery and draft approved planning artifacts.
-   - Supported targets: Antigravity, Claude, Cursor, and Codex.
-   - Requires `only-one-plan-skill` skill and `gitnexus` MCP server.
-   - Uses GitNexus code intelligence first to narrow symbol, dependency, call path, and blast radius analysis, followed by specific source file verification.
-   - Requires local repository indexing via `npx gitnexus analyze` as a usage prerequisite (no API credentials required).
-   - If GitNexus is unavailable or unindexed, asks user consent before falling back to local read-only search.
-   - Strict read-only execution boundary: never modifies application code, Git state, configuration, indexes, or external systems.
-   - Outputs durable plans to OpenSpec change artifacts (when OpenSpec is present) or `docs/plans/<slug>.md`.
-
 ### `structure-generate`
 
 Generate a structural blueprint markdown file for the project.

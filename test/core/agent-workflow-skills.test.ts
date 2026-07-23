@@ -159,38 +159,3 @@ describe('only-one-clockify-skill static validations', () => {
         expect(rulesContent).toContain('stop and list candidates');
     });
 });
-
-describe('only-one-plan-skill static validations', () => {
-    it('verifies read-only boundary, GitNexus-first discovery, decision gates, minimum impact, and required output sections', async () => {
-        const skillDir = join(skillsDir, 'only-one-plan-skill');
-        const skillContent = await readFile(join(skillDir, 'SKILL.md'), 'utf-8');
-
-        // Read-only boundary
-        expect(skillContent).toContain('Planning-Only Execution Boundary');
-        expect(skillContent).toContain('NEVER modify application code');
-        expect(skillContent).toContain('untrusted data');
-
-        // GitNexus-first & source verification
-        expect(skillContent).toContain('GitNexus-First Grounded Discovery');
-        expect(skillContent).toContain('gitnexus');
-        expect(skillContent).toContain('ask explicit consent before falling back');
-
-        // User-controlled decision gates & grill-me integration
-        expect(skillContent).toContain('User-Controlled Decision Gates & Relentless Interview (grill-me integration)');
-        expect(skillContent).toContain('one question at a time');
-        expect(skillContent).toContain('decision tree');
-        expect(skillContent).toContain('explore first before asking');
-        expect(skillContent).toContain('2–4 distinct options');
-        expect(skillContent).toContain('(Recommended)');
-
-        // Minimum impact
-        expect(skillContent).toContain('Minimum-Impact Architecture');
-        expect(skillContent).toContain('reusing existing logic');
-        expect(skillContent).toContain('smallest safe scope');
-
-        // Output contract & mandatory sections
-        expect(skillContent).toContain('Performance Analysis & Evidence');
-        expect(skillContent).toContain('Security Analysis & Evidence');
-        expect(skillContent).toContain('docs/plans/<slug>.md');
-    });
-});

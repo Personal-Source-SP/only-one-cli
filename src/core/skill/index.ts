@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { updateGitignore } from '@/core/init/gitignore.js';
-import { buildPrGitCommandContent, buildClockifyCommandContent, buildPlanCommandContent } from '@/core/templates/agent-workflows.js';
+import { buildPrGitCommandContent, buildClockifyCommandContent } from '@/core/templates/agent-workflows.js';
 import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import { generateCommand } from '@/core/command-generation/generator.js';
 import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
@@ -105,9 +105,6 @@ export const installSkills = async (request: {
                 } else if (skillName === 'only-one-clockify-skill') {
                     commandContent = buildClockifyCommandContent();
                     commandId = 'only-one-clockify';
-                } else if (skillName === 'only-one-plan-skill') {
-                    commandContent = buildPlanCommandContent();
-                    commandId = 'only-one-plan';
                 }
 
                 if (commandContent && commandId) {

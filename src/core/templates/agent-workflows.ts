@@ -3,7 +3,6 @@ import type { CommandContent } from '@/core/command-generation/types.js';
 export enum AgentWorkflowCommandId {
     Clockify = 'only-one-clockify',
     PrGit = 'only-one-pr-git',
-    Plan = 'only-one-plan',
 }
 
 export enum PrGitTag {
@@ -15,7 +14,6 @@ export enum PrGitTag {
 
 export const PR_GIT_SKILL_NAME = 'only-one-pr-git-skill';
 export const CLOCKIFY_SKILL_NAME = 'only-one-clockify-skill';
-export const PLAN_SKILL_NAME = 'only-one-plan-skill';
 
 export const PR_GIT_DEFAULT_BRANCH = 'main';
 export const PR_GIT_DEFAULT_TAG = PrGitTag.Feat;
@@ -29,10 +27,6 @@ export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps:
     [AgentWorkflowCommandId.Clockify]: {
         mcps: ['clockify'],
         skills: [CLOCKIFY_SKILL_NAME],
-    },
-    [AgentWorkflowCommandId.Plan]: {
-        mcps: ['gitnexus'],
-        skills: [PLAN_SKILL_NAME],
     },
 };
 
@@ -93,32 +87,6 @@ const buildClockifyCommandBody =
 If skill \`${CLOCKIFY_SKILL_NAME}\` or MCP \`clockify\` is unavailable, stop and tell the user to run \`only-one init\` or \`only-one init mcp clockify\`.
 `;
 
-const buildPlanCommandBody =
-    (): string => `Use skill \`${PLAN_SKILL_NAME}\` to investigate the codebase, resolve decision gates with the user, and write a durable plan using \`gitnexus\` MCP and source file verification.
-
-## Input
-
-\`\`\`text
-/only-one-plan <planning-goal-or-problem-description>
-\`\`\`
-
-The prompt or message following \`/only-one-plan\` describes the goal, feature request, or problem to plan.
-
-## Required behavior
-
-1. Load and follow skill \`${PLAN_SKILL_NAME}\`.
-2. Enforce planning-only execution boundary: inspect the project and write only the confirmed OpenSpec artifact or plan document (\`docs/plans/<slug>.md\`).
-3. Never modify application code, Git state, configuration, indexes, or external systems.
-4. Perform GitNexus-first code intelligence query for symbols, dependencies, call paths, and blast radius.
-5. Verify all planning conclusions against actual source code files before documenting.
-6. Ask the user when evidence is missing or a choice materially affects scope, behavior, architecture, API, dependencies, data, performance, security, or reversibility (provide 2–4 options with recommendation and trade-offs).
-7. Justify minimum-impact changes by documenting expected files to modify, reused logic, and preserved areas.
-8. Require explicit performance and security evidence/conclusions in the final output.
-9. Output durable plan to OpenSpec change artifacts (if available) or \`docs/plans/<slug>.md\`.
-
-If skill \`${PLAN_SKILL_NAME}\` or MCP \`gitnexus\` is unavailable, stop and tell the user to run \`only-one init\` or \`only-one init mcp gitnexus\`.
-`;
-
 export const buildPrGitCommandContent = (): CommandContent => ({
     body: buildPrGitCommandBody(),
     category: 'Workflow',
@@ -137,17 +105,4 @@ export const buildClockifyCommandContent = (): CommandContent => ({
     tags: ['only-one', 'clockify', 'mcp', 'time-tracking'],
 });
 
-export const buildPlanCommandContent = (): CommandContent => ({
-    body: buildPlanCommandBody(),
-    category: 'Workflow',
-    description: 'Perform grounded code discovery and draft an approved planning artifact using only-one-plan-skill and GitNexus MCP.',
-    id: AgentWorkflowCommandId.Plan,
-    name: AgentWorkflowCommandId.Plan,
-    tags: ['only-one', 'gitnexus', 'mcp', 'planning', 'openspec'],
-});
-
-export const buildAgentWorkflowCommandContents = (): CommandContent[] => [
-    buildPrGitCommandContent(),
-    buildClockifyCommandContent(),
-    buildPlanCommandContent(),
-];
+export const buildAgentWorkflowCommandContents = (): CommandContent[] => [buildPrGitCommandContent(), buildClockifyCommandContent()];
