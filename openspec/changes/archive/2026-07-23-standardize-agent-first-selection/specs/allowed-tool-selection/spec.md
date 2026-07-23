@@ -19,6 +19,12 @@ Rule: Target-selecting commands SHALL use explicit target IDs when provided and 
 - **THEN** the command stops before side effects
 - **AND** reports the invalid ID and valid IDs for that command
 
+#### Scenario: Automatic selection
+- **GIVEN** no explicit target is provided
+- **AND** automatic selection is enabled
+- **WHEN** target selection runs
+- **THEN** every target valid for the command capability is selected
+
 #### Scenario: Interactive target selection defaults compatible agents
 - **GIVEN** no explicit target is provided
 - **AND** interactive selection is available
