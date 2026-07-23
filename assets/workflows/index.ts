@@ -13,4 +13,10 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredSkills: ['only-one-pr-git-skill'],
         requiredMcps: ['github'],
     },
+    {
+        name: 'only-one-plan',
+        description: 'Perform grounded code discovery and draft an approved planning artifact using only-one-plan-skill and GitNexus MCP.',
+        requiredSkills: ['only-one-plan-skill'],
+        requiredMcps: ['gitnexus'],
+    },
 ];

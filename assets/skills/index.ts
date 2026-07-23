@@ -27,4 +27,9 @@ export const SKILLS: SkillManifest[] = [
         description: 'Create or update a GitHub Pull Request from the current branch.',
         associatedWorkflows: ['only-one-pr-git'],
     },
+    {
+        name: 'only-one-plan-skill',
+        description: 'Perform grounded code discovery and draft an approved planning artifact using GitNexus MCP.',
+        associatedWorkflows: ['only-one-plan'],
+    },
 ];

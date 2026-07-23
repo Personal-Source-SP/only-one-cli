@@ -27,6 +27,7 @@ import { COMBOS } from '@assets/combos/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
 import { SKILLS } from '@assets/skills/index.js';
+import { WORKFLOWS } from '@assets/workflows/index.js';
 import { installWorkflows, checkExistingWorkflows } from '@/core/workflow/index.js';
 import type {
     InitCommandRequest,
@@ -470,11 +471,18 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 deps.stdout('  No MCP manifests available');
             } else {
                 const preSelectedMcps = new Set<string>();
-                if (selectedSkillNames.includes('only-one-pr-git-skill')) {
-                    preSelectedMcps.add('github');
-                }
-                if (selectedSkillNames.includes('only-one-clockify-skill')) {
-                    preSelectedMcps.add('clockify');
+                for (const skillName of selectedSkillNames) {
+                    const skillMeta = SKILLS.find((s) => s.name === skillName);
+                    if (skillMeta?.associatedWorkflows) {
+                        for (const wfName of skillMeta.associatedWorkflows) {
+                            const wfMeta = WORKFLOWS.find((w) => w.name === wfName);
+                            if (wfMeta?.requiredMcps) {
+                                for (const mcpId of wfMeta.requiredMcps) {
+                                    preSelectedMcps.add(mcpId);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if (yes || !deps.prompts?.checkbox) {
@@ -495,15 +503,22 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
                 }
 
                 // Dependency checking & opt-out warning
-                if (selectedSkillNames.includes('only-one-pr-git-skill') && !selectedMcpNames.includes('github')) {
-                    deps.stdout(
-                        '  Warning: Skill only-one-pr-git-skill requires the github MCP server. Opting out may break its functionality.',
-                    );
-                }
-                if (selectedSkillNames.includes('only-one-clockify-skill') && !selectedMcpNames.includes('clockify')) {
-                    deps.stdout(
-                        '  Warning: Skill only-one-clockify-skill requires the clockify MCP server. Opting out may break its functionality.',
-                    );
+                for (const skillName of selectedSkillNames) {
+                    const skillMeta = SKILLS.find((s) => s.name === skillName);
+                    if (skillMeta?.associatedWorkflows) {
+                        for (const wfName of skillMeta.associatedWorkflows) {
+                            const wfMeta = WORKFLOWS.find((w) => w.name === wfName);
+                            if (wfMeta?.requiredMcps) {
+                                for (const mcpId of wfMeta.requiredMcps) {
+                                    if (!selectedMcpNames.includes(mcpId)) {
+                                        deps.stdout(
+                                            `  Warning: Skill ${skillName} requires the ${mcpId} MCP server. Opting out may break its functionality.`,
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1048,20 +1063,22 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
             deps.stdout('                READINESS REPORT');
             deps.stdout('==================================================');
 
-            const workflows = [
-                {
-                    id: 'only-one-pr-git',
-                    skillName: 'only-one-pr-git-skill',
-                    mcpId: 'github',
-                    secretKey: 'GITHUB_PERSONAL_ACCESS_TOKEN',
-                },
-                {
-                    id: 'only-one-clockify',
-                    skillName: 'only-one-clockify-skill',
-                    mcpId: 'clockify',
-                    secretKey: 'CLOCKIFY_API_KEY',
-                },
-            ];
+            const workflows = WORKFLOWS.map((wf) => {
+                const mcpId = wf.requiredMcps?.[0];
+                let secretKey: string | undefined;
+                let usageNote: string | undefined;
+                if (mcpId === 'github') secretKey = 'GITHUB_PERSONAL_ACCESS_TOKEN';
+                else if (mcpId === 'clockify') secretKey = 'CLOCKIFY_API_KEY';
+                else if (mcpId === 'gitnexus') usageNote = 'Indexed project directory required before use';
+
+                return {
+                    id: wf.name,
+                    skillName: wf.requiredSkills[0],
+                    mcpId,
+                    secretKey,
+                    usageNote,
+                };
+            });
 
             for (const workflow of workflows) {
                 const hasSkillInAny = activeTools.some((t) => existsSync(join(projectDir, t.skillsDir!, 'skills', workflow.skillName)));
@@ -1087,38 +1104,46 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                 deps.stdout(`    - Command (${workflow.id}): ${isCommandReady ? 'Ready' : 'Not configured'}`);
                 deps.stdout(`    - Skill (${workflow.skillName}): ${isSkillReady ? 'Ready' : 'Not configured'}`);
 
-                const configuredIdes: string[] = [];
-                const incompleteIdes: { name: string; path: string }[] = [];
+                if (workflow.mcpId) {
+                    const configuredIdes: string[] = [];
+                    const incompleteIdes: { name: string; path: string }[] = [];
 
-                for (const adapter of [cursorMcpAdapter, antigravityMcpAdapter]) {
-                    try {
-                        const path = adapter.getConfigPath(homedir(), process.platform);
-                        if (existsSync(path)) {
-                            const config = parseJsoncObject(readFileSync(path, 'utf8')) as any;
-                            const mcpConfig = config?.mcpServers?.[workflow.mcpId] as any;
-                            if (mcpConfig) {
-                                configuredIdes.push(adapter.name);
-                                const credentialValue = mcpConfig.env?.[workflow.secretKey];
-                                if (credentialValue === undefined || credentialValue === '') {
-                                    incompleteIdes.push({ name: adapter.name, path });
+                    for (const adapter of [cursorMcpAdapter, antigravityMcpAdapter]) {
+                        try {
+                            const path = adapter.getConfigPath(homedir(), process.platform);
+                            if (existsSync(path)) {
+                                const config = parseJsoncObject(readFileSync(path, 'utf8')) as any;
+                                const mcpConfig = config?.mcpServers?.[workflow.mcpId] as any;
+                                if (mcpConfig) {
+                                    configuredIdes.push(adapter.name);
+                                    if (workflow.secretKey) {
+                                        const credentialValue = mcpConfig.env?.[workflow.secretKey];
+                                        if (credentialValue === undefined || credentialValue === '') {
+                                            incompleteIdes.push({ name: adapter.name, path });
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    } catch {}
-                }
+                        } catch {}
+                    }
 
-                if (configuredIdes.length > 0) {
-                    deps.stdout(`    - MCP Server (${workflow.mcpId}): Configured in ${configuredIdes.join(', ')}`);
-                    if (incompleteIdes.length > 0) {
-                        deps.stdout(`    - Credentials: Setup incomplete`);
-                        for (const ide of incompleteIdes) {
-                            deps.stdout(`      ⚠️ ${ide.name}: ${ide.path} -> ${workflow.secretKey} requires manual editing`);
+                    if (configuredIdes.length > 0) {
+                        deps.stdout(`    - MCP Server (${workflow.mcpId}): Configured in ${configuredIdes.join(', ')}`);
+                        if (workflow.secretKey) {
+                            if (incompleteIdes.length > 0) {
+                                deps.stdout(`    - Credentials: Setup incomplete`);
+                                for (const ide of incompleteIdes) {
+                                    deps.stdout(`      ⚠️ ${ide.name}: ${ide.path} -> ${workflow.secretKey} requires manual editing`);
+                                }
+                            } else {
+                                deps.stdout(`    - Credentials: Ready`);
+                            }
+                        } else if (workflow.usageNote) {
+                            deps.stdout(`    - Usage Note: ${workflow.usageNote}`);
                         }
                     } else {
-                        deps.stdout(`    - Credentials: Ready`);
+                        deps.stdout(`    - MCP Server (${workflow.mcpId}): Not configured`);
                     }
-                } else {
-                    deps.stdout(`    - MCP Server (${workflow.mcpId}): Not configured`);
                 }
             }
             deps.stdout('\n==================================================');

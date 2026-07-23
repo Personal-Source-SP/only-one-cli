@@ -11,6 +11,7 @@ import {
     buildAgentWorkflowCommandContents,
     buildClockifyCommandContent,
     buildPrGitCommandContent,
+    buildPlanCommandContent,
 } from '@src/core/templates/agent-workflows.js';
 import { normalizeStructureCommandPath } from '@src/core/agent/command-path.js';
 
@@ -41,8 +42,22 @@ describe('agent workflow command sources', () => {
         expect(command.body).toContain('clockify');
     });
 
-    it('exports both workflow commands in deterministic order', () => {
-        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual(['only-one-pr-git', 'only-one-clockify']);
+    it('defines plan workflow option and boundary contract', () => {
+        const command = buildPlanCommandContent();
+
+        expect(command.id).toBe(AgentWorkflowCommandId.Plan);
+        expect(command.body).toContain('/only-one-plan <planning-goal-or-problem-description>');
+        expect(command.body).toContain('only-one-plan-skill');
+        expect(command.body).toContain('gitnexus');
+        expect(command.body).toContain('planning-only execution boundary');
+    });
+
+    it('exports all workflow commands in deterministic order', () => {
+        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual([
+            'only-one-pr-git',
+            'only-one-clockify',
+            'only-one-plan',
+        ]);
     });
 });
 
