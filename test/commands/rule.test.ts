@@ -51,13 +51,13 @@ describe('Rule Command & Installation Integration (Tasks 4.1 - 4.5)', () => {
         });
 
         // Verify native file copy locations
-        expect(existsSync(join(testProjectDir, '.agents/rules/context-minimization.md'))).toBe(true);
-        expect(existsSync(join(testProjectDir, '.claude/rules/context-minimization.md'))).toBe(true);
-        expect(existsSync(join(testProjectDir, '.cursor/rules/context-minimization.md'))).toBe(true);
+        expect(existsSync(join(testProjectDir, '.agents/rules/01-context-and-tools.md'))).toBe(true);
+        expect(existsSync(join(testProjectDir, '.claude/rules/01-context-and-tools.md'))).toBe(true);
+        expect(existsSync(join(testProjectDir, '.cursor/rules/01-context-and-tools.md'))).toBe(true);
 
-        const content = await readFile(join(testProjectDir, '.agents/rules/context-minimization.md'), 'utf-8');
-        expect(content).toContain('# Context Minimization');
-        expect(content).toContain('Code Discovery & Analysis');
+        const content = await readFile(join(testProjectDir, '.agents/rules/01-context-and-tools.md'), 'utf-8');
+        expect(content).toContain('# CONTEXT & TOOLING');
+        expect(content).toContain('## Discovery');
 
         // Cleanup
         await rm(testProjectDir, { recursive: true, force: true });

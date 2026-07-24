@@ -46,7 +46,7 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
                 skills: undefined,
             },
             {
-                id: 'react-nextjs',
+                id: 'architecture-stack',
                 packages: undefined,
                 plugins: undefined,
                 mcps: undefined,
@@ -57,8 +57,6 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
                     'next-partial-prefetching-adoption',
                 ],
             },
-            { id: 'nestjs', packages: undefined, plugins: undefined, mcps: undefined, skills: undefined },
-            { id: 'typescript', packages: undefined, plugins: undefined, mcps: undefined, skills: undefined },
             { id: 'ui', packages: undefined, plugins: undefined, mcps: undefined, skills: undefined },
         ];
 

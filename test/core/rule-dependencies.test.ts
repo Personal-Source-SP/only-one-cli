@@ -35,9 +35,9 @@ describe('Rule Dependency Resolution & Preflight Validation (Tasks 3.1, 3.2, 3.7
         expect(plan.skills).toEqual([]);
     });
 
-    it('resolves all registered Next.js skills for react-nextjs', () => {
-        const result = validateRuleDependenciesPreflight(['react-nextjs'], [AllowedToolId.Antigravity]);
-        const plan = buildDeduplicatedDependencyPlan(['react-nextjs']);
+    it('resolves all registered Next.js skills for architecture-stack', () => {
+        const result = validateRuleDependenciesPreflight(['architecture-stack'], [AllowedToolId.Antigravity]);
+        const plan = buildDeduplicatedDependencyPlan(['architecture-stack']);
 
         expect(result).toEqual({ valid: true, errors: [] });
         expect(plan.skills).toEqual([

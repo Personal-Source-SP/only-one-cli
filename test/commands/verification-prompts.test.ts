@@ -38,7 +38,7 @@ describe('Existing-resource verification prompts & non-TTY skip (Tasks 4.2 & 4.3
 
         await rm(testProjectDir, { recursive: true, force: true });
         await mkdir(join(testProjectDir, '.agents/rules'), { recursive: true });
-        await writeFile(join(testProjectDir, '.agents/rules/context-minimization.md'), 'existing rule');
+        await writeFile(join(testProjectDir, '.agents/rules/01-context-and-tools.md'), 'existing rule');
 
         const cmd = createRuleCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir, 'context-minimization', '--tool', 'antigravity']);

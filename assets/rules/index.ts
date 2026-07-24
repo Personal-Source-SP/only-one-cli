@@ -11,9 +11,9 @@ export const RULES: RuleManifest[] = [
         requiredMcps: ['gitnexus'],
     },
     {
-        id: 'react-nextjs',
-        description: 'ReactJS and Next.js — component, hook, rendering boundary, i18n, and responsive conventions',
-        sourceFile: 'react-nextjs.md',
+        id: 'architecture-stack',
+        description: 'Architecture & Tech Stack Guidelines — NestJS, Next.js/React, TypeScript standards and shared contracts',
+        sourceFile: '02-architecture-stack.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
         requiredSkills: [
             'next-dev-loop',
@@ -21,18 +21,6 @@ export const RULES: RuleManifest[] = [
             'next-cache-components-optimizer',
             'next-partial-prefetching-adoption',
         ],
-    },
-    {
-        id: 'nestjs',
-        description: 'NestJS — module, service, repository, error handling, and contract conventions',
-        sourceFile: 'nestjs.md',
-        supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
-    },
-    {
-        id: 'typescript',
-        description: 'TypeScript — preserve strict typing and validate type contracts',
-        sourceFile: 'typescript.md',
-        supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
     },
     {
         id: 'ui',
@@ -43,7 +31,7 @@ export const RULES: RuleManifest[] = [
     {
         id: 'context-minimization',
         description: 'Context Minimization — enforce dependency discovery and minimal file context loading before edits',
-        sourceFile: 'context-minimization.md',
+        sourceFile: '01-context-and-tools.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
         requiredPackages: ['@fission-ai/openspec'],
         requiredPlugins: ['superpowers'],
