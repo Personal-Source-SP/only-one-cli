@@ -5,6 +5,11 @@
 - Keep strict TypeScript. Define clear types or interfaces at public, API, persistence, event, and component boundaries.
 - Do not use `any` unless unavoidable. Document reason and keep scope minimal when used.
 
+## Code Structure & Conventions
+- Name classes, interfaces, methods, and functions strictly according to Domain-Driven Design (DDD) principles (Ubiquitous Language) for clear domain mapping.
+- Prefer using `lodash` for common utility logic and complex data manipulations instead of writing custom helper functions.
+- Maintain strict separation of concerns by organizing code into dedicated role-based directories (e.g., `types/`, `interfaces/`, `dtos/`, `services/`, `constants/`). Every component/module folder MUST contain an `index.ts` file to export its public API and clean up imports.
+
 ## Contracts and Quality
 - Preserve public type and API contracts. Provide migration or compatibility plan and coverage for intentional contract changes.
 - Prefer existing project utilities and type patterns over duplicate helpers or ad-hoc casts.
