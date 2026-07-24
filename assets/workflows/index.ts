@@ -16,11 +16,12 @@ export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-bug',
         description: 'Reproduce, diagnose, approve, fix, and verify a bug using evidence-driven debugging.',
-        requiredSkills: [],
+        requiredSkills: ['systematic-debugging', 'test-driven-development', 'verification-before-completion'],
+        requiredMcps: ['gitnexus'],
     },
     {
         name: 'only-one-ui',
         description: 'Design and implement approved, responsive, accessible UI using existing project patterns.',
-        requiredSkills: [],
+        requiredSkills: ['ux-ui-max'],
     },
 ];

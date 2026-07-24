@@ -23,12 +23,12 @@ export const CLOCKIFY_DEFAULT_TASKS_PER_DAY = 2;
 
 export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps: string[]; skills: string[] }> = {
     [AgentWorkflowCommandId.Bug]: {
-        mcps: [],
-        skills: [],
+        mcps: ['gitnexus'],
+        skills: ['systematic-debugging', 'test-driven-development', 'verification-before-completion'],
     },
     [AgentWorkflowCommandId.Ui]: {
         mcps: [],
-        skills: [],
+        skills: ['ux-ui-max'],
     },
     [AgentWorkflowCommandId.PrGit]: {
         mcps: ['github'],
