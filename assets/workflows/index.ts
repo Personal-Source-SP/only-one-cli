@@ -13,4 +13,14 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredSkills: ['only-one-pr-git-skill'],
         requiredMcps: ['github'],
     },
+    {
+        name: 'only-one-bug',
+        description: 'Reproduce, diagnose, approve, fix, and verify a bug using evidence-driven debugging.',
+        requiredSkills: [],
+    },
+    {
+        name: 'only-one-ui',
+        description: 'Design and implement approved, responsive, accessible UI using existing project patterns.',
+        requiredSkills: [],
+    },
 ];

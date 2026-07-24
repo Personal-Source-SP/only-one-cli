@@ -37,7 +37,6 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
     it('rule manifests declare expected dependencies and supported targets', () => {
         const supportedTargets = [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor];
         const expectedDependencies = [
-            { id: 'bug-fix', packages: undefined, plugins: ['superpowers'], mcps: ['gitnexus'], skills: undefined },
             {
                 id: 'context-minimization',
                 packages: ['@fission-ai/openspec'],
@@ -57,7 +56,6 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
                     'next-partial-prefetching-adoption',
                 ],
             },
-            { id: 'ui', packages: undefined, plugins: undefined, mcps: undefined, skills: undefined },
         ];
 
         for (const expected of expectedDependencies) {

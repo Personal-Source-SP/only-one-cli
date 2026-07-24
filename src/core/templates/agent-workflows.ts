@@ -1,6 +1,8 @@
 import type { CommandContent } from '@/core/command-generation/types.js';
 
 export enum AgentWorkflowCommandId {
+    Bug = 'only-one-bug',
+    Ui = 'only-one-ui',
     Clockify = 'only-one-clockify',
     PrGit = 'only-one-pr-git',
 }
@@ -20,6 +22,14 @@ export const PR_GIT_DEFAULT_TAG = PrGitTag.Feat;
 export const CLOCKIFY_DEFAULT_TASKS_PER_DAY = 2;
 
 export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps: string[]; skills: string[] }> = {
+    [AgentWorkflowCommandId.Bug]: {
+        mcps: [],
+        skills: [],
+    },
+    [AgentWorkflowCommandId.Ui]: {
+        mcps: [],
+        skills: [],
+    },
     [AgentWorkflowCommandId.PrGit]: {
         mcps: ['github'],
         skills: [PR_GIT_SKILL_NAME],
@@ -87,6 +97,64 @@ const buildClockifyCommandBody =
 If skill \`${CLOCKIFY_SKILL_NAME}\` or MCP \`clockify\` is unavailable, stop and tell the user to run \`only-one init\` or \`only-one init mcp clockify\`.
 `;
 
+const buildBugCommandBody = (): string => `Use this workflow to reproduce, diagnose, approve, fix, and verify a reported bug.
+
+## Input
+
+\`\`\`text
+/only-one-bug <bug report, symptom, or failing case>
+\`\`\`
+
+## Required behavior
+
+1. Check external dependencies \`superpowers\` and \`gitnexus\`. If either is unavailable, report blocker and stop.
+2. Invoke \`superpowers:systematic-debugging\` before diagnosis.
+3. Reproduce the bug, separate facts from hypotheses, and confirm root cause.
+4. Use GitNexus for dependency and impact discovery.
+5. Present evidence, minimal fix, affected files, risks, and test plan. Wait for explicit approval before changes.
+6. After approval, use test-driven development when applicable and make the smallest root-cause fix.
+7. Invoke \`superpowers:verification-before-completion\` and report fresh validation evidence.
+8. Never expose secrets, credentials, tokens, or PII during diagnosis.
+`;
+
+const buildUiCommandBody = (): string => `Use this workflow only for web or mobile UI work.
+
+## Input
+
+\`\`\`text
+/only-one-ui <UI task, requirement, or reference>
+\`\`\`
+
+## Required behavior
+
+1. Check external skill \`ux-ui-max\`. If unavailable, report blocker and stop.
+2. Load and follow \`ux-ui-max\` before proposing or implementing UI work.
+3. Collect design references, existing UI patterns, tokens, theme configuration, architecture, i18n, and breakpoints.
+4. If no approved reference exists, propose a concrete design direction and wait for explicit approval before implementation.
+5. Reuse existing components and tokens. Prefer suitable Ant Design components; use Tailwind CSS for styling and responsive utilities.
+6. Cover relevant states, semantic HTML, accessibility, keyboard navigation, contrast, and reduced motion.
+7. Implement and test mobile, tablet, and desktop behavior.
+8. Collect browser or screenshot evidence. Do not claim visual completion without fresh viewport evidence.
+`;
+
+export const buildBugCommandContent = (): CommandContent => ({
+    body: buildBugCommandBody(),
+    category: 'Workflow',
+    description: 'Reproduce, diagnose, approve, fix, and verify a bug using evidence-driven debugging.',
+    id: AgentWorkflowCommandId.Bug,
+    name: AgentWorkflowCommandId.Bug,
+    tags: ['only-one', 'bug', 'debugging', 'verification'],
+});
+
+export const buildUiCommandContent = (): CommandContent => ({
+    body: buildUiCommandBody(),
+    category: 'Workflow',
+    description: 'Design and implement approved, responsive, accessible UI using existing project patterns.',
+    id: AgentWorkflowCommandId.Ui,
+    name: AgentWorkflowCommandId.Ui,
+    tags: ['only-one', 'ui', 'ux', 'responsive'],
+});
+
 export const buildPrGitCommandContent = (): CommandContent => ({
     body: buildPrGitCommandBody(),
     category: 'Workflow',
@@ -105,4 +173,9 @@ export const buildClockifyCommandContent = (): CommandContent => ({
     tags: ['only-one', 'clockify', 'mcp', 'time-tracking'],
 });
 
-export const buildAgentWorkflowCommandContents = (): CommandContent[] => [buildPrGitCommandContent(), buildClockifyCommandContent()];
+export const buildAgentWorkflowCommandContents = (): CommandContent[] => [
+    buildPrGitCommandContent(),
+    buildClockifyCommandContent(),
+    buildBugCommandContent(),
+    buildUiCommandContent(),
+];

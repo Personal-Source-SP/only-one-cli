@@ -9,6 +9,8 @@ import {
     PR_GIT_DEFAULT_TAG,
     SUPPORTED_PR_GIT_TAGS,
     buildAgentWorkflowCommandContents,
+    buildBugCommandContent,
+    buildUiCommandContent,
     buildClockifyCommandContent,
     buildPrGitCommandContent,
 } from '@src/core/templates/agent-workflows.js';
@@ -41,8 +43,35 @@ describe('agent workflow command sources', () => {
         expect(command.body).toContain('clockify');
     });
 
+    it('defines bug workflow approval and dependency blockers', () => {
+        const command = buildBugCommandContent();
+
+        expect(command.id).toBe(AgentWorkflowCommandId.Bug);
+        expect(command.body).toContain('superpowers');
+        expect(command.body).toContain('gitnexus');
+        expect(command.body).toContain('report blocker and stop');
+        expect(command.body).toContain('Wait for explicit approval before changes');
+        expect(command.body).toContain('verification-before-completion');
+    });
+
+    it('defines UI workflow approval and viewport validation', () => {
+        const command = buildUiCommandContent();
+
+        expect(command.id).toBe(AgentWorkflowCommandId.Ui);
+        expect(command.body).toContain('ux-ui-max');
+        expect(command.body).toContain('report blocker and stop');
+        expect(command.body).toContain('wait for explicit approval before implementation');
+        expect(command.body).toContain('mobile, tablet, and desktop');
+        expect(command.body).toContain('viewport evidence');
+    });
+
     it('exports all workflow commands in deterministic order', () => {
-        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual(['only-one-pr-git', 'only-one-clockify']);
+        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual([
+            'only-one-pr-git',
+            'only-one-clockify',
+            'only-one-bug',
+            'only-one-ui',
+        ]);
     });
 });
 
