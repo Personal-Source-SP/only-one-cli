@@ -42,7 +42,7 @@ description: Discover a bounded feature scope, design affected UI, and produce a
 
 1. Invoke `superpowers:brainstorming` using only feature intent, confirmed evidence, UI design, assumptions, and unknowns.
 2. Resolve decisions that affect contracts, user behavior, data flow, or task boundaries. Do not guess unresolved requirements.
-3. Invoke `superpowers:writing-plans` to create `docs/plans/<DD-MM-YYYY>/<feature-slug>.md` using the current local date unless the user supplies another path.
+3. Invoke `superpowers:writing-plans` to create the plan file. You MUST save the plan exactly at `docs/plans/<DD-MM-YYYY>/<feature-slug>.md` (using the current local date for the path, unless the user supplies another path). Do NOT use `docs/superpowers/plans/` or any other directory specified by the writing-plans skill defaults. This is a strict repository-wide constraint.
 4. The plan must contain:
    - Goal, non-goals, acceptance criteria, assumptions, and risks.
    - GitNexus evidence and the exact blast-radius allowlist.
@@ -56,7 +56,7 @@ description: Discover a bounded feature scope, design affected UI, and produce a
    - RED test and expected failure reason.
    - Minimal GREEN change.
    - REFACTOR and focused verification.
-   - Dependencies and completion evidence.
+   - Dependencies and completion evidence (explicitly omit any commit steps, as changes should remain uncommitted until final integration).
 6. Split backend and frontend work into separate tasks. Add an explicit integration task for shared DTO or API contracts.
 7. Ensure independent tasks do not write the same files. Mark dependency order when tasks cannot run in parallel.
 

@@ -31,7 +31,7 @@ description: Execute an approved feature plan through isolated subagents, mandat
    - One task and its acceptance criteria.
    - One or two permitted source files and the direct test file.
    - Exact symbols permitted for modification.
-   - Required RED, GREEN, REFACTOR, and verification steps.
+   - Required RED, GREEN, REFACTOR, and verification steps (explicitly instruct the subagent NOT to commit any code).
    - Relevant contract excerpts and dependency outputs.
 4. Do not give backend subagents frontend source context or frontend subagents backend source context. Shared-contract and integration tasks may receive only the contract files named by the plan.
 5. Run dependent tasks sequentially. Run tasks in parallel only when the plan marks them independent and they do not write the same files.
@@ -54,7 +54,7 @@ Each implementation subagent must invoke `superpowers:test-driven-development` a
    - Improve naming, duplication, composition, and type safety without changing behavior.
    - Re-run the focused test and relevant neighboring tests.
 4. Do not skip tests, weaken assertions, accept meaningless snapshots, use `any` without documented necessity, or test implementation details when behavior can be tested.
-5. Return changed files, diff summary, commands, RED failure reason, GREEN result, REFACTOR result, and remaining risks.
+5. Return changed files, diff summary, commands, RED failure reason, GREEN result, REFACTOR result, and remaining risks. Do not create any git commits.
 
 ## Review and integration
 
