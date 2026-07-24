@@ -4,3 +4,17 @@
 adr
 openspec
 test
+.git/
+.github/
+.agent/
+.agents/
+.claude/
+.cursor/
+src/
+test/
+coverage/
+*.test.*
+*.spec.*
+.env
+.env.*
+*.log

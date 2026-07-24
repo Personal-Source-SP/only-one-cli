@@ -1,9 +1,9 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { IGNORE_TEMPLATES, IgnoreTarget } from '@assets/ignore/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
 export { IgnoreTarget } from '@assets/ignore/index.js';
 
@@ -19,7 +19,8 @@ const TEMPLATE_NAMES: Record<IgnoreTarget, string> = {
     [IgnoreTarget.Npm]: 'npm.ignore',
 };
 
-const packageRoot = join(fileURLToPath(new URL('../../..', import.meta.url)));
+export const resolveIgnoreTemplatePath = (metaUrl: string, target: IgnoreTarget): string =>
+    join(resolvePackageRoot(metaUrl), 'assets', 'ignore', TEMPLATE_NAMES[target]);
 
 export const selectIgnoreTargets = async (deps: ProgramDeps): Promise<IgnoreTarget[]> => {
     if (!deps.prompts?.checkbox) return [];
@@ -38,7 +39,7 @@ export const writeIgnoreTemplates = async (projectDir: string, targets: IgnoreTa
     const results: IgnoreWriteResult[] = [];
     for (const target of targets) {
         const { fileName } = IGNORE_TEMPLATES[target];
-        const templatePath = join(packageRoot, 'assets', 'ignore', TEMPLATE_NAMES[target]);
+        const templatePath = resolveIgnoreTemplatePath(import.meta.url, target);
         const targetPath = join(projectDir, fileName);
         const template = await readFile(templatePath, 'utf8');
         const content = existsSync(targetPath) ? await readFile(targetPath, 'utf8') : '';
