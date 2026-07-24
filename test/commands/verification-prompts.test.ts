@@ -41,11 +41,11 @@ describe('Existing-resource verification prompts & non-TTY skip (Tasks 4.2 & 4.3
         await writeFile(join(testProjectDir, '.agents/rules/01-context-and-tools.md'), 'existing rule');
 
         const cmd = createRuleCommand(deps as ProgramDeps);
-        await cmd.parseAsync(['node', 'test', testProjectDir, 'context-minimization', '--tool', 'antigravity']);
+        await cmd.parseAsync(['node', 'test', testProjectDir, 'context-and-tools', '--tool', 'antigravity']);
 
         const fullLog = stdoutLogs.join('\n');
         expect(fullLog).toContain('Skipped:');
-        expect(fullLog).toContain('context-minimization in Antigravity');
+        expect(fullLog).toContain('context-and-tools in Antigravity');
 
         await rm(testProjectDir, { recursive: true, force: true });
     });

@@ -40,7 +40,7 @@ export function createComboCommand(deps: ProgramDeps): Command {
                     (c) => c.id.toLowerCase() === comboName.toLowerCase() || c.name.toLowerCase() === comboName.toLowerCase(),
                 );
                 if (!combo) {
-                    throw new Error(`Combo '${comboName}' not found in libraries/combos`);
+                    throw new Error(`Combo '${comboName}' not found in assets/combos`);
                 }
 
                 deps.stdout(`\nProcessing combo: ${COLORS.primary(combo.name)}...`);

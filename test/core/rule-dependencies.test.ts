@@ -22,15 +22,15 @@ describe('Rule Dependency Resolution & Preflight Validation (Tasks 3.1, 3.2, 3.7
     });
 
     it('preflight validation fails if Codex target is explicitly selected for rules', () => {
-        const result = validateRuleDependenciesPreflight(['context-minimization'], [AllowedToolId.Codex]);
+        const result = validateRuleDependenciesPreflight(['context-and-tools'], [AllowedToolId.Codex]);
         expect(result.valid).toBe(false);
         expect(result.errors[0]).toContain("Target 'codex' does not support rule installation");
     });
 
     it('buildDeduplicatedDependencyPlan returns deterministic order: packages, plugins, MCPs, skills', () => {
-        const plan = buildDeduplicatedDependencyPlan(['context-minimization']);
-        expect(plan.packages).toEqual(['@fission-ai/openspec']);
-        expect(plan.plugins).toEqual(['superpowers']);
+        const plan = buildDeduplicatedDependencyPlan(['context-and-tools']);
+        expect(plan.packages).toEqual([]);
+        expect(plan.plugins).toEqual([]);
         expect(plan.mcps).toEqual(['gitnexus']);
         expect(plan.skills).toEqual([]);
     });

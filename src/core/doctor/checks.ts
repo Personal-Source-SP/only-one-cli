@@ -544,11 +544,11 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
         },
         {
             command: 'only-one setting-vs --editors antigravity,cursor',
-            description: 'Merge shared editor settings from libraries/vs',
+            description: 'Merge shared editor settings from assets/vs',
         },
         {
             command: 'only-one extensions-vs --editors antigravity,cursor',
-            description: 'Install missing editor extensions from libraries/vs',
+            description: 'Install missing editor extensions from assets/vs',
         },
     ];
 }

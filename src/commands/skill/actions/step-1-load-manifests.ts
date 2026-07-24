@@ -9,7 +9,7 @@ export const loadSkillManifestsStep = (deps: ProgramDeps, pathArg?: string): { p
 
     const availableSkills = SKILLS.map((s) => s.name);
     if (!availableSkills?.length) {
-        deps.stdout(COLORS.warning('No custom skills available in libraries/skills.'));
+        deps.stdout(COLORS.warning('No custom skills available in assets/skills.'));
     }
 
     return { projectDir, availableSkills };

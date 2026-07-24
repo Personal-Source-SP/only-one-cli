@@ -12,7 +12,7 @@ export const loadComboManifestsStep = async (
 
     const availableCombos = await readComboManifests();
     if (!availableCombos?.length) {
-        deps.stdout(COLORS.warning('No predefined combos available in libraries/combos.'));
+        deps.stdout(COLORS.warning('No predefined combos available in assets/combos.'));
     }
 
     return { projectDir, availableCombos };

@@ -9,7 +9,7 @@ export const loadWorkflowManifestsStep = (deps: ProgramDeps, pathArg?: string): 
 
     const availableWorkflows = WORKFLOWS.map((w) => w.name);
     if (!availableWorkflows?.length) {
-        deps.stdout(COLORS.warning('No workflows available in libraries/workflows.'));
+        deps.stdout(COLORS.warning('No workflows available in assets/workflows.'));
     }
 
     return { projectDir, availableWorkflows };

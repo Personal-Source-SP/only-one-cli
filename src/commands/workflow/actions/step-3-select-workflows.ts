@@ -37,7 +37,7 @@ export const selectWorkflowsStep = async (
     } else {
         for (const workflow of selectedWorkflows) {
             if (!availableWorkflows.includes(workflow)) {
-                throw new Error(`Workflow '${workflow}' not found in libraries/workflows`);
+                throw new Error(`Workflow '${workflow}' not found in assets/workflows`);
             }
         }
     }

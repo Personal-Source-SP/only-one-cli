@@ -21,7 +21,7 @@ describe('Rule Command Agent-First Selection & Per-Agent Choices (Tasks 2.3, 2.4
                         return ['claude'];
                     }
                     if (opts.message.includes('Claude')) {
-                        return ['context-minimization'];
+                        return ['context-and-tools'];
                     }
                     return [];
                 },
@@ -59,7 +59,7 @@ describe('Rule Command Agent-First Selection & Per-Agent Choices (Tasks 2.3, 2.4
         await mkdir(testProjectDir, { recursive: true });
 
         const cmd = createRuleCommand(deps as ProgramDeps);
-        await expect(cmd.parseAsync(['node', 'test', testProjectDir, 'context-minimization'])).rejects.toThrow();
+        await expect(cmd.parseAsync(['node', 'test', testProjectDir, 'context-and-tools'])).rejects.toThrow();
 
         await rm(testProjectDir, { recursive: true, force: true });
     });

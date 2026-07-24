@@ -37,7 +37,7 @@ export const selectSkillsStep = async (
     } else {
         for (const skill of selectedSkills) {
             if (!availableSkills.includes(skill)) {
-                throw new Error(`Skill '${skill}' not found in libraries/skills`);
+                throw new Error(`Skill '${skill}' not found in assets/skills`);
             }
         }
     }

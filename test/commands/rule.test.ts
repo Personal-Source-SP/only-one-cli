@@ -24,12 +24,12 @@ describe('Rule Command & Installation Integration (Tasks 4.1 - 4.5)', () => {
 
         const cmd = createRuleCommand(deps as ProgramDeps);
 
-        await expect(cmd.parseAsync(['node', 'test', testProjectDir, 'context-minimization', '--tool', 'codex'])).rejects.toThrow(
+        await expect(cmd.parseAsync(['node', 'test', testProjectDir, 'context-and-tools', '--tool', 'codex'])).rejects.toThrow(
             "Unsupported target 'codex'. Valid targets: antigravity, claude, cursor",
         );
     });
 
-    it('copies context-minimization rule file to native target paths for Antigravity, Claude, and Cursor', async () => {
+    it('copies context-and-tools rule file to native target paths for Antigravity, Claude, and Cursor', async () => {
         const stdoutLogs: string[] = [];
         const deps: Partial<ProgramDeps> = {
             stdout: (msg) => stdoutLogs.push(msg),
@@ -46,7 +46,7 @@ describe('Rule Command & Installation Integration (Tasks 4.1 - 4.5)', () => {
             deps: deps as ProgramDeps,
             projectDir: testProjectDir,
             selectedTargets,
-            ruleIds: ['context-minimization'],
+            ruleIds: ['context-and-tools'],
             execFileAsync: mockExecFileAsync,
         });
 
