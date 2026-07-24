@@ -24,4 +24,16 @@ export const WORKFLOWS: WorkflowManifest[] = [
         description: 'Design and implement approved, responsive, accessible UI using existing project patterns.',
         requiredSkills: ['ux-ui-max'],
     },
+    {
+        name: 'only-one-plan',
+        description: 'Discover a bounded feature scope, design affected UI, and produce an approved micro-task plan.',
+        requiredSkills: [],
+        requiredMcps: ['gitnexus'],
+    },
+    {
+        name: 'only-one-implement',
+        description: 'Execute an approved feature plan through isolated subagents, mandatory TDD, review, and integration verification.',
+        requiredSkills: [],
+        requiredMcps: ['gitnexus'],
+    },
 ];
