@@ -48,8 +48,11 @@ export const executePackageActions = async (
         deps.stdout(`  Installing ${pkg.id}...`);
         const args = ['install', packageName];
         if (scope === 'global') args.push('-g');
+        if (overwriteList && overwriteList.includes(pkg.id)) {
+            args.push('--force');
+        }
         try {
-            await runExecFile(packageName === pkg.id ? packageName : 'npm', args, { cwd: projectDir, timeout: 120000, shell: true });
+            await runExecFile('npm', args, { cwd: projectDir, timeout: 120000, shell: true });
             installed.push(pkg.id);
             deps.stdout(`    ✓ Installed ${pkg.id}`);
         } catch (error) {

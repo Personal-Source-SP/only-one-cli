@@ -9,6 +9,7 @@ export const PACKAGES: PackageManifest[] = [
             packageName: '@fission-ai/openspec',
             scope: 'global',
         },
+        requirements: ['node', 'npm'],
     },
     {
         id: 'ui-ux-pro-max-cli',
@@ -18,5 +19,6 @@ export const PACKAGES: PackageManifest[] = [
             packageName: 'ui-ux-pro-max-cli',
             scope: 'global',
         },
+        requirements: ['node', 'npm'],
     },
 ];

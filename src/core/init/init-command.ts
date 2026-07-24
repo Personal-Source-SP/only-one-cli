@@ -474,7 +474,9 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
             });
 
             for (const workflow of workflows) {
-                const hasSkillInAny = activeTools.some((t) => existsSync(join(projectDir, t.skillsDir!, 'skills', workflow.skillName)));
+                const hasSkillInAny = workflow.skillName
+                    ? activeTools.some((t) => existsSync(join(projectDir, t.skillsDir!, 'skills', workflow.skillName)))
+                    : false;
                 if (!hasSkillInAny) continue;
 
                 deps.stdout(`\n  ${workflow.id} workflow:`);

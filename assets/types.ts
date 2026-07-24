@@ -40,6 +40,7 @@ export interface PackageManifest {
     id: string;
     description?: string;
     installer: PackageInstaller;
+    requirements?: string[];
 }
 
 export interface McpServerConfig {

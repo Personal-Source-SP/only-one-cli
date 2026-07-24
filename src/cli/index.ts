@@ -14,6 +14,7 @@ import {
     createMcpCommand,
     createComboCommand,
     createTuiCommand,
+    createPackageCommand,
 } from '@/commands/index.js';
 import { COLORS, VERSION } from '@/constants/index.js';
 import type { ProgramDeps } from './deps.js';
@@ -84,6 +85,7 @@ export function createProgram(deps: ProgramDeps) {
     program.addCommand(createRuleCommand(deps));
     program.addCommand(createMcpCommand(deps));
     program.addCommand(createComboCommand(deps));
+    program.addCommand(createPackageCommand(deps));
     program.addCommand(createStructureGenerateCommand(deps));
 
     program.addCommand(createUpdateCommand(deps));

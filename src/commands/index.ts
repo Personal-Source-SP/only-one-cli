@@ -33,4 +33,7 @@ export type * from './mcp/types.js';
 export { createComboCommand } from './combo/index.js';
 export type * from './combo/types.js';
 
+export { createPackageCommand } from './package/index.js';
+export type * from './package/types.js';
+
 export { createTuiCommand } from './tui/index.js';
