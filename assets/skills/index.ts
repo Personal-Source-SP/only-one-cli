@@ -34,6 +34,26 @@ export const SKILLS: SkillManifest[] = [
         description: 'Adopt partial prefetching in eligible Next.js applications.',
     },
     {
+        name: 'subagent-driven-development',
+        description: 'Execute implementation plans with isolated task agents and review gates.',
+    },
+    {
+        name: 'test-driven-development',
+        description: 'Use test-first red-green-refactor cycles for features and fixes.',
+    },
+    {
+        name: 'requesting-code-review',
+        description: 'Request rigorous code review before integration.',
+    },
+    {
+        name: 'verification-before-completion',
+        description: 'Require fresh verification evidence before completion claims.',
+    },
+    {
+        name: 'systematic-debugging',
+        description: 'Diagnose root causes before proposing fixes.',
+    },
+    {
         name: 'only-one-clockify-skill',
         description: 'Validate and log Clockify time entries from task lines.',
         associatedWorkflows: ['only-one-clockify'],

@@ -101,7 +101,7 @@ describe('combo command', () => {
             expect(existsSync(join(cwd, '.cursor', 'rules', '02-architecture-stack.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'rules', '01-context-and-tools.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(true);
-            expect(writes.join('\n')).toContain('Plugins:');
+            expect(writes.join('\n')).not.toContain('Configuring plugin superpowers');
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Workflows:');
         } finally {

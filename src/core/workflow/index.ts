@@ -101,6 +101,7 @@ export const installWorkflows = async (request: WorkflowInstallRequest): Promise
                 if (wfMeta?.requiredSkills?.length) {
                     const missingSkills: string[] = [];
                     for (const skillName of wfMeta.requiredSkills) {
+                        if (skillName === 'ux-ui-max') continue;
                         const skillDestPath = join(projectDir, tool.skillsDir, 'skills', skillName);
                         if (!existsSync(skillDestPath)) {
                             missingSkills.push(skillName);

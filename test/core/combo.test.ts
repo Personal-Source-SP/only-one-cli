@@ -36,6 +36,12 @@ describe('combo manifest preflight', () => {
         ).toThrow("Combo 'bad-flow' references unknown packages ID 'missing-package'");
     });
 
+    it('rejects a missing transitive workflow skill before installation', () => {
+        expect(() =>
+            validateComboManifestReferences([{ id: 'flow', name: 'Flow', workflows: ['workflow-a'] }], { ...registries, skills: [] }),
+        ).toThrow("Combo 'flow' workflow 'workflow-a' references unknown skills ID 'workflow-skill'");
+    });
+
     it('deduplicates direct and transitive dependencies in declaration order', () => {
         expect(
             buildComboDependencyPlan(

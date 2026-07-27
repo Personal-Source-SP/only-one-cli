@@ -8,6 +8,7 @@ import {
     executeAndReportComboStep,
     loadComboManifestsStep,
     selectCombosStep,
+    selectComboPluginsStep,
     selectComboTargetStep,
 } from './actions/index.js';
 
@@ -46,7 +47,17 @@ export function createComboCommand(deps: ProgramDeps): Command {
                 deps.stdout(`\nProcessing combo: ${COLORS.primary(combo.name)}...`);
 
                 const overwriteList = await confirmComboOverwriteStep(deps, projectDir, combo, targetTools);
-                await executeAndReportComboStep(deps, projectDir, combo, targetTools, overwriteList, options, ignoreTargets);
+                const selectedPluginIds = await selectComboPluginsStep(deps, combo);
+                await executeAndReportComboStep(
+                    deps,
+                    projectDir,
+                    combo,
+                    targetTools,
+                    overwriteList,
+                    selectedPluginIds,
+                    options,
+                    ignoreTargets,
+                );
             }
         });
 

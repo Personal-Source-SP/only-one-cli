@@ -113,10 +113,50 @@ export const validateComboManifestReferences = (combos: ComboManifest[], registr
                 }
             }
         }
+
+        for (const workflowName of combo.workflows || []) {
+            const workflow = registries.workflows.find((item) => item.name === workflowName);
+            for (const skillName of workflow?.requiredSkills || []) {
+                if (skillName === 'ux-ui-max') {
+                    if (!(combo.packages || []).includes('ui-ux-pro-max-cli')) {
+                        throw new Error(
+                            `Combo '${combo.id}' workflow '${workflowName}' requires external skill 'ux-ui-max'; add package 'ui-ux-pro-max-cli'`,
+                        );
+                    }
+                    continue;
+                }
+                if (!registries.skills.some((skill) => skill.name === skillName)) {
+                    throw new Error(`Combo '${combo.id}' workflow '${workflowName}' references unknown skills ID '${skillName}'`);
+                }
+            }
+            for (const mcpId of workflow?.requiredMcps || []) {
+                if (!registries.mcps.some((mcp) => mcp.id === mcpId)) {
+                    throw new Error(`Combo '${combo.id}' workflow '${workflowName}' references unknown mcps ID '${mcpId}'`);
+                }
+            }
+        }
+
+        for (const ruleId of combo.rules || []) {
+            const rule = registries.rules.find((item) => item.id === ruleId);
+            const dependencies: Array<[string, string[] | undefined, Set<string>]> = [
+                ['packages', rule?.requiredPackages, new Set(registries.packages.map((item) => item.id))],
+                ['plugins', rule?.requiredPlugins, new Set(registries.plugins.map((item) => item.id))],
+                ['skills', rule?.requiredSkills, new Set(registries.skills.map((item) => item.name))],
+                ['mcps', rule?.requiredMcps, new Set(registries.mcps.map((item) => item.id))],
+            ];
+            for (const [field, ids, catalog] of dependencies) {
+                for (const id of ids || []) {
+                    if (!catalog.has(id)) throw new Error(`Combo '${combo.id}' rule '${ruleId}' references unknown ${field} ID '${id}'`);
+                }
+            }
+        }
     }
 };
 
-export const buildComboDependencyPlan = (combo: ComboManifest, registries: ComboAssetRegistries): ComboDependencyPlan => {
+export const buildComboDependencyPlan = (
+    combo: ComboManifest,
+    registries: ComboAssetRegistries = comboRegistries(),
+): ComboDependencyPlan => {
     const ruleDependencies = (combo.rules || []).flatMap((id) => {
         const rule = registries.rules.find((item) => item.id === id);
         return rule ? [rule] : [];
@@ -133,7 +173,7 @@ export const buildComboDependencyPlan = (combo: ComboManifest, registries: Combo
         skills: unique([
             ...(combo.skills || []),
             ...ruleDependencies.flatMap((rule) => rule.requiredSkills || []),
-            ...workflowDependencies.flatMap((workflow) => workflow.requiredSkills || []),
+            ...workflowDependencies.flatMap((workflow) => (workflow.requiredSkills || []).filter((skill) => skill !== 'ux-ui-max')),
         ]),
         configs: unique(combo.configs || []),
         workflows: unique(combo.workflows || []),
@@ -308,9 +348,10 @@ export const installCombo = async (params: {
     selectedTools: AgentToolOption[];
     combo: ExtendedComboManifest;
     overwriteList?: string[]; // list of existing component ids that user confirmed to overwrite
+    selectedPluginIds?: string[];
     noIgnore?: boolean;
 }): Promise<ComboInstallResult> => {
-    const { deps, projectDir, homeDir, platform, selectedTools, combo, overwriteList = [], noIgnore = false } = params;
+    const { deps, projectDir, homeDir, platform, selectedTools, combo, overwriteList = [], selectedPluginIds, noIgnore = false } = params;
     const results: ComboInstallResult = {
         packages: [],
         configs: [],
@@ -370,11 +411,12 @@ export const installCombo = async (params: {
     }
 
     // 3. Plugins
-    if (plan.plugins.length > 0) {
+    const pluginsToRun = selectedPluginIds ?? plan.plugins;
+    if (pluginsToRun.length > 0) {
         const pluginResult = await executePluginActions({
             deps,
             projectDir,
-            selectedPluginIds: plan.plugins,
+            selectedPluginIds: pluginsToRun,
             targetIds: selectedTools.map((tool) => tool.value as import('@/constants/allowed-tools.js').AllowedToolId),
         });
         results.plugins = pluginResult.summary;

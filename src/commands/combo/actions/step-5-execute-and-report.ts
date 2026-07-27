@@ -12,6 +12,7 @@ export const executeAndReportComboStep = async (
     combo: ExtendedComboManifest,
     targetTools: AgentToolOption[],
     overwriteList: string[],
+    selectedPluginIds: string[],
     options: ComboCommandOptions,
     ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
 ): Promise<void> => {
@@ -23,6 +24,7 @@ export const executeAndReportComboStep = async (
         selectedTools: targetTools,
         combo,
         overwriteList,
+        selectedPluginIds,
         noIgnore: options.ignore === false,
     });
 
