@@ -85,7 +85,7 @@ describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
                     if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
-                    if (opts.message.includes('combos to install')) return ['idsd-flow'];
+                    if (opts.message.includes('combos to install')) return ['backend-flow'];
                     if (opts.message.includes('already exist')) return [];
                     return [];
                 },

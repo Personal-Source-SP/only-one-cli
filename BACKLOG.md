@@ -17,7 +17,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 ## Đã có — Agent workspace management
 
 - [x] **Skill management** — `skill` và `init skill` phát hiện, chọn, và đồng bộ custom skills cho agent targets.
-- [x] **Bundled skills** — Cung cấp `architectural-decision-records`, `c4-diagrams`, `gherkin-authoring`, `grill-me`, `only-one-clockify-skill`, `only-one-pr-git-skill`.
+- [x] **Bundled skills** — Cung cấp `c4-diagrams`, `gherkin-authoring`, `grill-me`, `only-one-clockify-skill`, `only-one-pr-git-skill`.
 - [x] **Workflow management** — `workflow` cài và đồng bộ agent workflows cùng dependencies.
 - [x] **Clockify workflow** — `only-one-clockify` xác thực task time entry và dùng Clockify MCP để ghi time.
 - [x] **GitHub PR workflow** — `only-one-pr-git` tạo hoặc cập nhật GitHub PR bằng GitHub MCP.

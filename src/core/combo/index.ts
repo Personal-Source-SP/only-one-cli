@@ -116,19 +116,6 @@ export const validateComboManifestReferences = (combos: ComboManifest[], registr
 
         for (const workflowName of combo.workflows || []) {
             const workflow = registries.workflows.find((item) => item.name === workflowName);
-            for (const skillName of workflow?.requiredSkills || []) {
-                if (skillName === 'ux-ui-max') {
-                    if (!(combo.packages || []).includes('ui-ux-pro-max-cli')) {
-                        throw new Error(
-                            `Combo '${combo.id}' workflow '${workflowName}' requires external skill 'ux-ui-max'; add package 'ui-ux-pro-max-cli'`,
-                        );
-                    }
-                    continue;
-                }
-                if (!registries.skills.some((skill) => skill.name === skillName)) {
-                    throw new Error(`Combo '${combo.id}' workflow '${workflowName}' references unknown skills ID '${skillName}'`);
-                }
-            }
             for (const mcpId of workflow?.requiredMcps || []) {
                 if (!registries.mcps.some((mcp) => mcp.id === mcpId)) {
                     throw new Error(`Combo '${combo.id}' workflow '${workflowName}' references unknown mcps ID '${mcpId}'`);
@@ -170,11 +157,7 @@ export const buildComboDependencyPlan = (
         packages: unique([...(combo.packages || []), ...ruleDependencies.flatMap((rule) => rule.requiredPackages || [])]),
         plugins: unique([...(combo.plugins || []), ...ruleDependencies.flatMap((rule) => rule.requiredPlugins || [])]),
         rules: unique(combo.rules || []),
-        skills: unique([
-            ...(combo.skills || []),
-            ...ruleDependencies.flatMap((rule) => rule.requiredSkills || []),
-            ...workflowDependencies.flatMap((workflow) => (workflow.requiredSkills || []).filter((skill) => skill !== 'ux-ui-max')),
-        ]),
+        skills: unique([...(combo.skills || []), ...ruleDependencies.flatMap((rule) => rule.requiredSkills || [])]),
         configs: unique(combo.configs || []),
         workflows: unique(combo.workflows || []),
         mcps: unique([
@@ -217,6 +200,56 @@ export const npmInstall = async (name: string, scope: 'global' | 'local', projec
     }
 };
 
+const SKILLS_CLI_TARGETS: Record<string, string> = {
+    antigravity: 'antigravity',
+    claude: 'claude-code',
+    cursor: 'cursor',
+    codex: 'codex',
+    cline: 'cline',
+    gemini: 'gemini',
+    'github-copilot': 'github-copilot',
+    opencode: 'opencode',
+    windsurf: 'windsurf',
+};
+
+const externalSkillPath = (projectDir: string, tool: AgentToolOption, skillName: string): string | undefined =>
+    tool.skillsDir ? join(projectDir, tool.skillsDir, 'skills', skillName, 'SKILL.md') : undefined;
+
+export const installExternalSkill = async (
+    installer: Extract<PackageManifest['installer'], { kind: 'skills' }>,
+    selectedTools: AgentToolOption[],
+    projectDir: string,
+): Promise<void> => {
+    const unsupported = selectedTools.filter((tool) => !SKILLS_CLI_TARGETS[tool.value]);
+    if (unsupported.length > 0)
+        throw new Error(`Skills CLI does not support target(s): ${unsupported.map((tool) => tool.value).join(', ')}`);
+    const agents = selectedTools.map((tool) => SKILLS_CLI_TARGETS[tool.value]);
+    await execFileAsync(
+        'npx',
+        [
+            '-y',
+            `skills@${installer.cliVersion}`,
+            'add',
+            installer.source,
+            '--skill',
+            installer.skillName,
+            '--agent',
+            ...agents,
+            '--yes',
+            '--copy',
+        ],
+        { cwd: projectDir, timeout: 120000, shell: false },
+    );
+    const missing = selectedTools.filter((tool) => {
+        const path = externalSkillPath(projectDir, tool, installer.skillName);
+        return !path || !existsSync(path);
+    });
+    if (missing.length > 0)
+        throw new Error(
+            `External skill '${installer.skillName}' missing after install for: ${missing.map((tool) => tool.value).join(', ')}`,
+        );
+};
+
 export const checkExistingComboComponents = async (params: {
     projectDir: string;
     homeDir: string;
@@ -233,16 +266,29 @@ export const checkExistingComboComponents = async (params: {
     if (plan.packages.length) {
         const pkgManifests = await readPackageManifests();
         for (const pkgName of plan.packages) {
-            const pkg = pkgManifests.find((m) => m.id === pkgName);
-            const scope = pkg?.installer.kind === 'npm' ? (pkg.installer.scope ?? 'global') : 'global';
-            const exists = await isPackageInstalled(pkgName, scope, projectDir);
+            const pkg = pkgManifests.find((manifest) => manifest.id === pkgName);
+            if (!pkg) continue;
+            const isExternalSkill = pkg.installer.kind === 'skills';
+            const scope = pkg.installer.kind === 'npm' ? (pkg.installer.scope ?? 'global') : undefined;
+            let exists: boolean;
+            if (pkg.installer.kind === 'skills') {
+                const skillName = pkg.installer.skillName;
+                exists =
+                    selectedTools.length > 0 &&
+                    selectedTools.every((tool) => {
+                        const path = externalSkillPath(projectDir, tool, skillName);
+                        return Boolean(path && existsSync(path));
+                    });
+            } else {
+                exists = await isPackageInstalled(pkg.installer.packageName, scope!, projectDir);
+            }
             results.push({
                 type: 'package',
                 id: `package:${pkgName}`,
                 name: pkgName,
-                label: `Package: ${pkgName} (${scope})`,
+                label: isExternalSkill ? `External skill: ${pkgName}` : `Package: ${pkgName} (${scope})`,
                 exists,
-                meta: { pkgName, scope },
+                meta: { pkgName, scope, installerKind: pkg.installer.kind },
             });
         }
     }
@@ -261,9 +307,8 @@ export const checkExistingComboComponents = async (params: {
         });
     }
 
-    // 5. Skills
-    if (combo.skills && selectedTools.length > 0) {
-        const skillChecks = await checkExistingSkills(projectDir, selectedTools, combo.skills);
+    if (plan.skills.length > 0 && selectedTools.length > 0) {
+        const skillChecks = await checkExistingSkills(projectDir, selectedTools, plan.skills);
         for (const check of skillChecks) {
             results.push({
                 type: 'skill',
@@ -314,10 +359,8 @@ export const checkExistingComboComponents = async (params: {
 
     // 6. MCPs (Explicit + Inferred from skills)
     const mcps = new Set<string>(plan.mcps);
-    if (combo.skills) {
-        if (combo.skills.includes('only-one-pr-git-skill')) mcps.add('github');
-        if (combo.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
-    }
+    if (plan.skills.includes('only-one-pr-git-skill')) mcps.add('github');
+    if (plan.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
         const mcpIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');
@@ -379,11 +422,18 @@ export const installCombo = async (params: {
 
             const pkgManifests = await readPackageManifests();
             const pkg = pkgManifests.find((m) => m.id === pkgName);
-            const scope = pkg?.installer.kind === 'npm' ? (pkg.installer.scope ?? 'global') : 'global';
+            if (!pkg) {
+                results.packages.push({ name: pkgName, status: 'failed', error: 'Package manifest not found' });
+                continue;
+            }
 
-            deps.stdout(`  Installing package ${pkgName}...`);
+            deps.stdout(`  Installing ${pkg.installer.kind === 'skills' ? 'external skill' : 'package'} ${pkgName}...`);
             try {
-                await npmInstall(pkgName, scope, projectDir);
+                if (pkg.installer.kind === 'npm') {
+                    await npmInstall(pkg.installer.packageName, pkg.installer.scope ?? 'global', projectDir);
+                } else {
+                    await installExternalSkill(pkg.installer, selectedTools, projectDir);
+                }
                 results.packages.push({ name: pkgName, status: 'success' });
             } catch (err: any) {
                 results.packages.push({
@@ -509,10 +559,8 @@ export const installCombo = async (params: {
 
     // 7. MCPs
     const mcps = new Set<string>(plan.mcps);
-    if (combo.skills) {
-        if (combo.skills.includes('only-one-pr-git-skill')) mcps.add('github');
-        if (combo.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
-    }
+    if (plan.skills.includes('only-one-pr-git-skill')) mcps.add('github');
+    if (plan.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
         const mcpIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');

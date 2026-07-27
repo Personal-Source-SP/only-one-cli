@@ -38,12 +38,6 @@ export const executeAndReportWorkflowsStep = async (
         deps.stdout(COLORS.success('\n✓ Successfully Installed (New/Reinstalled):'));
         for (const r of successes) {
             deps.stdout(`  - ${COLORS.secondary(r.workflowName)} -> ${COLORS.primary(r.toolName)}`);
-            if (r.installedSkills?.length) {
-                deps.stdout(`    Required skills installed:`);
-                for (const s of r.installedSkills) {
-                    deps.stdout(`      * ${COLORS.secondary(s.skillName)} (${s.status})`);
-                }
-            }
         }
     }
 

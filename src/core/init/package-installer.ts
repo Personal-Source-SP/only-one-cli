@@ -44,6 +44,11 @@ export const executePackageActions = async (
             deps.stdout(`  - Skipped ${pkg.id} (already installed)`);
             continue;
         }
+        if (pkg.installer.kind === 'skills') {
+            actionRequired.push(pkg.id);
+            deps.stdout(`  - ${pkg.id} requires combo target selection for external skill installation`);
+            continue;
+        }
         const { packageName, scope = 'global' } = pkg.installer;
         deps.stdout(`  Installing ${pkg.id}...`);
         const args = ['install', packageName];

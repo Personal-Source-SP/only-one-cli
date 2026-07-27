@@ -13,7 +13,7 @@ description: Shape and approve a Next.js or React frontend change through OpenSp
 1. Check OpenSpec CLI, MCP `gitnexus`, and skills `openspec-propose`, `brainstorming`, `writing-plans`, `gherkin-authoring`, and `ux-ui-max`.
 2. Check workflow `only-one-ui` as the UI discovery and evidence protocol.
 3. For Next.js work, check `next-dev-loop`. Check `next-cache-components-adoption` and `next-cache-components-optimizer` when data fetching or cache boundaries change. Check `next-partial-prefetching-adoption` when navigation or prefetch behavior changes.
-4. Check `architectural-decision-records` and `c4-diagrams` when shared design-system or multi-layout boundaries change.
+4. Check `c4-diagrams` when shared design-system or multi-layout boundaries change.
 5. Report every unavailable required dependency and stop. Do not silently skip, rename, or replace dependencies.
 
 ## Change selection and OpenSpec protocol
@@ -37,7 +37,7 @@ description: Shape and approve a Next.js or React frontend change through OpenSp
 4. Exclude root config, middleware, environment, and bootstrapping files unless approved intent requires infrastructure changes.
 5. Record exact blast-radius allowlist: file, symbol, ownership, direct dependencies, confidence, and colocated test.
 6. Stop when scope exceeds budget. If GitNexus is stale or incomplete, report limitation and use targeted reads only.
-7. Invoke ADR/C4 dependencies for shared design-system contracts, new component patterns, or non-obvious multi-layout boundaries.
+7. Invoke `c4-diagrams` for shared design-system contracts, new component patterns, or non-obvious multi-layout boundaries.
 8. If a backend endpoint or contract change is required, record an out-of-scope dependency for `/only-one-plan-be`.
 
 ## Next.js and React planning constraints

@@ -466,7 +466,6 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
 
                 return {
                     id: wf.name,
-                    skillName: wf.requiredSkills[0],
                     mcpId,
                     secretKey,
                     usageNote,
@@ -474,30 +473,16 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
             });
 
             for (const workflow of workflows) {
-                const hasSkillInAny = workflow.skillName
-                    ? activeTools.some((t) => existsSync(join(projectDir, t.skillsDir!, 'skills', workflow.skillName)))
-                    : false;
-                if (!hasSkillInAny) continue;
+                const commandPaths = activeTools.map((tool) => {
+                    const adapter = CommandAdapterRegistry.get(tool.value);
+                    return adapter ? join(projectDir, normalizeStructureCommandPath(adapter.getFilePath(workflow.id), workflow.id)) : '';
+                });
+                if (!commandPaths.some((path) => path && existsSync(path))) continue;
 
                 deps.stdout(`\n  ${workflow.id} workflow:`);
 
-                let isCommandReady = true;
-                let isSkillReady = true;
-                for (const tool of activeTools) {
-                    const adapter = CommandAdapterRegistry.get(tool.value);
-                    const commandPath = adapter
-                        ? join(projectDir, normalizeStructureCommandPath(adapter.getFilePath(workflow.id), workflow.id))
-                        : '';
-                    if (!commandPath || !existsSync(commandPath)) {
-                        isCommandReady = false;
-                    }
-                    if (!existsSync(join(projectDir, tool.skillsDir!, 'skills', workflow.skillName))) {
-                        isSkillReady = false;
-                    }
-                }
-
+                const isCommandReady = commandPaths.every((path) => path && existsSync(path));
                 deps.stdout(`    - Command (${workflow.id}): ${isCommandReady ? 'Ready' : 'Not configured'}`);
-                deps.stdout(`    - Skill (${workflow.skillName}): ${isSkillReady ? 'Ready' : 'Not configured'}`);
 
                 if (workflow.mcpId) {
                     const configuredIdes: string[] = [];

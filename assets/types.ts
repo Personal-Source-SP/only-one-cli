@@ -30,11 +30,18 @@ export interface RuleManifest {
     requiredSkills?: string[];
 }
 
-export type PackageInstaller = {
-    kind: 'npm';
-    packageName: string;
-    scope?: 'global' | 'local';
-};
+export type PackageInstaller =
+    | {
+          kind: 'npm';
+          packageName: string;
+          scope?: 'global' | 'local';
+      }
+    | {
+          kind: 'skills';
+          source: string;
+          skillName: string;
+          cliVersion: string;
+      };
 
 export interface PackageManifest {
     id: string;
@@ -68,7 +75,6 @@ export interface SkillManifest {
 export interface WorkflowManifest {
     name: string; // exact workflow file name (without .md), e.g. "only-one-clockify"
     description: string;
-    requiredSkills: string[]; // skills required by this workflow
     requiredMcps?: string[]; // MCPs required by this workflow
 }
 

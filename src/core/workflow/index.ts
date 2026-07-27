@@ -4,8 +4,6 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
-import { WORKFLOWS } from '@assets/workflows/index.js';
-import { installSkills, type SkillInstallResult } from '@/core/skill/index.js';
 
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
@@ -25,7 +23,6 @@ export interface WorkflowInstallResult {
     workflowName: string;
     status: 'success' | 'skipped' | 'failed';
     error?: string;
-    installedSkills?: SkillInstallResult[];
 }
 
 export interface WorkflowInstallRequest {
@@ -62,7 +59,7 @@ export const checkExistingWorkflows = async (
 };
 
 export const installWorkflows = async (request: WorkflowInstallRequest): Promise<WorkflowInstallResult[]> => {
-    const { deps, projectDir, selectedTools, workflowNames, overwriteList = [], noIgnore = false } = request;
+    const { deps, projectDir, selectedTools, workflowNames, overwriteList = [] } = request;
     const results: WorkflowInstallResult[] = [];
 
     const existingChecks = await checkExistingWorkflows(projectDir, selectedTools, workflowNames);
@@ -95,38 +92,11 @@ export const installWorkflows = async (request: WorkflowInstallRequest): Promise
                 await mkdir(toolWorkflowsDir, { recursive: true });
                 await cp(srcPath, destPath, { force: true });
 
-                // Check dependencies (Required Skills)
-                const wfMeta = WORKFLOWS.find((w) => w.name === wfName);
-                let skillResults: SkillInstallResult[] = [];
-                if (wfMeta?.requiredSkills?.length) {
-                    const missingSkills: string[] = [];
-                    for (const skillName of wfMeta.requiredSkills) {
-                        if (skillName === 'ux-ui-max') continue;
-                        const skillDestPath = join(projectDir, tool.skillsDir, 'skills', skillName);
-                        if (!existsSync(skillDestPath)) {
-                            missingSkills.push(skillName);
-                        }
-                    }
-
-                    if (missingSkills.length > 0) {
-                        deps.stdout(`  Workflow '${wfName}' requires skill(s): ${missingSkills.join(', ')}. Installing them...`);
-                        skillResults = await installSkills({
-                            deps,
-                            projectDir,
-                            selectedTools: [tool],
-                            skillNames: missingSkills,
-                            overwriteList: missingSkills.map((s) => `${tool.value}:${s}`),
-                            noIgnore,
-                        });
-                    }
-                }
-
                 results.push({
                     toolId: tool.value,
                     toolName: tool.name,
                     workflowName: wfName,
                     status: 'success',
-                    installedSkills: skillResults,
                 });
             } catch (error: unknown) {
                 results.push({

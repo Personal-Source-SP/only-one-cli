@@ -11,7 +11,7 @@ description: Shape and approve a NestJS backend change through OpenSpec artifact
 ## Dependency preflight
 
 1. Check OpenSpec CLI, MCP `gitnexus`, and skills `openspec-propose`, `brainstorming`, `writing-plans`, and `gherkin-authoring`.
-2. Check `architectural-decision-records` and `c4-diagrams` when their triggers below apply.
+2. Check `c4-diagrams` when its triggers below apply.
 3. Report every unavailable required dependency and stop. Do not silently skip, rename, or replace dependencies.
 
 ## Change selection and OpenSpec protocol
@@ -38,7 +38,7 @@ description: Shape and approve a NestJS backend change through OpenSpec artifact
 7. Stop and ask for narrower capability when candidate scope exceeds budget. Do not expand automatically.
 8. If GitNexus is stale or incomplete, report limitation and use only targeted reads for identified files. Do not claim complete impact coverage.
 9. For every source file, search for a colocated spec first. Create a new spec only when none exists.
-10. If change modifies a shared API contract, adds a NestJS module/global provider, or crosses service boundaries, invoke `architectural-decision-records`. If multi-module relationships are non-obvious, invoke `c4-diagrams` first.
+10. If multi-module relationships are non-obvious, invoke `c4-diagrams`.
 11. If UI work is required, stop and record an out-of-scope dependency for `/only-one-plan-fe`.
 
 ## NestJS architecture constraints

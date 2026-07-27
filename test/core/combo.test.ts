@@ -19,10 +19,9 @@ describe('combo manifest preflight', () => {
         skills: [
             { name: 'direct-skill', description: '' },
             { name: 'rule-skill', description: '' },
-            { name: 'workflow-skill', description: '' },
         ],
         configs: { 'config-a': { name: 'config-a', files: [] } },
-        workflows: [{ name: 'workflow-a', description: '', requiredSkills: ['workflow-skill'], requiredMcps: ['workflow-mcp'] }],
+        workflows: [{ name: 'workflow-a', description: '', requiredMcps: ['workflow-mcp'] }],
         mcps: [
             { id: 'direct-mcp', server: { command: 'echo' } },
             { id: 'rule-mcp', server: { command: 'echo' } },
@@ -36,10 +35,10 @@ describe('combo manifest preflight', () => {
         ).toThrow("Combo 'bad-flow' references unknown packages ID 'missing-package'");
     });
 
-    it('rejects a missing transitive workflow skill before installation', () => {
-        expect(() =>
-            validateComboManifestReferences([{ id: 'flow', name: 'Flow', workflows: ['workflow-a'] }], { ...registries, skills: [] }),
-        ).toThrow("Combo 'flow' workflow 'workflow-a' references unknown skills ID 'workflow-skill'");
+    it('does not infer skills from workflow metadata', () => {
+        const plan = buildComboDependencyPlan({ id: 'flow', name: 'Flow', workflows: ['workflow-a'] }, registries);
+
+        expect(plan.skills).toEqual([]);
     });
 
     it('deduplicates direct and transitive dependencies in declaration order', () => {
@@ -62,7 +61,7 @@ describe('combo manifest preflight', () => {
             packages: ['direct-package'],
             plugins: ['direct-plugin'],
             rules: ['rule-a'],
-            skills: ['direct-skill', 'rule-skill', 'workflow-skill'],
+            skills: ['direct-skill', 'rule-skill'],
             configs: ['config-a'],
             workflows: ['workflow-a'],
             mcps: ['direct-mcp', 'rule-mcp', 'workflow-mcp'],

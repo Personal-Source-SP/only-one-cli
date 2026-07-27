@@ -32,12 +32,12 @@ describe('combo command', () => {
                 },
             });
 
-            await program.parseAsync(['combo', cwd, 'idsd-flow', '--tool', 'cursor'], { from: 'user' });
+            await program.parseAsync(['combo', cwd, 'backend-flow', '--tool', 'cursor'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('Processing combo:');
-            expect(output).toContain('IDSD Flow Setup');
-            expect(output).toContain("COMBO 'IDSD FLOW SETUP' REPORT");
+            expect(output).toContain('Backend Flow Setup');
+            expect(output).toContain("COMBO 'BACKEND FLOW SETUP' REPORT");
 
             // Verify configuration template copy
             const configPath = join(cwd, 'openspec', 'config.yaml');
@@ -72,7 +72,7 @@ describe('combo command', () => {
                 },
             });
 
-            await program.parseAsync(['combo', cwd, 'idsd-flow', '--tool', 'cursor'], { from: 'user' });
+            await program.parseAsync(['combo', cwd, 'backend-flow', '--tool', 'cursor'], { from: 'user' });
 
             const overwritePrompt = prompts.find((prompt) => prompt.message.includes('already exist'));
             expect(overwritePrompt?.choices.length).toBeGreaterThan(0);

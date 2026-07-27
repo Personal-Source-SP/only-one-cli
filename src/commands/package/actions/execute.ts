@@ -14,7 +14,7 @@ export const executePackagesStep = async (
     const packageStatuses = await Promise.all(
         selectedPackageIds.map(async (id) => {
             const pkg = packageManifests.find((m) => m.id === id);
-            if (!pkg) return { id, installed: false };
+            if (!pkg || pkg.installer.kind !== 'npm') return { id, installed: false };
             const scope = pkg.installer.scope ?? 'global';
             const installed = await isPackageInstalled(pkg.installer.packageName, scope, projectDir);
             return { id, installed };

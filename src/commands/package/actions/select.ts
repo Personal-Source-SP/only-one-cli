@@ -17,6 +17,7 @@ export const selectPackagesStep = async (
     // 1. Determine existing package statuses
     const packageStatuses = await Promise.all(
         availablePackages.map(async (pkg) => {
+            if (pkg.installer.kind !== 'npm') return { pkg, installed: false };
             const scope = pkg.installer.scope ?? 'global';
             const installed = await isPackageInstalled(pkg.installer.packageName, scope, projectDir);
             return { pkg, installed };
@@ -31,7 +32,9 @@ export const selectPackagesStep = async (
             .map((n) => n.trim())
             .filter(Boolean);
         for (const name of inputNames) {
-            const found = availablePackages.find((p) => p.id === name || p.installer.packageName === name);
+            const found = availablePackages.find(
+                (pkg) => pkg.id === name || (pkg.installer.kind === 'npm' && pkg.installer.packageName === name),
+            );
             if (!found) {
                 throw new Error(`Package '${name}' not found in assets/packages.`);
             }

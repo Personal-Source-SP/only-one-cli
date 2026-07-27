@@ -35,7 +35,7 @@ describe('Workflow Command Unit & Integration Tests', () => {
         await rmP(testProjectDir, { recursive: true, force: true });
     });
 
-    it('installs workflows and required dependency skills', async () => {
+    it('installs workflows without implicitly installing skills', async () => {
         const outputs: string[] = [];
         const deps: Partial<ProgramDeps> = {
             stdout: (msg) => {
@@ -60,7 +60,7 @@ describe('Workflow Command Unit & Integration Tests', () => {
         const skillDest = join(testProjectDir, '.agents/skills/only-one-clockify-skill/SKILL.md');
 
         expect(existsSync(workflowDest)).toBe(true);
-        expect(existsSync(skillDest)).toBe(true);
+        expect(existsSync(skillDest)).toBe(false);
 
         await rmP(testProjectDir, { recursive: true, force: true });
     });

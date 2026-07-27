@@ -19,8 +19,10 @@ export async function planPackages(options: PlanPackageOptions): Promise<Planned
         const manifest = packageManifests.find((m) => m.id === pkgId);
         if (!manifest) continue;
 
-        const { packageName, scope = 'global' } = manifest.installer;
-        const installed = await isPackageInstalled(packageName, scope, projectDir);
+        const installed =
+            manifest.installer.kind === 'npm'
+                ? await isPackageInstalled(manifest.installer.packageName, manifest.installer.scope ?? 'global', projectDir)
+                : false;
         items.push({
             key: `package:${manifest.id}`,
             category: 'package',

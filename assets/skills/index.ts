@@ -2,10 +2,6 @@ import type { SkillManifest } from '../types.js';
 
 export const SKILLS: SkillManifest[] = [
     {
-        name: 'architectural-decision-records',
-        description: 'Use when documenting, drafting, reviewing, or updating architectural decisions.',
-    },
-    {
         name: 'c4-diagrams',
         description: 'Use when explaining existing code architecture, visualizing a new system.',
     },
@@ -16,38 +12,6 @@ export const SKILLS: SkillManifest[] = [
     {
         name: 'grill-me',
         description: 'Interview the user relentlessly about a plan or design.',
-    },
-    {
-        name: 'next-dev-loop',
-        description: 'Verify Next.js runtime behavior through the development server and browser.',
-    },
-    {
-        name: 'next-cache-components-adoption',
-        description: 'Enable Cache Components and resolve blocking routes in Next.js applications.',
-    },
-    {
-        name: 'next-cache-components-optimizer',
-        description: 'Optimize Next.js Cache Components boundaries and cache behavior.',
-    },
-    {
-        name: 'next-partial-prefetching-adoption',
-        description: 'Adopt partial prefetching in eligible Next.js applications.',
-    },
-    {
-        name: 'test-driven-development',
-        description: 'Use test-first red-green-refactor cycles for features and fixes.',
-    },
-    {
-        name: 'requesting-code-review',
-        description: 'Request rigorous code review before integration.',
-    },
-    {
-        name: 'verification-before-completion',
-        description: 'Require fresh verification evidence before completion claims.',
-    },
-    {
-        name: 'systematic-debugging',
-        description: 'Diagnose root causes before proposing fixes.',
     },
     {
         name: 'only-one-clockify-skill',
