@@ -1,69 +1,71 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
-/**
- * Appends directory/file patterns to the project's .gitignore file
- * under a dedicated section if they are not already ignored.
- *
- * @param projectDir Absolute path to the project directory
- * @param pathsToIgnore Array of paths/patterns to ignore (e.g. ['.cursor', '.claude'])
- */
-export async function updateGitignore(projectDir: string, pathsToIgnore: string[]): Promise<void> {
+interface IgnoreSection {
+    header: string;
+    patterns: string[];
+}
+
+const normalizePattern = (pattern: string): string => pattern.trim().replace(/\/$/, '');
+
+const parseSections = (template: string): IgnoreSection[] => {
+    const sections: IgnoreSection[] = [];
+    let current: IgnoreSection | undefined;
+
+    for (const rawLine of template.split(/\r?\n/)) {
+        const line = rawLine.trim();
+        if (!line) continue;
+        if (line.startsWith('#')) {
+            current = { header: line, patterns: [] };
+            sections.push(current);
+        } else if (current) {
+            current.patterns.push(line);
+        }
+    }
+
+    return sections.filter((section) => section.patterns.length > 0);
+};
+
+const findSectionEnd = (lines: string[], headerIndex: number): number => {
+    let index = headerIndex + 1;
+    while (index < lines.length && !lines[index].trim().startsWith('#') && lines[index].trim() !== '') index++;
+    return index;
+};
+
+/** Merge patterns from assets/ignore/git.ignore into a project's .gitignore. */
+export async function updateGitignore(projectDir: string): Promise<void> {
     const gitignorePath = join(projectDir, '.gitignore');
-    let content = '';
+    const templatePath = join(resolvePackageRoot(import.meta.url), 'assets', 'ignore', 'git.ignore');
+    const template = await readFile(templatePath, 'utf8');
+    const sections = parseSections(template);
+    const original = existsSync(gitignorePath) ? await readFile(gitignorePath, 'utf8') : '';
+    const newline = original.includes('\r\n') ? '\r\n' : '\n';
+    const lines = original ? original.split(/\r?\n/) : [];
+    if (lines.at(-1) === '') lines.pop();
 
-    if (existsSync(gitignorePath)) {
-        content = await readFile(gitignorePath, 'utf-8');
+    const existingPatterns = new Set(
+        lines
+            .map((line) => line.trim())
+            .filter((line) => line && !line.startsWith('#'))
+            .map(normalizePattern),
+    );
+
+    for (const section of sections) {
+        const missing = section.patterns.filter((pattern) => !existingPatterns.has(normalizePattern(pattern)));
+        if (missing.length === 0) continue;
+
+        const headerIndex = lines.findIndex((line) => line.trim() === section.header);
+        if (headerIndex >= 0) {
+            lines.splice(findSectionEnd(lines, headerIndex), 0, ...missing);
+        } else {
+            if (lines.length > 0 && lines.at(-1)?.trim() !== '') lines.push('');
+            lines.push(section.header, ...missing);
+        }
+        for (const pattern of missing) existingPatterns.add(normalizePattern(pattern));
     }
 
-    const sectionHeader = '# AI ignores';
-    const lines = content.split(/\r?\n/);
-
-    const sectionStartIndex = lines.findIndex((line) => line.trim() === sectionHeader);
-
-    // Default ignores as requested by the user
-    const defaultIgnores = ['.agent/', '.agents/', 'openspec/', 'adr/'];
-
-    // Format all input directories to ensure they end with a slash for safety
-    const formattedInputPaths = (pathsToIgnore || []).map((p) => {
-        const cleanPath = p.trim().replace(/\/$/, '');
-        return `${cleanPath}/`;
-    });
-
-    // Merge default ignores with formatted input paths
-    const allPaths = Array.from(new Set([...defaultIgnores, ...formattedInputPaths]));
-
-    const newIgnores: string[] = [];
-    for (const p of allPaths) {
-        // Check if the path is already present
-        const isAlreadyIgnored = lines.some((line) => {
-            const trimmed = line.trim();
-            return trimmed === p;
-        });
-
-        if (!isAlreadyIgnored) {
-            newIgnores.push(p);
-        }
-    }
-
-    if (newIgnores.length === 0) return;
-
-    if (sectionStartIndex === -1) {
-        // Append section to the end of the file
-        if (content && !content.endsWith('\n')) {
-            content += '\n';
-        }
-        content += `\n${sectionHeader}\n${newIgnores.join('\n')}\n`;
-    } else {
-        // Insert new ignore patterns after the section header
-        let insertIndex = sectionStartIndex + 1;
-        while (insertIndex < lines.length && lines[insertIndex].trim() !== '' && !lines[insertIndex].startsWith('#')) {
-            insertIndex++;
-        }
-        lines.splice(insertIndex, 0, ...newIgnores);
-        content = lines.join('\n');
-    }
-
-    await writeFile(gitignorePath, content, 'utf-8');
+    const content = lines.length > 0 ? `${lines.join(newline)}${newline}` : original;
+    if (content !== original) await writeFile(gitignorePath, content, 'utf8');
 }

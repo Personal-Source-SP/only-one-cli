@@ -64,13 +64,11 @@ export const installSkills = async (request: {
 }): Promise<SkillInstallResult[]> => {
     const { deps, projectDir, selectedTools, skillNames, overwriteList = [], noIgnore = false } = request;
     const results: SkillInstallResult[] = [];
-    const gitignorePaths: string[] = [];
 
     const existingChecks = await checkExistingSkills(projectDir, selectedTools, skillNames);
 
     for (const tool of selectedTools) {
         if (!tool.skillsDir) continue;
-        gitignorePaths.push(tool.skillsDir);
 
         for (const skillName of skillNames) {
             const check = existingChecks.find((c) => c.toolId === tool.value && c.skillName === skillName);
@@ -136,10 +134,9 @@ export const installSkills = async (request: {
         }
     }
 
-    if (!noIgnore && gitignorePaths.length > 0) {
-        const uniquePaths = Array.from(new Set(gitignorePaths));
+    if (!noIgnore && selectedTools.length > 0) {
         try {
-            await updateGitignore(projectDir, uniquePaths);
+            await updateGitignore(projectDir);
         } catch (error) {
             deps.stdout(`Warning: Failed to update .gitignore: ${error instanceof Error ? error.message : String(error)}`);
         }

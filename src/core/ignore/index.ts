@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { IGNORE_TEMPLATES, IgnoreTarget } from '@assets/ignore/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import { updateGitignore } from '@/core/init/gitignore.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
 export { IgnoreTarget } from '@assets/ignore/index.js';
@@ -40,23 +41,31 @@ export const writeIgnoreTemplates = async (projectDir: string, targets: IgnoreTa
     for (const target of targets) {
         const { fileName } = IGNORE_TEMPLATES[target];
         const templatePath = resolveIgnoreTemplatePath(import.meta.url, target);
-        const targetPath = join(projectDir, fileName);
         const template = await readFile(templatePath, 'utf8');
+        const targetPath = join(projectDir, fileName);
         const content = existsSync(targetPath) ? await readFile(targetPath, 'utf8') : '';
+        const templatePatterns = template
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line && !line.startsWith('#'));
         const existing = new Set(
             content
                 .split(/\r?\n/)
-                .map((line) => line.trim())
+                .map((line) => line.trim().replace(/\/$/, ''))
                 .filter(Boolean),
         );
-        const additions = template
-            .split(/\r?\n/)
-            .filter((line) => line.trim() && !line.trim().startsWith('#') && !existing.has(line.trim()));
-        if (additions.length) {
-            const prefix = content && !content.endsWith('\n') ? '\n' : '';
-            await writeFile(targetPath, `${content}${prefix}${additions.join('\n')}\n`, 'utf8');
+        const added = templatePatterns.filter((line) => !existing.has(line.replace(/\/$/, ''))).length;
+
+        if (target === IgnoreTarget.Git) {
+            await updateGitignore(projectDir);
+        } else {
+            const additions = templatePatterns.filter((line) => !existing.has(line.replace(/\/$/, '')));
+            if (additions.length) {
+                const prefix = content && !content.endsWith('\n') ? '\n' : '';
+                await writeFile(targetPath, `${content}${prefix}${additions.join('\n')}\n`, 'utf8');
+            }
         }
-        results.push({ added: additions.length, fileName, target });
+        results.push({ added, fileName, target });
     }
     return results;
 };

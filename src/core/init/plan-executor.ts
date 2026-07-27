@@ -228,7 +228,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
 
     // 8. .gitignore update
     if (!noIgnore && plan.selectedTools.length > 0) {
-        await updateGitignore(plan.projectDir, plan.selectedTools);
+        await updateGitignore(plan.projectDir);
     }
 
     return {
