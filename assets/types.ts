@@ -88,6 +88,10 @@ export interface ComboManifest {
     name: string;
     description?: string;
     packages?: string[];
+    mcps?: string[];
+    plugins?: string[];
     skills?: string[];
+    rules?: string[];
     configs?: string[];
+    workflows?: string[];
 }

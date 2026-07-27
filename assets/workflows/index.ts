@@ -32,9 +32,21 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredMcps: ['gitnexus'],
     },
     {
-        name: 'only-one-implement',
-        description: 'Execute an approved feature plan through isolated subagents, mandatory TDD, review, and integration verification.',
-        requiredSkills: [],
+        name: 'only-one-implement-fe',
+        description: 'Execute an approved frontend plan (Next.js/React) through isolated subagents, mandatory TDD, review, and integration verification.',
+        requiredSkills: ['ux-ui-max', 'next-cache-components-adoption', 'next-partial-prefetching-adoption', 'subagent-driven-development', 'test-driven-development', 'requesting-code-review', 'verification-before-completion'],
         requiredMcps: ['gitnexus'],
+    },
+    {
+        name: 'only-one-implement-be',
+        description: 'Execute an approved backend plan (NestJS) through isolated subagents, mandatory TDD, review, and integration verification.',
+        requiredSkills: ['subagent-driven-development', 'test-driven-development', 'requesting-code-review', 'verification-before-completion'],
+        requiredMcps: ['gitnexus'],
+    },
+    {
+        name: 'only-one-implement-fast',
+        description: 'Scope, implement, and verify a simple low-risk task directly — no subagent delegation, no written plan, no large skill requirements.',
+        requiredSkills: [],
+        requiredMcps: [],
     },
 ];
