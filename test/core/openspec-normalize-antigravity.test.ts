@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -46,5 +46,19 @@ describe('normalizeOpenSpecAntigravityOutput', () => {
         await normalizeOpenSpecAntigravityOutput(root);
         expect(await readFile(join(root, '.agent/keep.txt'), 'utf8')).toBe('keep');
         expect(existsSync(join(root, '.agent/skills'))).toBe(false);
+    });
+
+    it('ignores legacy skill symlinks that target canonical directories', async () => {
+        const root = await project();
+        await put(root, '.agents/skills/next-dev-loop/SKILL.md', 'next skill');
+        await mkdir(join(root, '.agent/skills'), { recursive: true });
+        await symlink('../../.agents/skills/next-dev-loop', join(root, '.agent/skills/next-dev-loop'));
+        await put(root, '.agent/skills/openspec-propose/SKILL.md', 'openspec skill');
+
+        await normalizeOpenSpecAntigravityOutput(root);
+
+        expect(await readFile(join(root, '.agents/skills/next-dev-loop/SKILL.md'), 'utf8')).toBe('next skill');
+        expect(await readFile(join(root, '.agents/skills/openspec-propose/SKILL.md'), 'utf8')).toBe('openspec skill');
+        expect(existsSync(join(root, '.agent'))).toBe(false);
     });
 });

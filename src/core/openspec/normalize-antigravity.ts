@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, lstatSync } from 'node:fs';
 import { cp, readdir, rm, rmdir } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
@@ -22,7 +22,11 @@ export const normalizeOpenSpecAntigravityOutput = async (projectDir: string): Pr
         if (!existsSync(source)) continue;
         const destination = join(projectDir, '.agents', directory);
         const sourceFiles = await listFiles(source);
-        await cp(source, destination, { recursive: true, force: true });
+        await cp(source, destination, {
+            recursive: true,
+            force: true,
+            filter: (path) => !lstatSync(path).isSymbolicLink(),
+        });
 
         const missing = sourceFiles.filter((file) => !existsSync(join(destination, relative(source, file))));
         if (missing.length > 0) {
