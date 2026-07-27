@@ -108,7 +108,7 @@ describe('combo command', () => {
             await rm(cwd, { recursive: true, force: true });
         }
     });
-    it('shows every dependency group and installation status in combo choices', async () => {
+    it('shows combo id, name, and description without dependency details', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'combo-details-test-'));
         let comboChoices: Array<{ name: string; checked?: boolean }> = [];
 
@@ -129,14 +129,7 @@ describe('combo command', () => {
             await program.parseAsync(['combo', cwd, '--tool', 'cursor'], { from: 'user' });
 
             const frontend = comboChoices.find((choice) => choice.name.includes('frontend-flow'));
-            expect(frontend?.name).toContain('Packages:');
-            expect(frontend?.name).toContain('Plugins:');
-            expect(frontend?.name).toContain('Rules:');
-            expect(frontend?.name).toContain('Skills:');
-            expect(frontend?.name).toContain('Configs:');
-            expect(frontend?.name).toContain('Workflows:');
-            expect(frontend?.name).toContain('MCPs:');
-            expect(frontend?.name).toContain('[missing]');
+            expect(frontend?.name).toBe('frontend-flow — Frontend Flow Setup\n  Next.js and React frontend development toolkit');
             expect(frontend?.checked).toBe(true);
         } finally {
             await rm(cwd, { recursive: true, force: true });
