@@ -8,6 +8,7 @@ export const nodeVsFileSystem: VsFileSystem = {
         await fs.mkdir(path, { recursive: true });
     },
     readFile: async (path) => fs.readFile(path, 'utf8'),
+    removeEmptyDir: (path) => fs.rmdir(path),
     rename: fs.rename,
     rm: async (path) => {
         await fs.rm(path, { recursive: true, force: true });

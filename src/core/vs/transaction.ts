@@ -81,6 +81,11 @@ export class VsSyncTransaction {
         await this.persist();
         await this.fs.rm(this.journalPath);
         for (const file of this.journal.files) await this.fs.rm(file.backupPath);
+        try {
+            await this.fs.removeEmptyDir(dirname(this.journalPath));
+        } catch {
+            // Keep the journal directory when another only-one artifact still uses it.
+        }
     }
 
     public async rollback(): Promise<void> {

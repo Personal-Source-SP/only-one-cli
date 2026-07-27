@@ -29,6 +29,11 @@ class MemoryFs implements VsFileSystem {
         return content;
     }
 
+    public async removeEmptyDir(path: string): Promise<void> {
+        if ([...this.files.keys()].some((file) => file.startsWith(`${path}/`))) throw new Error('ENOTEMPTY');
+        this.dirs.delete(path);
+    }
+
     public async rename(source: string, target: string): Promise<void> {
         const content = this.files.get(source);
         if (content === undefined) throw missingFile();
@@ -129,6 +134,18 @@ describe('VS core sync helpers', () => {
         reporter.step('one');
         reporter.step('two');
         expect(writes).toEqual(['✓ start', '✓ one', '✓ two']);
+    });
+
+    it('removes an empty journal directory after commit', async () => {
+        const fs = new MemoryFs();
+        const journalPath = resolveVsJournalPath('/repo');
+        const transaction = new VsSyncTransaction(fs, new MemoryRunner(), new PercentProgressReporter(() => undefined), journalPath);
+
+        await transaction.begin();
+        await transaction.commit();
+
+        expect(fs.files.has(journalPath)).toBe(false);
+        expect(fs.dirs.has(dirname(journalPath))).toBe(false);
     });
 
     it('rolls settings back when a later editor write fails', async () => {

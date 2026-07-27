@@ -20,6 +20,7 @@ export interface VsFileSystem {
     copyFile: (source: string, target: string) => Promise<void>;
     mkdir: (path: string) => Promise<void>;
     readFile: (path: string) => Promise<string>;
+    removeEmptyDir: (path: string) => Promise<void>;
     rename: (source: string, target: string) => Promise<void>;
     rm: (path: string) => Promise<void>;
     stat: (path: string) => Promise<{ isFile: () => boolean }>;
