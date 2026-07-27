@@ -56,7 +56,7 @@ describe('implementation workspace contracts', () => {
         expect(workflow).toContain('current project workspace and current Git branch');
         expect(workflow).toContain('Do not invoke `using-git-worktrees`');
         expect(workflow).toContain('Do not run `git worktree` commands');
-        expect(workflow).toContain('This workflow creates no plan and no `tasks.md`.');
+        expect(workflow).toContain("IDE's default `implementation_plan.md`");
     });
 
     it.each(['only-one-implement-fe.md', 'only-one-implement-be.md'])(
@@ -72,8 +72,10 @@ describe('implementation workspace contracts', () => {
             expect(workflow).toContain('`git reset`');
             expect(workflow).toContain('unstaged changes');
             expect(workflow).toContain('Keep `ai/<feature-slug>` as a recovery branch');
+            expect(workflow).toContain('`/only-one-archive-cleanup`');
+            expect(workflow).not.toContain('`git branch -D ai/<feature-slug>`');
             expect(workflow).toContain('Do not commit on the target branch');
-            expect(workflow).toContain('Do not archive the OpenSpec change');
+            expect(workflow).toContain('Do not delete the recovery branch or archive the OpenSpec change');
             expect(workflow).not.toContain('<plan-dir>/tasks.md');
         },
     );
@@ -88,7 +90,7 @@ describe('GitNexus freshness workflow contracts', () => {
             expect(workflow).toContain('current working-tree revision');
             expect(workflow).toContain('`stale` or `incomplete`');
             expect(workflow).toContain('sync/reindex');
-            expect(workflow).toContain('Do not claim complete impact coverage from a stale or incomplete index.');
+            expect(workflow).toMatch(/Do not (?:silently replace it or )?claim complete impact coverage/);
         },
     );
 
@@ -107,11 +109,12 @@ describe('GitNexus freshness workflow contracts', () => {
     it('requires GitNexus gates and escalation for fast implementation', async () => {
         const workflow = await readFile(join(repoRoot, 'assets', 'workflows', 'only-one-implement-fast.md'), 'utf-8');
 
-        expect(workflow).toContain('Dependency and scope preflight');
-        expect(workflow).toContain('Relationship gate');
+        expect(workflow).toContain('Dependency preflight');
+        expect(workflow).toContain('Discovery and scope');
+        expect(workflow).toContain('Planning and approval gate');
         expect(workflow).toContain('Completion impact gate');
         expect(workflow).toContain('`detect_changes`');
-        expect(workflow).toContain('impact exceeds 1–3 files');
+        expect(workflow).toContain('final impact exceeds approved scope');
 
         const fastWorkflow = WORKFLOWS.find((workflow) => workflow.name === 'only-one-implement-fast');
         expect(fastWorkflow?.requiredMcps).toContain('gitnexus');

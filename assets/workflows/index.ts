@@ -44,8 +44,14 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredMcps: ['gitnexus'],
     },
     {
+        name: 'only-one-archive-cleanup',
+        description: 'Sync and archive a completed OpenSpec change, safely clean current and stale AI worktrees and branches, then refresh GitNexus.',
+        requiredSkills: [],
+        requiredMcps: ['gitnexus'],
+    },
+    {
         name: 'only-one-implement-fast',
-        description: 'Scope, implement, and verify a simple low-risk task directly — no subagent delegation, no written plan, no large skill requirements.',
+        description: 'Scope, optionally plan, implement, and proportionally verify a small or moderate task directly in the current workspace.',
         requiredSkills: [],
         requiredMcps: ['gitnexus'],
     },

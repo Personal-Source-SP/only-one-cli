@@ -9,7 +9,13 @@ const readWorkflow = async (name: string): Promise<string> => readFile(join(work
 
 describe('feature pipeline workflows', () => {
     it('registers FE and BE planning and implementation workflows with GitNexus', () => {
-        const names = ['only-one-plan-fe', 'only-one-plan-be', 'only-one-implement-fe', 'only-one-implement-be'];
+        const names = [
+            'only-one-plan-fe',
+            'only-one-plan-be',
+            'only-one-implement-fe',
+            'only-one-implement-be',
+            'only-one-archive-cleanup',
+        ];
 
         for (const name of names) {
             expect(WORKFLOWS.find((workflow) => workflow.name === name)).toMatchObject({ requiredMcps: ['gitnexus'] });
@@ -75,6 +81,26 @@ describe('feature pipeline workflows', () => {
         expect(content).toContain('`git merge --squash ai/<feature-slug>`');
         expect(content).toContain('unstaged changes');
         expect(content).not.toContain('<plan-dir>/tasks.md');
+    });
+
+    it('archives OpenSpec changes and safely cleans multiple AI branches', async () => {
+        const content = await readWorkflow('only-one-archive-cleanup');
+
+        expect(content).toContain('`openspec status --change "<name>" --json`');
+        expect(content).toContain('delta specs');
+        expect(content).toContain('archive succeeds');
+        expect(content).toContain('git worktree list --porcelain');
+        expect(content).toContain('refs/heads/ai/*');
+        expect(content).toContain('safe');
+        expect(content).toContain('needs-review');
+        expect(content).toContain('blocked');
+        expect(content).toContain('cleanup preview');
+        expect(content).toContain('explicit confirmation');
+        expect(content).toContain('git worktree prune');
+        expect(content).toContain('git branch -D');
+        expect(content).toContain('Do not use `git worktree remove --force`');
+        expect(content).toContain('npx gitnexus analyze . --force --skip-agents-md');
+        expect(content).toContain('`stale` or `incomplete`');
     });
 
     it('keeps global architecture rule framework-neutral', async () => {

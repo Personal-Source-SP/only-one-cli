@@ -87,8 +87,19 @@ git reset
 4. Show `git status --short`, `git diff --stat`, and changed-file list. Do not stage or hide resulting changes.
 5. Do not commit on the target branch. User reviews, edits, stages, and commits manually.
 6. On merge conflict, stop and report conflict paths. Do not abort, reset, delete, or resolve without explicit instruction.
-7. After successful squash and reset, remove worktree only when safe. Keep `ai/<feature-slug>` as a recovery branch.
-8. Do not archive the OpenSpec change and do not delete recovery branch. Archive through OpenSpec workflow only after user reviews and commits target changes.
+7. After successful squash and reset, confirm the feature worktree is clean, then run `git worktree remove .worktrees/<feature-slug>` followed by `git worktree prune` from the repository root.
+8. After removal, verify `.worktrees/<feature-slug>` no longer exists and `git worktree list` no longer reports it. If `.worktrees` is empty, run `rmdir .worktrees` so no empty worktree folder remains.
+
+```bash
+git worktree remove .worktrees/<feature-slug>
+git worktree prune
+test ! -e .worktrees/<feature-slug>
+[ ! -d .worktrees ] || rmdir .worktrees
+```
+
+9. If removal fails because the worktree is dirty, locked, or still registered, stop and report the exact state. Do not use `--force` or manually delete the folder.
+10. Keep `ai/<feature-slug>` as a recovery branch until `/only-one-archive-cleanup` successfully syncs and archives the related OpenSpec change and verifies the squash result on the target branch.
+11. Do not delete the recovery branch or archive the OpenSpec change in this workflow. Completion report must record OpenSpec change name, recovery branch, target branch, target HEAD at handoff, and worktree cleanup status for `/only-one-archive-cleanup`.
 
 ## Completion report
 
