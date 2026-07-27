@@ -1,5 +1,5 @@
-﻿---
-description: Execute an approved backend plan (NestJS) through isolated subagents, mandatory TDD, review, and integration verification.
+---
+description: Execute an approved backend plan directly through plan-local task tracking, mandatory TDD, review, and integration verification.
 ---
 
 ## Input
@@ -8,79 +8,61 @@ description: Execute an approved backend plan (NestJS) through isolated subagent
 /only-one-implement-be <plan-path>
 ```
 
+## Execution location
+
+1. Work only in current project workspace and current Git branch.
+2. Do not invoke `using-git-worktrees`.
+3. Do not run `git worktree` commands or create, switch to, or delete any worktree.
+4. Do not create git commits.
+
 ## Dependency preflight
 
-1. Check whether MCP `gitnexus` and Superpowers skills `subagent-driven-development`, `test-driven-development`, `requesting-code-review`, and `verification-before-completion` are available.
-2. If a required dependency is unavailable, report each blocker and stop. Ask the user to install it or approve an explicit alternative.
-3. Do not silently skip, rename, or replace a required dependency.
+1. Check MCP `gitnexus` and skills `test-driven-development`, `requesting-code-review`, and `verification-before-completion`.
+2. Report unavailable dependency and stop. Do not silently replace it.
 
 ## Approval and scope gate
 
-1. Read the selected plan. Do not read feature documents outside the plan unless it links them explicitly.
-2. Confirm the user approved this exact plan, blast-radius allowlist, API contract, schema changes, risks, and verification scope.
-3. Require acceptance criteria, ordered micro-tasks, exact files and symbols, direct spec files, dependencies, and verification commands.
-4. If the plan is missing required information or conflicts with current code, stop and request a plan update. Do not infer missing requirements.
-5. Use GitNexus only to verify listed symbols, direct relationships, and current impact. Do not restart broad discovery.
-6. If the index is stale or impact exceeds the approved allowlist, report the scope change and wait for explicit approval.
+1. Read selected plan only, except documents linked by plan.
+2. Confirm user approved exact plan, allowlist, API contract, schema changes, risks, verification scope.
+3. Require acceptance criteria, ordered micro-tasks, files, symbols, specs, dependencies, verification commands.
+4. Stop for missing/conflicting plan information. Do not infer requirements.
+5. Use GitNexus only for listed symbols, direct relationships, current impact.
+6. Stop for stale index or impact beyond allowlist until explicit approval.
 
-## Subagent orchestration
+## Plan-local task tracking
 
-1. Invoke `superpowers:subagent-driven-development`.
-2. The coordinating agent must not implement a micro-task. Assign every micro-task to a fresh subagent.
-3. Give each subagent only:
-   - One task and its acceptance criteria.
-   - One or two permitted source files and the direct spec file (`*.spec.ts`).
-   - Exact symbols permitted for modification.
-   - Required RED, GREEN, REFACTOR, and verification steps (explicitly instruct the subagent NOT to commit any code).
-   - Relevant API contract excerpts, schema definitions, and dependency outputs.
-4. Do not give backend subagents frontend source context. Shared-contract and integration tasks may receive only the contract files named by the plan.
-5. Schema and migration tasks must run first and complete fully before any service, controller, or DTO task begins.
-6. Run dependent tasks sequentially. Run tasks in parallel only when the plan marks them independent and they do not write the same files.
-7. Review each subagent report and diff before starting a dependent task.
-8. If a subagent needs an unlisted file, symbol, dependency, migration, or contract change, it must stop and return a scope-change request. The coordinating agent must not approve its own scope expansion.
+1. Before source changes, create `<plan-dir>/tasks.md` beside plan.
+2. Convert approved ordered micro-tasks into ordered `- [ ]` entries. Each entry records allowed files, symbols, dependencies, API/schema constraints, acceptance criteria, direct spec, TDD steps, review, completion evidence.
+3. If `tasks.md` exists, preserve completed entries and resume first `- [ ]` task.
+4. Execute schema and migration tasks first. Do not start service, controller, or DTO work until required schema tasks are `- [x]`.
+5. Do not start dependent task before prerequisites are `- [x]`.
+6. Tick `- [x]` only after RED/GREEN/REFACTOR evidence, task review, focused checks.
 
-## Mandatory TDD task protocol
+## Direct task protocol
 
-Each implementation subagent must invoke `superpowers:test-driven-development` using `Jest` + `@nestjs/testing`, and provide evidence for all stages:
-
-1. **RED**
-   - Add the smallest behavioral unit or integration spec.
-   - List all mock providers required for `createTestingModule` — every injected dependency must be mocked explicitly.
-   - Run the focused spec and capture the expected failure.
-   - Confirm failure comes from missing behavior, not syntax, environment, fixture, or unrelated errors.
-   - If the new spec passes before implementation, stop and correct the spec or plan.
-2. **GREEN**
-   - Write the minimum strict TypeScript change needed to satisfy the spec.
-   - Run the focused spec and capture passing output.
-3. **REFACTOR**
-   - Improve naming, duplication, composition, and type safety without changing behavior.
-   - Re-run the focused spec and relevant neighboring specs.
-4. Do not skip tests, weaken assertions, use `any` without documented necessity, or test implementation details when behavior can be tested.
-5. Return changed files, diff summary, commands, RED failure reason, GREEN result, REFACTOR result, and remaining risks. Do not create any git commits.
+1. Implement one unchecked task directly within plan allowlist.
+2. Invoke `test-driven-development` and follow RED, GREEN, REFACTOR using Jest + `@nestjs/testing`.
+3. RED: add smallest behavioral spec, explicitly mock every injected `createTestingModule` provider, run focused spec, confirm expected missing-behavior failure.
+4. GREEN: write minimum strict TypeScript change, run focused spec, capture pass.
+5. REFACTOR: improve names, duplication, composition, type safety without behavior change; rerun focused and neighboring specs.
+6. Do not weaken assertions, use undocumented `any`, or test implementation details when behavior can be tested.
+7. Inspect task diff and invoke `requesting-code-review`. Resolve blocking findings before ticking task.
 
 ## API contract enforcement
 
-All subagents implementing controller or DTO tasks must verify their changes conform exactly to the approved API contract in the plan:
-
-1. Endpoint method and full path must match the contract exactly.
-2. Request DTO field names, types, validation decorators, and optionality must match.
-3. Response DTO field names, types, HTTP status codes, and error shapes must match.
-4. Authorization guards and required roles/permissions must match.
-5. If a subagent discovers the implementation cannot satisfy the contract without modifications, it must stop and return a contract-conflict report. Do not silently alter the contract.
-6. If a shared contract type imported by other modules or the frontend is modified, flag this as a breaking change and return a scope-change request immediately.
+1. Match approved endpoint method, full path, request DTO, response DTO, validation, optionality, status, error shapes, guards, roles, permissions.
+2. Stop and report contract conflict; do not silently alter contract.
+3. Treat shared contract modification as breaking scope change requiring approval.
 
 ## Review and integration
 
-1. After all task subagents finish, inspect the complete `git diff`. Do not scan the full source tree.
-2. Invoke `superpowers:requesting-code-review` for task-level changes and the integrated change.
-3. Resolve blocking review findings through new bounded subagent tasks using the same TDD protocol.
-4. For NestJS changes, compare endpoint method and path, request DTO, response type, serialization, enum values, optionality, nullability, validation, and error behavior against the approved contract.
-5. Run focused specs first, then repository typecheck, lint or format check, build when required, and full spec suite using existing scripts.
-6. Run GitNexus impact analysis again for changed public symbols and contracts. If impact exceeds approved scope, stop and request approval before more changes.
-7. Invoke `superpowers:verification-before-completion`. Do not claim completion without fresh command evidence.
+1. After all `tasks.md` entries are `- [x]`, inspect complete `git diff`.
+2. Invoke `requesting-code-review` for integrated change. Resolve blocking findings with direct bounded TDD work.
+3. Compare endpoint path/method, DTOs, serialization, enums, optionality, nullability, validation, error behavior against plan contract.
+4. Run focused specs, typecheck, lint or format, build when required, full suite.
+5. Run GitNexus impact analysis for changed public symbols/contracts. Stop for impact beyond scope.
+6. Invoke `verification-before-completion` with fresh command evidence.
 
 ## Completion report
 
-1. Mark plan tasks complete only when their evidence exists.
-2. Report changed files, subagent task outcomes, RED/GREEN/REFACTOR evidence, review findings and resolutions, integration results, checks not run, and remaining risks.
-3. If any required check cannot run, report the blocker and exact manual verification steps. Do not report the feature as fully verified.
+Report `tasks.md` outcome, changed files, direct-task RED/GREEN/REFACTOR evidence, reviews, integration results, skipped checks, blockers, risks. Do not claim full verification without evidence.

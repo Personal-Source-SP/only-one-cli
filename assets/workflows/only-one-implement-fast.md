@@ -8,6 +8,14 @@ description: Scope, implement, and verify a simple low-risk task directly — no
 /only-one-implement-fast <task description>
 ```
 
+## Execution location
+
+1. Work only in current project workspace and current Git branch.
+2. Do not invoke `using-git-worktrees`.
+3. Do not run `git worktree` commands or create, switch to, or delete any worktree.
+4. Do not create git commits.
+5. This workflow creates no plan and no `tasks.md`.
+
 ## When to use this workflow
 
 Use this workflow when the task:
@@ -15,7 +23,7 @@ Use this workflow when the task:
 - Affects 1–3 files and a small, well-understood set of symbols.
 - Has a clear, unambiguous outcome that does not require brainstorming or UI design.
 - Carries low regression risk (no schema changes, no contract modifications, no shared-module impact).
-- Does not require subagent delegation, architectural decisions, or a written plan.
+- Does not require a plan, `tasks.md`, subagent delegation, architectural decisions, or a written plan.
 
 Stop and redirect to `/only-one-plan-be`, `/only-one-plan-fe`, or `/only-one-bug` if the task:
 

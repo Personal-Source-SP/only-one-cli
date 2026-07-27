@@ -33,14 +33,14 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-implement-fe',
-        description: 'Execute an approved frontend plan (Next.js/React) through isolated subagents, mandatory TDD, review, and integration verification.',
-        requiredSkills: ['ux-ui-max', 'next-cache-components-adoption', 'next-partial-prefetching-adoption', 'subagent-driven-development', 'test-driven-development', 'requesting-code-review', 'verification-before-completion'],
+        description: 'Execute an approved frontend plan (Next.js/React) directly with plan-local task tracking, mandatory TDD, review, and integration verification.',
+        requiredSkills: ['ux-ui-max', 'next-cache-components-adoption', 'next-partial-prefetching-adoption', 'test-driven-development', 'requesting-code-review', 'verification-before-completion'],
         requiredMcps: ['gitnexus'],
     },
     {
         name: 'only-one-implement-be',
-        description: 'Execute an approved backend plan (NestJS) through isolated subagents, mandatory TDD, review, and integration verification.',
-        requiredSkills: ['subagent-driven-development', 'test-driven-development', 'requesting-code-review', 'verification-before-completion'],
+        description: 'Execute an approved backend plan (NestJS) directly with plan-local task tracking, mandatory TDD, review, and integration verification.',
+        requiredSkills: ['test-driven-development', 'requesting-code-review', 'verification-before-completion'],
         requiredMcps: ['gitnexus'],
     },
     {

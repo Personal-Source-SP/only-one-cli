@@ -34,10 +34,6 @@ export const SKILLS: SkillManifest[] = [
         description: 'Adopt partial prefetching in eligible Next.js applications.',
     },
     {
-        name: 'subagent-driven-development',
-        description: 'Execute implementation plans with isolated task agents and review gates.',
-    },
-    {
         name: 'test-driven-development',
         description: 'Use test-first red-green-refactor cycles for features and fixes.',
     },

@@ -8,33 +8,33 @@ const workflowsDir = join(process.cwd(), 'assets/workflows');
 const readWorkflow = async (name: string): Promise<string> => readFile(join(workflowsDir, `${name}.md`), 'utf8');
 
 describe('feature pipeline workflows', () => {
-    it('registers planning and implementation workflows with GitNexus', () => {
-        const plan = WORKFLOWS.find((workflow) => workflow.name === 'only-one-plan');
-        const implement = WORKFLOWS.find((workflow) => workflow.name === 'only-one-implement');
+    it('registers FE and BE planning and implementation workflows with GitNexus', () => {
+        const names = ['only-one-plan-fe', 'only-one-plan-be', 'only-one-implement-fe', 'only-one-implement-be'];
 
-        expect(plan).toMatchObject({ requiredMcps: ['gitnexus'], requiredSkills: [] });
-        expect(implement).toMatchObject({ requiredMcps: ['gitnexus'], requiredSkills: [] });
+        for (const name of names) {
+            expect(WORKFLOWS.find((workflow) => workflow.name === name)).toMatchObject({ requiredMcps: ['gitnexus'] });
+        }
     });
 
-    it('bounds planning discovery and gates implementation approval', async () => {
-        const content = await readWorkflow('only-one-plan');
+    it.each(['only-one-plan-fe', 'only-one-plan-be'])('bounds %s discovery and gates implementation approval', async (name) => {
+        const content = await readWorkflow(name);
 
         expect(content).toContain('Do not recursively list, grep, read, or scan the entire repository');
-        expect(content).toContain('Target a working set of 2–5% of the codebase');
-        expect(content).toContain('ux-ui-max');
-        expect(content).toContain('`docs/plans/<DD-MM-YYYY>/<feature-slug>.md`');
-        expect(content).toContain('Wait for explicit user approval');
+        expect(content).toContain('docs/plans/<DD-MM-YYYY>/<feature-slug>.md');
+        expect(content).toContain('explicit user approval');
     });
 
-    it('requires isolated subagents, TDD evidence, and integration review', async () => {
-        const content = await readWorkflow('only-one-implement');
+    it.each(['only-one-implement-fe', 'only-one-implement-be'])(
+        'requires direct %s task tracking, TDD, and integration review',
+        async (name) => {
+            const content = await readWorkflow(name);
 
-        expect(content).toContain('Assign every micro-task to a fresh subagent');
-        expect(content).toContain('The coordinating agent must not implement a micro-task');
-        expect(content).toContain('**RED**');
-        expect(content).toContain('**GREEN**');
-        expect(content).toContain('**REFACTOR**');
-        expect(content).toContain('superpowers:requesting-code-review');
-        expect(content).toContain('superpowers:verification-before-completion');
-    });
+            expect(content).toContain('<plan-dir>/tasks.md');
+            expect(content).toContain('Implement one unchecked task directly');
+            expect(content).toContain('RED, GREEN, REFACTOR');
+            expect(content).toContain('requesting-code-review');
+            expect(content).toContain('verification-before-completion');
+            expect(content).not.toContain('subagent-driven-development');
+        },
+    );
 });

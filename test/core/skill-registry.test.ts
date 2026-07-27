@@ -25,3 +25,12 @@ describe('Next.js skill registry', () => {
         }
     });
 });
+
+describe('obsolete skill removal', () => {
+    it('does not register or ship subagent-driven-development', () => {
+        const skillPath = join(packageRoot, 'assets/skills', 'subagent-driven-development');
+
+        expect(SKILLS.some((skill) => skill.name === 'subagent-driven-development')).toBe(false);
+        expect(existsSync(skillPath)).toBe(false);
+    });
+});

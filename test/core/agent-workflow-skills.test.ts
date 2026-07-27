@@ -47,6 +47,28 @@ describe('agent workflow skills', () => {
     });
 });
 
+describe('direct implementation workflow contracts', () => {
+    it.each([
+        ['only-one-implement-fe.md', true],
+        ['only-one-implement-be.md', true],
+        ['only-one-implement-fast.md', false],
+    ])('keeps %s on current workspace and branch', async (workflowName, usesPlanTasks) => {
+        const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
+
+        expect(workflow).toContain('current project workspace and current Git branch');
+        expect(workflow).toContain('Do not invoke `using-git-worktrees`');
+        expect(workflow).toContain('Do not run `git worktree` commands');
+
+        if (usesPlanTasks) {
+            expect(workflow).toContain('<plan-dir>/tasks.md');
+            expect(workflow).toContain('resume first `- [ ]` task');
+            expect(workflow).toContain('Tick `- [x]` only after RED/GREEN/REFACTOR evidence');
+        } else {
+            expect(workflow).toContain('This workflow creates no plan and no `tasks.md`.');
+        }
+    });
+});
+
 describe('only-one-pr-git-skill static validations', () => {
     it('verifies Conventional Commit tag requirements, English PR body, Vietnamese summary, Git preflights, and confirmation rules', async () => {
         const skillDir = join(skillsDir, 'only-one-pr-git-skill');
