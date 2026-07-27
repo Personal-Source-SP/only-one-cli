@@ -19,3 +19,6 @@ coverage/
 .agents/
 .claude/
 .cursor/
+
+# Git worktrees
+.worktrees/

@@ -79,3 +79,6 @@ adr
 .agents/
 .claude/
 .cursor/
+
+# Git worktrees
+.worktrees/
