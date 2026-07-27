@@ -1,8 +1,8 @@
 # Intent-Driven OpenSpec Schema
 
 `intent-driven` is a proposal-to-tasks workflow for changes where contributor
-intent, observable behaviour, technical design, and durable architectural
-decisions should all be captured before implementation.
+intent, observable behaviour, and technical design should all be captured
+before implementation.
 
 It keeps specs mergeable by default OpenSpec archive by generating
 `specs/<capability>/spec.md` files. The Markdown headings are the OpenSpec
@@ -10,8 +10,7 @@ wrapper; the content inside each requirement and scenario should be written in
 Gherkin style with `GIVEN`, `WHEN`, and `THEN` steps.
 
 - Good fit: product or platform changes with meaningful behaviour and
-  long-lived design decisions, cross-module work, or architecture choices that
-  future changes should honor.
+  cross-module work, or architecture choices that need explicit design.
 - Not a good fit: small tactical fixes, docs-only changes, dependency bumps, or
   behaviour-only work where `behaviour-driven` is enough.
 
@@ -28,7 +27,7 @@ schema: intent-driven
 Artifact order:
 
 ```text
-proposal -> specs -> design -> adr -> tasks
+proposal -> specs -> design -> tasks
 ```
 
 Gate expectations:
@@ -37,11 +36,8 @@ Gate expectations:
   behaviour specs.
 - `specs` creates one OpenSpec Markdown delta file per capability at
   `specs/<capability>/spec.md`.
-- `design` explains the implementation approach and accounts for currently
-  in-force ADRs.
-- `adr` records durable architecture decisions after design and before task
-  planning.
-- `tasks` are planned only after proposal, specs, design, and ADR artifacts are
+- `design` explains the implementation approach and technical decisions.
+- `tasks` are planned only after proposal, specs, and design artifacts are
   complete.
 
 ## Spec Format
@@ -65,13 +61,6 @@ Rule: Users can export their own data
 Do not create `.feature` files for this schema. External Gherkin linting can be
 run by the target project, but the schema package intentionally does not include
 Gherkin lint configuration.
-
-## ADR Persistence
-
-ADR files are generated under the target repository's top-level `adr/` folder,
-not inside the OpenSpec change folder. Accepted ADRs are immutable. If a future
-decision changes a prior ADR, create a new ADR that supersedes the old one and
-leave the original file unchanged.
 
 ## Validate
 
