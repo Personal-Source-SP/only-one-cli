@@ -10,7 +10,7 @@ description: Shape and approve a NestJS backend change through OpenSpec artifact
 
 ## Dependency preflight
 
-1. Check OpenSpec CLI, MCP `gitnexus`, and skills `openspec-propose`, `brainstorming`, `writing-plans`, and `gherkin-authoring`.
+1. Check OpenSpec CLI, MCP `gitnexus`, and skills `only-one-bounded-discovery`, `openspec-propose`, `brainstorming`, `writing-plans`, and `gherkin-authoring`.
 2. Check `c4-diagrams` when its triggers below apply.
 3. Report every unavailable required dependency and stop. Do not silently skip, rename, or replace dependencies.
 
@@ -27,25 +27,15 @@ description: Shape and approve a NestJS backend change through OpenSpec artifact
 4. Continue in dependency order until every artifact listed by `applyRequires` is done.
 5. Treat OpenSpec-resolved artifacts as the only planning source. Do not create `docs/plans/...` or a second task tracker.
 
-## Discovery budget
+## Bounded discovery
 
-1. **Schema impact check first:** Determine whether tables, Prisma models, TypeORM entities, migrations, indexes, relations, or cascades change. Analyze affected schema symbols and downstream consumers before DTO or endpoint design. Put required schema work first in the task artifact.
-2. Use GitNexus queries, symbol context, routes, and impact analysis for relevant entry points and relationships.
-3. Start from feature terms and known symbols. Do not recursively list, grep, read, or scan the entire repository.
-4. Target 2-5% of the codebase: affected models/migrations, NestJS controllers, services, DTOs, guards, interceptors, pipes, decorators, shared contracts, and colocated `*.spec.ts` files.
-5. Exclude `main.ts`, `app.module.ts`, `.env*`, and root bootstrapping files unless approved intent explicitly requires global infrastructure changes.
-6. Record an exact blast-radius allowlist: file, symbol, role, direct dependencies, confidence, and colocated spec.
-7. Stop and ask for narrower capability when candidate scope exceeds budget. Do not expand automatically.
-8. If GitNexus is stale or incomplete, report limitation and use only targeted reads for identified files. Do not claim complete impact coverage.
-9. For every source file, search for a colocated spec first. Create a new spec only when none exists.
-10. If multi-module relationships are non-obvious, invoke `c4-diagrams`.
-11. If UI work is required, stop and record an out-of-scope dependency for `/only-one-plan-fe`.
+Invoke `only-one-bounded-discovery` (BE variant). This produces the blast-radius allowlist and identifies schema impact before any DTO or endpoint design begins.
 
 ## NestJS architecture constraints
 
 Apply these only after confirming NestJS from package manifest, framework config, bootstrap entry point, module layout, persistence adapter, and existing conventions:
 
-1. Preserve established Controller -> Service -> Repository/Entity boundaries. Keep transport and DTO concerns out of business logic; keep business logic in services or approved domain units.
+1. Preserve established Controller → Service → Repository/Entity boundaries. Keep transport and DTO concerns out of business logic; keep business logic in services or approved domain units.
 2. Use incoming DTO classes with project-established `class-validator` and `class-transformer` behavior. Treat backend DTOs or approved shared/generated schemas as API payload source of truth; do not duplicate contracts manually.
 3. Define explicit request and response DTOs/types for public boundaries. Validate untrusted input and preserve strict TypeScript.
 4. Preserve dependency injection, module ownership, repository injection such as `@InjectRepository` when TypeORM is established, transaction boundaries, and testability.
