@@ -8,6 +8,7 @@ import type { AgentToolOption } from '@/core/agent/tools.js';
 import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
 import { checkExistingWorkflows, installWorkflows, type WorkflowInstallResult } from '@/core/workflow/index.js';
 import { executePluginActions, type PluginActionResult } from '@/core/plugin/index.js';
+import { normalizeOpenSpecAntigravityOutput } from '@/core/openspec/normalize-antigravity.js';
 import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import type {
@@ -444,18 +445,24 @@ export const installCombo = async (params: {
             }
         }
 
-        // Post install check for openspec CLI
-        const packagesInstalled = results.packages.filter((p) => p.status === 'success').map((p) => p.name);
-        if (packagesInstalled.includes('@fission-ai/openspec')) {
+        // Initialize OpenSpec whenever its package is available, including an existing global installation.
+        const openspecResult = results.packages.find((pkg) => pkg.name === '@fission-ai/openspec');
+        if (openspecResult && openspecResult.status !== 'failed') {
             deps.stdout('\nInitializing OpenSpec CLI...');
             const toolIds = selectedTools.map((t) => t.value).join(',');
             const toolsArg = toolIds || 'none';
             try {
                 deps.stdout(`  Running: npx openspec init --tools ${toolsArg} --force`);
                 await execFileAsync('npx', ['openspec', 'init', '--tools', toolsArg, '--force'], { cwd: projectDir, shell: true });
+                if (selectedTools.some((tool) => tool.value === 'antigravity')) {
+                    await normalizeOpenSpecAntigravityOutput(projectDir);
+                }
                 deps.stdout('    ✓ OpenSpec CLI initialized successfully');
             } catch (error) {
-                deps.stdout(`    ✗ OpenSpec CLI initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+                const message = error instanceof Error ? error.message : String(error);
+                openspecResult.status = 'failed';
+                openspecResult.error = `OpenSpec initialization failed: ${message}`;
+                deps.stdout(`    ✗ ${openspecResult.error}`);
             }
         }
     }

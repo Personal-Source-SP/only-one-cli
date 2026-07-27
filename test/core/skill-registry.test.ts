@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { SKILLS } from '@assets/skills/index.js';
@@ -14,14 +14,12 @@ const nextSkillNames = [
 ];
 
 describe('Next.js skill registry', () => {
-    it('registers skill directories with matching SKILL.md frontmatter', () => {
+    it('does not register or ship externally installed Next.js skills', () => {
         for (const skillName of nextSkillNames) {
-            const manifest = SKILLS.find((skill) => skill.name === skillName);
-            const skillPath = join(packageRoot, 'assets/skills', skillName, 'SKILL.md');
+            const skillPath = join(packageRoot, 'assets/skills', skillName);
 
-            expect(manifest).toBeDefined();
-            expect(existsSync(skillPath)).toBe(true);
-            expect(readFileSync(skillPath, 'utf-8')).toContain(`name: ${skillName}`);
+            expect(SKILLS.some((skill) => skill.name === skillName)).toBe(false);
+            expect(existsSync(skillPath)).toBe(false);
         }
     });
 });
