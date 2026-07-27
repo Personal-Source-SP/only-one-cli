@@ -4,8 +4,7 @@ export const COMBOS: ComboManifest[] = [
     {
         id: 'frontend-flow',
         name: 'Frontend Flow Setup',
-        description:
-            'Full frontend development combo for Next.js/React — includes OpenSpec, UI/UX tooling, Next.js-specific skills, and shared planning skills',
+        description: 'Next.js and React frontend development toolkit',
         packages: [
             '@fission-ai/openspec',
             'ui-ux-pro-max-cli',
@@ -24,8 +23,7 @@ export const COMBOS: ComboManifest[] = [
     {
         id: 'backend-flow',
         name: 'Backend Flow Setup',
-        description:
-            'Full backend development combo for NestJS — includes OpenSpec and shared planning, architecture, and spec authoring skills',
+        description: 'NestJS backend development toolkit',
         packages: ['@fission-ai/openspec'],
         mcps: ['gitnexus', 'postgres', 'github'],
         plugins: ['superpowers'],
