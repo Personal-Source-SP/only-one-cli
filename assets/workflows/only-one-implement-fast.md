@@ -1,5 +1,5 @@
 ---
-description: Scope, implement, and verify a simple low-risk task directly with GitNexus freshness gates — no subagent delegation, no written plan, no large skill requirements.
+description: Scope, implement, and verify a small or moderate task directly in the current workspace, using GitNexus for fast discovery and the IDE plan only when approval is needed.
 ---
 
 ## Input
@@ -8,79 +8,116 @@ description: Scope, implement, and verify a simple low-risk task directly with G
 /only-one-implement-fast <task description>
 ```
 
-## Execution location
+## Purpose
 
-1. Work only in current project workspace and current Git branch.
+Use this workflow for UI changes and straightforward logic changes that do not justify OpenSpec, Superpowers, worktrees, subagent orchestration, mandatory TDD, or a separate planning workflow.
+
+Keep discovery, optional approval, implementation, and verification in this workflow.
+
+## Execution location and prohibited workflows
+
+1. Work only in the current project workspace and current Git branch.
 2. Do not invoke `using-git-worktrees`.
 3. Do not run `git worktree` commands or create, switch to, or delete any worktree.
-4. Do not create git commits.
-5. This workflow creates no plan and no `tasks.md`.
+4. Do not invoke OpenSpec or Superpowers skills or workflows.
+5. Do not delegate implementation to subagents.
+6. Do not create design specs, OpenSpec artifacts, Superpowers documents, or separate task files.
+7. Do not create git commits.
+8. A plan, when required, must use only the IDE's default `implementation_plan.md` artifact and approval flow.
 
-## Dependency and scope preflight
+## Dependency preflight
 
-1. Check MCP `gitnexus`. Report unavailable dependency and stop. Do not silently replace it.
-2. Before using GitNexus evidence, verify its index covers current repository, checked-out branch, and current working-tree revision, and is not `stale` or `incomplete`.
-3. If the index is not current, stop, sync/reindex using available GitNexus tooling, then repeat the query.
-4. Do not claim complete impact coverage from a stale or incomplete index.
+1. Check MCP `gitnexus` before codebase discovery.
+2. Verify its index covers the current repository, checked-out branch, and current working-tree revision and is not `stale` or `incomplete`.
+3. If the index is stale or incomplete, sync/reindex it using available GitNexus tooling, then repeat the query.
+4. If GitNexus is unavailable or cannot be refreshed, report the exact limitation and ask whether to continue with direct code search. Do not silently replace it or claim complete impact coverage.
 
-## When to use this workflow
+## Clarification gate
 
-Use this workflow when the task:
+1. Determine the requested observable result before editing.
+2. If behavior, UI outcome, affected area, or acceptance criteria are unclear, ask focused questions before planning or editing.
+3. Ask only questions that affect implementation. Do not start a brainstorming, specification, or design-document workflow.
+4. If UI details are sufficiently clear from the request and existing project patterns, proceed without additional design ceremony.
 
-- Affects 1–3 files and a small, well-understood set of symbols.
-- Has a clear, unambiguous outcome that does not require brainstorming or UI design.
-- Carries low regression risk (no schema changes, no contract modifications, no shared-module impact).
-- Does not require a plan, `tasks.md`, subagent delegation, architectural decisions, or a written plan.
+## Discovery and scope
 
-Stop and redirect to `/only-one-plan-be`, `/only-one-plan-fe`, or `/only-one-bug` if the task:
+1. Use GitNexus first to locate relevant symbols, callers, dependencies, routes, and likely tests.
+2. Verify findings against current source files before relying on them.
+3. State the intended change, expected observable result, affected files or symbols, and verification approach.
+4. Confirm whether the change affects shared contracts, public APIs, database schema, migrations, configuration, authentication boundaries, or broad shared modules.
+5. Keep changes focused. Do not include unrelated refactoring.
 
-- Requires touching more than 3 files or unknown symbols.
-- Involves a schema migration, API contract change, or shared type modification.
-- Requires significant UI design decisions.
-- Cannot be fully verified with a focused test or a narrow manual check.
+## Planning and approval gate
 
-## Scope definition
+### Direct execution
 
-Before writing any code:
+Proceed directly after a short scope summary when all conditions hold:
 
-1. State the task in one sentence: what changes and what the observable result is.
-2. List exact files and symbols that will change. Use current GitNexus evidence to inspect direct relationships. Stop if you cannot enumerate them.
-3. Identify a single direct test file (colocated `*.spec.ts` or `*.test.tsx`) that covers behavior. If none exists, name file to create.
-4. Confirm no shared contracts, public APIs, database schema, or config files are affected. If any are, stop and use appropriate full workflow.
+- Expected behavior is clear.
+- Impact is low and well understood.
+- Change is limited to 1–3 files or a similarly small set of tightly related symbols.
+- No shared contract, public API, schema, migration, configuration, or architectural decision is involved.
 
-## Relationship gate
+Do not create a written plan for this path.
 
-1. Before changing a symbol with a relationship, public/shared surface, or unclear relationship, verify GitNexus index remains current.
-2. Source change since latest successful index/sync expires GitNexus evidence. Stop, sync/reindex, and repeat query before another GitNexus-dependent decision.
-3. Do not continue using old graph evidence for scope or impact decisions.
+### IDE plan required
+
+Create or update only the IDE's default `implementation_plan.md`, request feedback, and wait for explicit approval when any condition holds:
+
+- More than 3 files are likely to change.
+- Exact impact is uncertain after discovery.
+- Change crosses multiple components or layers.
+- UI behavior requires a meaningful product or interaction decision.
+- Regression risk is moderate or verification requires several coordinated steps.
+
+The plan must stay concise: goal, affected files and symbols, proposed edits, risks, and verification. After approval, implement immediately in this workflow. Do not redirect through OpenSpec, Superpowers, another planning workflow, or subagents.
+
+### Redirect only for unsuitable work
+
+Stop and recommend an appropriate full workflow only when the task includes:
+
+- Database schema migration or broad data migration.
+- Breaking API or shared-contract change.
+- Major architectural decision or cross-system redesign.
+- Security-sensitive behavior requiring dedicated review.
+- A complex or unreproduced bug needing evidence-driven diagnosis.
+- Scope too large to review safely in one IDE plan.
+
+Explain the concrete reason for redirecting. Do not redirect solely because tests need changes or more than 3 files are affected.
 
 ## Implementation
 
-1. Apply minimum change required to satisfy task. Do not refactor unrelated code.
-2. Preserve existing comments, naming conventions, and code patterns in touched files.
-3. If task produces visible UI change: use existing design tokens, components, and i18n keys. Do not introduce new colors, fonts, or hardcoded strings.
-4. If task touches NestJS endpoint: keep existing HTTP method, path, DTO shape, status codes, and guard chain unchanged unless task explicitly requires modifying them.
-5. Do not add dependencies, environment variables, or configuration keys without explicit user approval.
+1. Apply the minimum coherent change needed to satisfy the approved scope.
+2. Preserve existing comments, naming conventions, architecture, and code patterns.
+3. For visible UI changes, reuse existing design tokens, components, accessibility conventions, responsive patterns, and i18n keys.
+4. Do not introduce new dependencies, environment variables, configuration keys, public contracts, or unrelated abstractions without explicit approval.
+5. Re-check GitNexus freshness before making a new impact-dependent decision after source changes. Refresh the index when needed.
+6. If implementation reveals materially broader scope than approved, stop, update the IDE plan, and request approval again.
 
-## Verification
+## Tests and verification
 
-1. Run focused test or spec for changed file(s) and capture result.
-2. Run project typecheck (`tsc --noEmit` or equivalent) if TypeScript file changed.
-3. Run project lint check if linting script is available.
-4. If task changed component, confirm relevant UI state (loading, error, empty, success) still renders correctly.
-5. If any check cannot run, report blocker and exact manual verification step needed. Do not claim task done without evidence.
+1. Choose verification proportional to the change. Mandatory TDD is not part of this workflow.
+2. Run relevant existing focused tests when available.
+3. Tests may be modified when intended behavior changes or existing expectations are no longer correct.
+4. Add a new test when it provides meaningful regression protection for changed logic; do not add ceremonial tests for trivial presentation-only changes.
+5. Never weaken or delete a valid test merely to make checks pass. Test changes must reflect approved behavior.
+6. Run typecheck and lint when applicable and available.
+7. For UI changes, perform a focused manual or browser check of affected states when practical, including relevant loading, error, empty, success, responsive, and interaction states.
+8. If a check cannot run, report the blocker and exact manual verification needed. Do not claim unsupported verification.
 
 ## Completion impact gate
 
-1. After source change, sync/reindex GitNexus before running `detect_changes` or impact analysis for changed symbols.
-2. If sync/reindex cannot run, report blocker and do not claim task complete using stale evidence.
-3. Stop and redirect to `/only-one-plan-fe`, `/only-one-plan-be`, or `/only-one-bug` if impact exceeds 1–3 files or reaches shared/public API, contract, schema, config, or relationships outside scoped symbols.
+1. After source changes, sync/reindex GitNexus before final `detect_changes` or impact analysis.
+2. Verify changed symbols do not reach unapproved shared/public surfaces or unrelated areas.
+3. If final impact exceeds approved scope, stop and update the IDE plan rather than silently expanding the change.
+4. If GitNexus cannot refresh, report the blocker and distinguish verified code checks from unverified graph impact.
 
 ## Completion report
 
-1. List every changed file and symbols modified within it.
-2. Provide test command run and output (pass/fail).
-3. Provide typecheck and lint results.
-4. Provide GitNexus refresh and impact-analysis result, or exact blocker.
-5. State remaining risks or follow-up items explicitly.
-6. Do not create a git commit.
+1. List every changed file and important symbol modified.
+2. Summarize observable behavior changed.
+3. Report tests added, modified, and run, including pass/fail results.
+4. Report typecheck, lint, and UI/manual verification performed.
+5. Report GitNexus refresh and final impact result, or exact blocker.
+6. State remaining risks or follow-up work.
+7. Do not create a git commit.
