@@ -1,5 +1,5 @@
 ---
-description: Apply an approved NestJS OpenSpec change in one feature worktree with strict TDD, checkpoint commits, full verification, and unstaged local handoff.
+description: Apply an approved NestJS OpenSpec change in one feature worktree, applying TDD only for business-logic layers (services, utils), committing at phase boundaries, with full verification and unstaged local handoff.
 ---
 
 ## Input
@@ -47,15 +47,17 @@ For each pending task returned by apply instructions, in dependency order:
 1. Re-read relevant `contextFiles` and show current task/progress.
 2. If code-level decisions remain open, invoke `brainstorming` for micro-brainstorming limited to that task. Do not reopen approved product decisions.
 3. If discovery changes scope, schema, API contract, or design, update resolved OpenSpec artifacts and stop for explicit user approval before implementation.
-4. Invoke `test-driven-development` and follow RED, GREEN, REFACTOR:
-   - **RED:** Add smallest behavioral test first. For NestJS `createTestingModule`, mock every injected provider explicitly. Run focused spec and confirm expected missing-behavior failure, not syntax/setup error.
-   - **GREEN:** Write minimum strict TypeScript implementation. Run focused spec and confirm pass.
-   - **REFACTOR:** Improve names, duplication, composition, and type safety without behavior change. Rerun focused and neighboring specs.
+4. **TDD applies only to services and utils that contain business logic.** For other layers (controllers, modules, DTOs, guards, interceptors, migrations) follow the existing system design patterns — no mandatory RED/GREEN/REFACTOR cycle required.
+   - **When TDD is required (service / utils):** Invoke `test-driven-development` and follow RED, GREEN, REFACTOR:
+     - **RED:** Add smallest behavioral test first. For NestJS `createTestingModule`, mock every injected provider explicitly. Run focused spec and confirm expected missing-behavior failure, not syntax/setup error.
+     - **GREEN:** Write minimum strict TypeScript implementation. Run focused spec and confirm pass.
+     - **REFACTOR:** Improve names, duplication, composition, and type safety without behavior change. Rerun focused and neighboring specs.
+   - **When TDD is not required:** Implement following the project's established design pattern. Run existing related specs to confirm nothing regressed.
 5. Do not weaken assertions, add undocumented `any`, or test implementation details when observable behavior is testable.
-6. Inspect task diff and invoke `requesting-code-review`. Resolve blocking findings through another bounded RED, GREEN, REFACTOR cycle.
+6. Inspect task diff and invoke `requesting-code-review`. Resolve blocking findings (for TDD layers: another bounded RED, GREEN, REFACTOR cycle; for other layers: fix and rerun specs).
 7. Refresh GitNexus when source changed; run focused impact check for touched public symbols.
-8. Update task checkbox only after TDD evidence, review, focused checks, and dependencies are complete.
-9. Create a checkpoint commit containing task code, tests, and task-artifact update. Do not commit unverified work. Use a descriptive Conventional Commit message.
+8. Update task checkbox only after implementation, review, focused checks, and dependencies are complete.
+9. **Do not commit after every individual task.** Accumulate work within a phase (e.g., schema & migrations, core services, controllers & wiring) and create a single checkpoint commit at the end of each phase. Do not commit unverified work. Use a descriptive Conventional Commit message.
 10. Rerun `openspec instructions apply --change "<name>" --json` to refresh progress and select next pending task.
 
 ## API and schema enforcement
@@ -103,4 +105,4 @@ test ! -e .worktrees/<feature-slug>
 
 ## Completion report
 
-Report change/schema, OpenSpec progress, checkpoint commits, changed files, RED/GREEN/REFACTOR evidence, reviews, full verification, GitNexus impact, handoff status, skipped checks, blockers, and recovery branch. Never claim full verification without fresh evidence.
+Report change/schema, OpenSpec progress, phase checkpoint commits (not per-task), changed files, TDD evidence for service/utils layers, design-pattern compliance for other layers, reviews, full verification, GitNexus impact, handoff status, skipped checks, blockers, and recovery branch. Never claim full verification without fresh evidence.
