@@ -43,15 +43,27 @@ export interface ExtendedComboManifest extends ComboManifest {
     mcps?: string[];
 }
 
+export type ComboComponentStatus = 'installed' | 'missing' | 'partial' | 'not-applicable';
+
 export interface ExistingComboComponent {
-    type: 'package' | 'skill' | 'config' | 'mcp' | 'rule' | 'workflow';
+    type: 'package' | 'plugin' | 'skill' | 'config' | 'mcp' | 'rule' | 'workflow';
     id: string; // e.g. "package:@fission-ai/openspec", "skill:cursor:c4-diagrams", "config:openspec", "mcp:cursor:github"
     name: string; // Name of package, skill, config, or mcp
     toolId?: string; // If skill/mcp, which tool/ide
     label: string; // User-friendly description
     exists: boolean;
+    status: ComboComponentStatus;
     meta: any;
 }
+
+export type ComboInstallationStatus = 'installed' | 'missing' | 'partial';
+
+export const summarizeComboInstallation = (components: ExistingComboComponent[]): ComboInstallationStatus => {
+    const applicable = components.filter((component) => component.status !== 'not-applicable');
+    if (applicable.length === 0 || applicable.every((component) => component.status === 'installed')) return 'installed';
+    if (applicable.every((component) => component.status === 'missing')) return 'missing';
+    return 'partial';
+};
 
 export interface ComboInstallResult {
     packages: { name: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
@@ -289,6 +301,7 @@ export const checkExistingComboComponents = async (params: {
                 name: pkgName,
                 label: isExternalSkill ? `External skill: ${pkgName}` : `Package: ${pkgName} (${scope})`,
                 exists,
+                status: exists ? 'installed' : 'missing',
                 meta: { pkgName, scope, installerKind: pkg.installer.kind },
             });
         }
@@ -297,13 +310,16 @@ export const checkExistingComboComponents = async (params: {
     // 2. Configs
     for (const configName of plan.configs) {
         const config = CONFIGS[configName];
-        const exists = Boolean(config?.files.some((file) => existsSync(join(projectDir, file.dest))));
+        const fileStates = config?.files.map((file) => existsSync(join(projectDir, file.dest))) ?? [];
+        const exists = fileStates.length > 0 && fileStates.every(Boolean);
+        const status: ComboComponentStatus = exists ? 'installed' : fileStates.some(Boolean) ? 'partial' : 'missing';
         results.push({
             type: 'config',
             id: `config:${configName}`,
             name: configName,
             label: `Config Template: ${configName}`,
             exists,
+            status,
             meta: { configName },
         });
     }
@@ -318,6 +334,7 @@ export const checkExistingComboComponents = async (params: {
                 toolId: check.toolId,
                 label: `Skill: ${check.skillName} in ${check.toolName}`,
                 exists: check.exists,
+                status: check.exists ? 'installed' : 'missing',
                 meta: { skillName: check.skillName, toolId: check.toolId },
             });
         }
@@ -337,6 +354,7 @@ export const checkExistingComboComponents = async (params: {
                 toolId: check.toolId,
                 label: `Rule: ${check.ruleId} in ${check.toolName}`,
                 exists: check.exists,
+                status: check.exists ? 'installed' : 'missing',
                 meta: { ruleId: check.ruleId, toolId: check.toolId },
             });
         }
@@ -353,6 +371,7 @@ export const checkExistingComboComponents = async (params: {
                 toolId: check.toolId,
                 label: `Workflow: ${check.workflowName} in ${check.toolName}`,
                 exists: check.exists,
+                status: check.exists ? 'installed' : 'missing',
                 meta: { workflowName: check.workflowName, toolId: check.toolId },
             });
         }
@@ -364,9 +383,26 @@ export const checkExistingComboComponents = async (params: {
     if (plan.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
-        const mcpIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');
-        if (mcpIdeIds.length > 0) {
-            const mcpChecks = await checkExistingMcps(homeDir, platform, mcpIdeIds, Array.from(mcps));
+        const supportedIdeIds: string[] = selectedTools
+            .map((tool) => tool.value)
+            .filter((value) => value === 'cursor' || value === 'antigravity');
+        const unsupportedTools = selectedTools.filter((tool) => !supportedIdeIds.includes(tool.value));
+        for (const tool of unsupportedTools) {
+            for (const mcpId of mcps) {
+                results.push({
+                    type: 'mcp',
+                    id: `mcp:${tool.value}:${mcpId}`,
+                    name: mcpId,
+                    toolId: tool.value,
+                    label: `MCP Config: ${mcpId} in ${tool.name}`,
+                    exists: false,
+                    status: 'not-applicable',
+                    meta: { mcpId, ideId: tool.value },
+                });
+            }
+        }
+        if (supportedIdeIds.length > 0) {
+            const mcpChecks = await checkExistingMcps(homeDir, platform, supportedIdeIds, Array.from(mcps));
             for (const check of mcpChecks) {
                 results.push({
                     type: 'mcp',
@@ -375,6 +411,7 @@ export const checkExistingComboComponents = async (params: {
                     toolId: check.ideId,
                     label: `MCP Config: ${check.mcpId} in ${check.ideName}`,
                     exists: check.exists,
+                    status: check.exists ? 'installed' : 'missing',
                     meta: { mcpId: check.mcpId, ideId: check.ideId },
                 });
             }

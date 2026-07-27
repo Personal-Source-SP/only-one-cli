@@ -41,7 +41,7 @@ export const checkExistingSkills = async (
         for (const skillName of skillNames) {
             const destPath = join(tool.skillsDir, 'skills', skillName);
             const absoluteDestPath = join(projectDir, destPath);
-            const exists = existsSync(absoluteDestPath);
+            const exists = existsSync(join(absoluteDestPath, 'SKILL.md'));
             results.push({
                 toolId: tool.value,
                 toolName: tool.name,
