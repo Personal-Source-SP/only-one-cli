@@ -1,4 +1,4 @@
-﻿---
+---
 description: Plan and design a frontend feature for a Next.js/React repository, covering discovery, UI direction, implementation guidelines, and an approved micro-task plan.
 ---
 
@@ -101,5 +101,5 @@ These guidelines apply to all UI micro-tasks in the plan. Each subagent implemen
 5. After approval, direct the user to run:
 
 ```text
-/only-one-implement <plan-path>
+/only-one-implement-fe <plan-path>
 ```

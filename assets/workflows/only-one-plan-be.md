@@ -1,4 +1,4 @@
-﻿---
+---
 description: Plan a backend feature for a NestJS repository, covering schema analysis, API contract design, and an approved micro-task plan.
 ---
 
@@ -78,5 +78,5 @@ Before writing micro-tasks, define the exact API contract that the feature expos
 5. After approval, direct the user to run:
 
 ```text
-/only-one-implement <plan-path>
+/only-one-implement-be <plan-path>
 ```
