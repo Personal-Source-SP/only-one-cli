@@ -38,6 +38,37 @@ export const executeAndReportComboStep = async (
         }
     }
 
+    if (
+        results.plugins.installed.length ||
+        results.plugins.actionRequired.length ||
+        results.plugins.skipped.length ||
+        results.plugins.failed.length
+    ) {
+        deps.stdout('\nPlugins:');
+        for (const plugin of results.plugins.installed) deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.success('installed')}`);
+        for (const plugin of results.plugins.actionRequired)
+            deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.warning('action required')}`);
+        for (const plugin of results.plugins.skipped) deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.dim('skipped')}`);
+        for (const plugin of results.plugins.failed) deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.error('failed')}`);
+    }
+
+    if (results.rules.length) {
+        deps.stdout('\nRules:');
+        for (const rule of results.rules) {
+            const statusColor =
+                rule.status === 'success' || rule.status === 'overwritten'
+                    ? COLORS.success
+                    : rule.status === 'skipped'
+                      ? COLORS.dim
+                      : rule.status === 'installed_not_ready'
+                        ? COLORS.warning
+                        : COLORS.error;
+            deps.stdout(
+                `  - ${COLORS.secondary(rule.ruleId)} in ${COLORS.primary(rule.toolName)}: ${statusColor(rule.status)}${rule.error ? ` (${rule.error})` : rule.details ? ` (${rule.details})` : ''}`,
+            );
+        }
+    }
+
     if (results.configs?.length) {
         deps.stdout('\nConfigs:');
         for (const c of results.configs) {
@@ -54,6 +85,16 @@ export const executeAndReportComboStep = async (
                 s.status === 'success' || s.status === 'overwritten' ? COLORS.success : s.status === 'skipped' ? COLORS.dim : COLORS.error;
             deps.stdout(
                 `  - ${COLORS.secondary(s.skillName)} in ${COLORS.primary(toolName)}: ${statusColor(s.status)}${s.error ? ` (${s.error})` : ''}`,
+            );
+        }
+    }
+
+    if (results.workflows.length) {
+        deps.stdout('\nWorkflows:');
+        for (const workflow of results.workflows) {
+            const statusColor = workflow.status === 'success' ? COLORS.success : workflow.status === 'skipped' ? COLORS.dim : COLORS.error;
+            deps.stdout(
+                `  - ${COLORS.secondary(workflow.workflowName)} in ${COLORS.primary(workflow.toolName)}: ${statusColor(workflow.status)}${workflow.error ? ` (${workflow.error})` : ''}`,
             );
         }
     }

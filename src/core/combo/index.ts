@@ -5,13 +5,31 @@ import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import type { AgentToolOption } from '@/core/agent/tools.js';
+import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
+import { checkExistingWorkflows, installWorkflows, type WorkflowInstallResult } from '@/core/workflow/index.js';
+import { executePluginActions, type PluginActionResult } from '@/core/plugin/index.js';
+import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
 import type { ProgramDeps } from '@/cli/deps.js';
-import type { ComboManifest, PackageManifest } from '@/core/init/types.js';
+import type {
+    ComboManifest,
+    ConfigManifest,
+    McpManifest,
+    PackageManifest,
+    PluginManifest,
+    RuleManifest,
+    SkillManifest,
+    WorkflowManifest,
+} from '@assets/types.js';
 import { checkExistingSkills, installSkills, type SkillInstallResult } from '@/core/skill/index.js';
 import { checkExistingMcps, syncMcpGlobalConfig, readMcpManifests } from '@/core/mcp/index.js';
 import { COMBOS } from '@assets/combos/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
+import { PLUGINS } from '@assets/plugins/index.js';
+import { RULES } from '@assets/rules/index.js';
+import { SKILLS } from '@assets/skills/index.js';
+import { WORKFLOWS } from '@assets/workflows/index.js';
+import { MCPS } from '@assets/mcps/index.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -25,7 +43,7 @@ export interface ExtendedComboManifest extends ComboManifest {
 }
 
 export interface ExistingComboComponent {
-    type: 'package' | 'skill' | 'config' | 'mcp';
+    type: 'package' | 'skill' | 'config' | 'mcp' | 'rule' | 'workflow';
     id: string; // e.g. "package:@fission-ai/openspec", "skill:cursor:c4-diagrams", "config:openspec", "mcp:cursor:github"
     name: string; // Name of package, skill, config, or mcp
     toolId?: string; // If skill/mcp, which tool/ide
@@ -37,11 +55,98 @@ export interface ExistingComboComponent {
 export interface ComboInstallResult {
     packages: { name: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
     configs: { name: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
+    plugins: PluginActionResult;
+    rules: RuleInstallResult[];
     skills: SkillInstallResult[];
+    workflows: WorkflowInstallResult[];
     mcps: { ideId: string; mcpId: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
 }
 
+export interface ComboAssetRegistries {
+    packages: PackageManifest[];
+    plugins: PluginManifest[];
+    rules: RuleManifest[];
+    skills: SkillManifest[];
+    configs: Record<string, ConfigManifest>;
+    workflows: WorkflowManifest[];
+    mcps: McpManifest[];
+}
+
+export interface ComboDependencyPlan {
+    packages: string[];
+    plugins: string[];
+    rules: string[];
+    skills: string[];
+    configs: string[];
+    workflows: string[];
+    mcps: string[];
+}
+
+const comboRegistries = (): ComboAssetRegistries => ({
+    packages: PACKAGES,
+    plugins: PLUGINS,
+    rules: RULES,
+    skills: SKILLS,
+    configs: CONFIGS,
+    workflows: WORKFLOWS,
+    mcps: MCPS,
+});
+
+const unique = (values: string[]): string[] => Array.from(new Set(values));
+
+export const validateComboManifestReferences = (combos: ComboManifest[], registries: ComboAssetRegistries): void => {
+    const catalogs: Array<[keyof ComboManifest, Set<string>]> = [
+        ['packages', new Set(registries.packages.map((item) => item.id))],
+        ['plugins', new Set(registries.plugins.map((item) => item.id))],
+        ['rules', new Set(registries.rules.map((item) => item.id))],
+        ['skills', new Set(registries.skills.map((item) => item.name))],
+        ['configs', new Set(Object.keys(registries.configs))],
+        ['workflows', new Set(registries.workflows.map((item) => item.name))],
+        ['mcps', new Set(registries.mcps.map((item) => item.id))],
+    ];
+
+    for (const combo of combos) {
+        for (const [field, ids] of catalogs) {
+            for (const id of combo[field] || []) {
+                if (!ids.has(id)) {
+                    throw new Error(`Combo '${combo.id}' references unknown ${field} ID '${id}'`);
+                }
+            }
+        }
+    }
+};
+
+export const buildComboDependencyPlan = (combo: ComboManifest, registries: ComboAssetRegistries): ComboDependencyPlan => {
+    const ruleDependencies = (combo.rules || []).flatMap((id) => {
+        const rule = registries.rules.find((item) => item.id === id);
+        return rule ? [rule] : [];
+    });
+    const workflowDependencies = (combo.workflows || []).flatMap((name) => {
+        const workflow = registries.workflows.find((item) => item.name === name);
+        return workflow ? [workflow] : [];
+    });
+
+    return {
+        packages: unique([...(combo.packages || []), ...ruleDependencies.flatMap((rule) => rule.requiredPackages || [])]),
+        plugins: unique([...(combo.plugins || []), ...ruleDependencies.flatMap((rule) => rule.requiredPlugins || [])]),
+        rules: unique(combo.rules || []),
+        skills: unique([
+            ...(combo.skills || []),
+            ...ruleDependencies.flatMap((rule) => rule.requiredSkills || []),
+            ...workflowDependencies.flatMap((workflow) => workflow.requiredSkills || []),
+        ]),
+        configs: unique(combo.configs || []),
+        workflows: unique(combo.workflows || []),
+        mcps: unique([
+            ...(combo.mcps || []),
+            ...ruleDependencies.flatMap((rule) => rule.requiredMcps || []),
+            ...workflowDependencies.flatMap((workflow) => workflow.requiredMcps || []),
+        ]),
+    };
+};
+
 export const readComboManifests = async (): Promise<ExtendedComboManifest[]> => {
+    validateComboManifestReferences(COMBOS, comboRegistries());
     return COMBOS;
 };
 
@@ -82,10 +187,12 @@ export const checkExistingComboComponents = async (params: {
     const { projectDir, homeDir, platform, selectedTools, combo } = params;
     const results: ExistingComboComponent[] = [];
 
+    const plan = buildComboDependencyPlan(combo, comboRegistries());
+
     // 1. Packages
-    if (combo.packages) {
+    if (plan.packages.length) {
         const pkgManifests = await readPackageManifests();
-        for (const pkgName of combo.packages) {
+        for (const pkgName of plan.packages) {
             const pkg = pkgManifests.find((m) => m.id === pkgName);
             const scope = pkg?.installer.kind === 'npm' ? (pkg.installer.scope ?? 'global') : 'global';
             const exists = await isPackageInstalled(pkgName, scope, projectDir);
@@ -101,21 +208,20 @@ export const checkExistingComboComponents = async (params: {
     }
 
     // 2. Configs
-    if (combo.configs) {
-        for (const configName of combo.configs) {
-            const exists = existsSync(join(projectDir, configName));
-            results.push({
-                type: 'config',
-                id: `config:${configName}`,
-                name: configName,
-                label: `Config Template: ${configName}`,
-                exists,
-                meta: { configName },
-            });
-        }
+    for (const configName of plan.configs) {
+        const config = CONFIGS[configName];
+        const exists = Boolean(config?.files.some((file) => existsSync(join(projectDir, file.dest))));
+        results.push({
+            type: 'config',
+            id: `config:${configName}`,
+            name: configName,
+            label: `Config Template: ${configName}`,
+            exists,
+            meta: { configName },
+        });
     }
 
-    // 3. Skills
+    // 5. Skills
     if (combo.skills && selectedTools.length > 0) {
         const skillChecks = await checkExistingSkills(projectDir, selectedTools, combo.skills);
         for (const check of skillChecks) {
@@ -131,8 +237,43 @@ export const checkExistingComboComponents = async (params: {
         }
     }
 
-    // 4. MCPs (Explicit + Inferred from skills)
-    const mcps = new Set<string>(combo.mcps || []);
+    // 4. Rules
+    if (combo.rules?.length) {
+        const ruleTargets = selectedTools
+            .map((tool) => ALLOWED_TARGETS.find((target) => target.id === tool.value))
+            .filter((target): target is (typeof ALLOWED_TARGETS)[number] => Boolean(target?.agent?.rulesDir));
+        const ruleChecks = await checkExistingRules(projectDir, ruleTargets, combo.rules);
+        for (const check of ruleChecks) {
+            results.push({
+                type: 'rule',
+                id: `rule:${check.toolId}:${check.ruleId}`,
+                name: check.ruleId,
+                toolId: check.toolId,
+                label: `Rule: ${check.ruleId} in ${check.toolName}`,
+                exists: check.exists,
+                meta: { ruleId: check.ruleId, toolId: check.toolId },
+            });
+        }
+    }
+
+    // 5. Workflows
+    if (combo.workflows?.length) {
+        const workflowChecks = await checkExistingWorkflows(projectDir, selectedTools, combo.workflows);
+        for (const check of workflowChecks) {
+            results.push({
+                type: 'workflow',
+                id: `workflow:${check.toolId}:${check.workflowName}`,
+                name: check.workflowName,
+                toolId: check.toolId,
+                label: `Workflow: ${check.workflowName} in ${check.toolName}`,
+                exists: check.exists,
+                meta: { workflowName: check.workflowName, toolId: check.toolId },
+            });
+        }
+    }
+
+    // 6. MCPs (Explicit + Inferred from skills)
+    const mcps = new Set<string>(plan.mcps);
     if (combo.skills) {
         if (combo.skills.includes('only-one-pr-git-skill')) mcps.add('github');
         if (combo.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
@@ -170,14 +311,23 @@ export const installCombo = async (params: {
     noIgnore?: boolean;
 }): Promise<ComboInstallResult> => {
     const { deps, projectDir, homeDir, platform, selectedTools, combo, overwriteList = [], noIgnore = false } = params;
-    const results: ComboInstallResult = { packages: [], configs: [], skills: [], mcps: [] };
+    const results: ComboInstallResult = {
+        packages: [],
+        configs: [],
+        plugins: { installed: [], actionRequired: [], skipped: [], failed: [] },
+        rules: [],
+        skills: [],
+        workflows: [],
+        mcps: [],
+    };
+    const plan = buildComboDependencyPlan(combo, comboRegistries());
 
     // Get existing component info
     const checks = await checkExistingComboComponents({ projectDir, homeDir, platform, selectedTools, combo });
 
     // 1. Packages
-    if (combo.packages) {
-        for (const pkgName of combo.packages) {
+    if (plan.packages.length) {
+        for (const pkgName of plan.packages) {
             const check = checks.find((c) => c.type === 'package' && c.name === pkgName);
             const exists = check ? check.exists : false;
 
@@ -219,10 +369,54 @@ export const installCombo = async (params: {
         }
     }
 
-    // 2. Configs
-    if (combo.configs && existsSync(configsDir)) {
+    // 3. Plugins
+    if (plan.plugins.length > 0) {
+        const pluginResult = await executePluginActions({
+            deps,
+            projectDir,
+            selectedPluginIds: plan.plugins,
+            targetIds: selectedTools.map((tool) => tool.value as import('@/constants/allowed-tools.js').AllowedToolId),
+        });
+        results.plugins = pluginResult.summary;
+    }
+
+    // 4. Rules
+    if (plan.rules.length > 0) {
+        const ruleTargets = selectedTools
+            .map((tool) => ALLOWED_TARGETS.find((target) => target.id === tool.value))
+            .filter((target): target is (typeof ALLOWED_TARGETS)[number] => Boolean(target?.agent?.rulesDir));
+        if (ruleTargets.length > 0) {
+            const ruleResult = await installRules({
+                deps,
+                projectDir,
+                selectedTargets: ruleTargets,
+                ruleIds: plan.rules,
+                overwriteList: overwriteList.filter((item) => item.startsWith('rule:')).map((item) => item.substring(5)),
+            });
+            results.rules = ruleResult.results;
+        }
+    }
+
+    // 5. Skills
+    if (plan.skills.length && selectedTools.length > 0) {
+        // Map the combo overwriteList to the format expected by installSkills ("toolId:skillName")
+        const skillOverwrites = overwriteList.filter((item) => item.startsWith('skill:')).map((item) => item.substring(6)); // strip "skill:" prefix
+
+        const skillResults = await installSkills({
+            deps,
+            projectDir,
+            selectedTools,
+            skillNames: plan.skills,
+            overwriteList: skillOverwrites,
+            noIgnore,
+        });
+        results.skills = skillResults;
+    }
+
+    // 5. Configs
+    if (plan.configs.length && existsSync(configsDir)) {
         try {
-            for (const configName of combo.configs) {
+            for (const configName of plan.configs) {
                 const check = checks.find((c) => c.type === 'config' && c.name === configName);
                 const exists = check ? check.exists : false;
 
@@ -259,24 +453,20 @@ export const installCombo = async (params: {
         }
     }
 
-    // 3. Skills
-    if (combo.skills && selectedTools.length > 0) {
-        // Map the combo overwriteList to the format expected by installSkills ("toolId:skillName")
-        const skillOverwrites = overwriteList.filter((item) => item.startsWith('skill:')).map((item) => item.substring(6)); // strip "skill:" prefix
-
-        const skillResults = await installSkills({
+    // 6. Workflows
+    if (plan.workflows.length > 0 && selectedTools.length > 0) {
+        results.workflows = await installWorkflows({
             deps,
             projectDir,
             selectedTools,
-            skillNames: combo.skills,
-            overwriteList: skillOverwrites,
+            workflowNames: plan.workflows,
+            overwriteList: overwriteList.filter((item) => item.startsWith('workflow:')).map((item) => item.substring(9)),
             noIgnore,
         });
-        results.skills = skillResults;
     }
 
-    // 4. MCPs
-    const mcps = new Set<string>(combo.mcps || []);
+    // 7. MCPs
+    const mcps = new Set<string>(plan.mcps);
     if (combo.skills) {
         if (combo.skills.includes('only-one-pr-git-skill')) mcps.add('github');
         if (combo.skills.includes('only-one-clockify-skill')) mcps.add('clockify');

@@ -8,6 +8,13 @@ import { createRuleCommand } from '@/commands/rule/command.js';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+vi.mock('node:child_process', () => ({
+    execFile: vi.fn((file, args, options, callback) => {
+        const cb = typeof options === 'function' ? options : callback;
+        cb?.(null, { stdout: '', stderr: '' });
+    }),
+}));
+
 const testProjectDir = join(process.cwd(), 'tmp/regression-agent-first-test');
 
 describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5.3)', () => {

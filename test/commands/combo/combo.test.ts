@@ -50,4 +50,31 @@ describe('combo command', () => {
             await rm(cwd, { recursive: true, force: true });
         }
     });
+
+    it('applies frontend flow rules and workflows instead of silently ignoring them', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'combo-frontend-test-'));
+        const writes: string[] = [];
+
+        try {
+            await mkdir(join(cwd, '.cursor'), { recursive: true });
+            const program = createProgram({
+                cwd,
+                env: {},
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: (line) => writes.push(line),
+                prompts: { checkbox: vi.fn().mockResolvedValue(['cursor']) },
+            });
+
+            await program.parseAsync(['combo', cwd, 'frontend-flow', '--tool', 'cursor'], { from: 'user' });
+
+            expect(existsSync(join(cwd, '.cursor', 'rules', '02-architecture-stack.md'))).toBe(true);
+            expect(existsSync(join(cwd, '.cursor', 'rules', '01-context-and-tools.md'))).toBe(true);
+            expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(true);
+            expect(writes.join('\n')).toContain('Plugins:');
+            expect(writes.join('\n')).toContain('Rules:');
+            expect(writes.join('\n')).toContain('Workflows:');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
 });
