@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 
+import { WORKFLOWS } from '../../assets/workflows/index.js';
+
 const repoRoot = process.cwd();
 const skillsDir = join(repoRoot, 'assets', 'skills');
 
@@ -66,6 +68,45 @@ describe('direct implementation workflow contracts', () => {
         } else {
             expect(workflow).toContain('This workflow creates no plan and no `tasks.md`.');
         }
+    });
+});
+
+describe('GitNexus freshness workflow contracts', () => {
+    it.each(['only-one-implement-fe.md', 'only-one-implement-be.md', 'only-one-implement-fast.md'])(
+        'requires current GitNexus evidence in %s',
+        async (workflowName) => {
+            const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
+
+            expect(workflow).toContain('current working-tree revision');
+            expect(workflow).toContain('`stale` or `incomplete`');
+            expect(workflow).toContain('sync/reindex');
+            expect(workflow).toContain('Do not claim complete impact coverage from a stale or incomplete index.');
+        },
+    );
+
+    it.each(['only-one-implement-fe.md', 'only-one-implement-be.md'])(
+        'uses preflight, boundary, and integration gates in %s',
+        async (workflowName) => {
+            const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
+
+            expect(workflow).toContain('Preflight scope gate');
+            expect(workflow).toContain('Public/shared boundary gate');
+            expect(workflow).toContain('Integration impact gate');
+            expect(workflow).toContain('`detect_changes`');
+        },
+    );
+
+    it('requires GitNexus gates and escalation for fast implementation', async () => {
+        const workflow = await readFile(join(repoRoot, 'assets', 'workflows', 'only-one-implement-fast.md'), 'utf-8');
+
+        expect(workflow).toContain('Dependency and scope preflight');
+        expect(workflow).toContain('Relationship gate');
+        expect(workflow).toContain('Completion impact gate');
+        expect(workflow).toContain('`detect_changes`');
+        expect(workflow).toContain('impact exceeds 1–3 files');
+
+        const fastWorkflow = WORKFLOWS.find((workflow) => workflow.name === 'only-one-implement-fast');
+        expect(fastWorkflow?.requiredMcps).toContain('gitnexus');
     });
 });
 

@@ -47,6 +47,6 @@ export const WORKFLOWS: WorkflowManifest[] = [
         name: 'only-one-implement-fast',
         description: 'Scope, implement, and verify a simple low-risk task directly — no subagent delegation, no written plan, no large skill requirements.',
         requiredSkills: [],
-        requiredMcps: [],
+        requiredMcps: ['gitnexus'],
     },
 ];
