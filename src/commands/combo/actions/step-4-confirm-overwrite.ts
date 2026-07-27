@@ -26,7 +26,7 @@ export const confirmComboOverwriteStep = async (
             choices: alreadyExisting.map((c) => ({
                 name: c.label,
                 value: c.id,
-                checked: true,
+                checked: false,
             })),
         });
     }

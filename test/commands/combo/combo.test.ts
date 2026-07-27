@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mkdtemp, rm, mkdir } from 'node:fs/promises';
+import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
@@ -46,6 +46,37 @@ describe('combo command', () => {
             // Verify skill copy
             const skillPath = join(cwd, '.cursor', 'skills', 'grill-me');
             expect(existsSync(skillPath)).toBe(true);
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
+
+    it('leaves existing combo components unchecked for overwrite by default', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'combo-overwrite-test-'));
+        const prompts: Array<{ message: string; choices: Array<{ checked?: boolean }> }> = [];
+
+        try {
+            await mkdir(join(cwd, '.cursor'), { recursive: true });
+            await mkdir(join(cwd, 'openspec'), { recursive: true });
+            await writeFile(join(cwd, 'openspec', 'config.yaml'), 'existing: true\n');
+            const program = createProgram({
+                cwd,
+                env: {},
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: () => undefined,
+                prompts: {
+                    checkbox: vi.fn(async (options) => {
+                        prompts.push(options);
+                        return [];
+                    }),
+                },
+            });
+
+            await program.parseAsync(['combo', cwd, 'idsd-flow', '--tool', 'cursor'], { from: 'user' });
+
+            const overwritePrompt = prompts.find((prompt) => prompt.message.includes('already exist'));
+            expect(overwritePrompt?.choices.length).toBeGreaterThan(0);
+            expect(overwritePrompt?.choices.every((choice) => choice.checked === false)).toBe(true);
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
