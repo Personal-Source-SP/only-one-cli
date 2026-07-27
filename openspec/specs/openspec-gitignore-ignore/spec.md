@@ -11,5 +11,5 @@ The `init` command MUST update the project's `.gitignore` file to append default
 - **GIVEN** a project is being initialized
 - **AND** the `.gitignore` file exists
 - **WHEN** the initialization executes successfully
-- **THEN** it appends `.agent/`, `openspec/`, `adr`, and `openspec` to `.gitignore` under the `# AI ignores` section
+- **THEN** it appends `.agent/`, `.agents/`, `openspec/`, and `adr/` to `.gitignore` under the `# AI ignores` section
 
