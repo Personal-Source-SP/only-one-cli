@@ -1,6 +1,12 @@
 # only-one
 
-CLI for initializing OpenSpec workflow projects and managing structural agent skills.
+CLI for developer environment setup, AI agent workspace management, OpenSpec workflows, and supported editor configuration synchronization.
+
+## Requirements
+
+- **Node.js 22+**
+- Git
+- `@fission-ai/openspec` for OpenSpec projects; `only-one init` can install it when needed
 
 ## Install
 
@@ -8,195 +14,227 @@ CLI for initializing OpenSpec workflow projects and managing structural agent sk
 npm install -g only-one
 ```
 
-Requires **Node.js 18+**. Also requires `openspec` CLI (`@fission-ai/openspec`) — installed automatically when you run `init`.
-
 ## Quick Start
 
 ```bash
-# Initialize project with openspec and agent skills
+# Initialize workspace tools, packages, and configurations
 only-one init
 
-# Generate structural blueprint
-only-one structure-generate
+# Apply predefined package, plugin, skill, rule, workflow, and MCP setup
+only-one combo idsd-flow
 
 # Check environment readiness
 only-one doctor
+
+# Open interactive terminal dashboard
+only-one tui
 ```
+
+Run `only-one <command> --help` for complete command options.
 
 ## Commands
 
 ### `init`
 
-Initialize project with openspec CLI and install custom agent skills.
+Initialize a project through selectable setup steps.
 
 ```bash
 only-one init [path] [options]
+only-one init --step skills --tool antigravity,claude
+only-one init --skip configs,packages /path/to/project
 ```
 
-| Option               | Description                                                                 |
-| -------------------- | --------------------------------------------------------------------------- |
-| `--force`            | Pass `--force` to openspec init                                             |
-| `--no-install-skill` | Skip openspec bootstrapping and custom skills sync                          |
-| `--tools <tools>`    | Agent tools: `all`, `none`, or comma-separated ids (`cursor`, `claude`, …)  |
-
-Flow:
-1. Checks if `@fission-ai/openspec` is installed globally — installs if missing
-2. Runs `openspec init [path]` with `--tools`/`--force` passthrough
-3. Copies custom skills from `.agents/skills/` to each selected tool's skill directory
-
-**Examples**
+Available focused subcommands:
 
 ```bash
-# Interactive init
-only-one init
-
-# Init without agent skills
-only-one init --no-install-skill
-
-# Non-interactive: install for Cursor and Claude
-only-one init --tools cursor,claude
+only-one init package [path] [names]
+only-one init skill [path] [names]
+only-one init configs [path] [names]
+only-one init combo [path] [names]
+only-one init mcp [names]
 ```
 
-### `init mcp`
+OpenSpec setup normalizes Antigravity output, reports initialization failures, and avoids copying symlinked legacy skills.
 
-Merge global MCP configurations into Antigravity, Claude, Cursor, and Codex settings.
+### `skill`
+
+Manage and synchronize custom agent skills for selected tools.
 
 ```bash
-only-one init mcp [names] [options]
+only-one skill [path] [names] --tool cursor
 ```
 
-| Option         | Description                                                                 |
-| -------------- | --------------------------------------------------------------------------- |
-| `--ide <ides>` | Comma-separated targets: `antigravity`, `claude`, `cursor`, `codex`       |
+Supported command-facing agent targets are Antigravity, Claude, Cursor, and Codex.
 
-**Examples**
+### `workflow`
+
+Manage and synchronize bundled agent workflows.
 
 ```bash
-# Configure all available MCPs for Cursor explicitly
-only-one init mcp github,clockify,gitnexus --ide cursor
+only-one workflow [path] [names] --tool cursor
+```
 
-# Configure github MCP for all supported targets
-only-one init mcp github --ide antigravity,claude,cursor,codex
+Bundled workflows cover bounded feature planning, TDD implementation, evidence-driven bug fixes, accessible UI work, GitHub pull requests, Clockify logging, and OpenSpec propose/apply/archive/explore flows. Implementation workflows include approval gates, GitNexus discovery, verification, and safe worktree cleanup guidance.
 
-# Configure GitNexus MCP for code intelligence across target IDEs
+### `plugin`
+
+Install target-specific agent plugins.
+
+```bash
+only-one plugin [path] [ids]
+```
+
+Plugin installation follows each target's supported method. Manual commands are printed when automated installation is unavailable.
+
+### `rule`
+
+Manage and copy persistent agent rules.
+
+```bash
+only-one rule [path] [ids]
+```
+
+Rules provide reusable architecture, tooling, testing, review, and workflow constraints for supported agents.
+
+### `mcp`
+
+Merge global MCP server definitions into supported agent configurations.
+
+```bash
+only-one mcp [names] --ide antigravity,claude,cursor,codex
+only-one mcp github,clockify
 only-one mcp gitnexus --ide antigravity,claude,cursor
 ```
 
-> **Note on GitNexus MCP:**
-> - GitNexus runs `npx -y gitnexus@latest mcp` dynamically at runtime.
-> - Default configuration sets `GITNEXUS_MCP_READ_ONLY=1` to enforce read-only tool scope during agent code planning.
-> - Before agents can inspect code structure, run `npx gitnexus analyze` (or index your repository with GitNexus) locally so the index is available.
+MCP synchronization supports Antigravity, Claude, Cursor, and Codex JSON or TOML configuration formats. Existing malformed selected configurations fail before writes.
 
-### Workflows
+GitNexus runs `npx -y gitnexus@latest mcp` with `GITNEXUS_MCP_READ_ONLY=1` by default. Run `npx gitnexus analyze` in target repository before agent code discovery.
 
-The CLI includes pre-built agent workflows:
+### `combo`
 
-1. **`pr-git` Workflow (GitHub PR creation)**
-   - Requires `only-one-pr-git-skill` skill and `github` MCP server.
-   - Requires setting `GITHUB_PERSONAL_ACCESS_TOKEN` in the IDE's MCP environment config file (e.g. Cursor's `mcp.json`).
-   - Standardizes PR titles, formats body to `references/pr-template.md`, and requests explicit confirmation.
+Initialize project from predefined combinations of packages, plugins, skills, rules, workflows, configurations, and MCP servers.
 
-2. **`only-one-clockify`**: Validate and log Clockify time entries for task lists.
-   - Requires `only-one-clockify-skill` skill and `clockify` MCP server.
-   - Requires setting `CLOCKIFY_API_KEY` in the IDE's MCP environment config file.
-   - Parses task format `[Label] Description | start-endh`, validates overlapping slots in GMT+7, and logs to Clockify.
+```bash
+only-one combo [path] [names]
+only-one combo idsd-flow
+```
+
+Before installation, combo preflight groups dependencies as installed, missing, partial, or unsupported. Existing components remain unchecked by default during overwrite confirmation.
+
+### `package`
+
+Install packages from typed package registry with environment validation and interactive selection.
+
+```bash
+only-one package [path] [names]
+only-one init package /path/to/project superpowers --target antigravity,claude
+```
+
+Bundled package definitions include:
+
+- `@fission-ai/openspec`: global npm package
+- `ui-ux-pro-max-cli`: global npm package
+- `superpowers`: target-aware agent plugin package
 
 ### `structure-generate`
 
-Generate a structural blueprint markdown file for the project.
+Scaffold structural blueprint for agent code discovery.
 
 ```bash
-only-one structure-generate [path] [options]
+only-one structure-generate [path]
+only-one structure-generate --output ./custom-blueprint.md
+only-one structure-generate --status
 ```
 
 ### `update`
 
-Refresh installed structural agent skills for tools listed in `agent_tools`.
+Refresh installed agent skills and workflow templates.
 
 ```bash
 only-one update [path] [--force]
 ```
 
+### `tui`
+
+Launch interactive terminal dashboard.
+
+```bash
+only-one tui
+```
+
 ### `doctor`
 
-Check environment readiness and CLI configuration.
+Check Git, Node.js, and CLI environment readiness.
 
 ```bash
 only-one doctor
 ```
 
-### `init package`
-
-Install packages from the typed `assets/packages` package registry.
-
-```bash
-only-one init package [path] [names] [options]
-```
-
-| Option         | Description                                                                 |
-| -------------- | --------------------------------------------------------------------------- |
-| `--target <ids>` | Target agent IDs for plugin packages: `antigravity`, `claude`, `cursor`, `codex` |
-
-Supported packages:
-- **`@fission-ai/openspec`** (npm package, global)
-- **`ui-ux-pro-max-cli`** (npm package, global)
-- **`superpowers`** (agent-plugin package): Installs Superpowers framework.
-  - Automatically executes `agy plugin install https://github.com/obra/superpowers` for **Antigravity**.
-  - Prints exact official manual commands for **Claude** (`/plugin install superpowers@claude-plugins-official`), **Cursor** (`/add-plugin superpowers`), and **Codex** (`/plugins` -> `superpowers` -> `Install Plugin`).
-
 ### `setting-vs`
 
-Merge `assets/vs/settings.json` into Antigravity or Cursor user settings on macOS/Windows.
+Merge bundled settings into Antigravity or Cursor user settings on macOS and Windows.
 
 ```bash
-only-one setting-vs --editors antigravity,cursor
+only-one setting-vs [settings] --editors antigravity,cursor
 ```
 
-- Source settings win when a key conflicts.
-- Target-only settings are preserved.
-- Command writes through a backup journal and rolls back on failure or recoverable termination.
+- Source settings win on key conflicts.
+- Target-only settings remain unchanged.
+- Writes use backup journal and rollback on failure or recoverable termination.
 
 ### `extensions-vs`
 
-Install missing extension IDs from `assets/vs/extensions.json` through Antigravity or Cursor CLI.
+Install missing bundled extension IDs through Antigravity or Cursor CLI.
 
 ```bash
-only-one extensions-vs --editors antigravity,cursor
+only-one extensions-vs [extensions] --editors antigravity,cursor
 ```
 
-- Existing extensions are preserved.
-- Only missing source extensions are installed.
-- Progress is reported as monotonic percentages from 0 to 100.
-- Interrupted runs recover from `.only-one/vs-sync-journal.json` before starting new mutations.
+- Existing extensions remain installed.
+- Only missing selected extensions are installed.
+- Progress increases monotonically from 0 to 100.
+- Interrupted runs recover from `.only-one/vs-sync-journal.json`.
+
+## Ignore Templates
+
+Initialization can merge bundled Git, Docker, and npm ignore templates. Git ignore merging preserves project-specific entries, writes named sections, normalizes directory rules, and deduplicates equivalent rules.
+
+## Workflow Integrations
+
+### GitHub Pull Requests
+
+`only-one-pr-git` requires its bundled skill, GitHub MCP server, and `GITHUB_PERSONAL_ACCESS_TOKEN` in selected agent MCP environment.
+
+### Clockify
+
+`only-one-clockify` requires its bundled skill, Clockify MCP server, and `CLOCKIFY_API_KEY`. Task lines use `[Label] Description | start-endh`; validation checks GMT+7 time ranges and overlaps before logging.
+
+### OpenSpec
+
+Bundled propose, apply, archive, and explore workflows support change artifacts, approval gates, test-driven execution, archive synchronization, and safe cleanup of eligible AI worktrees.
 
 ## Compatibility
 
-Command-facing agent targets are limited to Antigravity, Claude, Cursor, and Codex. Other explicit target IDs now fail before side effects.
+Command-facing agent targets are Antigravity, Claude, Cursor, and Codex. Explicit unsupported target IDs fail before side effects.
 
-`setting-vs` and `extensions-vs` support only Antigravity and Cursor; VS Code is no longer selectable.
+`setting-vs` and `extensions-vs` support Antigravity and Cursor only.
 
-MCP sync supports JSON and TOML configuration files. Existing malformed configurations fail before writes. Codex TOML writes preserve configuration semantics, but may rewrite comments and formatting.
+Codex TOML writes preserve configuration semantics but may rewrite comments and formatting.
 
 ## JSON Output
 
-Any command supports `--json` for machine-readable output:
+Commands supporting shared output options can emit machine-readable JSON:
 
 ```bash
-only-one --json init --no-install-skill
+only-one --json init --step skills --yes
 ```
 
 ## Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Run in dev mode
 npm run dev -- --help
-
-# Run tests
 npm test
-
-# Build
 npm run build
+npm run publish:local
 ```

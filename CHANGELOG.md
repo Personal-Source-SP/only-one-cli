@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.0.5 (2026-07-27)
+
+### Requirements
+
+- Node.js 22 or newer is required by the current terminal UI dependency stack.
+
+### Features
+
+- Added first-class `package`, `plugin`, `rule`, `workflow`, and `combo` management with interactive target selection and non-interactive options.
+- Added combo dependency preflight and grouped status reporting for installed, missing, partial, and unsupported components.
+- Added an Ink-based interactive terminal dashboard through `only-one tui`.
+- Added bundled planning, implementation, debugging, UI, pull-request, Clockify, OpenSpec, review, and verification workflows and skills.
+- Added safe OpenSpec archive and AI worktree cleanup guidance.
+- Added section-aware Git ignore template merging with rule deduplication, preserving existing project entries.
+- Expanded metadata manifests for workflows, combos, plugins, rules, and assets.
+
+### Fixes
+
+- Normalized OpenSpec Antigravity output and surfaced initialization failures.
+- Skipped symlinked legacy skills during Antigravity normalization.
+- Normalized default Git ignore directory entries with trailing slashes.
+- Left already-installed combo components unchecked during overwrite confirmation.
+- Removed empty VS synchronization journal directories after successful commits.
+
+### Internal
+
+- Moved skill installation into combo target selection and removed deprecated bundled skill assets.
+- Expanded workflow contracts with GitNexus discovery, approval gates, TDD, browser evidence, and proportional verification.
+
 ## 0.0.3 (2026-07-23)
 
 ### Breaking Changes
