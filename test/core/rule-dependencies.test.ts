@@ -35,17 +35,12 @@ describe('Rule Dependency Resolution & Preflight Validation (Tasks 3.1, 3.2, 3.7
         expect(plan.skills).toEqual([]);
     });
 
-    it('resolves all registered Next.js skills for architecture-stack', () => {
+    it('keeps architecture-stack free of framework skill dependencies', () => {
         const result = validateRuleDependenciesPreflight(['architecture-stack'], [AllowedToolId.Antigravity]);
         const plan = buildDeduplicatedDependencyPlan(['architecture-stack']);
 
         expect(result).toEqual({ valid: true, errors: [] });
-        expect(plan.skills).toEqual([
-            'next-dev-loop',
-            'next-cache-components-adoption',
-            'next-cache-components-optimizer',
-            'next-partial-prefetching-adoption',
-        ]);
+        expect(plan.skills).toEqual([]);
     });
 
     it('deduplicates shared dependencies across multiple selected rules', () => {

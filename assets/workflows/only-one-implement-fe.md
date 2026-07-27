@@ -1,80 +1,94 @@
 ---
-description: Execute an approved frontend plan directly through plan-local task tracking, mandatory TDD, review, and integration verification.
+description: Apply an approved frontend OpenSpec change in one feature worktree with TDD, browser evidence, checkpoint commits, full verification, and unstaged local handoff.
 ---
 
 ## Input
 
 ```text
-/only-one-implement-fe <plan-path>
+/only-one-implement-fe <change-name>
 ```
-
-## Execution location
-
-1. Work only in current project workspace and current Git branch.
-2. Do not invoke `using-git-worktrees`.
-3. Do not run `git worktree` commands or create, switch to, or delete any worktree.
-4. Do not create git commits.
 
 ## Dependency preflight
 
-1. Check MCP `gitnexus` and skills `test-driven-development`, `requesting-code-review`, and `verification-before-completion`.
-2. Check `ux-ui-max`. Stop if unavailable.
-3. For plans touching data-fetching or navigation, check `next-cache-components-adoption` and `next-partial-prefetching-adoption`.
-4. Report unavailable dependency and stop. Do not silently replace it.
+1. Check OpenSpec CLI, MCP `gitnexus`, workflow `only-one-ui`, and skills `openspec-apply-change`, `using-git-worktrees`, `brainstorming`, `ux-ui-max`, `test-driven-development`, `requesting-code-review`, and `verification-before-completion`.
+2. For Next.js work, check `next-dev-loop`; check cache and partial-prefetching skills when approved artifacts trigger them.
+3. Require browser tooling capable of affected viewport, interaction, console, and network verification.
+4. Report every unavailable dependency and stop. Do not silently replace it.
+
+## OpenSpec apply and approval gate
+
+1. Resolve `<name>` with `openspec-apply-change`. If ambiguous, run `openspec list --json` and ask user to select.
+2. Run `openspec status --change "<name>" --json`; read `schemaName`, `planningHome`, `changeRoot`, `actionContext`, and dynamic artifact paths.
+3. Run `openspec instructions apply --change "<name>" --json`; read `state`, `contextFiles`, progress, pending tasks, and instruction.
+4. Stop when blocked, when `actionContext` disallows implementation, or when explicit approval evidence is absent.
+5. Read every path in `contextFiles`. Confirm allowlist, approved UI direction, component boundaries, contracts, states, viewport matrix, risks, and verification commands.
+6. Stop for missing or conflicting information. Do not infer requirements or expand scope.
 
 ## GitNexus freshness gates
 
-1. GitNexus evidence expires after source changes since its latest successful index/sync.
-2. Before every GitNexus-dependent decision, verify index covers current repository, checked-out branch, and current working-tree revision, and is not `stale` or `incomplete`.
-3. If index is not current, stop, sync/reindex using available GitNexus tooling, then repeat query.
+1. GitNexus evidence expires after source changes since latest successful index/sync.
+2. Before each GitNexus-dependent decision, verify index covers current repository, checked-out branch, and current working-tree revision, and is not `stale` or `incomplete`.
+3. If not current, stop, sync/reindex, then repeat query.
 4. Do not claim complete impact coverage from a stale or incomplete index.
+5. **Preflight scope gate:** Query approved symbols and direct relationships only.
+6. **Public/shared boundary gate:** Refresh evidence before changing public symbols, shared UI contracts, typed API contracts, or cross-layout boundaries. Stop for impact beyond allowlist.
 
-## Approval and scope gate
+## One feature worktree
 
-1. Read selected plan only, except documents linked by plan.
-2. Confirm user approved exact plan, allowlist, UI direction, contracts, risks, verification scope.
-3. Require acceptance criteria, ordered micro-tasks, files, symbols, tests, dependencies, verification commands.
-4. Stop for missing/conflicting plan information. Do not infer requirements.
-5. **Preflight scope gate:** Use GitNexus only for listed symbols, direct relationships, and current impact after verifying index freshness.
-6. **Public/shared boundary gate:** Before changing public symbol, shared contract, or unclear relationship, refresh stale evidence, repeat query, and stop for impact beyond allowlist until explicit approval.
+1. Use one feature worktree for entire OpenSpec change. Never create one worktree per task.
+2. Require clean target working directory. Record target branch and HEAD. Do not stash, reset, or overwrite existing changes.
+3. Invoke `using-git-worktrees`. Use branch `ai/<feature-slug>` and repository-approved location, normally `.worktrees/<feature-slug>`.
+4. Resume matching worktree only after verifying branch and change identity. Stop on conflict.
+5. Run setup and baseline tests inside worktree. Stop and ask before proceeding from baseline failures.
+6. All source edits, OpenSpec task updates, UI evidence, reviews, and checkpoint commits happen inside worktree.
 
-## Plan-local task tracking
+## OpenSpec task loop
 
-1. Before source changes, create `<plan-dir>/tasks.md` beside plan.
-2. Convert approved ordered micro-tasks into ordered `- [ ]` entries. Each entry records allowed files, symbols, dependencies, acceptance criteria, direct test, TDD steps, review, completion evidence.
-3. If `tasks.md` exists, preserve completed entries and resume first `- [ ]` task.
-4. Do not start dependent task before prerequisites are `- [x]`.
-5. Tick `- [x]` only after RED/GREEN/REFACTOR evidence, task review, focused checks.
+For each pending task in dependency order:
 
-## Direct task protocol
+1. Re-read relevant `contextFiles` and show task/progress.
+2. If code-level or UI composition decisions remain open, invoke `brainstorming` for micro-brainstorming limited to task. Do not reopen approved product or visual decisions.
+3. If discovery changes scope, UI direction, public contract, Server/Client split, or architecture, update resolved OpenSpec artifacts and stop for explicit approval.
+4. Invoke `test-driven-development` and follow RED, GREEN, REFACTOR with established Vitest/Jest and Testing Library:
+   - **RED:** Add smallest behavioral test and confirm expected missing-behavior failure.
+   - **GREEN:** Write minimum strict TypeScript implementation and confirm focused pass.
+   - **REFACTOR:** Improve names, composition, duplication, and type safety; rerun focused and neighboring tests.
+5. Follow `only-one-ui` implementation constraints: preserve approved visual direction, ownership, design-system primitives, tokens, assets, i18n, semantic HTML, keyboard/focus behavior, contrast, reduced motion, responsive behavior, and relevant loading, empty, error, success, disabled, and permission states. Do not use placeholders.
+6. Preserve approved Server/Client boundaries. Use typed API wrappers or SDKs and exported or generated contracts. Apply approved cache and prefetch constraints only.
+7. Run browser verification for task viewport/state/interaction matrix. Inspect browser console and network, and capture required viewport evidence through screenshots or recordings when supported.
+8. Inspect task diff and invoke `requesting-code-review`. Resolve blocking findings through bounded RED, GREEN, REFACTOR.
+9. Refresh GitNexus after source changes and check touched public/shared symbols.
+10. Update OpenSpec checkbox only after TDD, browser evidence, review, focused checks, and dependencies complete.
+11. Create checkpoint commit with task code, tests, evidence/artifact updates. Do not commit unverified work.
+12. Rerun `openspec instructions apply --change "<name>" --json` and select next pending task.
 
-1. Implement one unchecked task directly within plan allowlist.
-2. Invoke `test-driven-development` and follow RED, GREEN, REFACTOR using project Vitest or Jest plus `@testing-library/react`.
-3. RED: add smallest behavioral test, run focused test, confirm expected missing-behavior failure.
-4. GREEN: write minimum strict TypeScript change, run focused test, capture pass.
-5. REFACTOR: improve names, duplication, composition, type safety without behavior change; rerun focused and neighboring tests.
-6. Do not weaken assertions, use meaningless snapshots, use undocumented `any`, or test implementation details when behavior can be tested.
-7. Inspect task diff and invoke `requesting-code-review`. Resolve blocking findings before ticking task.
+## Integrated verification
 
-## UI constraints
+1. Inspect complete feature-branch diff and history. Invoke `requesting-code-review` for integrated change and resolve blocking findings with bounded TDD.
+2. Verify approved visual direction, all relevant UI states, mobile/tablet/desktop behavior, accessibility, Server/Client boundaries, typed contracts, cache, and prefetch behavior.
+3. Run focused tests, neighboring tests, typecheck, lint/format, build when applicable, and full test suite.
+4. Use `next-dev-loop` when applicable. Inspect browser console and network across required viewport/state/interaction matrix; capture fresh viewport evidence. Never claim responsive or visual completion from code inspection alone.
+5. **Integration impact gate:** Sync/reindex GitNexus after source changes before `detect_changes` or final impact analysis. Stop for impact beyond allowlist.
+6. Invoke `verification-before-completion` with fresh command and browser evidence.
+7. Require clean feature worktree and all verified work committed before handoff.
 
-1. Load `ux-ui-max` before UI code.
-2. Preserve approved architecture, ownership, naming, tokens, composition.
-3. Reuse existing Ant Design primitives, theme tokens, components, assets, i18n keys. Do not use placeholders.
-4. Cover applicable loading, empty, error, success, disabled, permission states.
-5. Cover mobile, tablet, desktop; semantic HTML, keyboard navigation, focus, contrast, reduced motion.
-6. Respect approved Server/Client boundaries. Do not add `"use client"` without plan approval.
-7. Apply plan caching and prefetching constraints. Do not alter cache or prefetch configuration without approval.
+## Unstaged local handoff
 
-## Review and integration
+1. Recheck target working directory: recorded branch, clean state, and target HEAD containing recorded base. Stop on drift.
+2. From target directory, run `git merge --squash ai/<feature-slug>`, then run `git reset`.
 
-1. After all `tasks.md` entries are `- [x]`, inspect complete `git diff`.
-2. Invoke `requesting-code-review` for integrated change. Resolve blocking findings with direct bounded TDD work.
-3. Verify plan-required UI states, responsive behavior, accessibility, Server/Client boundaries.
-4. Run focused tests, typecheck, lint or format, build when required, full suite.
-5. **Integration impact gate:** After source changes, sync/reindex GitNexus before `detect_changes` or impact analysis. Run analysis for changed public symbols/contracts. Stop for impact beyond allowlist. If refresh cannot run, report blocker and do not tick task complete using stale evidence.
-6. Invoke `verification-before-completion` with fresh command evidence.
+```bash
+git merge --squash ai/<feature-slug>
+git reset
+```
+
+3. `git reset` leaves squash result as unstaged changes for full IDE review.
+4. Show `git status --short`, `git diff --stat`, and changed-file list. Do not stage or hide changes.
+5. Do not commit on the target branch. User reviews, edits, stages, and commits manually.
+6. On conflict, stop and report paths. Do not abort, reset, delete, or resolve without explicit instruction.
+7. Remove worktree only after successful safe handoff. Keep `ai/<feature-slug>` as a recovery branch.
+8. Do not archive the OpenSpec change or delete recovery branch. Archive only after user reviews and commits target changes.
 
 ## Completion report
 
-Report `tasks.md` outcome, changed files, direct-task RED/GREEN/REFACTOR evidence, reviews, integration results, skipped checks, blockers, risks. Do not claim full verification without evidence.
+Report OpenSpec progress, checkpoint commits, changed files, RED/GREEN/REFACTOR evidence, browser states/viewports, console/network results, reviews, full verification, GitNexus impact, handoff, skipped checks, blockers, and recovery branch.

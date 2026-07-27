@@ -49,12 +49,7 @@ describe('Rule Registry Model (Task 2.1 & 2.2)', () => {
                 packages: undefined,
                 plugins: undefined,
                 mcps: undefined,
-                skills: [
-                    'next-dev-loop',
-                    'next-cache-components-adoption',
-                    'next-cache-components-optimizer',
-                    'next-partial-prefetching-adoption',
-                ],
+                skills: undefined,
             },
         ];
 

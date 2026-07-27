@@ -49,26 +49,34 @@ describe('agent workflow skills', () => {
     });
 });
 
-describe('direct implementation workflow contracts', () => {
-    it.each([
-        ['only-one-implement-fe.md', true],
-        ['only-one-implement-be.md', true],
-        ['only-one-implement-fast.md', false],
-    ])('keeps %s on current workspace and branch', async (workflowName, usesPlanTasks) => {
-        const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
+describe('implementation workspace contracts', () => {
+    it('keeps fast implementation on current workspace and branch', async () => {
+        const workflow = await readFile(join(repoRoot, 'assets', 'workflows', 'only-one-implement-fast.md'), 'utf-8');
 
         expect(workflow).toContain('current project workspace and current Git branch');
         expect(workflow).toContain('Do not invoke `using-git-worktrees`');
         expect(workflow).toContain('Do not run `git worktree` commands');
-
-        if (usesPlanTasks) {
-            expect(workflow).toContain('<plan-dir>/tasks.md');
-            expect(workflow).toContain('resume first `- [ ]` task');
-            expect(workflow).toContain('Tick `- [x]` only after RED/GREEN/REFACTOR evidence');
-        } else {
-            expect(workflow).toContain('This workflow creates no plan and no `tasks.md`.');
-        }
+        expect(workflow).toContain('This workflow creates no plan and no `tasks.md`.');
     });
+
+    it.each(['only-one-implement-fe.md', 'only-one-implement-be.md'])(
+        'isolates %s and hands changes back unstaged',
+        async (workflowName) => {
+            const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
+
+            expect(workflow).toContain('one feature worktree');
+            expect(workflow).toContain('`using-git-worktrees`');
+            expect(workflow).toContain('`ai/<feature-slug>`');
+            expect(workflow).toContain('checkpoint commit');
+            expect(workflow).toContain('`git merge --squash ai/<feature-slug>`');
+            expect(workflow).toContain('`git reset`');
+            expect(workflow).toContain('unstaged changes');
+            expect(workflow).toContain('Keep `ai/<feature-slug>` as a recovery branch');
+            expect(workflow).toContain('Do not commit on the target branch');
+            expect(workflow).toContain('Do not archive the OpenSpec change');
+            expect(workflow).not.toContain('<plan-dir>/tasks.md');
+        },
+    );
 });
 
 describe('GitNexus freshness workflow contracts', () => {
