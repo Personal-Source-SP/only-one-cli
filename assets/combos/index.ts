@@ -33,7 +33,6 @@ export const COMBOS: ComboManifest[] = [
         rules: ['architecture-stack', 'context-and-tools'],
         workflows: [
             'only-one-implement-fast',
-            'only-one-bug',
             'only-one-clockify',
             'only-one-pr-git',
         ],
@@ -60,7 +59,6 @@ export const COMBOS: ComboManifest[] = [
         rules: ['architecture-stack', 'context-and-tools'],
         workflows: [
             'only-one-implement-fast',
-            'only-one-bug',
             'only-one-clockify',
             'only-one-pr-git',
         ],

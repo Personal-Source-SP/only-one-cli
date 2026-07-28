@@ -9,7 +9,6 @@ import {
     PR_GIT_DEFAULT_TAG,
     SUPPORTED_PR_GIT_TAGS,
     buildAgentWorkflowCommandContents,
-    buildBugCommandContent,
     buildUiCommandContent,
     buildClockifyCommandContent,
     buildPrGitCommandContent,
@@ -43,17 +42,6 @@ describe('agent workflow command sources', () => {
         expect(command.body).toContain('clockify');
     });
 
-    it('defines bug workflow approval and dependency blockers', () => {
-        const command = buildBugCommandContent();
-
-        expect(command.id).toBe(AgentWorkflowCommandId.Bug);
-        expect(command.body).toContain('superpowers');
-        expect(command.body).toContain('gitnexus');
-        expect(command.body).toContain('report blocker and stop');
-        expect(command.body).toContain('Wait for explicit approval before changes');
-        expect(command.body).toContain('verification-before-completion');
-    });
-
     it('defines UI workflow approval and viewport validation', () => {
         const command = buildUiCommandContent();
 
@@ -69,7 +57,6 @@ describe('agent workflow command sources', () => {
         expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual([
             'only-one-pr-git',
             'only-one-clockify',
-            'only-one-bug',
             'only-one-ui',
         ]);
     });

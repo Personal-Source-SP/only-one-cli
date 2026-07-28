@@ -1,7 +1,6 @@
 import type { CommandContent } from '@/core/command-generation/types.js';
 
 export enum AgentWorkflowCommandId {
-    Bug = 'only-one-bug',
     Ui = 'only-one-ui',
     Clockify = 'only-one-clockify',
     PrGit = 'only-one-pr-git',
@@ -22,10 +21,6 @@ export const PR_GIT_DEFAULT_TAG = PrGitTag.Feat;
 export const CLOCKIFY_DEFAULT_TASKS_PER_DAY = 2;
 
 export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps: string[]; skills: string[] }> = {
-    [AgentWorkflowCommandId.Bug]: {
-        mcps: ['gitnexus'],
-        skills: ['systematic-debugging', 'test-driven-development', 'verification-before-completion'],
-    },
     [AgentWorkflowCommandId.Ui]: {
         mcps: [],
         skills: ['ux-ui-max'],
@@ -97,26 +92,6 @@ const buildClockifyCommandBody =
 If skill \`${CLOCKIFY_SKILL_NAME}\` or MCP \`clockify\` is unavailable, stop and tell the user to run \`only-one init\` or \`only-one init mcp clockify\`.
 `;
 
-const buildBugCommandBody = (): string => `Use this workflow to reproduce, diagnose, approve, fix, and verify a reported bug.
-
-## Input
-
-\`\`\`text
-/only-one-bug <bug report, symptom, or failing case>
-\`\`\`
-
-## Required behavior
-
-1. Check external dependencies \`superpowers\` and \`gitnexus\`. If either is unavailable, report blocker and stop.
-2. Invoke \`superpowers:systematic-debugging\` before diagnosis.
-3. Reproduce the bug, separate facts from hypotheses, and confirm root cause.
-4. Use GitNexus for dependency and impact discovery.
-5. Present evidence, minimal fix, affected files, risks, and test plan. Wait for explicit approval before changes.
-6. After approval, use test-driven development when applicable and make the smallest root-cause fix.
-7. Invoke \`superpowers:verification-before-completion\` and report fresh validation evidence.
-8. Never expose secrets, credentials, tokens, or PII during diagnosis.
-`;
-
 const buildUiCommandBody = (): string => `Use this workflow only for web or mobile UI work.
 
 ## Input
@@ -136,15 +111,6 @@ const buildUiCommandBody = (): string => `Use this workflow only for web or mobi
 7. Implement and test mobile, tablet, and desktop behavior.
 8. Collect browser or screenshot evidence. Do not claim visual completion without fresh viewport evidence.
 `;
-
-export const buildBugCommandContent = (): CommandContent => ({
-    body: buildBugCommandBody(),
-    category: 'Workflow',
-    description: 'Reproduce, diagnose, approve, fix, and verify a bug using evidence-driven debugging.',
-    id: AgentWorkflowCommandId.Bug,
-    name: AgentWorkflowCommandId.Bug,
-    tags: ['only-one', 'bug', 'debugging', 'verification'],
-});
 
 export const buildUiCommandContent = (): CommandContent => ({
     body: buildUiCommandBody(),
@@ -176,6 +142,5 @@ export const buildClockifyCommandContent = (): CommandContent => ({
 export const buildAgentWorkflowCommandContents = (): CommandContent[] => [
     buildPrGitCommandContent(),
     buildClockifyCommandContent(),
-    buildBugCommandContent(),
     buildUiCommandContent(),
 ];

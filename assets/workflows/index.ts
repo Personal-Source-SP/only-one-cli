@@ -12,11 +12,6 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredMcps: ['github'],
     },
     {
-        name: 'only-one-bug',
-        description: 'Reproduce, diagnose, approve, fix, and verify a bug using evidence-driven debugging.',
-        requiredMcps: ['gitnexus'],
-    },
-    {
         name: 'only-one-implement-fast',
         description: 'Scope, optionally plan, implement, and proportionally verify a small or moderate task directly in the current workspace.',
         requiredMcps: ['gitnexus'],
