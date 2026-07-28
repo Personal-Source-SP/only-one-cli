@@ -49,7 +49,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-ui-design-direction',
-        description: 'Lead the UI design phase: brainstorm, map UI state, evaluate with ux-ui-max, and produce the approved directory structure plan before OpenSpec authoring.',
+        description: 'Lead the UI design phase: brainstorm, map UI state, evaluate with ux-ui-pro-max, and produce the approved directory structure plan before OpenSpec authoring.',
     },
 ];
 

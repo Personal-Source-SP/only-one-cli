@@ -23,7 +23,7 @@ export const CLOCKIFY_DEFAULT_TASKS_PER_DAY = 2;
 export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps: string[]; skills: string[] }> = {
     [AgentWorkflowCommandId.Ui]: {
         mcps: [],
-        skills: ['ux-ui-max'],
+        skills: ['ux-ui-pro-max'],
     },
     [AgentWorkflowCommandId.PrGit]: {
         mcps: ['github'],
@@ -102,8 +102,8 @@ const buildUiCommandBody = (): string => `Use this workflow only for web or mobi
 
 ## Required behavior
 
-1. Check external skill \`ux-ui-max\`. If unavailable, report blocker and stop.
-2. Load and follow \`ux-ui-max\` before proposing or implementing UI work.
+1. Check external skill \`ux-ui-pro-max\`. If unavailable, report blocker and stop.
+2. Load and follow \`ux-ui-pro-max\` before proposing or implementing UI work.
 3. Collect design references, existing UI patterns, tokens, theme configuration, architecture, i18n, and breakpoints.
 4. If no approved reference exists, propose a concrete design direction and wait for explicit approval before implementation.
 5. Reuse existing components and tokens. Prefer suitable Ant Design components; use Tailwind CSS for styling and responsive utilities.

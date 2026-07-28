@@ -225,7 +225,7 @@ apply:
 # Proposal requires a canonical reference path and must stop when absent.
 # Read `openspec instructions <artifact> --change "<name>" --json` before every artifact.
 # Design invokes `only-one-canonical-ref-gate`, `only-one-bounded-discovery`,
-# `only-one-component-inventory` Mode A, `only-one-ui-design-direction`, and `ux-ui-max`.
+# `only-one-component-inventory` Mode A, `only-one-ui-design-direction`, and `ux-ui-pro-max`.
 # Record GitNexus evidence and obtain explicit UI/source organization approval before tasks.
 # Apply invokes `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`,
 # `only-one-gitnexus-freshness`, and component inventory Mode B. Require browser tooling.

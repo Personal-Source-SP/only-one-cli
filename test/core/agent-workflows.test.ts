@@ -46,7 +46,7 @@ describe('agent workflow command sources', () => {
         const command = buildUiCommandContent();
 
         expect(command.id).toBe(AgentWorkflowCommandId.Ui);
-        expect(command.body).toContain('ux-ui-max');
+        expect(command.body).toContain('ux-ui-pro-max');
         expect(command.body).toContain('report blocker and stop');
         expect(command.body).toContain('wait for explicit approval before implementation');
         expect(command.body).toContain('mobile, tablet, and desktop');

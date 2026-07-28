@@ -1,6 +1,6 @@
 ---
 name: only-one-ui-design-direction
-description: Lead the UI design phase for a frontend change — brainstorm feature intent, map the current UI state, evaluate direction with ux-ui-max, and produce the approved directory structure plan. Use before creating OpenSpec artifacts for frontend changes.
+description: Lead the UI design phase for a frontend change — brainstorm feature intent, map the current UI state, evaluate direction with ux-ui-pro-max, and produce the approved directory structure plan. Use before creating OpenSpec artifacts for frontend changes.
 ---
 
 This phase runs after bounded discovery and before OpenSpec artifact authoring. Its purpose is to understand what to build and agree on visual direction and file structure before any artifact is written.
@@ -24,9 +24,9 @@ Explore and map the parts of the current UI that the new feature connects to, ex
 - Collect visual references provided by the user: screenshots, design files, or links.
 - Sketch the shortest user flow in plain text or ASCII. Do not implement anything.
 
-## Step 3 — Evaluate with ux-ui-max
+## Step 3 — Evaluate with ux-ui-pro-max
 
-Invoke `ux-ui-max` to evaluate and refine the proposed UI direction. Ensure it aligns with:
+Invoke `ux-ui-pro-max` to evaluate and refine the proposed UI direction. Ensure it aligns with:
 - The project's established visual language and accessibility requirements.
 - The structural patterns from `<canonical-ref>`.
 - The component inventory and reuse-first decisions from `only-one-component-inventory`.
