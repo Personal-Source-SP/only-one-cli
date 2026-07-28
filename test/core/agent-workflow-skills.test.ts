@@ -54,9 +54,8 @@ describe('implementation workspace contracts', () => {
         const workflow = await readFile(join(repoRoot, 'assets', 'workflows', 'only-one-implement-fast.md'), 'utf-8');
 
         expect(workflow).toContain('current project workspace and current Git branch');
-        expect(workflow).toContain('Do not invoke `using-git-worktrees`');
-        expect(workflow).toContain('Do not run `git worktree` commands');
-        expect(workflow).toContain("IDE's default `implementation_plan.md`");
+        expect(workflow).toContain('Do not run `git worktree`');
+        expect(workflow).toContain('IDE default `implementation_plan.md`');
     });
 
     it('keeps workspace, checkbox, feedback, and verification contracts in shared skill', async () => {
@@ -92,12 +91,11 @@ describe('GitNexus freshness contracts', () => {
     it('requires GitNexus gates and escalation for fast implementation', async () => {
         const workflow = await readFile(join(repoRoot, 'assets', 'workflows', 'only-one-implement-fast.md'), 'utf-8');
 
-        expect(workflow).toContain('Dependency preflight');
-        expect(workflow).toContain('Discovery and scope');
-        expect(workflow).toContain('Planning and approval gate');
-        expect(workflow).toContain('Completion impact gate');
-        expect(workflow).toContain('`detect_changes`');
-        expect(workflow).toContain('final impact exceeds approved scope');
+        expect(workflow).toContain('## 2. Discover and bound scope');
+        expect(workflow).toContain('## 3. Always plan and wait for approval');
+        expect(workflow).toContain('Check MCP `gitnexus` before discovery');
+        expect(workflow).toContain('Refresh GitNexus before final impact analysis');
+        expect(workflow).toContain('unapproved public/shared surfaces');
 
         const fastWorkflow = WORKFLOWS.find((workflow) => workflow.name === 'only-one-implement-fast');
         expect(fastWorkflow?.requiredMcps).toContain('gitnexus');
@@ -214,5 +212,37 @@ describe('only-one-clockify-skill static validations', () => {
         expect(skillContent).toContain('stop and list candidates');
         expect(rulesContent).toContain('ask user to choose');
         expect(rulesContent).toContain('stop and list candidates');
+    });
+});
+
+describe('fast implementation plan-first contract', () => {
+    it('requires clarification, approved plan, and tagged tasks before source changes', async () => {
+        const workflow = await readFile(join(repoRoot, 'assets', 'workflows', 'only-one-implement-fast.md'), 'utf-8');
+
+        for (const text of [
+            'Never infer product, UI, API, compatibility, or migration decisions.',
+            'Invoke `grill-me` whenever any implementation decision remains uncertain.',
+            'Ask one question at a time and provide recommended answer.',
+            'Always create or update the IDE default `implementation_plan.md` artifact.',
+            'Wait for explicit user approval before modifying source.',
+            'Work description',
+            'Why',
+            '[NEW]',
+            '[MODIFY]',
+            '[DELETE]',
+            '[TEST]',
+            '[WIRE]',
+            '[EXISTING]',
+            '[MIGRATE]',
+            'Allowed scope',
+            'Dependencies and constraints',
+            'Acceptance requirements',
+            'Verification',
+        ]) {
+            expect(workflow).toContain(text);
+        }
+
+        expect(workflow).not.toContain('### Direct execution');
+        expect(workflow).not.toContain('Do not create a written plan for this path.');
     });
 });
