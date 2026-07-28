@@ -9,98 +9,32 @@ const readWorkflow = async (name: string): Promise<string> => readFile(join(work
 
 describe('feature pipeline workflows', () => {
     it('registers FE and BE planning and implementation workflows with GitNexus', () => {
-        const names = [
-            'only-one-plan-fe',
-            'only-one-plan-be',
-            'only-one-implement-fe',
-            'only-one-implement-be',
-            'only-one-archive-cleanup',
-        ];
+        const names = ['only-one-plan-fe', 'only-one-plan-be', 'only-one-implement-fe', 'only-one-implement-be'];
 
         for (const name of names) {
             expect(WORKFLOWS.find((workflow) => workflow.name === name)).toMatchObject({ requiredMcps: ['gitnexus'] });
         }
     });
 
-    it('builds frontend planning artifacts through OpenSpec and UI protocols', async () => {
-        const content = await readWorkflow('only-one-plan-fe');
+    it.each(['only-one-plan-fe', 'only-one-plan-be'])('delegates shared OpenSpec phase planning in %s', async (workflowName) => {
+        const content = await readWorkflow(workflowName);
 
-        expect(content).toContain('Do not recursively list, grep, read, or scan the entire repository');
-        expect(content).toContain('`openspec-propose`');
-        expect(content).toContain('`openspec status --change "<name>" --json`');
-        expect(content).toContain('`openspec instructions <artifact-id> --change "<name>" --json`');
-        expect(content).toContain('`applyRequires`');
-        expect(content).toContain('`only-one-ui`');
-        expect(content).toContain('Server Component');
-        expect(content).toContain('generated OpenAPI or Zod');
-        expect(content).toContain('explicit user approval');
+        expect(content).toContain('`only-one-openspec-phase-planning`');
+        expect(content).toContain('Shared planning lifecycle');
+        expect(content).toContain('planning profile');
+        expect(content).toContain('approval gate');
         expect(content).not.toContain('docs/plans/<DD-MM-YYYY>/<feature-slug>.md');
     });
 
-    it('builds backend planning artifacts through the OpenSpec graph', async () => {
-        const content = await readWorkflow('only-one-plan-be');
+    it.each(['only-one-implement-fe', 'only-one-implement-be'])('delegates shared phase implementation in %s', async (workflowName) => {
+        const content = await readWorkflow(workflowName);
 
-        expect(content).toContain('Do not recursively list, grep, read, or scan the entire repository');
-        expect(content).toContain('`openspec-propose`');
-        expect(content).toContain('`openspec status --change "<name>" --json`');
-        expect(content).toContain('`openspec instructions <artifact-id> --change "<name>" --json`');
-        expect(content).toContain('`applyRequires`');
-        expect(content).toContain('macro-brainstorming');
-        expect(content).toContain('explicit user approval');
-        expect(content).not.toContain('docs/plans/<DD-MM-YYYY>/<feature-slug>.md');
-    });
-
-    it('applies frontend OpenSpec tasks through isolated TDD, UI evidence, and local handoff', async () => {
-        const content = await readWorkflow('only-one-implement-fe');
-
-        expect(content).toContain('`openspec-apply-change`');
-        expect(content).toContain('`openspec instructions apply --change "<name>" --json`');
         expect(content).toContain('`contextFiles`');
-        expect(content).toContain('micro-brainstorming');
-        expect(content).toContain('RED, GREEN, REFACTOR');
-        expect(content).toContain('browser console and network');
-        expect(content).toContain('viewport evidence');
-        expect(content).toContain('requesting-code-review');
-        expect(content).toContain('verification-before-completion');
-        expect(content).toContain('`git merge --squash ai/<feature-slug>`');
-        expect(content).toContain('unstaged changes');
-        expect(content).not.toContain('<plan-dir>/tasks.md');
-    });
-
-    it('applies backend OpenSpec tasks through isolated TDD and local handoff', async () => {
-        const content = await readWorkflow('only-one-implement-be');
-
-        expect(content).toContain('`openspec-apply-change`');
-        expect(content).toContain('`openspec instructions apply --change "<name>" --json`');
-        expect(content).toContain('`contextFiles`');
-        expect(content).toContain('micro-brainstorming');
-        expect(content).toContain('RED, GREEN, REFACTOR');
-        expect(content).toContain('requesting-code-review');
-        expect(content).toContain('verification-before-completion');
-        expect(content).toContain('full test suite');
-        expect(content).toContain('`git merge --squash ai/<feature-slug>`');
-        expect(content).toContain('unstaged changes');
-        expect(content).not.toContain('<plan-dir>/tasks.md');
-    });
-
-    it('archives OpenSpec changes and safely cleans multiple AI branches', async () => {
-        const content = await readWorkflow('only-one-archive-cleanup');
-
-        expect(content).toContain('`openspec status --change "<name>" --json`');
-        expect(content).toContain('delta specs');
-        expect(content).toContain('archive succeeds');
-        expect(content).toContain('git worktree list --porcelain');
-        expect(content).toContain('refs/heads/ai/*');
-        expect(content).toContain('safe');
-        expect(content).toContain('needs-review');
-        expect(content).toContain('blocked');
-        expect(content).toContain('cleanup preview');
-        expect(content).toContain('explicit confirmation');
-        expect(content).toContain('git worktree prune');
-        expect(content).toContain('git branch -D');
-        expect(content).toContain('Do not use `git worktree remove --force`');
-        expect(content).toContain('npx gitnexus analyze . --force --skip-agents-md');
-        expect(content).toContain('`stale` or `incomplete`');
+        expect(content).toContain('Implementation rules by file tag');
+        expect(content).toContain('`only-one-phase-implementation-loop`');
+        expect(content).toContain('execution profile');
+        expect(content).toContain('Completion profile');
+        expect(content).not.toContain('only-one-worktree-handoff');
     });
 
     it('keeps global architecture rule framework-neutral', async () => {

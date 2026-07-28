@@ -10,22 +10,14 @@ description: Shape and approve a NestJS backend change through OpenSpec artifact
 
 ## Dependency preflight
 
-1. Check OpenSpec CLI, MCP `gitnexus`, and skills `only-one-bounded-discovery`, `openspec-propose`, `brainstorming`, `writing-plans`, and `gherkin-authoring`.
+1. Check OpenSpec CLI, MCP `gitnexus`, and skills `only-one-bounded-discovery`, `only-one-openspec-phase-planning`, `openspec-propose`, `brainstorming`, `writing-plans`, and `gherkin-authoring`.
 2. Check `c4-diagrams` when its triggers below apply.
 3. Report every unavailable required dependency and stop. Do not silently skip, rename, or replace dependencies.
 
-## Change selection and OpenSpec protocol
+## Shared planning lifecycle
 
-1. Derive a kebab-case `<name>` from feature intent. If an active change may match, run `openspec list --json`; ask whether to continue it or create a new change.
-2. Invoke `brainstorming` for macro-brainstorming at product and architecture level. Resolve intent, actors, outcomes, constraints, acceptance criteria, non-goals, risks, and unknowns before creating artifacts.
-3. After design approval, invoke `openspec-propose` and follow its artifact lifecycle rather than recreating it:
-    - Create a missing change with `openspec new change "<name>"`.
-    - Run `openspec status --change "<name>" --json`.
-    - Read `schemaName`, `planningHome`, `changeRoot`, `artifactPaths`, `actionContext`, `artifacts`, and `applyRequires`.
-    - For each ready artifact, run `openspec instructions <artifact-id> --change "<name>" --json`.
-    - Use returned `resolvedOutputPath`, `template`, `instruction`, `rules`, and dependencies. Do not assume repo-local paths, fixed artifact names, or a `spec-driven` schema.
-4. Continue in dependency order until every artifact listed by `applyRequires` is done.
-5. Treat OpenSpec-resolved artifacts as the only planning source. Do not create `docs/plans/...` or a second task tracker.
+1. Invoke `brainstorming` at product and architecture level. Resolve intent, actors, outcomes, constraints, acceptance criteria, non-goals, risks, and unknowns.
+2. After design approval, invoke `only-one-openspec-phase-planning`. Follow its change selection, OpenSpec artifact lifecycle, phase/task contract, file ownership, and approval gate. Use resolved OpenSpec artifacts as the only planning source.
 
 ## Bounded discovery
 
@@ -57,46 +49,19 @@ Before task decomposition, define for every new or modified endpoint:
 
 Flag shared contract changes as breaking and require explicit user acknowledgment. Do not defer DTO or contract decisions into implementation tasks.
 
-## OpenSpec artifact requirements
+## Backend planning profile
 
-Fit these requirements into artifacts returned by OpenSpec instructions; do not invent unsupported artifact files:
+Add these backend-specific requirements to the shared phase/task contract:
 
-1. Proposal/design/spec artifacts capture goal, non-goals, risks, assumptions, schema impact, API contract, GitNexus evidence, allowlist, ADR/C4 references when relevant, and dependency order.
-2. Use `gherkin-authoring` for observable acceptance criteria when it adds clarity. Cover relevant happy paths, edge cases, validation, authorization, and errors.
-3. Organize implementation into ordered phases. Each phase must state:
-    - **Phase goal:** complete outcome delivered by the phase.
-    - **Tasks:** ordered by dependency.
-    - **Phase acceptance requirements:** observable conditions required for user approval.
-    - **Phase verification:** commands and review evidence required before the phase report.
-4. Each task represents one complete functional outcome and must state:
-    - **Main work:** concise description of the outcome to implement.
-    - **Files:** every affected file with an operation status:
-        - `[NEW]` — create a file.
-        - `[MODIFY]` — change an existing file.
-        - `[DELETE]` — remove an existing file.
-        - `[TEST]` — create or modify automated tests.
-        - `[MIGRATE]` — create or modify a schema or data migration file.
-        - `[WIRE]` — connect completed units through modules, dependency injection, routing, or integration entry points.
-    - **Allowed scope:** exact symbols or bounded sections allowed for modification when known.
-    - **Dependencies and constraints:** prerequisite tasks plus relevant API, schema, authorization, transaction, and compatibility constraints.
-    - **Test cases:** required when the task changes business logic in services, utilities, domain helpers, or policies. List scenario, input or precondition, expected output or state change, and expected exception, error, or status when relevant.
-    - **Acceptance requirements:** observable conditions that must be true for the task to be accepted.
-    - **Verification:** focused commands and review evidence required to prove acceptance.
-5. File statuses describe operations within a task; they do not require separate test, migration, or wiring tasks. Keep related source, tests, migration, DTO/controller, and wiring in one task when they deliver the same functional outcome.
-6. Do not require tests by default for pass-through controllers, DTO decorators, module or dependency-injection wiring, entity or schema declarations, migrations, or configuration unless an explicit risk or acceptance criterion requires them.
-7. Every `[MIGRATE]` file entry must state **create only; do not execute**. The task may create or modify the migration file and verify it through static review, type-checking, linting, or a safe preview that cannot modify a database. It must not run migration apply/up/run, migration revert/down, schema synchronization, seeds, or data backfills. Any database-changing command requires separate explicit user approval.
-8. Prevent independent tasks from writing the same files. Mark dependency order when shared-file work cannot be avoided.
-9. Use `writing-plans` task-right-sizing principles inside the OpenSpec task artifact; do not create its default plan path.
-10. Record relevant NestJS layer ownership, DTO validation, DI/repository, error/logging, public-contract, testing, and migration constraints only where they affect a phase or task.
-
-## Approval gate
-
-1. Do not modify product source, tests, dependencies, configuration, migrations, or data.
-2. Run `openspec status --change "<name>"` and verify all `applyRequires` artifacts exist at resolved paths.
-3. Present change name/location, artifact status, allowlist, API contract, schema impact, assumptions, risks, and unresolved questions.
-4. Wait for explicit user approval covering artifacts, scope, contracts, schema changes, and verification.
-5. Revision requests update existing resolved artifacts, rerun status, and require approval again.
-6. After approval, direct user to:
+1. Proposal/design/spec artifacts capture schema impact, API contract, GitNexus evidence, allowlist, ADR/C4 references when relevant, and backend dependency order.
+2. Use `gherkin-authoring` when observable acceptance is clearer in scenarios; cover relevant happy paths, edges, validation, authorization, and errors.
+3. Allowed file tags are `[NEW]`, `[MODIFY]`, `[DELETE]`, `[TEST]`, `[MIGRATE]`, and `[WIRE]`.
+4. Task constraints record relevant API, schema, authorization, transaction, compatibility, NestJS layer ownership, DTO validation, DI/repository, error/logging, public-contract, testing, and migration constraints.
+5. Tasks changing business logic in services, utilities, domain helpers, or policies list test scenario, input/precondition, expected output/state, and expected exception/error/status when relevant.
+6. Do not require tests by default for pass-through controllers, DTO decorators, wiring, entity/schema declarations, migrations, or configuration unless explicit risk or acceptance requires them.
+7. Every `[MIGRATE]` entry states **create only; do not execute**. Allow static review, typecheck, lint, or non-mutating safe preview only. Never run migration apply/up/run, revert/down, schema sync, seeds, or backfills without separate explicit user approval.
+8. Phase verification uses commands and review evidence. Approval presentation includes API contract and schema impact.
+9. After shared approval gate succeeds, direct user to:
 
 ```text
 /only-one-implement-be <change-name>

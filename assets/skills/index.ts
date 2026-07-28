@@ -29,11 +29,6 @@ export const SKILLS: SkillManifest[] = [
         associatedWorkflows: ['only-one-implement-be', 'only-one-implement-fe'],
     },
     {
-        name: 'only-one-worktree-handoff',
-        description: 'Set up and tear down a single feature worktree for an OpenSpec change, then perform unstaged local handoff via squash merge and git reset.',
-        associatedWorkflows: ['only-one-implement-be', 'only-one-implement-fe'],
-    },
-    {
         name: 'only-one-openspec-apply-gate',
         description: 'Resolve, apply, and validate an OpenSpec change before implementation. Reads contextFiles, verifies required plan artifacts, and enforces stop conditions.',
         associatedWorkflows: ['only-one-implement-be', 'only-one-implement-fe'],
@@ -42,6 +37,16 @@ export const SKILLS: SkillManifest[] = [
         name: 'only-one-bounded-discovery',
         description: 'Perform bounded codebase discovery using GitNexus within a 2-5% scope budget. Produces a blast-radius allowlist. Supports BE and FE variants.',
         associatedWorkflows: ['only-one-plan-be', 'only-one-plan-fe'],
+    },
+    {
+        name: 'only-one-openspec-phase-planning',
+        description: 'Use when planning OpenSpec changes with approval-gated phases and implementation-ready tasks.',
+        associatedWorkflows: ['only-one-plan-be', 'only-one-plan-fe'],
+    },
+    {
+        name: 'only-one-phase-implementation-loop',
+        description: 'Use when implementing approved OpenSpec phases with task tracking, verification, user review, and feedback rework.',
+        associatedWorkflows: ['only-one-implement-be', 'only-one-implement-fe'],
     },
     {
         name: 'only-one-canonical-ref-gate',

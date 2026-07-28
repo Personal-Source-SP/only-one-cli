@@ -18,27 +18,22 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-plan-fe',
-        description: 'Shape and approve a Next.js or React change through OpenSpec artifacts, bounded UI discovery, framework constraints, and TDD-ready micro-tasks.',
+        description: 'Shape and approve a frontend change through OpenSpec artifacts, UI system discovery, source organization, and implementation-ready phases.',
         requiredMcps: ['gitnexus'],
     },
     {
         name: 'only-one-plan-be',
-        description: 'Shape and approve a NestJS backend change through OpenSpec artifacts, bounded discovery, schema analysis, API contracts, and TDD-ready micro-tasks.',
+        description: 'Shape and approve a NestJS backend change through OpenSpec artifacts, source organization, API contracts, and implementation-ready phases.',
         requiredMcps: ['gitnexus'],
     },
     {
         name: 'only-one-implement-fe',
-        description: 'Apply an approved frontend OpenSpec change in one feature worktree with TDD, browser evidence, checkpoint commits, full verification, and unstaged local handoff.',
+        description: 'Apply an approved frontend OpenSpec change in the current workspace with tag-specific rules, phase approval, browser evidence, and no automatic commits.',
         requiredMcps: ['gitnexus'],
     },
     {
         name: 'only-one-implement-be',
-        description: 'Apply an approved NestJS OpenSpec change in one feature worktree with strict TDD, checkpoint commits, full verification, and unstaged local handoff.',
-        requiredMcps: ['gitnexus'],
-    },
-    {
-        name: 'only-one-archive-cleanup',
-        description: 'Sync and archive a completed OpenSpec change, safely clean current and stale AI worktrees and branches, then refresh GitNexus.',
+        description: 'Apply an approved NestJS OpenSpec change in the current workspace with tag-specific rules, phase approval, full verification, and no automatic commits.',
         requiredMcps: ['gitnexus'],
     },
     {

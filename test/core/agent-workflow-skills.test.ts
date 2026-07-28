@@ -60,49 +60,42 @@ describe('implementation workspace contracts', () => {
     });
 
     it.each(['only-one-implement-fe.md', 'only-one-implement-be.md'])(
-        'isolates %s and hands changes back unstaged',
+        'delegates %s to shared phase implementation lifecycle',
         async (workflowName) => {
             const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
 
-            expect(workflow).toContain('one feature worktree');
-            expect(workflow).toContain('`using-git-worktrees`');
-            expect(workflow).toContain('`ai/<feature-slug>`');
-            expect(workflow).toContain('checkpoint commit');
-            expect(workflow).toContain('`git merge --squash ai/<feature-slug>`');
-            expect(workflow).toContain('`git reset`');
-            expect(workflow).toContain('unstaged changes');
-            expect(workflow).toContain('Keep `ai/<feature-slug>` as a recovery branch');
-            expect(workflow).toContain('`/only-one-archive-cleanup`');
-            expect(workflow).not.toContain('`git branch -D ai/<feature-slug>`');
-            expect(workflow).toContain('Do not commit on the target branch');
-            expect(workflow).toContain('Do not delete the recovery branch or archive the OpenSpec change');
-            expect(workflow).not.toContain('<plan-dir>/tasks.md');
+            expect(workflow).toContain('`only-one-phase-implementation-loop`');
+            expect(workflow).toContain('current-workspace safety');
+            expect(workflow).toContain('checkbox transitions');
+            expect(workflow).toContain('feedback rework');
+            expect(workflow).not.toContain('only-one-worktree-handoff');
+            expect(workflow).not.toContain('`ai/<feature-slug>`');
+            expect(workflow).not.toContain('checkpoint commit');
         },
     );
+
+    it('keeps workspace, checkbox, feedback, and verification contracts in shared skill', async () => {
+        const skill = await readFile(join(repoRoot, 'assets', 'skills', 'only-one-phase-implementation-loop', 'SKILL.md'), 'utf-8');
+
+        expect(skill).toContain('current workspace and branch');
+        expect(skill).toContain('Do not stage, commit');
+        expect(skill).toContain('from `[ ]` to `[x]`');
+        expect(skill).toContain('from `[x]` to `[ ]`');
+        expect(skill).toContain('requesting-code-review');
+        expect(skill).toContain('verification-before-completion');
+    });
 });
 
 describe('GitNexus freshness workflow contracts', () => {
-    it.each(['only-one-implement-fe.md', 'only-one-implement-be.md', 'only-one-implement-fast.md'])(
-        'requires current GitNexus evidence in %s',
-        async (workflowName) => {
-            const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
-
-            expect(workflow).toContain('current working-tree revision');
-            expect(workflow).toContain('`stale` or `incomplete`');
-            expect(workflow).toContain('sync/reindex');
-            expect(workflow).toMatch(/Do not (?:silently replace it or )?claim complete impact coverage/);
-        },
-    );
-
     it.each(['only-one-implement-fe.md', 'only-one-implement-be.md'])(
-        'uses preflight, boundary, and integration gates in %s',
+        'delegates freshness and impact gates in %s',
         async (workflowName) => {
             const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
 
-            expect(workflow).toContain('Preflight scope gate');
-            expect(workflow).toContain('Public/shared boundary gate');
-            expect(workflow).toContain('Integration impact gate');
-            expect(workflow).toContain('`detect_changes`');
+            expect(workflow).toContain('`only-one-gitnexus-freshness`');
+            expect(workflow).toContain('before each GitNexus-dependent decision');
+            expect(workflow).toContain('public or shared boundaries');
+            expect(workflow).toContain('integrated verification');
         },
     );
 

@@ -18,7 +18,7 @@ export const COMBOS: ComboManifest[] = [
         skills: ['c4-diagrams', 'gherkin-authoring', 'grill-me'],
         configs: ['openspec'],
         rules: ['architecture-stack', 'context-and-tools'],
-        workflows: ['only-one-plan-fe', 'only-one-implement-fe', 'only-one-implement-fast', 'only-one-bug', 'only-one-archive-cleanup'],
+        workflows: ['only-one-plan-fe', 'only-one-implement-fe', 'only-one-implement-fast', 'only-one-bug'],
     },
     {
         id: 'backend-flow',
@@ -30,6 +30,6 @@ export const COMBOS: ComboManifest[] = [
         skills: ['c4-diagrams', 'gherkin-authoring', 'grill-me'],
         configs: ['openspec'],
         rules: ['architecture-stack', 'context-and-tools'],
-        workflows: ['only-one-plan-be', 'only-one-implement-be', 'only-one-implement-fast', 'only-one-bug', 'only-one-archive-cleanup'],
+        workflows: ['only-one-plan-be', 'only-one-implement-be', 'only-one-implement-fast', 'only-one-bug'],
     },
 ];

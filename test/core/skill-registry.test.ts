@@ -32,3 +32,16 @@ describe('obsolete skill removal', () => {
         expect(existsSync(skillPath)).toBe(false);
     });
 });
+
+describe('shared OpenSpec lifecycle skills', () => {
+    it.each([
+        ['only-one-openspec-phase-planning', ['only-one-plan-be', 'only-one-plan-fe']],
+        ['only-one-phase-implementation-loop', ['only-one-implement-be', 'only-one-implement-fe']],
+    ])('registers and ships %s', (skillName, associatedWorkflows) => {
+        const skillPath = join(packageRoot, 'assets/skills', skillName, 'SKILL.md');
+        const manifest = SKILLS.find((skill) => skill.name === skillName);
+
+        expect(existsSync(skillPath)).toBe(true);
+        expect(manifest?.associatedWorkflows).toEqual(associatedWorkflows);
+    });
+});
