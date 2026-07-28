@@ -25,7 +25,18 @@ alwaysApply: true
 - MUST preserve public contracts. Intentional breaking changes require explicit approval, before/after contract evidence, migration or compatibility plan, and tests.
 - MUST preserve dependency injection, ownership, validation, transaction, error, and logging boundaries established by the project.
 
-## 4. Quality & Verification
+## 4. Framework Skills
+
+- MUST read and follow `nestjs-development/SKILL.md` before creating or modifying NestJS controllers, services, modules, ORM repositories, entities, DTOs, validation, or backend error handling.
+- MUST read and follow `react-development/SKILL.md` before creating or modifying React components, hooks, client-side state, forms, or frontend data flows.
+- MUST read and follow `nextjs-development/SKILL.md` before creating or modifying Next.js routes, pages, layouts, client/server boundaries, server actions, or Next.js data fetching.
+- MUST read and follow `only-one-next-dev-loop/SKILL.md` when verifying changed Next.js runtime behavior in a running application.
+- MUST read and follow `only-one-next-cache-components-adoption/SKILL.md` only when enabling or migrating Cache Components.
+- MUST read and follow `only-one-next-cache-components-optimizer/SKILL.md` only when optimizing Cache Components route navigation or static shell behavior.
+- MUST read and follow `only-one-next-partial-prefetching-adoption/SKILL.md` only when enabling or migrating Partial Prefetching.
+- MUST read and follow `ui-ux-development/SKILL.md` before designing or materially changing a user interface.
+
+## 5. Quality & Verification
 
 - SHOULD use TDD for behavior changes and bug fixes.
 - MUST test observable behavior rather than implementation details when possible.

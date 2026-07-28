@@ -18,8 +18,28 @@ export const SKILLS: SkillManifest[] = [
         description: 'Use when creating or modifying NestJS backend code.',
     },
     {
-        name: 'react-next-development',
-        description: 'Use when creating or modifying React or Next.js frontend code.',
+        name: 'react-development',
+        description: 'Use when creating or modifying React frontend code.',
+    },
+    {
+        name: 'nextjs-development',
+        description: 'Use when creating or modifying Next.js routes or components.',
+    },
+    {
+        name: 'only-one-next-dev-loop',
+        description: 'Verify Next.js runtime behavior in a running application.',
+    },
+    {
+        name: 'only-one-next-cache-components-adoption',
+        description: 'Enable or migrate Next.js Cache Components safely.',
+    },
+    {
+        name: 'only-one-next-cache-components-optimizer',
+        description: 'Optimize Cache Components routes for verified instant navigation.',
+    },
+    {
+        name: 'only-one-next-partial-prefetching-adoption',
+        description: 'Enable or migrate Next.js Partial Prefetching safely.',
     },
     {
         name: 'ui-ux-development',
