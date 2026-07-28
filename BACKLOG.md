@@ -24,15 +24,15 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 - [x] **Plugin management** — `plugin` quản lý plugin theo target; hiện có Superpowers.
 - [x] **Superpowers install** — Tự chạy `agy plugin install` trên Antigravity; hướng dẫn command/UI chính thức cho Claude, Cursor, Codex.
 - [x] **Rule management** — `rule` cài persistent agent rules vào native path của từng target.
-- [x] **Context minimization rule** — Cung cấp rule `context-minimization`, tự kiểm tra dependency OpenSpec, Superpowers, GitNexus trước khi cài.
+- [x] **Context minimization rule** — Cung cấp rule `context-minimization`, tự kiểm tra dependency OpenSpec, Superpowers, code intelligence trước khi cài.
 
 ## Đã có — MCP management
 
 - [x] **MCP sync** — `mcp` và `init mcp` chọn MCP server và merge global config vào Antigravity, Claude, Cursor, Codex.
 - [x] **Multi-format config** — Đọc/ghi JSON cho Antigravity, Claude, Cursor và TOML cho Codex.
 - [x] **Pre-write validation** — Dừng trước khi ghi khi selected existing configuration malformed.
-- [x] **MCP registry** — Cung cấp Clockify, Fetch, GitNexus, GitHub, Memory, Notion, Postgres, Tavily manifests.
-- [x] **GitNexus safety** — Cấu hình GitNexus MCP read-only mặc định qua `GITNEXUS_MCP_READ_ONLY=1`.
+- [x] **MCP registry** — Cung cấp Clockify, Fetch, code intelligence, GitHub, Memory, Notion, Postgres, Tavily manifests.
+- [x] **code intelligence safety** — Cấu hình code intelligence MCP read-only mặc định qua `code intelligence_MCP_READ_ONLY=1`.
 
 ## Đã có — Editor synchronization
 
@@ -59,7 +59,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 
 - [ ] **VS sync trên Linux** — Hỗ trợ phát hiện paths settings và extension CLI của Antigravity/Cursor trên Linux, giữ transaction journal và rollback.
 - [ ] **Plugin install tự động** — Tự động cài Superpowers cho Claude, Cursor, Codex khi host có CLI/API hỗ trợ; fallback sang hướng dẫn chính thức khi không hỗ trợ.
-- [ ] **MCP config validation** — Bổ sung `only-one doctor` checks cho credentials, binary availability, malformed config, và GitNexus index trước khi sync.
+- [ ] **MCP config validation** — Bổ sung `only-one doctor` checks cho credentials, binary availability, malformed config, và code intelligence index trước khi sync.
 
 ## P2 — Template ecosystem
 

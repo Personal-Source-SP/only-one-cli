@@ -13,6 +13,5 @@ export const RULES: RuleManifest[] = [
         description: 'Context Minimization — enforce dependency discovery and minimal file context loading before edits',
         sourceFile: '01-context-and-tools.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
-        requiredMcps: ['gitnexus'],
     },
 ];

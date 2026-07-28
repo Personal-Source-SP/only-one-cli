@@ -218,7 +218,7 @@ apply:
     On feedback, reopen affected task checkboxes, rework only affected scope, rerun phase verification,
     and wait for acceptance again. Stop for missing profile context, scope/contract conflict, blockers, or clarification.
 
-    Invoke `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-gitnexus-freshness`. Before component changes invoke `only-one-component-inventory` Mode B. Require browser tooling. Stop for `[EXISTING]` modification, undeclared files, or unapproved shared-boundary impact.
+    Invoke `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-source inspection-freshness`. Before component changes invoke `only-one-component-inventory` Mode B. Require browser tooling. Stop for `[EXISTING]` modification, undeclared files, or unapproved shared-boundary impact.
     Run `openspec instructions apply --change "<name>" --json` as source of truth.
 
 # OpenSpec-only frontend orchestration contract:
@@ -226,9 +226,9 @@ apply:
 # Read `openspec instructions <artifact> --change "<name>" --json` before every artifact.
 # Design invokes `only-one-canonical-ref-gate`, `only-one-bounded-discovery`,
 # `only-one-component-inventory` Mode A, `only-one-ui-design-direction`, and `ux-ui-pro-max`.
-# Record GitNexus evidence and obtain explicit UI/source organization approval before tasks.
+# Record discovery evidence and obtain explicit UI/source organization approval before tasks.
 # Apply invokes `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`,
-# `only-one-gitnexus-freshness`, and component inventory Mode B. Require browser tooling.
+# and component inventory Mode B. Require browser tooling.
 # Stop for `[EXISTING]` modification, undeclared files, or unapproved shared-boundary impact.
 # Stage rule references: rules/01-global-safety.md rules/02-file-tags.md rules/03-planning-contract.md rules/04-apply-loop.md
 # Before writing design.md, read rules. Before writing tasks.md, read rules. Before modifying source, read rules.

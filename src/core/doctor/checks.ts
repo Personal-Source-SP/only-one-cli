@@ -15,18 +15,15 @@ import {
 import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint } from '@/core/runtime/credentials.js';
 import { resolveLocalConfigPathForProject } from '@/core/prebuilt/index-output.js';
 import type { DoctorMode } from '@/core/indexing/tools.js';
-import { resolveCocoindexImage, resolveCocoindexScript, resolveGitnexusBin, resolveGitnexusImage } from '@/core/indexing/tools.js';
+import { resolveCocoindexImage, resolveCocoindexScript } from '@/core/indexing/tools.js';
 import {
     COCOINDEX_CONTAINER_NAME,
     ensureCocoindexContainerRunning,
-    ensureGitnexusContainerRunning,
     getContainerState,
     getDockerServerVersion,
-    GITNEXUS_CONTAINER_NAME,
     hasDockerImage,
     isDockerDaemonRunning,
     verifyCocoindexInContainer,
-    verifyGitnexusInContainer,
 } from '@/core/indexing/docker-runtime.js';
 
 export interface RunIndexingChecksOptions {
@@ -255,99 +252,6 @@ export async function checkDocker(mode: DoctorMode): Promise<CheckResult> {
     };
 }
 
-export async function checkGitnexus(mode: DoctorMode, options: RunIndexingChecksOptions = {}): Promise<CheckResult> {
-    if (mode === 'docker') {
-        return checkGitnexusDocker(options);
-    }
-    return checkGitnexusLocal();
-}
-
-async function checkGitnexusLocal(): Promise<CheckResult> {
-    const bin = resolveGitnexusBin();
-    const args = bin === 'npx' ? ['gitnexus', '--version'] : ['--version'];
-
-    try {
-        const version = execFileSync(bin, args, {
-            encoding: 'utf-8',
-            stdio: 'pipe',
-        }).trim();
-        return {
-            name: 'gitnexus',
-            ok: true,
-            detail: version || 'available',
-            required: true,
-        };
-    } catch {
-        return {
-            name: 'gitnexus',
-            ok: false,
-            detail: 'not found',
-            required: true,
-            remediation: 'Install GitNexus CLI: npm install -g gitnexus@1.6.4',
-        };
-    }
-}
-
-async function checkGitnexusDocker(options: RunIndexingChecksOptions): Promise<CheckResult> {
-    const image = resolveGitnexusImage();
-    if (!hasDockerImage(image)) {
-        return {
-            name: 'gitnexus',
-            ok: false,
-            detail: `image not found (${image})`,
-            required: true,
-            remediation: `Pull GitNexus image: docker pull ${image} (or only-one doctor --install-missing)`,
-        };
-    }
-
-    const containerState = getContainerState(GITNEXUS_CONTAINER_NAME);
-    if (containerState !== 'running') {
-        if (options.autoStartContainers !== false) {
-            try {
-                ensureGitnexusContainerRunning(image);
-            } catch (err: unknown) {
-                const message = err instanceof Error ? err.message : 'failed to start container';
-                return {
-                    name: 'gitnexus',
-                    ok: false,
-                    detail: `container ${GITNEXUS_CONTAINER_NAME} failed to start (${message})`,
-                    required: true,
-                    remediation: `Start GitNexus container: docker start ${GITNEXUS_CONTAINER_NAME}`,
-                };
-            }
-        } else {
-            return {
-                name: 'gitnexus',
-                ok: false,
-                detail:
-                    containerState === 'stopped'
-                        ? `container ${GITNEXUS_CONTAINER_NAME} stopped`
-                        : `container ${GITNEXUS_CONTAINER_NAME} missing`,
-                required: true,
-                remediation: `Run only-one doctor to start ${GITNEXUS_CONTAINER_NAME}`,
-            };
-        }
-    }
-
-    try {
-        const version = verifyGitnexusInContainer();
-        return {
-            name: 'gitnexus',
-            ok: true,
-            detail: `${version} (${GITNEXUS_CONTAINER_NAME} running)`,
-            required: true,
-        };
-    } catch {
-        return {
-            name: 'gitnexus',
-            ok: false,
-            detail: `container ${GITNEXUS_CONTAINER_NAME} unhealthy`,
-            required: true,
-            remediation: `Recreate container: docker rm -f ${GITNEXUS_CONTAINER_NAME} && only-one doctor --install-missing`,
-        };
-    }
-}
-
 export async function checkCocoindex(mode: DoctorMode, options: RunIndexingChecksOptions = {}): Promise<CheckResult> {
     if (mode === 'docker') {
         return checkCocoindexDocker(options);
@@ -453,7 +357,7 @@ async function checkCocoindexDocker(options: RunIndexingChecksOptions): Promise<
 
 export async function runIndexingChecks(mode: DoctorMode, options: RunIndexingChecksOptions = {}): Promise<CheckResult[]> {
     const checksOptions = { autoStartContainers: options.autoStartContainers ?? true };
-    return Promise.all([checkDocker(mode), checkGitnexus(mode, checksOptions), checkCocoindex(mode, checksOptions)]);
+    return Promise.all([checkDocker(mode), checkCocoindex(mode, checksOptions)]);
 }
 
 export async function assertIndexingReadiness(cwd: string, modeOverride?: string): Promise<DoctorReport> {
@@ -528,7 +432,7 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
         return [
             {
                 command: 'only-one doctor --install-missing',
-                description: 'Install missing GitNexus/CocoIndex dependencies',
+                description: 'Install missing CocoIndex dependencies',
             },
             {
                 command: 'only-one doctor --print-install-script',

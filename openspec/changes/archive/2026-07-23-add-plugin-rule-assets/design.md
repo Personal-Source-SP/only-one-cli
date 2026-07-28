@@ -4,7 +4,6 @@ Current implementation has typed registries for packages, MCPs, skills, workflow
 
 Agent rule mechanisms differ by host. Antigravity supports `.agents/rules/*.md`; Claude supports recursively discovered `.claude/rules/*.md`; Cursor supports project rules under `.cursor/rules/`; Codex uses hierarchical `AGENTS.md` files rather than a dedicated native rule directory. Plugin targets remain Antigravity, Claude, Cursor, and Codex, while rule targets must be capability-filtered to Antigravity, Claude, and Cursor.
 
-Rule `context-minimization` applies before planning or modification and requires OpenSpec package, Superpowers plugin, and GitNexus MCP. Rules may later require packages, plugins, MCPs, and skills. Dependencies must be queued automatically, but manual plugin actions cannot be falsely reported installed.
 
 ADR 0001 remains accepted and not superseded. Top-level component commands follow current `skill`, `mcp`, and `combo` direction; init may orchestrate their core flows without reclaiming OpenSpec's standard initialization responsibility.
 
@@ -44,7 +43,6 @@ flowchart LR
 - Add `only-one plugin` and `only-one rule` commands using shared target selection.
 - Support rule dependencies on packages, plugins, MCPs, and skills with automatic queueing.
 - Install rules through verified native directories for Antigravity, Claude, and Cursor.
-- Add `context-minimization` rule with OpenSpec, Superpowers, and GitNexus dependencies.
 - Report per-target installation and readiness accurately.
 
 **Non-Goals:**
@@ -128,7 +126,6 @@ Add a Markdown asset expressing:
 
 BEFORE creating any plan or modification:
 1. DO NOT recursively scan or search the entire codebase using grep/find.
-2. Use GitNexus CLI/Tool to map exact symbol dependencies and get the minimal file list.
 3. Reference the feature spec in `openspec/` for business logic.
 4. If a task requires modifying File A, load ONLY File A and its direct tests into context.
 ```
@@ -137,7 +134,6 @@ Manifest dependencies:
 
 - package: `@fission-ai/openspec`
 - plugin: `superpowers`
-- MCP: `gitnexus`
 - skills: none initially
 
 The rule applies globally within project because no path filters are declared.
@@ -156,7 +152,6 @@ Because current Superpowers package change is unarchived and uncommitted, no dep
 - [Cursor rule format details vary by version] -> Use plain Markdown in documented `.cursor/rules/` location and avoid frontmatter until a scoped-rule requirement exists.
 - [Codex users cannot install first rule] -> Exclude Codex through capability filtering instead of unsafe `AGENTS.md` merge.
 - [Package migration leaves dead target-plugin branches] -> Remove unused union variants and add negative registry tests proving Superpowers appears only in plugin registry.
-- [Rule text conflicts with environments lacking GitNexus CLI] -> MCP dependency installs GitNexus server; rule says CLI/Tool so agent can use available GitNexus interface.
 
 ## Migration Plan
 

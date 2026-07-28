@@ -84,6 +84,6 @@ export const generatePayloadAndReportStep = async (
     deps.stdout(`  1. ${COLORS.dim('Open your AI agent/IDE chat window.')}`);
     deps.stdout(`  2. ${COLORS.dim('Type the slash command, tag the file, or run the command shown above.')}`);
     deps.stdout(`  3. ${COLORS.dim('Upload the generated index to the backend server:')}`);
-    deps.stdout(`     ${COLORS.cli.command('only-one push-index --skip-gitnexus --skip-cocoindex')}`);
+    deps.stdout(`     ${COLORS.cli.command('only-one push-index --skip-cocoindex')}`);
     deps.stdout(COLORS.dim('──────────────────────────────────────────────────────────────────────────'));
 };

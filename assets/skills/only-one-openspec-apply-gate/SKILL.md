@@ -34,5 +34,5 @@ Run this gate immediately after dependency preflight, before any worktree setup 
 
 After a successful gate, record:
 - The ordered task list for the task loop
-- The allowlist for GitNexus freshness gates
+- The allowlist for preflight evidence gates
 - The verification commands for integrated verification

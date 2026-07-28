@@ -1,5 +1,5 @@
 ---
-description: Clarify, plan, approve, implement, and verify a bounded change in current workspace with tagged tasks and GitNexus evidence.
+description: Clarify, plan, approve, implement, and verify a bounded change in current workspace.
 ---
 
 ## Input
@@ -29,9 +29,8 @@ Use for a bounded UI or logic change that does not need an OpenSpec change. Alwa
 
 ## 2. Discover and bound scope
 
-1. Check MCP `gitnexus` before discovery. Verify index covers current repository, branch, and working-tree revision and is not `stale` or `incomplete`.
 2. If unavailable or stale, report exact limitation and ask whether direct source search is acceptable. Do not claim complete impact coverage.
-3. Use GitNexus first for symbols, callers, dependencies, routes, and likely tests. Verify findings in current source.
+3. Inspect targeted source for symbols, callers, dependencies, routes, and likely tests.
 4. Identify shared contracts, public APIs, schema/migrations, configuration, authorization, and broad shared modules. Keep unrelated refactors out of scope.
 
 ## 3. Always plan and wait for approval
@@ -69,7 +68,7 @@ Choose profile tags exactly:
 
 ## 5. Implement after approval
 
-1. Apply only approved task scope and tags. Recheck GitNexus freshness before impact-dependent decisions after source changes.
+1. Apply only approved task scope and tags. Recheck targeted source before impact-dependent decisions after source changes.
 2. Preserve comments, naming, architecture, design tokens, components, accessibility, responsive patterns, i18n, and public behavior unless plan approves change.
 3. Do not introduce dependency, environment, configuration, public contract, database mutation, or unrelated abstraction without explicit approval.
 4. If discovery or implementation expands scope, conflicts with plan, or violates tag contract, stop. Update plan and request approval again.
@@ -79,6 +78,6 @@ Choose profile tags exactly:
 
 1. Run every declared verification. Run relevant focused tests, typecheck/lint when available, and focused browser/manual checks for UI states when applicable.
 2. Do not weaken valid tests merely to pass checks. Report unavailable checks, blockers, and exact manual verification.
-3. Refresh GitNexus before final impact analysis. Stop and re-plan if impact reaches unapproved public/shared surfaces.
+3. Inspect targeted source before final impact analysis. Stop and re-plan if impact reaches unapproved public/shared surfaces.
 4. Report changed files/symbols, completed task checkboxes, observable behavior, verification evidence/results, final impact, remaining risks, and checks not run.
 5. Do not create a git commit.

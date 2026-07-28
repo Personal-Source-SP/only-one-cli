@@ -462,7 +462,6 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                 let usageNote: string | undefined;
                 if (mcpId === 'github') secretKey = 'GITHUB_PERSONAL_ACCESS_TOKEN';
                 else if (mcpId === 'clockify') secretKey = 'CLOCKIFY_API_KEY';
-                else if (mcpId === 'gitnexus') usageNote = 'Indexed project directory required before use';
 
                 return {
                     id: wf.name,

@@ -3,14 +3,9 @@ import isEmpty from 'lodash/isEmpty.js';
 import map from 'lodash/map.js';
 import { execFileSync } from 'node:child_process';
 import type { DoctorMode } from '@/core/indexing/tools.js';
-import { resolveCocoindexImage, resolveGitnexusImage } from '@/core/indexing/tools.js';
+import { resolveCocoindexImage } from '@/core/indexing/tools.js';
 import type { CheckResult } from './checks.js';
-import {
-    COCOINDEX_CONTAINER_NAME,
-    ensureCocoindexContainerRunning,
-    ensureGitnexusContainerRunning,
-    GITNEXUS_CONTAINER_NAME,
-} from '@/core/indexing/docker-runtime.js';
+import { COCOINDEX_CONTAINER_NAME, ensureCocoindexContainerRunning } from '@/core/indexing/docker-runtime.js';
 import type { DoctorBuildInstallScriptRequest, DoctorInstallDependenciesRequest, InstallResult } from './types.js';
 
 export function missingIndexingDependencies(checks: CheckResult[]): string[] {
@@ -31,12 +26,6 @@ export function buildInstallScript(request: DoctorBuildInstallScriptRequest): st
     }
 
     if (mode === 'docker') {
-        if (missing.includes('gitnexus')) {
-            const image = resolveGitnexusImage();
-            lines.push(`docker pull ${image}`);
-            lines.push(`docker run -d --name ${GITNEXUS_CONTAINER_NAME} --restart unless-stopped ${image}`);
-            lines.push('');
-        }
         if (missing.includes('cocoindex')) {
             const image = resolveCocoindexImage();
             lines.push(`docker pull ${image}`);
@@ -44,11 +33,6 @@ export function buildInstallScript(request: DoctorBuildInstallScriptRequest): st
             lines.push('');
         }
         return lines.join('\n').trimEnd();
-    }
-
-    if (missing.includes('gitnexus')) {
-        lines.push('npm install -g gitnexus@1.6.4');
-        lines.push('');
     }
 
     if (missing.includes('cocoindex')) {
@@ -76,25 +60,6 @@ export async function runMissingInstalls(mode: DoctorMode, missing: string[]): P
     }
 
     if (mode === 'docker') {
-        if (missing.includes('gitnexus')) {
-            try {
-                const image = resolveGitnexusImage();
-                await pullDockerImage(image);
-                ensureGitnexusContainerRunning(image);
-                results.push({
-                    ok: true,
-                    dependency: 'gitnexus',
-                    detail: `GitNexus image pulled; container ${GITNEXUS_CONTAINER_NAME} running`,
-                });
-            } catch (err: any) {
-                results.push({
-                    ok: false,
-                    dependency: 'gitnexus',
-                    detail: err?.message ? String(err.message) : 'docker pull failed',
-                });
-            }
-        }
-
         if (missing.includes('cocoindex')) {
             try {
                 const image = resolveCocoindexImage();
@@ -115,26 +80,6 @@ export async function runMissingInstalls(mode: DoctorMode, missing: string[]): P
         }
 
         return results;
-    }
-
-    if (missing.includes('gitnexus')) {
-        try {
-            execFileSync('npm', ['install', '-g', 'gitnexus@1.6.4'], {
-                stdio: 'pipe',
-                encoding: 'utf-8',
-            });
-            results.push({
-                ok: true,
-                dependency: 'gitnexus',
-                detail: 'installed globally via npm',
-            });
-        } catch (err: any) {
-            results.push({
-                ok: false,
-                dependency: 'gitnexus',
-                detail: err?.message ? String(err.message) : 'npm install failed',
-            });
-        }
     }
 
     if (missing.includes('cocoindex')) {

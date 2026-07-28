@@ -218,15 +218,15 @@ apply:
     On feedback, reopen affected task checkboxes, rework only affected scope, rerun phase verification,
     and wait for acceptance again. Stop for missing profile context, scope/contract conflict, blockers, or clarification.
 
-    Invoke `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-gitnexus-freshness`. Stop for contract conflict or unapproved shared-boundary impact. Do not execute migration apply/up/run, revert/down, schema sync, seeds, or backfills without separate explicit approval.
+    Invoke `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-source inspection-freshness`. Stop for contract conflict or unapproved shared-boundary impact. Do not execute migration apply/up/run, revert/down, schema sync, seeds, or backfills without separate explicit approval.
     Run `openspec instructions apply --change "<name>" --json` as source of truth.
 
 # OpenSpec-only backend orchestration contract:
 # Read `openspec instructions <artifact> --change "<name>" --json` before every artifact.
 # Proposal invokes `brainstorming` for actors, outcomes, constraints, acceptance, non-goals, risks, and unknowns.
-# Design invokes `only-one-bounded-discovery`, records GitNexus evidence, uses `gherkin-authoring`,
+# Design invokes `only-one-bounded-discovery`, records discovery evidence, uses `gherkin-authoring`,
 # and uses `c4-diagrams` or `architectural-decision-records` when triggered. Define API/schema contract before tasks.
-# Apply invokes `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-gitnexus-freshness`.
+# Apply invokes `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-source inspection-freshness`.
 # Stop for contract conflict or unapproved shared-boundary impact. Never execute migration apply/up/run,
 # revert/down, schema sync, seeds, or backfills without separate explicit approval.
 # Stage rule references: rules/01-global-safety.md rules/02-file-tags.md rules/03-planning-contract.md rules/04-apply-loop.md

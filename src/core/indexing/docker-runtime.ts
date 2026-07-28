@@ -1,7 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { GITNEXUS_DOCKER_CLI_PATH, resolveCocoindexImage, resolveGitnexusImage } from '@/core/indexing/tools.js';
+import { resolveCocoindexImage } from '@/core/indexing/tools.js';
 
-export const GITNEXUS_CONTAINER_NAME = 'only-one-gitnexus';
 export const COCOINDEX_CONTAINER_NAME = 'only-one-cocoindex';
 
 const DOCKER = 'docker';
@@ -55,16 +54,8 @@ export function getContainerState(name: string): DockerContainerState {
     }
 }
 
-export function gitnexusContainerRunArgs(image: string): string[] {
-    return ['run', '-d', '--name', GITNEXUS_CONTAINER_NAME, '--restart', 'unless-stopped', image];
-}
-
 export function cocoindexContainerRunArgs(image: string): string[] {
     return ['run', '-d', '--name', COCOINDEX_CONTAINER_NAME, '--restart', 'unless-stopped', '--entrypoint', 'sleep', image, 'infinity'];
-}
-
-export function ensureGitnexusContainerRunning(image = resolveGitnexusImage()): void {
-    ensureContainerRunning(GITNEXUS_CONTAINER_NAME, gitnexusContainerRunArgs(image));
 }
 
 export function ensureCocoindexContainerRunning(image = resolveCocoindexImage()): void {
@@ -81,18 +72,6 @@ export function ensureContainerRunning(name: string, runArgs: string[]): void {
         return;
     }
     execFileSync(DOCKER, runArgs, { encoding: 'utf-8', stdio: 'pipe' });
-}
-
-export function verifyGitnexusInContainer(): string {
-    const state = getContainerState(GITNEXUS_CONTAINER_NAME);
-    if (state !== 'running') {
-        throw new Error(`container ${GITNEXUS_CONTAINER_NAME} is not running`);
-    }
-    return execFileSync(DOCKER, ['exec', GITNEXUS_CONTAINER_NAME, 'node', GITNEXUS_DOCKER_CLI_PATH, '--version'], {
-        encoding: 'utf-8',
-        stdio: 'pipe',
-        timeout: 120_000,
-    }).trim();
 }
 
 export function verifyCocoindexInContainer(): void {

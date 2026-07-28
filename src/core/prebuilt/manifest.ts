@@ -5,14 +5,7 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { promisify } from 'node:util';
 import type { IndexMode } from '@/core/config/index.js';
-import {
-    GITNEXUS_DOCKER_CLI_PATH,
-    resolveCocoindexImage,
-    resolveCocoindexScript,
-    resolveGitnexusBin,
-    resolveGitnexusImage,
-} from '@/core/indexing/tools.js';
-import { verifyGitnexusInContainer } from '@/core/indexing/docker-runtime.js';
+import { resolveCocoindexImage, resolveCocoindexScript } from '@/core/indexing/tools.js';
 import { listStructureRelativePaths } from '@/core/structure/paths.js';
 
 const execFileAsync = promisify(execFile);
@@ -23,14 +16,13 @@ export interface ManifestData {
     commitSha: string;
     createdAt: string;
     fileCount: number;
-    gitnexusVersion: string;
     indexVersionId?: string;
     projectName: string;
     schemaVersion: string;
     structuralFiles?: string[];
 }
 
-const ARTIFACT_DIRS = ['.gitnexus', '.cocoindex'] as const;
+const ARTIFACT_DIRS = ['.cocoindex'] as const;
 
 export async function countFiles(dir: string): Promise<number> {
     if (!existsSync(dir)) return 0;
@@ -49,33 +41,6 @@ export async function getCommitSha(dir: string): Promise<string> {
             timeout: 5000,
         });
         return stdout.trim();
-    } catch {
-        return 'unknown';
-    }
-}
-
-export async function detectGitnexusVersion(mode: IndexMode): Promise<string> {
-    if (mode === 'docker') {
-        try {
-            return verifyGitnexusInContainer();
-        } catch {
-            const image = resolveGitnexusImage();
-            const version = await execFileAsync(
-                'docker',
-                ['run', '--rm', '--entrypoint', 'node', image, GITNEXUS_DOCKER_CLI_PATH, '--version'],
-                {
-                    timeout: 120_000,
-                },
-            );
-            return version.stdout.trim() || image;
-        }
-    }
-
-    const bin = resolveGitnexusBin();
-    const args = bin === 'npx' ? ['gitnexus', '--version'] : ['--version'];
-    try {
-        const { stdout } = await execFileAsync(bin, args, { timeout: 30_000 });
-        return stdout.trim() || 'unknown';
     } catch {
         return 'unknown';
     }
@@ -142,9 +107,8 @@ export async function buildManifestData(
     projectName: string,
     mode: IndexMode,
 ): Promise<ManifestData> {
-    const [commitSha, gitnexusVersion, cocoindexVersion, fileCount, artifactChecksum] = await Promise.all([
+    const [commitSha, cocoindexVersion, fileCount, artifactChecksum] = await Promise.all([
         getCommitSha(projectDir),
-        detectGitnexusVersion(mode),
         detectCocoindexVersion(mode),
         countFiles(join(outputDir, '.cocoindex')),
         computeArtifactChecksum(outputDir),
@@ -158,7 +122,6 @@ export async function buildManifestData(
         commitSha,
         createdAt: new Date().toISOString(),
         fileCount,
-        gitnexusVersion,
         projectName,
         schemaVersion: '1.0',
         ...(structuralFiles.length ? { structuralFiles } : {}),

@@ -1,4 +1,5 @@
 # AI project settings
+.agent/
 .agents/
 .claude/
 .cursor/
@@ -8,6 +9,3 @@ openspec/
 
 # Git worktrees
 .worktrees/
-
-# Git Nexus
-.gitnexus/

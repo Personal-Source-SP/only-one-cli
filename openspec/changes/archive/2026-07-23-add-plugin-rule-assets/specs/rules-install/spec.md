@@ -26,9 +26,7 @@ Rule: Before copying a rule, the system SHALL validate and deduplicate its requi
 
 #### Scenario: Queue dependencies for context-minimization
 - **GIVEN** `context-minimization` is selected
-- **AND** OpenSpec, Superpowers, or GitNexus is missing from the installation plan
 - **WHEN** rule dependencies are prepared
-- **THEN** package `@fission-ai/openspec`, plugin `superpowers`, and MCP `gitnexus` are queued once
 - **AND** dependency actions run before the rule file is copied
 
 #### Scenario: Deduplicate shared dependencies

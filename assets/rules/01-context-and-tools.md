@@ -7,15 +7,8 @@ alwaysApply: true
 ## Discovery
 
 - Start from user-provided files and the narrowest relevant scope. Expand only when evidence shows the current scope is insufficient; never scan the repository without a concrete query.
-- Before broad discovery or any multi-file change, **MUST use GitNexus** to inspect dependencies, callers, and blast radius. Trivial, isolated edits do not require it.
+- Before broad discovery or any multi-file change, inspect direct dependencies, callers, and blast radius. Trivial, isolated edits do not require it.
 - Repository-wide exact-symbol search is allowed when needed to prove complete usage, compatibility, or removal safety.
-- If GitNexus is unavailable, stale, or empty:
-    1. Report the limitation before proceeding.
-    2. Use scoped symbol search and manually trace imports, exports, and callers.
-    3. Treat blast radius as unknown.
-    4. Stop for user approval before deletions, renames, breaking contracts, or migrations.
-
-## Intent & Scope
 
 - The user's explicit request is the authoritative source of intent and MUST clearly define the goal, expected behavior, and relevant boundaries.
 - If critical details are missing, ambiguous, or conflicting, **stop and ask targeted clarifying questions before editing**. Do not infer requirements or choose product behavior on the user's behalf.

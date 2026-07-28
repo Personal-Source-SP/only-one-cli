@@ -31,7 +31,7 @@ All notable changes to this project will be documented in this file.
 ### Internal
 
 - Moved skill installation into combo target selection and removed deprecated bundled skill assets.
-- Expanded workflow contracts with GitNexus discovery, approval gates, TDD, browser evidence, and proportional verification.
+- Expanded workflow contracts with code intelligence discovery, approval gates, TDD, browser evidence, and proportional verification.
 
 ## 0.0.3 (2026-07-23)
 

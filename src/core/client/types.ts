@@ -143,7 +143,6 @@ export interface IndexVersionMetadata {
     createdAt?: string;
     createdBy?: string;
     fileCount?: number;
-    gitnexusVersion?: string;
     indexVersionId?: string;
     isLatest?: boolean;
     projectId?: string;
@@ -162,7 +161,6 @@ export interface LatestIndexMetadata {
     cocoindexVersion?: string;
     commitSha?: string;
     createdAt?: string;
-    gitnexusVersion?: string;
     indexVersionId?: string;
 }
 

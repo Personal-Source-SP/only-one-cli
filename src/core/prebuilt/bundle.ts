@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { listStructureRelativePaths } from '@/core/structure/paths.js';
 
-const CORE_BUNDLE_ENTRIES = ['.gitnexus', '.cocoindex', 'manifest.json'] as const;
+const CORE_BUNDLE_ENTRIES = ['.cocoindex', 'manifest.json'] as const;
 
 export function listBundleEntries(indexOutputDir: string): string[] {
     const entries: string[] = [];
@@ -25,9 +25,7 @@ export function createPrebuiltBundle(indexOutputDir: string, bundlePath: string)
     const dirs = listBundleEntries(indexOutputDir);
 
     if (!dirs.length) {
-        throw new Error(
-            'No index artifacts found. Run only-one index:create first, or omit --skip-gitnexus / --skip-cocoindex on push-index.',
-        );
+        throw new Error('No index artifacts found. Run only-one index:create first on push-index.');
     }
 
     execFileSync('tar', ['--create', '--gzip', '--file', bundlePath, '--directory', indexOutputDir, ...dirs], {

@@ -1,13 +1,13 @@
 ---
 name: only-one-bounded-discovery
-description: Perform bounded codebase discovery using GitNexus within a strict 2-5% scope budget. Produces a blast-radius allowlist. Use during planning phases for both BE and FE changes before designing tasks or writing artifacts.
+description: Perform bounded codebase discovery using targeted source inspection within a strict 2-5% scope budget. Produces a blast-radius allowlist. Use during planning phases for both BE and FE changes before designing tasks or writing artifacts.
 ---
 
 Bounded discovery establishes the exact set of files and symbols that will be affected. It runs after the canonical reference gate (FE) or brainstorming (BE), and before any task decomposition or artifact content is written.
 
 ## Core protocol (all variants)
 
-1. Use GitNexus queries, symbol context, routes, and impact analysis to locate relevant entry points and relationships. Do not recursively list, grep, read, or scan the entire repository.
+1. Use targeted source inspection queries, symbol context, routes, and impact analysis to locate relevant entry points and relationships. Do not recursively list, grep, read, or scan the entire repository.
 2. Start from feature terms and known symbols. Expand only to direct dependencies.
 3. **Scope budget:** Target 2–5% of the codebase. Stop and ask for a narrower capability when candidate scope exceeds budget. Do not expand automatically.
 4. **Exclusions:** Do not include root config, middleware, bootstrapping files, or environment files unless the approved intent explicitly requires infrastructure changes.
@@ -16,7 +16,7 @@ Bounded discovery establishes the exact set of files and symbols that will be af
    - Symbol name and role
    - Direct dependencies
    - Confidence level
-6. If GitNexus is stale or incomplete: report the limitation and use only targeted reads for already-identified files. Do not claim complete impact coverage.
+6. If targeted source inspection is stale or incomplete: report the limitation and use only targeted reads for already-identified files. Do not claim complete impact coverage.
 7. Stop when scope exceeds budget. Do not silently expand.
 
 ## BE variant additions
@@ -44,4 +44,4 @@ Apply these when the change targets a Next.js or React frontend:
 Record and present:
 - Blast-radius allowlist (complete, per item)
 - Any out-of-scope dependencies for other workflows
-- GitNexus freshness status at time of discovery
+- targeted source inspection freshness status at time of discovery

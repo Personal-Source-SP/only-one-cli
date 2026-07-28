@@ -93,7 +93,7 @@ Manage and synchronize bundled agent workflows.
 only-one workflow [path] [names] --tool cursor
 ```
 
-Bundled workflows cover bounded feature planning, TDD implementation, evidence-driven bug fixes, accessible UI work, GitHub pull requests, Clockify logging, and OpenSpec propose/apply/archive/explore flows. Implementation workflows include approval gates, GitNexus discovery, verification, and safe worktree cleanup guidance.
+Bundled workflows cover bounded feature planning, TDD implementation, evidence-driven bug fixes, accessible UI work, GitHub pull requests, Clockify logging, and OpenSpec propose/apply/archive/explore flows. Implementation workflows include approval gates, code intelligence discovery, verification, and safe worktree cleanup guidance.
 
 ### `plugin`
 
@@ -122,12 +122,12 @@ Merge global MCP server definitions into supported agent configurations.
 ```bash
 only-one mcp [names] --ide antigravity,claude,cursor,codex
 only-one mcp github,clockify
-only-one mcp gitnexus --ide antigravity,claude,cursor
+only-one mcp code intelligence --ide antigravity,claude,cursor
 ```
 
 MCP synchronization supports Antigravity, Claude, Cursor, and Codex JSON or TOML configuration formats. Existing malformed selected configurations fail before writes.
 
-GitNexus runs `npx -y gitnexus@latest mcp` with `GITNEXUS_MCP_READ_ONLY=1` by default. Run `npx gitnexus analyze` in target repository before agent code discovery.
+code intelligence runs `npx -y code intelligence@latest mcp` with `code intelligence_MCP_READ_ONLY=1` by default. Run `npx code intelligence analyze` in target repository before agent code discovery.
 
 ### `combo`
 

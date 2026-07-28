@@ -10,7 +10,6 @@ Plugin installers and persistent agent rules are distinct asset domains, but the
 - Simplify package manifests back to npm package concerns after target-plugin behavior moves to plugins.
 - Add typed `assets/rules/` registry, Markdown rule assets, target adapters, and a top-level `only-one rule` command.
 - Allow rule manifests to declare `requiredPackages`, `requiredPlugins`, `requiredMcps`, and `requiredSkills`; automatically queue missing dependencies before installing a rule.
-- Add `context-minimization` rule requiring OpenSpec, Superpowers, and GitNexus before planning or modification.
 - Install rules only to verified native rule paths: Antigravity `.agents/rules/`, Claude `.claude/rules/`, and Cursor `.cursor/rules/`; Codex remains unavailable for rule selection because it uses `AGENTS.md` rather than a native rules directory.
 - Add focused registry, dependency-resolution, target-filtering, install, migration, and integration tests.
 
@@ -22,7 +21,6 @@ Plugin installers and persistent agent rules are distinct asset domains, but the
 - `plugins-install`: Defines plugin selection, shared target selection, automatic/manual action execution, and per-target reporting.
 - `rule-library-registry`: Defines Markdown rule manifests, native target mappings, and cross-domain dependency declarations.
 - `rules-install`: Defines rule selection, recursive dependency queueing, native installation, overwrite checks, and readiness reporting.
-- `context-minimization-rule`: Defines planning-time context minimization behavior and its OpenSpec, Superpowers, and GitNexus dependencies.
 
 ### Modified Capabilities
 

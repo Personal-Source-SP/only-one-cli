@@ -18,7 +18,7 @@ For each phase:
 1. Re-read relevant `contextFiles`; present goal, ordered tasks, acceptance, and verification.
 2. For each task: confirm prerequisites; change only declared work, files, scope, and constraints; apply caller tag rules; run profile verification and acceptance checks; inspect diff.
 3. Only after implementation, required evidence, acceptance, and diff review succeed, change corresponding resolved task checkbox from `[ ]` to `[x]`. Never tick blocked, partial, or unverified tasks.
-4. After all tasks, run phase and neighboring verification, review full phase diff, resolve blockers, rerun affected checks, and apply GitNexus boundary gate when relevant.
+4. After all tasks, run phase and neighboring verification, review full phase diff, resolve blockers, rerun affected checks, and apply integration boundary gate when relevant.
 5. Publish caller-defined phase report and wait for explicit feedback or acceptance.
 
 ## Feedback loop
@@ -30,4 +30,4 @@ For each phase:
 
 ## Integrated verification
 
-After every phase is accepted: inspect full diff; inspect phase diff; run caller-defined integrated checks; apply GitNexus integration gate; run fresh declared verification; confirm workflow changes remain unstaged and uncommitted; publish caller-defined completion report.
+After every phase is accepted: inspect full diff; inspect phase diff; run caller-defined integrated checks; apply integration gate; run fresh declared verification; confirm workflow changes remain unstaged and uncommitted; publish caller-defined completion report.

@@ -25,7 +25,6 @@
 - [x] 3.4 Reuse package, plugin, MCP, and skill services to execute missing rule dependencies before rule writes.
 - [x] 3.5 Propagate automatic dependency failures by skipping dependent rule writes and identifying the failed dependency.
 - [x] 3.6 Allow rule writes after manual plugin actions but report installed-not-ready and action-required status.
-- [x] 3.7 Verify `context-minimization` queues `@fission-ai/openspec`, `superpowers`, and `gitnexus` exactly once per applicable plan.
 
 ## 4. Rule Command and Init Integration
 

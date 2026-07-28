@@ -272,7 +272,7 @@ export const formatSearchSectionYaml = (search?: SearchConfig): string => {
         '  # Defaults for only-one search; CLI flags override these values when passed on the command line.',
         `  top_k: ${resolved.top_k}  # Maximum number of results (-k, --top-k)`,
         `  snippet_lines: ${resolved.snippet_lines}  # Max snippet lines per hit; 0 = show full excerpt (--snippet-lines)`,
-        `  structural: ${resolved.structural}  # Add GitNexus execution-flow context (--structural; per-project only)`,
+        `  structural: ${resolved.structural}`,
         `  scope: ${resolved.scope}  # per-project (default) or cross-project (--scope or --cross-project)`,
     ];
 

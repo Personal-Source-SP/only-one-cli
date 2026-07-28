@@ -24,16 +24,12 @@ export const SKILLS: SkillManifest[] = [
         associatedWorkflows: ['only-one-pr-git'],
     },
     {
-        name: 'only-one-gitnexus-freshness',
-        description: 'Apply GitNexus freshness gates — verify index currency, sync/reindex when stale, enforce preflight scope and public/shared boundary gates.',
-    },
-    {
         name: 'only-one-openspec-apply-gate',
         description: 'Resolve, apply, and validate an OpenSpec change before implementation. Reads contextFiles, verifies required plan artifacts, and enforces stop conditions.',
     },
     {
         name: 'only-one-bounded-discovery',
-        description: 'Perform bounded codebase discovery using GitNexus within a 2-5% scope budget. Produces a blast-radius allowlist. Supports BE and FE variants.',
+        description: 'Perform bounded codebase discovery within a 2-5% scope budget. Produces a blast-radius allowlist. Supports BE and FE variants.',
     },
     {
         name: 'only-one-phase-implementation-loop',

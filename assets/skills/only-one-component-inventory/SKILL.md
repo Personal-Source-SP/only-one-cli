@@ -11,7 +11,7 @@ Run after bounded discovery and before UI design.
 
 ### Component inventory
 
-1. Query GitNexus and read the design system to identify all custom components relevant to the feature:
+1. Read the design system to identify all custom components relevant to the feature:
    - Component name, file path, and accepted props/variants.
 2. List the design system conventions in use:
    - Color tokens, spacing tokens, typography scales, theme/CSS variable naming.

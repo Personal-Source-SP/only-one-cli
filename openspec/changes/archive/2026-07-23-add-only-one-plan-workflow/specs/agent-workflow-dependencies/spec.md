@@ -1,7 +1,6 @@
 ## MODIFIED Requirements
 
 ### Requirement: Command dependency mapping
-Rule: Init SHALL derive required skills, workflows, and MCPs from registry metadata for each selected command, including mapping the `only-one-plan` command to `only-one-plan-skill`, `only-one-plan`, and `gitnexus`.
 
 #### Scenario: Select PR agent command
 - **GIVEN** user selects `pr-git`
@@ -11,12 +10,7 @@ Rule: Init SHALL derive required skills, workflows, and MCPs from registry metad
 #### Scenario: Select planning agent command
 - **GIVEN** user selects `only-one-plan`
 - **WHEN** dependency selections are prepared
-- **THEN** `only-one-plan-skill`, `only-one-plan`, and `gitnexus` are derived from registry relationships
-- **AND** GitNexus is preselected for installation
 
-#### Scenario: User opts out of GitNexus
-- **GIVEN** `only-one-plan` is selected and GitNexus is preselected
-- **WHEN** the user removes GitNexus from the installation selection
 - **THEN** init warns that planning will lose preferred code-intelligence context
 - **AND** init preserves the user's opt-out decision
 
@@ -29,10 +23,7 @@ Rule: Init SHALL report readiness as command, skill, workflow, MCP, and any requ
 - **THEN** the result reports setup incomplete
 - **AND** identifies the config file and key requiring manual editing
 
-#### Scenario: GitNexus is installed without credentials
-- **GIVEN** `only-one-plan`, its skill and workflow, and GitNexus were installed
 - **WHEN** readiness is evaluated
-- **THEN** GitNexus is reported ready without a credential requirement
 - **AND** the result identifies project indexing as a usage prerequisite rather than a missing secret
 
 ## ADDED Requirements

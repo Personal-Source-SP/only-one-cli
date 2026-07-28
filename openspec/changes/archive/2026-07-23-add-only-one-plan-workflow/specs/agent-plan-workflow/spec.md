@@ -32,25 +32,17 @@ Rule: The workflow SHALL ask the user when required evidence is missing or a cho
 - **THEN** it follows that convention without asking an unnecessary question
 - **AND** it records the convention as evidence when it affects a planned step
 
-### Requirement: GitNexus-first grounded discovery
-Rule: The workflow SHALL use available GitNexus read-only code intelligence first to identify relevant symbols, dependencies, call paths, and blast radius, then verify conclusions against specific source files.
 
-#### Scenario: GitNexus returns relevant code paths
-- **GIVEN** GitNexus is available with a usable project index
 - **WHEN** the workflow investigates a requested change
-- **THEN** it uses targeted GitNexus queries to narrow the investigation
 - **AND** it verifies planning conclusions against identified source files
 - **AND** the plan cites the evidence paths or symbols used
 
-#### Scenario: GitNexus is unavailable or insufficient
-- **GIVEN** GitNexus is unavailable, unindexed, stale, or lacks evidence needed for the plan
 - **WHEN** the workflow detects the limitation
 - **THEN** it explains the limitation to the user
 - **AND** it asks whether to continue with read-only local search
 - **AND** it does not start fallback investigation until the user confirms
 
 #### Scenario: Narrow queries provide enough evidence
-- **GIVEN** targeted GitNexus and source queries establish the relevant code path
 - **WHEN** the workflow evaluates further discovery
 - **THEN** it avoids an unnecessary full-repository scan
 - **AND** it limits results and context to evidence needed by the plan
