@@ -13,6 +13,6 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-implement-fast',
-        description: 'Scope, optionally plan, implement, and proportionally verify a small or moderate task directly in the current workspace.',
+        description: 'Fix a small, evidenced issue with minimal context, inline patch review, and focused verification.',
     },
 ];

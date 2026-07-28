@@ -1,83 +1,73 @@
 ---
-description: Clarify, plan, approve, implement, and verify a bounded change in current workspace.
+description: Fix a small, evidenced issue with minimal context, inline patch review, and focused verification.
 ---
 
 ## Input
 
 ```text
-/only-one-implement-fast <task description>
+/only-one-implement-fast <error evidence and task description>
 ```
 
 ## Purpose
 
-Use for a bounded UI or logic change that does not need an OpenSpec change. Always clarify unknown decisions, always create an IDE plan, and implement only after explicit user approval.
+Use for a small bug fix or bounded edit with clear evidence. Work fast: isolate only relevant context, make a narrow inline patch, and verify proportionally.
 
 ## Location and boundaries
 
 1. Work only in current project workspace and current Git branch.
 2. Do not run `git worktree`, create/switch/delete worktrees, delegate to subagents, create commits, or invoke OpenSpec.
-3. Use only IDE default `implementation_plan.md` artifact and its approval flow. Do not create separate task files.
+3. Do not create an `implementation_plan.md`, task artifact, or tagged-task contract.
 4. Preserve unrelated working-tree changes.
 
-## 1. Clarify first
+## 1. Receive evidence
 
-1. Determine requested observable result before discovery or planning.
-2. Ask focused questions before proceeding when profile, behavior, UI outcome, affected area, API/compatibility, constraints, acceptance, or verification is unknown.
-3. Never infer product, UI, API, compatibility, or migration decisions.
-4. Invoke `grill-me` whenever any implementation decision remains uncertain. Ask one question at a time and provide recommended answer.
-5. State confirmed facts separately from unanswered questions. Stop until answers resolve decisions that change scope or implementation.
+1. Use provided selected code, named file, stack trace, test failure, or concise observed behavior as primary evidence.
+2. Ask one focused question only when source location or evidence is insufficient to isolate likely cause.
+3. Do not ask for profile `FE`/`BE`, invoke `grill-me`, or request broad product decisions for a clear minor task.
 
-## 2. Discover and bound scope
+## 2. Isolate minimal context
 
-2. If unavailable or stale, report exact limitation and ask whether direct source search is acceptable. Do not claim complete impact coverage.
-3. Inspect targeted source for symbols, callers, dependencies, routes, and likely tests.
-4. Identify shared contracts, public APIs, schema/migrations, configuration, authorization, and broad shared modules. Keep unrelated refactors out of scope.
+1. Read only named/selected source and direct dependencies needed to prove cause or avoid a likely side effect.
+2. Do not load unrelated docs, routes, callers, modules, or full-project context.
+3. State concise finding: likely cause, affected file/symbol, assumption if any, and expected side effect.
+4. Stop and escalate before editing if cause needs broad discovery or evidence remains ambiguous.
 
-## 3. Always plan and wait for approval
+## 3. Patch and review inline
 
-1. Always create or update the IDE default `implementation_plan.md` artifact.
-2. Plan must contain:
-    - **Work description**: requested change and confirmed observable result.
-    - **Why**: user problem or value.
-    - **Profile**: `FE` or `BE`; ask if not clear.
-    - **Scope and non-goals**: approved files/symbols and exclusions.
-    - **Risks and decisions**: contracts, compatibility, migrations, UI/accessibility, or unknowns.
-    - **Verification**: commands, tests, browser/manual evidence, and final impact check.
-3. Organize work into dependency-ordered phases. Every phase has goal, acceptance requirements, and verification.
-4. Request feedback on plan. Wait for explicit user approval before modifying source.
+1. Apply smallest patch that fixes reported behavior in affected file(s), so user can review inline diff and accept it.
+2. Keep naming, comments, architecture, design tokens, accessibility, responsive patterns, i18n, and public behavior intact unless fix requires otherwise.
+3. Do not refactor unrelated code or introduce a dependency, environment/configuration change, public API/contract change, database mutation, schema change, migration, or new broad abstraction.
+4. Report changed file/symbol, fix rationale, and known side effects.
 
-## 4. Tagged task contract
+## 4. Verify proportionally
 
-Every task uses checkbox format and declares Files/tags, Allowed scope, Dependencies and constraints, Acceptance requirements, and Verification:
+1. Run focused relevant test, lint, typecheck, or manual/browser check when available and appropriate for changed source.
+2. Do not weaken valid tests merely to pass checks.
+3. Report command/result, checks not run, blockers, and short manual verification when automated check is unavailable.
 
-```md
-- [ ] 1.1 Task description
-    - **Files:** `path` `[TAG]`
-    - **Allowed scope:** bounded files and sections only
-    - **Dependencies and constraints:** ownership, contracts, reuse, compatibility
-    - **Acceptance requirements:** observable outcome
-    - **Verification:** tests, commands, or browser/manual evidence
-```
+## 5. Regression test — optional, encouraged
 
-Choose profile tags exactly:
+1. After patch, offer focused unit or regression test for bug fixed.
+2. Write test only when user requests it.
+3. Keep test scoped to reported behavior; do not expand unrelated coverage.
 
-- **FE:** `[NEW]`, `[MODIFY]`, `[DELETE]`, `[TEST]`, `[WIRE]`, `[EXISTING]`.
-- **BE:** `[NEW]`, `[MODIFY]`, `[DELETE]`, `[TEST]`, `[MIGRATE]`, `[WIRE]`.
-- `[EXISTING]` is reference/reuse only. Do not modify it; stop and update plan if modification becomes needed.
-- `[MIGRATE]` creates or modifies a migration only. Do not execute migration apply/up/run, revert/down, schema sync, seeds, or backfills without separate explicit approval.
+## 6. Stop and use planned workflow
 
-## 5. Implement after approval
+Stop before editing and request a planned/bounded-change workflow when task affects or may affect:
 
-1. Apply only approved task scope and tags. Recheck targeted source before impact-dependent decisions after source changes.
-2. Preserve comments, naming, architecture, design tokens, components, accessibility, responsive patterns, i18n, and public behavior unless plan approves change.
-3. Do not introduce dependency, environment, configuration, public contract, database mutation, or unrelated abstraction without explicit approval.
-4. If discovery or implementation expands scope, conflicts with plan, or violates tag contract, stop. Update plan and request approval again.
-5. Tick a task only after its declared acceptance requirements and verification pass.
+- public API, shared contract, schema, migration, database mutation, authorization, or security behavior;
+- shared module, broad callers/routes, dependency, environment, or configuration;
+- unclear product/UI/compatibility decision; or
+- scope beyond a narrow, evidenced fix.
 
-## 6. Verify and report
+Report exact reason for escalation. Do not claim complete impact coverage without inspecting necessary source.
 
-1. Run every declared verification. Run relevant focused tests, typecheck/lint when available, and focused browser/manual checks for UI states when applicable.
-2. Do not weaken valid tests merely to pass checks. Report unavailable checks, blockers, and exact manual verification.
-3. Inspect targeted source before final impact analysis. Stop and re-plan if impact reaches unapproved public/shared surfaces.
-4. Report changed files/symbols, completed task checkboxes, observable behavior, verification evidence/results, final impact, remaining risks, and checks not run.
-5. Do not create a git commit.
+## 7. Final report
+
+Report concise result:
+
+1. evidence and isolated cause;
+2. changed files/symbols and observable fix;
+3. verification evidence/results and checks not run;
+4. final known impact or escalation reason; and
+5. optional regression-test next step.
