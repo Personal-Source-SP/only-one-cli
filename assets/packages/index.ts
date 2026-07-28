@@ -21,17 +21,4 @@ export const PACKAGES: PackageManifest[] = [
         },
         requirements: ['node', 'npm'],
     },
-    ...['next-dev-loop', 'next-cache-components-adoption', 'next-cache-components-optimizer', 'next-partial-prefetching-adoption'].map(
-        (skillName): PackageManifest => ({
-            id: skillName,
-            description: `Official Next.js skill: ${skillName}`,
-            installer: {
-                kind: 'skills',
-                source: 'https://github.com/vercel/next.js/tree/canary/skills',
-                skillName,
-                cliVersion: '1.4.0',
-            },
-            requirements: ['node', 'npm'],
-        }),
-    ),
 ];
