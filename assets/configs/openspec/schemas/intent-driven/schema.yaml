@@ -1,4 +1,4 @@
-name: intent-driven-fe
+name: intent-driven
 version: 1
 description: Intent-driven OpenSpec workflow - proposal -> Gherkin-style specs -> design -> tasks
 artifacts:
@@ -163,9 +163,6 @@ artifacts:
 
       Reference the proposal for motivation and specs for requirements.
 
-      Profile requirement: preserve all profile template headings. `Canonical Reference and Allowlist` and
-      every profile section in the design template are mandatory planning context.
-
 
       Good design docs explain the "why" behind technical decisions.
     requires:
@@ -209,26 +206,5 @@ apply:
     - tasks
   tracks: tasks.md
   instruction: |
-    Read context files and verify active profile design/task sections before implementation.
-
-    Before modifying source, read `rules/01-global-safety.md`, `rules/02-file-tags.md`, and `rules/04-apply-loop.md`. Stop when any rule conflicts with declared scope, ownership, contract, or allowlist.
-    Process phases in dependency order. Do not start next phase before explicit acceptance.
-    For each phase, execute ordered declared tasks only; run declared acceptance and verification;
-    mark complete only verified task checkboxes; publish phase evidence; then wait for explicit acceptance.
-    On feedback, reopen affected task checkboxes, rework only affected scope, rerun phase verification,
-    and wait for acceptance again. Stop for missing profile context, scope/contract conflict, blockers, or clarification.
-
-    Invoke `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-source inspection-freshness`. Before component changes invoke `only-one-component-inventory` Mode B. Require browser tooling. Stop for `[EXISTING]` modification, undeclared files, or unapproved shared-boundary impact.
-    Run `openspec instructions apply --change "<name>" --json` as source of truth.
-
-# OpenSpec-only frontend orchestration contract:
-# Proposal requires a canonical reference path and must stop when absent.
-# Read `openspec instructions <artifact> --change "<name>" --json` before every artifact.
-# Design invokes `only-one-canonical-ref-gate`, `only-one-bounded-discovery`,
-# `only-one-component-inventory` Mode A, `only-one-ui-design-direction`, and `ux-ui-pro-max`.
-# Record discovery evidence and obtain explicit UI/source organization approval before tasks.
-# Apply invokes `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`,
-# and component inventory Mode B. Require browser tooling.
-# Stop for `[EXISTING]` modification, undeclared files, or unapproved shared-boundary impact.
-# Stage rule references: rules/01-global-safety.md rules/02-file-tags.md rules/03-planning-contract.md rules/04-apply-loop.md
-# Before writing design.md, read rules. Before writing tasks.md, read rules. Before modifying source, read rules.
+    Read context files, work through pending tasks, mark complete as you go.
+    Pause if you hit blockers or need clarification.

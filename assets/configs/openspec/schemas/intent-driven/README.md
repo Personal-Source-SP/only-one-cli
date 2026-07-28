@@ -1,6 +1,6 @@
 # Intent-Driven OpenSpec Schema
 
-`intent-driven-be` is a proposal-to-tasks workflow for changes where contributor
+`intent-driven` is a proposal-to-tasks workflow for changes where contributor
 intent, observable behaviour, and technical design should all be captured
 before implementation.
 
@@ -19,7 +19,7 @@ Gherkin style with `GIVEN`, `WHEN`, and `THEN` steps.
 Set this in `openspec/config.yaml`:
 
 ```yaml
-schema: intent-driven-be
+schema: intent-driven
 ```
 
 ## Stage Gates
