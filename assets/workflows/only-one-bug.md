@@ -12,7 +12,7 @@ description: Reproduce, diagnose, approve, fix, and verify a bug using evidence-
 
 1. Check whether plugin `superpowers` and MCP `gitnexus` are available.
 2. If either is unavailable, stop and report each missing dependency as a blocker. Ask user to install it or provide an approved alternative.
-3. Invoke `superpowers:systematic-debugging` before diagnosis or fix proposals. If an equivalent installed workflow has a different name, use it and state the selected equivalent.
+3. Diagnose from reproducible evidence before proposing a fix.
 4. Do not silently skip dependency or workflow requirements.
 
 ## Discovery
@@ -35,12 +35,12 @@ description: Reproduce, diagnose, approve, fix, and verify a bug using evidence-
 
 ## After approval
 
-1. Invoke `superpowers:test-driven-development` when a focused regression test can express expected behavior before implementation.
+1. Add a focused regression test before implementation when it can express expected behavior.
 2. Make the smallest fix addressing confirmed root cause. Do not hide symptoms with broad catch blocks, disabled validation, retry loops, or unrelated refactors.
 3. Add or update regression coverage.
 4. Run the narrowest relevant test, lint, typecheck, and required project checks.
 5. Re-run GitNexus impact analysis for changed public symbols or contracts. Expand validation when impacted paths exceed approved scope.
-6. Invoke `superpowers:verification-before-completion` before reporting completion.
+6. Run fresh relevant verification before reporting completion.
 7. When checks cannot run, report blocker, unverified behavior, and concrete manual verification steps.
 8. Report changed files, fresh validation evidence, results, and checks not run.
 
