@@ -1,48 +1,57 @@
 # Intent-Driven OpenSpec Schema
 
-`intent-driven` is a proposal-to-tasks workflow for changes where contributor
-intent, observable behaviour, and technical design should all be captured
-before implementation.
+`intent-driven` controls Epic and Major Feature work before implementation.
+Architecture contract and explicit source context become inputs to code generation.
 
-It keeps specs mergeable by default OpenSpec archive by generating
-`specs/<capability>/spec.md` files. The Markdown headings are the OpenSpec
-wrapper; the content inside each requirement and scenario should be written in
-Gherkin style with `GIVEN`, `WHEN`, and `THEN` steps.
-
-- Good fit: product or platform changes with meaningful behaviour and
-  cross-module work, or architecture choices that need explicit design.
-- Not a good fit: small tactical fixes, docs-only changes, dependency bumps, or
-  behaviour-only work where `behaviour-driven` is enough.
-
-## Activate
-
-Set this in `openspec/config.yaml`:
-
-```yaml
-schema: intent-driven
-```
-
-## Stage Gates
-
-Artifact order:
+## Artifact Order
 
 ```text
-proposal -> specs -> design -> tasks
+proposal → specs → architecture → context → design → scaffold → tasks
 ```
 
-Gate expectations:
+| Artifact | Purpose |
+| --- | --- |
+| `proposal.md` | Why change matters and affected capabilities. |
+| `specs/<capability>/spec.md` | Observable behavior in OpenSpec Markdown and Gherkin style. |
+| `architecture.md` | Business rules, data flow, data/API contracts, boundaries, and constraints. |
+| `context.md` | Explicit repository-relative files and commands AI must read. |
+| `design.md` | Implementation strategy and technical decisions. |
+| `scaffold.md` | Reviewable file tree, contracts, module boundaries, and test stubs. |
+| `tasks.md` | Ordered implementation checklist. |
 
-- `proposal` states why the change matters and lists the capabilities that need
-  behaviour specs.
-- `specs` creates one OpenSpec Markdown delta file per capability at
-  `specs/<capability>/spec.md`.
-- `design` explains the implementation approach and technical decisions.
-- `tasks` are planned only after proposal, specs, and design artifacts are
-  complete.
+Use this schema for cross-module work, new architecture, significant data/API changes,
+or features with meaningful business behavior. Use a smaller schema for tactical fixes.
+
+## Review and Apply Gate
+
+`/opsx-propose` creates planning artifacts. Review architecture, context, design,
+scaffold, and tasks before `/opsx-apply`.
+
+Running `/opsx-apply` is user acceptance of current planning artifacts. AI then reads
+all explicit paths in `context.md`, creates scaffold code first, and implements tasks.
+
+## Context Injection
+
+`context.md` is source manifest, not copied source. Each required file must use an
+explicit repository-relative path with reason and read phase. Do not use wildcards or
+globs. Attach or `@` the manifest files when asking AI to create scaffold or apply work.
+
+## Contract Drift
+
+When implementation uncovers business, specification, or design conflict:
+
+1. Stop affected implementation.
+2. Update affected proposal, specs, architecture, context, design, scaffold, and tasks.
+3. Review revised planning artifacts.
+4. Run `/opsx-apply` again.
+5. Regenerate affected code from updated contract.
+
+Do not patch code around documented constraints.
 
 ## Spec Format
 
-Use OpenSpec Markdown delta headers so archive can merge the change:
+Use OpenSpec Markdown delta headers. Every requirement has at least one Gherkin-style
+scenario with observable `GIVEN`, `WHEN`, and `THEN` steps.
 
 ```md
 ## ADDED Requirements
@@ -50,22 +59,17 @@ Use OpenSpec Markdown delta headers so archive can merge the change:
 ### Requirement: User data export
 Feature: User data export
 
-Rule: Users can export their own data
-
 #### Scenario: Successful CSV export
 - **GIVEN** a user has saved data
 - **WHEN** the user exports their data as CSV
 - **THEN** the system provides a CSV file containing the user's data
 ```
 
-Do not create `.feature` files for this schema. External Gherkin linting can be
-run by the target project, but the schema package intentionally does not include
-Gherkin lint configuration.
+Do not create `.feature` files for this schema.
 
 ## Validate
 
 ```bash
 openspec schema validate intent-driven
+openspec validate <change> --type change --strict
 ```
-
-For more schemas, refer to https://github.com/intent-driven-dev/openspec-schemas.

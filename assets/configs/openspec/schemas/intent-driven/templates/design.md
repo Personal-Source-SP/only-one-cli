@@ -1,6 +1,6 @@
 ## Context
 
-<!-- Background and current state -->
+<!-- Background, current state, constraints, stakeholders, and links to architecture.md plus context.md. -->
 
 ## Goals / Non-Goals
 
@@ -10,18 +10,26 @@
 **Non-Goals:**
 <!-- What is explicitly out of scope -->
 
+## Implementation Strategy
+
+<!-- Ordered approach that honors architecture contract and context manifest. -->
+
 ## Decisions
 
-<!-- Key design decisions and rationale -->
+<!-- Key implementation decisions, rationale, alternatives, and ADR links where applicable. -->
 
 ## Risks / Trade-offs
 
-<!-- Known risks and trade-offs -->
+<!-- Known risks and trade-offs. -->
 
 ## Migration Plan
 
-<!-- Deployment, migration, and rollback notes if applicable -->
+<!-- Deployment, migration, and rollback notes if applicable. -->
+
+## Traceability
+
+<!-- Map strategy and decisions to proposal, specs, and architecture sections. -->
 
 ## Open Questions
 
-<!-- Outstanding decisions, including any in-force ADRs that need supersession -->
+<!-- Outstanding decisions. -->

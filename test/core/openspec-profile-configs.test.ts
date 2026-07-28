@@ -22,14 +22,26 @@ describe('OpenSpec config', () => {
         expect(existsSync(join(configsDir, configName, 'schemas', schemaName, 'schema.yaml'))).toBe(true);
     });
 
-    it('includes proposal, spec, design, and task templates', async () => {
+    it('ships Epic planning templates and guards', async () => {
         const schema = await readAsset('schemas', schemaName, 'schema.yaml');
+        const config = await readAsset('config.yaml');
         const templates = await Promise.all(
-            ['proposal.md', 'spec.md', 'design.md', 'tasks.md'].map((template) => readAsset('schemas', schemaName, 'templates', template)),
+            ['proposal.md', 'spec.md', 'architecture.md', 'context.md', 'design.md', 'scaffold.md', 'tasks.md'].map((template) =>
+                readAsset('schemas', schemaName, 'templates', template),
+            ),
         );
 
         for (const template of templates) expect(template.length).toBeGreaterThan(0);
-        expect(schema).toContain('Follow the template below exactly');
-        expect(schema).toContain('Read context files, work through pending tasks');
+        expect(schema).toContain('id: architecture');
+        expect(schema).toContain('id: context');
+        expect(schema).toContain('id: scaffold');
+        expect(schema).toContain('      - scaffold');
+        expect(schema).toContain('Running /opsx-apply confirms user review');
+        expect(schema).toContain('Do not use placeholders, wildcards, globs');
+        expect(schema).toContain('do not create implementation files');
+        expect(config).toContain('Running /opsx-apply confirms the user reviewed current planning artifacts');
+        expect(config).toContain('Do not patch code to bypass an architecture or specification contract');
+        expect(templates[3]).toContain('explicit repository-relative paths only');
+        expect(templates[5]).toContain('Review complete before `/opsx-apply`');
     });
 });
