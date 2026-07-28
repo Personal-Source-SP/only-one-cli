@@ -36,10 +36,6 @@ export const SKILLS: SkillManifest[] = [
         description: 'Perform bounded codebase discovery using GitNexus within a 2-5% scope budget. Produces a blast-radius allowlist. Supports BE and FE variants.',
     },
     {
-        name: 'only-one-openspec-phase-planning',
-        description: 'Use when planning OpenSpec changes with approval-gated phases and implementation-ready tasks.',
-    },
-    {
         name: 'only-one-phase-implementation-loop',
         description: 'Use when implementing approved OpenSpec phases with task tracking, verification, user review, and feedback rework.',
     },
