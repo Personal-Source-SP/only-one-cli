@@ -5,14 +5,7 @@ export const COMBOS: ComboManifest[] = [
         id: 'frontend-flow',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
-        packages: [
-            '@fission-ai/openspec',
-            'ui-ux-pro-max-cli',
-            'next-dev-loop',
-            'next-cache-components-adoption',
-            'next-cache-components-optimizer',
-            'next-partial-prefetching-adoption',
-        ],
+        packages: ['@fission-ai/openspec', 'ui-ux-pro-max-cli'],
         mcps: ['fetch', 'tavily', 'github', 'clockify'],
         skills: [
             'c4-diagrams',
