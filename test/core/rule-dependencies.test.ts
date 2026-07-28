@@ -30,7 +30,6 @@ describe('Rule Dependency Resolution & Preflight Validation (Tasks 3.1, 3.2, 3.7
     it('buildDeduplicatedDependencyPlan returns deterministic order: packages, plugins, MCPs, skills', () => {
         const plan = buildDeduplicatedDependencyPlan(['context-and-tools']);
         expect(plan.packages).toEqual([]);
-        expect(plan.plugins).toEqual([]);
         expect(plan.mcps).toEqual(['gitnexus']);
         expect(plan.skills).toEqual([]);
     });
@@ -51,7 +50,6 @@ describe('Rule Dependency Resolution & Preflight Validation (Tasks 3.1, 3.2, 3.7
                 sourceFile: 'context-minimization.md',
                 supportedTargets: [AllowedToolId.Antigravity],
                 requiredPackages: ['@fission-ai/openspec'],
-                requiredPlugins: ['superpowers'],
             },
             {
                 id: 'rule-2',
@@ -59,12 +57,10 @@ describe('Rule Dependency Resolution & Preflight Validation (Tasks 3.1, 3.2, 3.7
                 sourceFile: 'context-minimization.md',
                 supportedTargets: [AllowedToolId.Antigravity],
                 requiredPackages: ['@fission-ai/openspec'],
-                requiredPlugins: ['superpowers'],
             },
         ];
 
         const plan = buildDeduplicatedDependencyPlan(['rule-1', 'rule-2'], customRules);
         expect(plan.packages).toEqual(['@fission-ai/openspec']);
-        expect(plan.plugins).toEqual(['superpowers']);
     });
 });

@@ -146,14 +146,12 @@ Install packages from typed package registry with environment validation and int
 
 ```bash
 only-one package [path] [names]
-only-one init package /path/to/project superpowers --target antigravity,claude
 ```
 
 Bundled package definitions include:
 
 - `@fission-ai/openspec`: global npm package
 - `ui-ux-pro-max-cli`: global npm package
-- `superpowers`: target-aware agent plugin package
 
 ### `structure-generate`
 

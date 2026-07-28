@@ -14,7 +14,6 @@ export const COMBOS: ComboManifest[] = [
             'next-partial-prefetching-adoption',
         ],
         mcps: ['gitnexus', 'fetch', 'tavily', 'github', 'clockify'],
-        plugins: ['superpowers'],
         skills: [
             'c4-diagrams',
             'gherkin-authoring',
@@ -43,7 +42,6 @@ export const COMBOS: ComboManifest[] = [
         description: 'NestJS backend development toolkit',
         packages: ['@fission-ai/openspec'],
         mcps: ['gitnexus', 'postgres', 'github', 'clockify'],
-        plugins: ['superpowers'],
         skills: [
             'c4-diagrams',
             'gherkin-authoring',

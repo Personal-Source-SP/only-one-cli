@@ -65,8 +65,7 @@ describe('implementation workspace contracts', () => {
         expect(skill).toContain('Do not stage, commit');
         expect(skill).toContain('from `[ ]` to `[x]`');
         expect(skill).toContain('from `[x]` to `[ ]`');
-        expect(skill).toContain('requesting-code-review');
-        expect(skill).toContain('verification-before-completion');
+        expect(skill).toContain('fresh declared verification');
     });
 });
 

@@ -104,7 +104,6 @@ describe('combo command', () => {
             expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(false);
             expect(await readFile(join(cwd, 'openspec', 'config.yaml'), 'utf8')).toContain('schema: intent-driven-fe');
             expect(existsSync(join(cwd, 'openspec', 'schemas', 'intent-driven-fe', 'schema.yaml'))).toBe(true);
-            expect(writes.join('\n')).not.toContain('Configuring plugin superpowers');
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Workflows:');
         } finally {
