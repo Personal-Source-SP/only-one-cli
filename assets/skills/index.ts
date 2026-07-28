@@ -26,42 +26,34 @@ export const SKILLS: SkillManifest[] = [
     {
         name: 'only-one-gitnexus-freshness',
         description: 'Apply GitNexus freshness gates — verify index currency, sync/reindex when stale, enforce preflight scope and public/shared boundary gates.',
-        associatedWorkflows: ['only-one-implement-be', 'only-one-implement-fe'],
     },
     {
         name: 'only-one-openspec-apply-gate',
         description: 'Resolve, apply, and validate an OpenSpec change before implementation. Reads contextFiles, verifies required plan artifacts, and enforces stop conditions.',
-        associatedWorkflows: ['only-one-implement-be', 'only-one-implement-fe'],
     },
     {
         name: 'only-one-bounded-discovery',
         description: 'Perform bounded codebase discovery using GitNexus within a 2-5% scope budget. Produces a blast-radius allowlist. Supports BE and FE variants.',
-        associatedWorkflows: ['only-one-plan-be', 'only-one-plan-fe'],
     },
     {
         name: 'only-one-openspec-phase-planning',
         description: 'Use when planning OpenSpec changes with approval-gated phases and implementation-ready tasks.',
-        associatedWorkflows: ['only-one-plan-be', 'only-one-plan-fe'],
     },
     {
         name: 'only-one-phase-implementation-loop',
         description: 'Use when implementing approved OpenSpec phases with task tracking, verification, user review, and feedback rework.',
-        associatedWorkflows: ['only-one-implement-be', 'only-one-implement-fe'],
     },
     {
         name: 'only-one-canonical-ref-gate',
         description: 'Validate and read the --ref canonical reference input, summarize its structure, and establish it as the immutable planning anchor for FE changes.',
-        associatedWorkflows: ['only-one-plan-fe'],
     },
     {
         name: 'only-one-component-inventory',
         description: 'Build a component and design system inventory, then apply and enforce the reuse-first rule ([USE]/[EXTEND]/[NEW]) for every component decision in FE changes.',
-        associatedWorkflows: ['only-one-plan-fe', 'only-one-implement-fe'],
     },
     {
         name: 'only-one-ui-design-direction',
         description: 'Lead the UI design phase: brainstorm, map UI state, evaluate with ux-ui-max, and produce the approved directory structure plan before OpenSpec authoring.',
-        associatedWorkflows: ['only-one-plan-fe'],
     },
 ];
 

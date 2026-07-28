@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
@@ -41,7 +41,8 @@ describe('combo command', () => {
 
             // Verify configuration template copy
             const configPath = join(cwd, 'openspec', 'config.yaml');
-            expect(existsSync(configPath)).toBe(true);
+            expect(await readFile(configPath, 'utf8')).toContain('schema: intent-driven-be');
+            expect(existsSync(join(cwd, 'openspec', 'schemas', 'intent-driven-be', 'schema.yaml'))).toBe(true);
 
             // Verify skill copy
             const skillPath = join(cwd, '.cursor', 'skills', 'grill-me');
@@ -100,7 +101,9 @@ describe('combo command', () => {
 
             expect(existsSync(join(cwd, '.cursor', 'rules', '02-architecture-stack.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'rules', '01-context-and-tools.md'))).toBe(true);
-            expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(true);
+            expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(false);
+            expect(await readFile(join(cwd, 'openspec', 'config.yaml'), 'utf8')).toContain('schema: intent-driven-fe');
+            expect(existsSync(join(cwd, 'openspec', 'schemas', 'intent-driven-fe', 'schema.yaml'))).toBe(true);
             expect(writes.join('\n')).not.toContain('Configuring plugin superpowers');
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Workflows:');

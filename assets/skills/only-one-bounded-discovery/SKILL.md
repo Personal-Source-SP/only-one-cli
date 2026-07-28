@@ -27,7 +27,7 @@ Apply these when the change targets a NestJS backend:
 2. Target NestJS-specific symbols: controllers, services, DTOs, guards, interceptors, pipes, decorators, shared contracts, and colocated `*.spec.ts` files.
 3. For each source file, check for a colocated spec. Note it in the allowlist.
 4. If multi-module relationships are non-obvious, invoke `c4-diagrams`.
-5. If UI work is also required, record it as an out-of-scope dependency for `/only-one-plan-fe`.
+5. If UI work is also required, record it as an out-of-scope dependency in resolved frontend OpenSpec artifacts.
 
 ## FE variant additions
 
@@ -36,7 +36,7 @@ Apply these when the change targets a Next.js or React frontend:
 1. **Framework detection first:** Confirm package manifest, Next.js and React versions, App or Pages Router, framework config, layouts, path aliases, browser tooling, design system conventions, and i18n setup.
 2. Target FE-specific symbols: affected routes, layouts, components, hooks, typed API clients, shared contracts, tokens, i18n keys, and colocated tests.
 3. Invoke `c4-diagrams` when shared design-system contracts, new component patterns, or non-obvious multi-layout boundaries are involved.
-4. If a backend endpoint or contract change is required, record it as an out-of-scope dependency for `/only-one-plan-be`.
+4. If a backend endpoint or contract change is required, record it as an out-of-scope dependency in resolved backend OpenSpec artifacts.
 5. After core discovery, invoke `only-one-component-inventory` to build the component and design system inventory for the affected area.
 
 ## Output

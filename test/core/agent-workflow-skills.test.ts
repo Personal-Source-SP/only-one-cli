@@ -59,21 +59,6 @@ describe('implementation workspace contracts', () => {
         expect(workflow).toContain("IDE's default `implementation_plan.md`");
     });
 
-    it.each(['only-one-implement-fe.md', 'only-one-implement-be.md'])(
-        'delegates %s to shared phase implementation lifecycle',
-        async (workflowName) => {
-            const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
-
-            expect(workflow).toContain('`only-one-phase-implementation-loop`');
-            expect(workflow).toContain('current-workspace safety');
-            expect(workflow).toContain('checkbox transitions');
-            expect(workflow).toContain('feedback rework');
-            expect(workflow).not.toContain('only-one-worktree-handoff');
-            expect(workflow).not.toContain('`ai/<feature-slug>`');
-            expect(workflow).not.toContain('checkpoint commit');
-        },
-    );
-
     it('keeps workspace, checkbox, feedback, and verification contracts in shared skill', async () => {
         const skill = await readFile(join(repoRoot, 'assets', 'skills', 'only-one-phase-implementation-loop', 'SKILL.md'), 'utf-8');
 
@@ -86,18 +71,23 @@ describe('implementation workspace contracts', () => {
     });
 });
 
-describe('GitNexus freshness workflow contracts', () => {
-    it.each(['only-one-implement-fe.md', 'only-one-implement-be.md'])(
-        'delegates freshness and impact gates in %s',
-        async (workflowName) => {
-            const workflow = await readFile(join(repoRoot, 'assets', 'workflows', workflowName), 'utf-8');
+describe('GitNexus freshness contracts', () => {
+    it('keeps GitNexus freshness and escalation in OpenSpec profile schemas', async () => {
+        const frontend = await readFile(
+            join(repoRoot, 'assets', 'configs', 'openspec-fe', 'schemas', 'intent-driven-fe', 'schema.yaml'),
+            'utf-8',
+        );
+        const backend = await readFile(
+            join(repoRoot, 'assets', 'configs', 'openspec-be', 'schemas', 'intent-driven-be', 'schema.yaml'),
+            'utf-8',
+        );
 
-            expect(workflow).toContain('`only-one-gitnexus-freshness`');
-            expect(workflow).toContain('before each GitNexus-dependent decision');
-            expect(workflow).toContain('public or shared boundaries');
-            expect(workflow).toContain('integrated verification');
-        },
-    );
+        for (const schema of [frontend, backend]) {
+            expect(schema).toContain('`only-one-gitnexus-freshness`');
+            expect(schema).toContain('shared-boundary impact');
+            expect(schema).toContain('`only-one-phase-implementation-loop`');
+        }
+    });
 
     it('requires GitNexus gates and escalation for fast implementation', async () => {
         const workflow = await readFile(join(repoRoot, 'assets', 'workflows', 'only-one-implement-fast.md'), 'utf-8');

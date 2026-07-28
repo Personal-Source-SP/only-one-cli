@@ -9,8 +9,9 @@ description: Use when planning an OpenSpec change that must be organized into ap
 
 1. Select or derive a kebab-case change name. If an active change may match, list candidates and require explicit continue-or-create selection.
 2. Use `openspec-propose`; create missing change, inspect JSON status, and follow artifact dependencies from `applyRequires`.
-3. For each ready artifact, use `openspec instructions <artifact-id> --change "<name>" --json` and write only to `resolvedOutputPath` using returned template, rules, and dependencies.
-4. Treat resolved OpenSpec artifacts as sole planning source. Never create a second plan or task tracker.
+3. Resolve active schema/profile from `openspec status --change "<name>" --json`. For each ready artifact, use `openspec instructions <artifact-id> --change "<name>" --json` and write only to `resolvedOutputPath` using returned template, rules, and dependencies.
+4. Treat resolved OpenSpec artifacts and active schema instructions as sole planning source. Never create a second plan or task tracker.
+5. Preserve every template heading and required profile section. Template minimum is not sufficient when active schema instructions require profile fields.
 
 ## Phase and task contract
 
@@ -20,9 +21,9 @@ Every task is one complete functional outcome and requires **Main work**, declar
 
 File tags describe operations or references inside a task, not separate task types. Keep related files together when they deliver one outcome. Prevent independent tasks from writing the same files; order shared-file work explicitly. Apply `writing-plans` right-sizing inside the resolved task artifact only.
 
-## Profile extensions
+## Profile contract
 
-Caller workflow must add domain-specific artifact fields, tags, contracts, evidence, and safety rules. Shared lifecycle must not weaken them.
+Active OpenSpec schema owns domain-specific artifact fields, tags, contracts, evidence, and safety rules. Caller workflow selects and verifies profile only; it must not append a competing artifact format.
 
 ## Approval gate
 

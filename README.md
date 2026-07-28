@@ -56,6 +56,25 @@ only-one init mcp [names]
 
 OpenSpec setup normalizes Antigravity output, reports initialization failures, and avoids copying symlinked legacy skills.
 
+## OpenSpec profiles
+
+- `frontend-flow` installs `openspec-fe`, selecting `intent-driven-fe`.
+- `backend-flow` installs `openspec-be`, selecting `intent-driven-be`.
+- Both config assets copy to project `openspec/`; select one profile per initialization. Do not combine both assets in one project because they share destination.
+
+Use OpenSpec directly; FE/BE planning and implementation slash workflows are not installed:
+
+```bash
+openspec propose <change-name>
+openspec instructions proposal --change <change-name> --json
+openspec instructions specs --change <change-name> --json
+openspec instructions design --change <change-name> --json
+openspec instructions tasks --change <change-name> --json
+openspec apply <change-name>
+```
+
+Read returned instructions before creating each artifact or applying work. Installed profile schema defines artifact format, required skill/tool gates, phase acceptance, feedback rework, and checkbox tracking.
+
 ### `skill`
 
 Manage and synchronize custom agent skills for selected tools.

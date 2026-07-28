@@ -1,4 +1,4 @@
-name: intent-driven
+name: intent-driven-be
 version: 1
 description: Intent-driven OpenSpec workflow - proposal -> Gherkin-style specs -> design -> tasks
 artifacts:
@@ -163,6 +163,9 @@ artifacts:
 
       Reference the proposal for motivation and specs for requirements.
 
+      Profile requirement: preserve all profile template headings. `API and Shared Contract` and
+      every profile section in the design template are mandatory planning context.
+
 
       Good design docs explain the "why" behind technical decisions.
     requires:
@@ -206,5 +209,25 @@ apply:
     - tasks
   tracks: tasks.md
   instruction: |
-    Read context files, work through pending tasks, mark complete as you go.
-    Pause if you hit blockers or need clarification.
+    Read context files and verify active profile design/task sections before implementation.
+
+    Before modifying source, read `rules/01-global-safety.md`, `rules/02-file-tags.md`, and `rules/04-apply-loop.md`. Stop when any rule conflicts with declared scope, ownership, contract, or allowlist.
+    Process phases in dependency order. Do not start next phase before explicit acceptance.
+    For each phase, execute ordered declared tasks only; run declared acceptance and verification;
+    mark complete only verified task checkboxes; publish phase evidence; then wait for explicit acceptance.
+    On feedback, reopen affected task checkboxes, rework only affected scope, rerun phase verification,
+    and wait for acceptance again. Stop for missing profile context, scope/contract conflict, blockers, or clarification.
+
+    Invoke `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-gitnexus-freshness`. Stop for contract conflict or unapproved shared-boundary impact. Do not execute migration apply/up/run, revert/down, schema sync, seeds, or backfills without separate explicit approval.
+    Run `openspec instructions apply --change "<name>" --json` as source of truth.
+
+# OpenSpec-only backend orchestration contract:
+# Read `openspec instructions <artifact> --change "<name>" --json` before every artifact.
+# Proposal invokes `brainstorming` for actors, outcomes, constraints, acceptance, non-goals, risks, and unknowns.
+# Design invokes `only-one-bounded-discovery`, records GitNexus evidence, uses `gherkin-authoring`,
+# and uses `c4-diagrams` or `architectural-decision-records` when triggered. Define API/schema contract before tasks.
+# Apply invokes `only-one-openspec-apply-gate`, `only-one-phase-implementation-loop`, and `only-one-gitnexus-freshness`.
+# Stop for contract conflict or unapproved shared-boundary impact. Never execute migration apply/up/run,
+# revert/down, schema sync, seeds, or backfills without separate explicit approval.
+# Stage rule references: rules/01-global-safety.md rules/02-file-tags.md rules/03-planning-contract.md rules/04-apply-loop.md
+# Before writing design.md, read rules. Before writing tasks.md, read rules. Before modifying source, read rules.
