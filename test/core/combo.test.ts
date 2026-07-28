@@ -1,6 +1,9 @@
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { COMBOS } from '@assets/combos/index.js';
+import { SKILLS } from '@assets/skills/index.js';
+import { WORKFLOWS } from '@assets/workflows/index.js';
 import { describe, expect, it } from 'vitest';
 import { checkExistingSkills } from '@/core/skill/index.js';
 import { buildComboDependencyPlan, summarizeComboInstallation, validateComboManifestReferences } from '@/core/combo/index.js';
@@ -89,6 +92,25 @@ describe('combo manifest preflight', () => {
             ]),
         ).toBe('installed');
     });
+});
+
+describe('prebuilt combo completeness', () => {
+    for (const comboId of ['frontend-flow', 'backend-flow']) {
+        it(`${comboId} includes workflow dependencies and shared utility workflows`, () => {
+            const combo = COMBOS.find(({ id }) => id === comboId);
+            expect(combo).toBeDefined();
+            expect(combo?.workflows).toEqual(expect.arrayContaining(['only-one-clockify', 'only-one-pr-git']));
+
+            const selectedWorkflows = WORKFLOWS.filter(({ name }) => combo?.workflows?.includes(name));
+            const requiredMcps = selectedWorkflows.flatMap(({ requiredMcps = [] }) => requiredMcps);
+            expect(combo?.mcps).toEqual(expect.arrayContaining(requiredMcps));
+
+            const associatedSkills = SKILLS.filter(({ associatedWorkflows = [] }) =>
+                associatedWorkflows.some((workflow) => combo?.workflows?.includes(workflow)),
+            ).map(({ name }) => name);
+            expect(combo?.skills).toEqual(expect.arrayContaining(associatedSkills));
+        });
+    }
 });
 
 describe('combo component existence', () => {
