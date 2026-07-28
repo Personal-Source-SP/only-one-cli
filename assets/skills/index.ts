@@ -14,6 +14,18 @@ export const SKILLS: SkillManifest[] = [
         description: 'Interview the user relentlessly about a plan or design.',
     },
     {
+        name: 'nestjs-development',
+        description: 'Use when creating or modifying NestJS backend code.',
+    },
+    {
+        name: 'react-next-development',
+        description: 'Use when creating or modifying React or Next.js frontend code.',
+    },
+    {
+        name: 'ui-ux-development',
+        description: 'Use when designing or materially changing user interfaces.',
+    },
+    {
         name: 'only-one-clockify-skill',
         description: 'Validate and log Clockify time entries from task lines.',
         associatedWorkflows: ['only-one-clockify'],
