@@ -74,11 +74,5 @@ temp/
 .onlyonecli.yml
 
 # AI ignores
-.agent/
-adr
-.agents/
 .claude/
 .cursor/
-
-# Git worktrees
-.worktrees/
