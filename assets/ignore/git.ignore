@@ -7,5 +7,5 @@
 # Openspec
 openspec/
 
-# Git worktrees
-.worktrees/
+# Git Nexus
+.gitnexus/
