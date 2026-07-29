@@ -11,6 +11,7 @@ alwaysApply: true
 - Repository-wide exact-symbol search is allowed when needed to prove complete usage, compatibility, or removal safety.
 - When Git Nexus MCP is installed and available, prefer its semantic repository search for discovery. Use local exact search as fallback when Git Nexus is unavailable or when exact-symbol proof is required.
 - Evaluate Git Nexus search performance against the narrowest equivalent local search before relying on it for broad discovery. Record latency, result relevance, and scope covered; use the faster method when relevance and completeness are equivalent.
+- When Git Nexus reports stale, missing, or incompatible analysis data, run `npx gitnexus analyze . --force --skip-agents-md` from repository root, then retry the Git Nexus operation. Do not treat stale graph results as current. If re-analysis fails, report its error and use narrow local search as fallback.
 
 ## Intent & Scope
 
