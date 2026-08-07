@@ -64,14 +64,16 @@ Use two or three options when genuinely useful. Do not invent weak alternatives 
 
 ### 3. Implementation architecture
 
-Describe recommended solution structure:
+Describe the implementation scaffold at directory and file level. This section prepares the structure before implementation; do not repeat detailed per-file logic that belongs in section 4.
 
-- participating modules or layers;
-- responsibility of each component;
-- dependency direction;
-- request, processing, persistence, and response flow;
+Include:
+
+- participating modules, layers, and their dependency direction;
+- target directory tree showing relevant existing and planned paths;
+- every file to add, modify, or delete;
+- responsibility of each directory or file in one concise line;
+- request, processing, persistence, and response flow when useful for understanding structure;
 - affected API, entity, DTO, event, or database contracts;
-- files to add, modify, or delete;
 - migration and rollback when applicable;
 - Mermaid or ASCII diagram when multiple components make text unclear.
 
@@ -83,26 +85,38 @@ Label every planned file change:
 [DELETE] path/to/file
 ```
 
-Use explicit verified paths. Do not use globs.
+Use explicit verified paths. Do not use globs. Group files under their parent directories or architecture layers. Keep file descriptions structural and concise; defer detailed behavior and code examples to section 4.
 
 ### 4. Implementation code examples
 
-Organize examples by architecture part or affected file:
+Describe every file listed in section 3 in the same order. For each file:
 
-- identify symbols to create or modify;
-- provide concise snippets for important logic;
-- show relevant method signatures, types, interfaces, or pseudocode;
-- explain input, output, and error handling;
-- mark snippets as illustrative, not final patches.
+- repeat its `[NEW]`, `[MODIFY]`, or `[DELETE]` label and exact path;
+- summarize what the file will do and why it changes;
+- identify symbols to create, modify, move, or remove;
+- describe important logic, control flow, dependencies, and data transformations;
+- describe inputs, outputs, validation, error handling, and contract effects when applicable;
+- identify a design pattern that can be applied when it genuinely improves the solution;
+- for each proposed pattern, explain the problem it solves, where it applies, and its trade-offs;
+- provide concise illustrative snippets for important logic, method signatures, types, interfaces, configuration, or pseudocode;
+- explicitly state when no code example is needed for an obvious manifest, export, deletion, or mechanical change.
 
-Do not copy complete files. Omit examples for obvious code that adds no design-review value.
+Do not force a design pattern into simple code. If no pattern provides clear value, state `Design pattern: None needed` or omit the field. Prefer existing repository patterns over introducing a new abstraction.
 
-Use this format when applicable:
+Every planned file from section 3 MUST have a corresponding subsection in section 4. Do not introduce files in section 4 that are absent from section 3.
+
+Mark snippets as illustrative, not final patches. Do not copy complete files. Omit only snippets that add no design-review value, but retain the file subsection and its implementation description.
+
+Use this format:
 
 ````markdown
 #### [MODIFY] `src/modules/example/example.service.ts`
 
-**Symbol:** `ExampleService.execute`
+**Overview:** Enforce the new execution rule while preserving the existing service boundary.
+
+**Symbols:** `ExampleService.execute`, `ExecuteInput`, `Result`
+
+**Design pattern:** Strategy — isolates interchangeable execution rules behind the existing service contract. Prefer direct branching if only one stable rule exists.
 
 ```ts
 async execute(input: ExecuteInput): Promise<Result> {
