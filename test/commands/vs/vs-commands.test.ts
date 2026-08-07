@@ -153,7 +153,7 @@ describe('VS sync commands', () => {
     it('prompts extension selection and confirm overwrite in interactive mode', async () => {
         const checkbox = vi
             .fn()
-            .mockResolvedValueOnce(['johnpapa.vscode-peacock', 'signageos.signageos-vscode-sops'])
+            .mockResolvedValueOnce(['johnpapa.vscode-peacock', 'steoates.autoimport'])
             .mockResolvedValueOnce(['cursor:johnpapa.vscode-peacock']);
 
         const program = createProgram({
@@ -190,7 +190,7 @@ describe('VS sync commands', () => {
             expect.objectContaining({
                 editorIds: [VsEditorId.Cursor],
                 extensionIdsPerEditor: {
-                    [VsEditorId.Cursor]: ['johnpapa.vscode-peacock', 'signageos.signageos-vscode-sops'],
+                    [VsEditorId.Cursor]: ['johnpapa.vscode-peacock', 'steoates.autoimport'],
                 },
             }),
         );

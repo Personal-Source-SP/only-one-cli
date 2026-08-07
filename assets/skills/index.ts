@@ -18,32 +18,8 @@ export const SKILLS: SkillManifest[] = [
         description: 'Use for NestJS development with selectively loaded architecture references.',
     },
     {
-        name: 'react-development',
-        description: 'Use when creating or modifying React frontend code.',
-    },
-    {
         name: 'only-one-nextjs-development',
         description: 'Use for Next.js and React development with selectively loaded references.',
-    },
-    {
-        name: 'only-one-next-dev-loop',
-        description: 'Verify Next.js runtime behavior in a running application.',
-    },
-    {
-        name: 'only-one-next-cache-components-adoption',
-        description: 'Enable or migrate Next.js Cache Components safely.',
-    },
-    {
-        name: 'only-one-next-cache-components-optimizer',
-        description: 'Optimize Cache Components routes for verified instant navigation.',
-    },
-    {
-        name: 'only-one-next-partial-prefetching-adoption',
-        description: 'Enable or migrate Next.js Partial Prefetching safely.',
-    },
-    {
-        name: 'ui-ux-development',
-        description: 'Use when designing or materially changing user interfaces.',
     },
     {
         name: 'only-one-clockify-skill',
