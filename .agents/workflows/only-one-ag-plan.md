@@ -49,6 +49,7 @@ Present viable implementation options. For each option describe:
 
 - how it works;
 - affected files or layers;
+- UI/UX layout concept (ASCII wireframe) when comparing visual or interaction designs;
 - advantages;
 - disadvantages;
 - complexity;
@@ -74,6 +75,7 @@ Include:
 - responsibility of each directory or file in one concise line;
 - request, processing, persistence, and response flow when useful for understanding structure;
 - affected API, entity, DTO, event, or database contracts;
+- UI mockups (ASCII / text wireframes) whenever the change involves frontend/UI: draw visual wireframes, layout boxes, component hierarchy, controls, and key states directly in text/markdown blocks (no image files needed—just clear text drawings to easily visualize the interface);
 - migration and rollback when applicable;
 - Mermaid or ASCII diagram when multiple components make text unclear.
 
@@ -168,4 +170,5 @@ End with verified repository commands planned for test, lint, typecheck, or othe
 - Do not modify project source during planning.
 - Do not propose unverified files, symbols, contracts, or commands.
 - Keep plan depth proportional to change risk and complexity.
+- Draw UI mockups in ASCII/text within the plan for UI tasks; do not require or generate external image files.
 - Do not repeat artifact contents in chat. Link plan and mention only blockers or decisions requiring user input.
