@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box, Text } from 'ink';
+import { DEFAULT_FOOTER_HINTS } from '../constants/index.js';
 
 interface FooterProps {
     hints?: string[];
 }
 
 export const Footer: React.FC<FooterProps> = ({ hints }) => {
-    const defaultHints = ['↑/↓ Navigate', 'Enter Select', 'q Exit'];
-    const activeHints = hints || defaultHints;
+    const activeHints = hints || DEFAULT_FOOTER_HINTS;
 
     return (
         <Box

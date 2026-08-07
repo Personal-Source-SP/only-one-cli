@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Text, useInput } from 'ink';
-
-export interface MenuItem {
-    label: string;
-    value: string;
-    description?: string;
-    icon?: string;
-}
+import type { MenuItem } from '../types/index.js';
 
 interface SelectMenuProps {
     items: MenuItem[];

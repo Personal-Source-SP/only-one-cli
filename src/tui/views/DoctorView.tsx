@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { Header } from '../components/Header.js';
 import { Footer } from '../components/Footer.js';
 import { runDoctorChecksStep } from '@/commands/doctor/actions/index.js';
 import type { CheckResult } from '@/core/doctor/checks.js';
 
+import { BACK_KEY_INPUTS } from '../constants/index.js';
+
 interface DoctorViewProps {
     onBack: () => void;
 }
 
-export const DoctorView: React.FC<DoctorViewProps> = ({ onBack }) => {
+export const DoctorView: FC<DoctorViewProps> = ({ onBack }) => {
     const [loading, setLoading] = useState(true);
     const [results, setResults] = useState<CheckResult[]>([]);
 
@@ -27,7 +29,7 @@ export const DoctorView: React.FC<DoctorViewProps> = ({ onBack }) => {
     }, []);
 
     useInput((input, key) => {
-        if (key.return || input === 'b' || input === 'q') {
+        if (key.return || BACK_KEY_INPUTS.includes(input)) {
             onBack();
         }
     });
