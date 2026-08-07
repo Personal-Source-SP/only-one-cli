@@ -1,4 +1,5 @@
-import { access, readdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { execFileSync } from 'node:child_process';
@@ -6,6 +7,12 @@ import { checkGit, checkNode, type CheckResult } from '@/core/doctor/checks.js';
 import type { RunDoctorOptions } from '@/core/doctor/types.js';
 import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 import { findVsEditor } from '@/core/vs/index.js';
+import { findMcpIdeAdapter } from '@/core/mcp/index.js';
+import { MCPS } from '../../../../assets/mcps/index.js';
+import { SKILLS } from '../../../../assets/skills/index.js';
+import { WORKFLOWS } from '../../../../assets/workflows/index.js';
+import { VS_LIBRARY } from '../../../../assets/vs/index.js';
+import { RULES } from '../../../../assets/rules/index.js';
 
 export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promise<CheckResult[]> => {
     const results: CheckResult[] = [];
@@ -107,7 +114,6 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
     const targetsToCheck =
         targetEditorId === 'all' ? getAllowedVsSettingsTargets() : getAllowedVsSettingsTargets().filter((t) => t.id === targetEditorId);
 
-    // Default fallback descriptor if selected editor isn't in targets (or defaults to vscode)
     const effectiveTargets = targetsToCheck.length ? targetsToCheck : [getAllowedVsSettingsTargets()[0]];
 
     for (const target of effectiveTargets) {
@@ -138,123 +144,153 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
             }
         }
 
-        // 7. Extensions
+        // 7. Extensions: Check individually against VS_LIBRARY.extensions
         if (editorDescriptor && editorDescriptor.commandCandidates.length) {
-            let extensionCount: number | null = null;
+            let installedExts: string[] = [];
             for (const cmd of editorDescriptor.commandCandidates) {
                 try {
                     const extOutput = execFileSync(cmd, ['--list-extensions'], { encoding: 'utf-8' });
-                    const exts = extOutput.trim().split('\n').filter(Boolean);
-                    extensionCount = exts.length;
+                    installedExts = extOutput
+                        .trim()
+                        .split('\n')
+                        .filter(Boolean)
+                        .map((e) => e.toLowerCase());
                     break;
                 } catch {
-                    // Try next command candidate
+                    // Command candidate failed
                 }
             }
 
-            if (extensionCount !== null) {
+            for (const extId of VS_LIBRARY.extensions) {
+                const isInstalled = installedExts.includes(extId.toLowerCase());
                 results.push({
                     category: 'Extensions',
-                    name: `${editorName} extensions`,
-                    ok: true,
-                    detail: `${extensionCount} installed`,
+                    name: `extension: ${extId}`,
+                    ok: isInstalled,
+                    detail: isInstalled ? 'Installed' : 'Missing',
                     required: false,
-                });
-            } else {
-                results.push({
-                    category: 'Extensions',
-                    name: `${editorName} extensions`,
-                    ok: false,
-                    detail: `CLI command (${editorDescriptor.commandCandidates.join(', ')}) not available`,
-                    required: false,
-                    remediation: `Ensure ${editorName} shell command is installed in PATH`,
+                    remediation: isInstalled ? undefined : `Install extension ${extId} on ${editorName}`,
                 });
             }
         }
     }
 
-    // 4. Các MCP
-    try {
-        const mcpConfigPath = join(cwd, 'mcp.json');
-        await access(mcpConfigPath);
+    // 4. Các MCP: Check using target IDE adapter global config + local mcp.json fallback
+    let configuredMcps: string[] = [];
+    const mcpAdapter = findMcpIdeAdapter(targetEditorId);
+    let mcpServersObj: Record<string, unknown> = {};
+
+    if (mcpAdapter) {
+        try {
+            const globalMcpPath = mcpAdapter.getConfigPath(homedir(), process.platform);
+            if (existsSync(globalMcpPath)) {
+                const parsed = mcpAdapter.codec.parse(await readFile(globalMcpPath, 'utf-8'), globalMcpPath);
+                mcpServersObj = mcpAdapter.getMcpServers(parsed);
+            }
+        } catch {
+            // Failed reading global MCP config
+        }
+    }
+
+    if (Object.keys(mcpServersObj).length === 0) {
+        try {
+            const localMcpPath = join(cwd, 'mcp.json');
+            const content = JSON.parse(await readFile(localMcpPath, 'utf-8'));
+            mcpServersObj = content.mcpServers || {};
+        } catch {
+            // No local mcp.json
+        }
+    }
+
+    configuredMcps = Object.keys(mcpServersObj).map((k) => k.toLowerCase());
+
+    for (const mcpManifest of MCPS) {
+        const isConfigured = configuredMcps.includes(mcpManifest.id.toLowerCase());
         results.push({
-            category: 'MCP',
-            name: 'MCP Config (mcp.json)',
-            ok: true,
-            detail: mcpConfigPath,
+            category: 'MCP Servers',
+            name: `MCP: ${mcpManifest.id}`,
+            ok: isConfigured,
+            detail: isConfigured ? 'Configured in IDE/Workspace' : 'Not configured',
             required: false,
-        });
-    } catch {
-        results.push({
-            category: 'MCP',
-            name: 'MCP Config (mcp.json)',
-            ok: false,
-            detail: 'No local mcp.json found',
-            required: false,
-            remediation: 'Configure MCP servers via `only-one` dashboard',
+            remediation: isConfigured ? undefined : `Configure MCP server '${mcpManifest.id}' via only-one`,
         });
     }
 
-    // 5. Skills, Workflows, Rules
-    const agentsDir = join(cwd, '.agents');
-    try {
-        const skillsDir = join(agentsDir, 'skills');
-        const skills = await readdir(skillsDir);
+    // 5. Skills: Check against SKILLS manifest
+    for (const skill of SKILLS) {
+        const skillPath = join(cwd, '.agents', 'skills', skill.name, 'SKILL.md');
+        let exists = false;
+        try {
+            await access(skillPath);
+            exists = true;
+        } catch {}
+
         results.push({
-            category: 'Agent Assets',
-            name: 'Skills (.agents/skills)',
-            ok: true,
-            detail: `${skills.length} skills found`,
+            category: 'Agent Skills',
+            name: `skill: ${skill.name}`,
+            ok: exists,
+            detail: exists ? '.agents/skills' : 'Missing',
             required: false,
-        });
-    } catch {
-        results.push({
-            category: 'Agent Assets',
-            name: 'Skills (.agents/skills)',
-            ok: false,
-            detail: 'Missing directory',
-            required: false,
-            remediation: 'Run `only-one` to sync agent skills',
+            remediation: exists ? undefined : `Sync skill '${skill.name}' via only-one`,
         });
     }
 
-    try {
-        const workflowsDir = join(agentsDir, 'workflows');
-        const workflows = await readdir(workflowsDir);
+    // Workflows: Check against WORKFLOWS manifest
+    for (const workflow of WORKFLOWS) {
+        const workflowPath = join(cwd, '.agents', 'workflows', `${workflow.name}.md`);
+        let exists = false;
+        try {
+            await access(workflowPath);
+            exists = true;
+        } catch {}
+
         results.push({
-            category: 'Agent Assets',
-            name: 'Workflows (.agents/workflows)',
-            ok: true,
-            detail: `${workflows.length} workflows found`,
+            category: 'Agent Workflows',
+            name: `workflow: ${workflow.name}.md`,
+            ok: exists,
+            detail: exists ? '.agents/workflows' : 'Missing',
             required: false,
-        });
-    } catch {
-        results.push({
-            category: 'Agent Assets',
-            name: 'Workflows (.agents/workflows)',
-            ok: false,
-            detail: 'Missing directory',
-            required: false,
+            remediation: exists ? undefined : `Sync workflow '${workflow.name}' via only-one`,
         });
     }
 
+    // Rules: Check AGENTS.md files + RULES manifest
     try {
-        const rulesPath = join(agentsDir, 'AGENTS.md');
+        const rulesPath = join(cwd, '.agents', 'AGENTS.md');
         await access(rulesPath);
         results.push({
-            category: 'Agent Assets',
-            name: 'Rules (AGENTS.md)',
+            category: 'Agent Rules',
+            name: 'rules: .agents/AGENTS.md',
             ok: true,
-            detail: rulesPath,
+            detail: 'Present in project',
             required: false,
         });
     } catch {
         results.push({
-            category: 'Agent Assets',
-            name: 'Rules (AGENTS.md)',
+            category: 'Agent Rules',
+            name: 'rules: .agents/AGENTS.md',
             ok: false,
-            detail: 'Missing AGENTS.md file',
+            detail: 'Missing in project root',
             required: false,
+            remediation: 'Create .agents/AGENTS.md rules file',
+        });
+    }
+
+    for (const ruleManifest of RULES) {
+        const rulePath = join(cwd, '.agents', 'rules', ruleManifest.sourceFile);
+        let exists = false;
+        try {
+            await access(rulePath);
+            exists = true;
+        } catch {}
+
+        results.push({
+            category: 'Agent Rules',
+            name: `rule: ${ruleManifest.id}`,
+            ok: exists,
+            detail: exists ? `.agents/rules/${ruleManifest.sourceFile}` : 'Missing',
+            required: false,
+            remediation: exists ? undefined : `Install rule '${ruleManifest.id}' via only-one rule`,
         });
     }
 
@@ -287,5 +323,5 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
         }
     }
 
-    return results;
+    return results.sort((a, b) => (a.ok === b.ok ? 0 : a.ok ? -1 : 1));
 };

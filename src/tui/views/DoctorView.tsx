@@ -86,29 +86,32 @@ export const DoctorView: FC<DoctorViewProps> = ({ onBack }) => {
                 </Box>
             ) : (
                 <Box flexDirection="column" marginY={1}>
-                    {Object.entries(categorized).map(([category, items], catIdx) => (
-                        <Box key={catIdx} flexDirection="column" marginY={0}>
-                            <Text bold color="blue">
-                                [{category}]
-                            </Text>
-                            {items.map((result, idx) => (
-                                <Box key={idx} flexDirection="column" marginLeft={2}>
-                                    <Box>
-                                        <Text color={result.ok ? 'green' : 'red'}>{result.ok ? '✔ ' : '✖ '}</Text>
-                                        <Text bold color={result.ok ? 'green' : 'red'}>
-                                            {result.name}:
-                                        </Text>
-                                        <Text color="white"> {result.detail}</Text>
-                                    </Box>
-                                    {result.remediation && (
-                                        <Box marginLeft={4}>
-                                            <Text color="yellow">💡 {result.remediation}</Text>
+                    {Object.entries(categorized).map(([category, items], catIdx) => {
+                        const sortedItems = [...items].sort((a, b) => (a.ok === b.ok ? 0 : a.ok ? -1 : 1));
+                        return (
+                            <Box key={catIdx} flexDirection="column" marginY={0}>
+                                <Text bold color="blue">
+                                    [{category}]
+                                </Text>
+                                {sortedItems.map((result, idx) => (
+                                    <Box key={idx} flexDirection="column" marginLeft={2}>
+                                        <Box>
+                                            <Text color={result.ok ? 'green' : 'red'}>{result.ok ? '✔ ' : '✖ '}</Text>
+                                            <Text bold color={result.ok ? 'green' : 'red'}>
+                                                {result.name}:
+                                            </Text>
+                                            <Text color="white"> {result.detail}</Text>
                                         </Box>
-                                    )}
-                                </Box>
-                            ))}
-                        </Box>
-                    ))}
+                                        {result.remediation && (
+                                            <Box marginLeft={4}>
+                                                <Text color="yellow">💡 {result.remediation}</Text>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                ))}
+                            </Box>
+                        );
+                    })}
                 </Box>
             )}
 
