@@ -2,34 +2,76 @@ import type { MenuItem } from '../types/navigation.js';
 
 export const MAIN_MENU_ITEMS: MenuItem[] = [
     {
-        label: 'Initialize Workspace',
+        label: 'Initialize Workspace (init)',
         value: 'init',
         icon: '🚀',
         description: 'Initialize workspace configs, rules, and templates',
     },
     {
-        label: 'Sync Agent Skills',
+        label: 'Apply Predefined Combos (combo)',
+        value: 'combo',
+        icon: '✨',
+        description: 'Initialize project using predefined tool, package & skill combos',
+    },
+    {
+        label: 'Sync Agent Skills (skill)',
         value: 'skill',
         icon: '🧩',
         description: 'Manage & sync custom agent skills for Cursor / VS Code',
     },
     {
-        label: 'Configure MCP Servers',
-        value: 'mcp',
+        label: 'Sync Agent Workflows (workflow)',
+        value: 'workflow',
+        icon: '⚡',
+        description: 'Manage & sync agent workflow templates',
+    },
+    {
+        label: 'Sync Agent Rules (rule)',
+        value: 'rule',
+        icon: '📝',
+        description: 'Manage & sync workspace agent rules (.agents/AGENTS.md)',
+    },
+    {
+        label: 'Manage Agent Plugins (plugin)',
+        value: 'plugin',
         icon: '🔌',
+        description: 'Manage & install target-specific agent plugins',
+    },
+    {
+        label: 'Configure MCP Servers (mcp)',
+        value: 'mcp',
+        icon: '🌐',
         description: 'Configure global Model Context Protocol servers (GitHub, Clockify, etc.)',
     },
     {
-        label: 'Sync Editor Settings & Extensions',
+        label: 'Sync Editor Settings (setting-vs)',
         value: 'setting-vs',
         icon: '⚙️',
-        description: 'Sync & merge settings for Cursor / VS Code',
+        description: 'Sync & merge settings for Antigravity / Cursor / VS Code',
     },
     {
-        label: 'Run Environment Doctor',
+        label: 'Sync Editor Extensions (extensions-vs)',
+        value: 'extensions-vs',
+        icon: '📦',
+        description: 'Sync & install extensions for Antigravity / Cursor / VS Code',
+    },
+    {
+        label: 'Scaffold Blueprint Structure (structure-generate)',
+        value: 'structure-generate',
+        icon: '🏗️',
+        description: 'Scaffold structural blueprint files for agents',
+    },
+    {
+        label: 'Run Environment Doctor (doctor)',
         value: 'doctor',
         icon: '🩺',
         description: 'Check Git, Node.js, and workspace readiness',
+    },
+    {
+        label: 'Refresh Skills & Templates (update)',
+        value: 'update',
+        icon: '🔄',
+        description: 'Refresh installed agent skills and workspace templates',
     },
     {
         label: 'Exit',

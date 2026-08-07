@@ -34,14 +34,35 @@ export const App: FC<AppProps> = ({ deps }) => {
             case 'init':
                 setCurrentView('init');
                 break;
+            case 'combo':
+                setCurrentView('combo');
+                break;
             case 'skill':
                 setCurrentView('skill');
+                break;
+            case 'workflow':
+                setCurrentView('workflow');
+                break;
+            case 'rule':
+                setCurrentView('rule');
+                break;
+            case 'plugin':
+                setCurrentView('plugin');
                 break;
             case 'mcp':
                 setCurrentView('mcp');
                 break;
             case 'setting-vs':
-                setCurrentView('settings');
+                setCurrentView('setting-vs');
+                break;
+            case 'extensions-vs':
+                setCurrentView('extensions-vs');
+                break;
+            case 'structure-generate':
+                setCurrentView('structure-generate');
+                break;
+            case 'update':
+                setCurrentView('update');
                 break;
         }
     };
@@ -56,7 +77,8 @@ export const App: FC<AppProps> = ({ deps }) => {
                 return <SkillView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'mcp':
                 return <McpView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'settings':
+            case 'setting-vs':
+            case 'extensions-vs':
                 return <SettingsView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'home':
             default:
