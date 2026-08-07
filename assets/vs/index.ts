@@ -35,7 +35,6 @@ export const VS_LIBRARY: VsLibraryManifest = {
         'shd101wyy.markdown-preview-enhanced',
         'shopify.ruby-lsp',
         'sibiraj-s.vscode-scss-formatter',
-        'signageos.signageos-vscode-sops',
         'steoates.autoimport',
         'streetsidesoftware.code-spell-checker',
         'streetsidesoftware.code-spell-checker-vietnamese',
