@@ -2,6 +2,12 @@ import type { ProgramDeps } from '@/cli/deps.js';
 import type { CheckResult, DoctorReport, SampleCommand } from './checks.js';
 import type { DoctorMode } from '@/core/indexing/tools.js';
 
+export type DoctorCategory = 'environment' | 'libraries' | 'ide_settings' | 'mcp' | 'agent_assets' | 'ignore_files' | 'extensions';
+
+export interface RunDoctorOptions {
+    targetEditorId?: string;
+}
+
 export interface InstallResult {
     ok: boolean;
     detail: string;
@@ -15,6 +21,7 @@ export interface InstallMissingOptions {
 
 export interface DoctorCommandOptions {
     mode?: string;
+    editor?: string;
     noInstall?: boolean;
     installMissing?: boolean;
     printInstallScript?: boolean;

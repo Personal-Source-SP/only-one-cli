@@ -33,6 +33,7 @@ export interface RunIndexingChecksOptions {
 export type ReadinessStatus = 'READY' | 'MISSING' | 'NOT_INITIALIZED';
 
 export interface CheckResult {
+    category?: string;
     name: string;
     ok: boolean;
     detail: string;
