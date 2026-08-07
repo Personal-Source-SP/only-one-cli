@@ -12,7 +12,6 @@ export const executeAndReportComboStep = async (
     combo: ExtendedComboManifest,
     targetTools: AgentToolOption[],
     overwriteList: string[],
-    selectedPluginIds: string[],
     options: ComboCommandOptions,
     ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
 ): Promise<void> => {
@@ -24,7 +23,6 @@ export const executeAndReportComboStep = async (
         selectedTools: targetTools,
         combo,
         overwriteList,
-        selectedPluginIds,
         noIgnore: options.ignore === false,
     });
 
@@ -38,20 +36,6 @@ export const executeAndReportComboStep = async (
             const statusColor = p.status === 'success' ? COLORS.success : p.status === 'skipped' ? COLORS.dim : COLORS.error;
             deps.stdout(`  - ${COLORS.secondary(p.name)}: ${statusColor(p.status)}${p.error ? ` (${p.error})` : ''}`);
         }
-    }
-
-    if (
-        results.plugins.installed.length ||
-        results.plugins.actionRequired.length ||
-        results.plugins.skipped.length ||
-        results.plugins.failed.length
-    ) {
-        deps.stdout('\nPlugins:');
-        for (const plugin of results.plugins.installed) deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.success('installed')}`);
-        for (const plugin of results.plugins.actionRequired)
-            deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.warning('action required')}`);
-        for (const plugin of results.plugins.skipped) deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.dim('skipped')}`);
-        for (const plugin of results.plugins.failed) deps.stdout(`  - ${COLORS.secondary(plugin)}: ${COLORS.error('failed')}`);
     }
 
     if (results.rules.length) {

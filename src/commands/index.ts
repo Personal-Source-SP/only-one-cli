@@ -21,9 +21,6 @@ export type * from './skill/types.js';
 export { createWorkflowCommand } from './workflow/index.js';
 export type * from './workflow/types.js';
 
-export { createPluginCommand } from './plugin/index.js';
-export type * from './plugin/types.js';
-
 export { createRuleCommand } from './rule/index.js';
 export type * from './rule/types.js';
 

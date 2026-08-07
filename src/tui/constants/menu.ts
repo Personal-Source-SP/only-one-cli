@@ -32,12 +32,6 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
         description: 'Manage & sync workspace agent rules (.agents/AGENTS.md)',
     },
     {
-        label: 'Manage Agent Plugins (plugin)',
-        value: 'plugin',
-        icon: '🔌',
-        description: 'Manage & install target-specific agent plugins',
-    },
-    {
         label: 'Configure MCP Servers (mcp)',
         value: 'mcp',
         icon: '🌐',

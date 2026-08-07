@@ -9,7 +9,6 @@ assets/
 ├── skills/       # Pre-copied agent skills (từng skill 1 subdir, chứa SKILL.md)
 ├── templates/    # Init templates
 ├── packages/     # Package manifests (.ts) — npm package name + global scope
-├── plugins/      # Target-specific plugin manifests (.ts)
 ├── rules/        # Persistent agent rule manifests (.ts) and markdown instructions (.md)
 ├── configs/      # Configuration templates
 ├── vs/           # VS Code/Cursor/Antigravity settings + extension manifest
@@ -21,7 +20,7 @@ assets/
 Init command và CLI subcommands (`skill`, `rule`, `mcp`, `combo`) đọc các manifest trong thư mục này:
 1. **skills/**: Mỗi subdir là 1 skill. Copy vào tool's skillsDir khi user chọn.
 2. **packages/**: Manifest package npm.
-3. **rules/**: Persistent agent rules (vd: `context-and-tools`). Copy vào path native của target (`.agents/rules`, `.claude/rules`, `.cursor/rules`). Tự động trigger dependency packages/plugins/MCPs trước khi ghi rule file.
+3. **rules/**: Persistent agent rules (vd: `context-and-tools`). Copy vào path native của target (`.agents/rules`, `.claude/rules`, `.cursor/rules`). Tự động trigger dependency packages/MCPs trước khi ghi rule file.
 3. **templates/**: Sử dụng cho scaffolding (WIP).
 4. **configs/**: Các template cấu hình cho project.
 5. **mcps/**: Các file manifest cấu hình MCP servers (ví dụ: `github.json`, `clockify.json`). Được dùng bởi `init mcp` hoặc bước đồng bộ MCP của `init` để merge cấu hình global vào Cursor/Antigravity.

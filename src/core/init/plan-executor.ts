@@ -197,13 +197,6 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
         }
     }
 
-    // 6. Plugins
-    const pluginItems = plan.items.filter((i) => i.category === 'plugin');
-    for (const item of pluginItems) {
-        results.push({ item, status: 'action-required', details: 'Manual command required' });
-        actionRequiredCount++;
-    }
-
     // 7. Rules
     const ruleItems = plan.items.filter((i) => i.category === 'rule');
     if (ruleItems.length > 0) {

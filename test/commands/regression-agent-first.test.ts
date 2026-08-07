@@ -3,7 +3,6 @@ import type { ProgramDeps } from '@/cli/deps.js';
 import { createComboCommand } from '@/commands/combo/command.js';
 import { createMcpCommand } from '@/commands/mcp/command.js';
 import { createSkillCommand } from '@/commands/skill/command.js';
-import { createPluginCommand } from '@/commands/plugin/command.js';
 import { createRuleCommand } from '@/commands/rule/command.js';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';

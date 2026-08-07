@@ -5,7 +5,6 @@ import { readComboManifests } from '@/core/combo/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
 import { readMcpManifests } from '@/core/mcp/registry.js';
 import { SKILLS } from '@assets/skills/index.js';
-import { PLUGINS } from '@assets/plugins/index.js';
 import { RULES } from '@assets/rules/index.js';
 
 export interface InitSelectionInputs {
@@ -16,7 +15,6 @@ export interface InitSelectionInputs {
     configs: string[];
     mcps: string[];
     skills: string[];
-    pluginsPerAgent: Record<string, string[]>;
     rulesPerAgent: Record<string, string[]>;
 }
 
@@ -78,17 +76,15 @@ export async function promptInitSelections(
             configs: [],
             mcps: [],
             skills: [],
-            pluginsPerAgent: {},
             rulesPerAgent: {},
         };
     }
 
-    // 3. Custom category order: Package -> Config -> MCP -> Skill -> Plugin -> Rule
+    // 3. Custom category order: Package -> Config -> MCP -> Skill -> Rule
     let selectedPackages: string[] = options.explicitPackages ? options.explicitPackages.split(',').map((s) => s.trim()) : [];
     let selectedConfigs: string[] = [];
     let selectedMcps: string[] = [];
     let selectedSkills: string[] = options.explicitSkills ? options.explicitSkills.split(',').map((s) => s.trim()) : [];
-    const pluginsPerAgent: Record<string, string[]> = {};
     const rulesPerAgent: Record<string, string[]> = {};
 
     if (deps.prompts?.checkbox) {
@@ -118,14 +114,6 @@ export async function promptInitSelections(
         }
 
         for (const toolId of selectedTools) {
-            const compatiblePlugins = PLUGINS.filter((p) => p.supportedTargets.includes(toolId as any));
-            if (compatiblePlugins.length > 0) {
-                pluginsPerAgent[toolId] = await deps.prompts.checkbox({
-                    message: `Select plugins for ${toolId} (optional, empty to skip):`,
-                    choices: compatiblePlugins.map((p) => ({ name: `${p.id} — ${p.description}`, value: p.id, checked: true })),
-                });
-            }
-
             const compatibleRules = RULES.filter((r) => r.supportedTargets.includes(toolId as any));
             if (compatibleRules.length > 0) {
                 rulesPerAgent[toolId] = await deps.prompts.checkbox({
@@ -143,7 +131,6 @@ export async function promptInitSelections(
         configs: selectedConfigs,
         mcps: selectedMcps,
         skills: selectedSkills,
-        pluginsPerAgent,
         rulesPerAgent,
     };
 }

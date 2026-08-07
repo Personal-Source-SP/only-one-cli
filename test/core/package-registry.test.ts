@@ -34,16 +34,8 @@ describe('Package Registry Model (Task 1.1, 1.4 & 1.5)', () => {
         }
     });
 
-    it('registers official Next.js skills as pinned external installables', () => {
+    it('does not register deprecated skill packages', () => {
         const nextSkills = PACKAGES.filter((pkg) => pkg.id.startsWith('next-'));
-        expect(nextSkills).toHaveLength(4);
-        for (const pkg of nextSkills) {
-            expect(pkg.installer.kind).toBe('skills');
-            if (pkg.installer.kind === 'skills') {
-                expect(pkg.installer.source).toBe('https://github.com/vercel/next.js/tree/canary/skills');
-                expect(pkg.installer.skillName).toBe(pkg.id);
-                expect(pkg.installer.cliVersion).toBe('1.4.0');
-            }
-        }
+        expect(nextSkills).toHaveLength(0);
     });
 });

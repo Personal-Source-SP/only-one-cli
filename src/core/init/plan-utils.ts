@@ -1,6 +1,6 @@
 import type { InitCategory, InitPlan, InitResult, PlannedItem } from './plan-types.js';
 
-export const CATEGORY_ORDER: InitCategory[] = ['package', 'config', 'mcp', 'skill', 'workflow', 'plugin', 'rule', 'gitignore'];
+export const CATEGORY_ORDER: InitCategory[] = ['package', 'config', 'mcp', 'skill', 'workflow', 'rule', 'gitignore'];
 
 /**
  * Deduplicates planned items by key.

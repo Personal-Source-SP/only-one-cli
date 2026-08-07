@@ -3,7 +3,6 @@ import type { ProgramDeps } from '@/cli/deps.js';
 import { createInitCommand } from '@/commands/init/command.ts';
 import { createComboCommand } from '@/commands/combo/command.ts';
 import { createMcpCommand } from '@/commands/mcp/command.ts';
-import { createPluginCommand } from '@/commands/plugin/command.ts';
 import { createRuleCommand } from '@/commands/rule/command.ts';
 import { createSkillCommand } from '@/commands/skill/command.ts';
 
@@ -49,11 +48,6 @@ describe('CLI-wide --yes rejection (Task 3.1)', () => {
 
     it('rejects --yes on standalone mcp command', async () => {
         const cmd = createMcpCommand(deps as ProgramDeps);
-        await expect(cmd.parseAsync(['node', 'test', '--yes'])).rejects.toThrow();
-    });
-
-    it('rejects --yes on standalone plugin command', async () => {
-        const cmd = createPluginCommand(deps as ProgramDeps);
         await expect(cmd.parseAsync(['node', 'test', '--yes'])).rejects.toThrow();
     });
 

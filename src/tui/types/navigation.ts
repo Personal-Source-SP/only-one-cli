@@ -6,7 +6,6 @@ export type ViewState =
     | 'skill'
     | 'workflow'
     | 'rule'
-    | 'plugin'
     | 'mcp'
     | 'setting-vs'
     | 'extensions-vs'

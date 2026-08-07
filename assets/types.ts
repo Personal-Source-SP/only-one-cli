@@ -1,31 +1,11 @@
 import { AllowedToolId } from '../src/constants/allowed-tools.js';
 
-export type TargetAction =
-    | {
-          type: 'command';
-          executable: string;
-          args?: string[];
-      }
-    | {
-          type: 'manual';
-          instruction: string;
-          docUrl?: string;
-      };
-
-export interface PluginManifest {
-    id: string;
-    description?: string;
-    supportedTargets: AllowedToolId[];
-    actions: Record<AllowedToolId, TargetAction>;
-}
-
 export interface RuleManifest {
     id: string;
     description?: string;
     sourceFile: string;
     supportedTargets: AllowedToolId[];
     requiredPackages?: string[];
-    requiredPlugins?: string[];
     requiredMcps?: string[];
     requiredSkills?: string[];
 }
@@ -95,7 +75,6 @@ export interface ComboManifest {
     description?: string;
     packages?: string[];
     mcps?: string[];
-    plugins?: string[];
     skills?: string[];
     rules?: string[];
     configs?: string[];

@@ -7,7 +7,6 @@ import { promisify } from 'node:util';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
 import { checkExistingWorkflows, installWorkflows, type WorkflowInstallResult } from '@/core/workflow/index.js';
-import { executePluginActions, type PluginActionResult } from '@/core/plugin/index.js';
 import { normalizeOpenSpecAntigravityOutput } from '@/core/openspec/normalize-antigravity.js';
 import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
 import type { ProgramDeps } from '@/cli/deps.js';
@@ -16,7 +15,6 @@ import type {
     ConfigManifest,
     McpManifest,
     PackageManifest,
-    PluginManifest,
     RuleManifest,
     SkillManifest,
     WorkflowManifest,
@@ -26,7 +24,6 @@ import { checkExistingMcps, syncMcpGlobalConfig, readMcpManifests } from '@/core
 import { COMBOS } from '@assets/combos/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
-import { PLUGINS } from '@assets/plugins/index.js';
 import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { WORKFLOWS } from '@assets/workflows/index.js';
@@ -46,7 +43,7 @@ export interface ExtendedComboManifest extends ComboManifest {
 export type ComboComponentStatus = 'installed' | 'missing' | 'partial' | 'not-applicable';
 
 export interface ExistingComboComponent {
-    type: 'package' | 'plugin' | 'skill' | 'config' | 'mcp' | 'rule' | 'workflow';
+    type: 'package' | 'skill' | 'config' | 'mcp' | 'rule' | 'workflow';
     id: string; // e.g. "package:@fission-ai/openspec", "skill:cursor:c4-diagrams", "config:openspec", "mcp:cursor:github"
     name: string; // Name of package, skill, config, or mcp
     toolId?: string; // If skill/mcp, which tool/ide
@@ -68,7 +65,6 @@ export const summarizeComboInstallation = (components: ExistingComboComponent[])
 export interface ComboInstallResult {
     packages: { name: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
     configs: { name: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
-    plugins: PluginActionResult;
     rules: RuleInstallResult[];
     skills: SkillInstallResult[];
     workflows: WorkflowInstallResult[];
@@ -77,7 +73,6 @@ export interface ComboInstallResult {
 
 export interface ComboAssetRegistries {
     packages: PackageManifest[];
-    plugins: PluginManifest[];
     rules: RuleManifest[];
     skills: SkillManifest[];
     configs: Record<string, ConfigManifest>;
@@ -87,7 +82,6 @@ export interface ComboAssetRegistries {
 
 export interface ComboDependencyPlan {
     packages: string[];
-    plugins: string[];
     rules: string[];
     skills: string[];
     configs: string[];
@@ -97,7 +91,6 @@ export interface ComboDependencyPlan {
 
 const comboRegistries = (): ComboAssetRegistries => ({
     packages: PACKAGES,
-    plugins: PLUGINS,
     rules: RULES,
     skills: SKILLS,
     configs: CONFIGS,
@@ -110,7 +103,6 @@ const unique = (values: string[]): string[] => Array.from(new Set(values));
 export const validateComboManifestReferences = (combos: ComboManifest[], registries: ComboAssetRegistries): void => {
     const catalogs: Array<[keyof ComboManifest, Set<string>]> = [
         ['packages', new Set(registries.packages.map((item) => item.id))],
-        ['plugins', new Set(registries.plugins.map((item) => item.id))],
         ['rules', new Set(registries.rules.map((item) => item.id))],
         ['skills', new Set(registries.skills.map((item) => item.name))],
         ['configs', new Set(Object.keys(registries.configs))],
@@ -140,7 +132,6 @@ export const validateComboManifestReferences = (combos: ComboManifest[], registr
             const rule = registries.rules.find((item) => item.id === ruleId);
             const dependencies: Array<[string, string[] | undefined, Set<string>]> = [
                 ['packages', rule?.requiredPackages, new Set(registries.packages.map((item) => item.id))],
-                ['plugins', rule?.requiredPlugins, new Set(registries.plugins.map((item) => item.id))],
                 ['skills', rule?.requiredSkills, new Set(registries.skills.map((item) => item.name))],
                 ['mcps', rule?.requiredMcps, new Set(registries.mcps.map((item) => item.id))],
             ];
@@ -168,7 +159,6 @@ export const buildComboDependencyPlan = (
 
     return {
         packages: unique([...(combo.packages || []), ...ruleDependencies.flatMap((rule) => rule.requiredPackages || [])]),
-        plugins: unique([...(combo.plugins || []), ...ruleDependencies.flatMap((rule) => rule.requiredPlugins || [])]),
         rules: unique(combo.rules || []),
         skills: unique([...(combo.skills || []), ...ruleDependencies.flatMap((rule) => rule.requiredSkills || [])]),
         configs: unique(combo.configs || []),
@@ -429,14 +419,12 @@ export const installCombo = async (params: {
     selectedTools: AgentToolOption[];
     combo: ExtendedComboManifest;
     overwriteList?: string[]; // list of existing component ids that user confirmed to overwrite
-    selectedPluginIds?: string[];
     noIgnore?: boolean;
 }): Promise<ComboInstallResult> => {
-    const { deps, projectDir, homeDir, platform, selectedTools, combo, overwriteList = [], selectedPluginIds, noIgnore = false } = params;
+    const { deps, projectDir, homeDir, platform, selectedTools, combo, overwriteList = [], noIgnore = false } = params;
     const results: ComboInstallResult = {
         packages: [],
         configs: [],
-        plugins: { installed: [], actionRequired: [], skipped: [], failed: [] },
         rules: [],
         skills: [],
         workflows: [],
@@ -502,18 +490,6 @@ export const installCombo = async (params: {
                 deps.stdout(`    ✗ ${openspecResult.error}`);
             }
         }
-    }
-
-    // 3. Plugins
-    const pluginsToRun = selectedPluginIds ?? plan.plugins;
-    if (pluginsToRun.length > 0) {
-        const pluginResult = await executePluginActions({
-            deps,
-            projectDir,
-            selectedPluginIds: pluginsToRun,
-            targetIds: selectedTools.map((tool) => tool.value as import('@/constants/allowed-tools.js').AllowedToolId),
-        });
-        results.plugins = pluginResult.summary;
     }
 
     // 4. Rules

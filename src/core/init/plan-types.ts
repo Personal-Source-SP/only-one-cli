@@ -1,4 +1,4 @@
-export type InitCategory = 'package' | 'config' | 'mcp' | 'skill' | 'workflow' | 'plugin' | 'rule' | 'gitignore';
+export type InitCategory = 'package' | 'config' | 'mcp' | 'skill' | 'workflow' | 'rule' | 'gitignore';
 
 export type ItemOrigin = 'selected' | 'auto-required';
 

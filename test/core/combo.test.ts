@@ -5,7 +5,6 @@ import { COMBOS } from '@assets/combos/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
 import { MCPS } from '@assets/mcps/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
-import { PLUGINS } from '@assets/plugins/index.js';
 import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { WORKFLOWS } from '@assets/workflows/index.js';
@@ -16,14 +15,12 @@ import { buildComboDependencyPlan, summarizeComboInstallation, validateComboMani
 describe('combo manifest preflight', () => {
     const registries = {
         packages: [{ id: 'direct-package', installer: { kind: 'npm' as const, packageName: 'direct-package' } }],
-        plugins: [{ id: 'direct-plugin', supportedTargets: [], actions: {} }],
         rules: [
             {
                 id: 'rule-a',
                 sourceFile: 'rule-a.md',
                 supportedTargets: [],
                 requiredPackages: ['direct-package'],
-                requiredPlugins: ['direct-plugin'],
                 requiredSkills: ['rule-skill'],
                 requiredMcps: ['rule-mcp'],
             },
@@ -60,7 +57,6 @@ describe('combo manifest preflight', () => {
                     id: 'flow',
                     name: 'Flow',
                     packages: ['direct-package'],
-                    plugins: ['direct-plugin'],
                     rules: ['rule-a'],
                     skills: ['direct-skill'],
                     configs: ['config-a'],
@@ -71,7 +67,6 @@ describe('combo manifest preflight', () => {
             ),
         ).toEqual({
             packages: ['direct-package'],
-            plugins: ['direct-plugin'],
             rules: ['rule-a'],
             skills: ['direct-skill', 'rule-skill'],
             configs: ['config-a'],
@@ -102,7 +97,6 @@ describe('combo manifest preflight', () => {
 describe('prebuilt combo completeness', () => {
     const productionRegistries = {
         packages: PACKAGES,
-        plugins: PLUGINS,
         rules: RULES,
         skills: SKILLS,
         configs: CONFIGS,

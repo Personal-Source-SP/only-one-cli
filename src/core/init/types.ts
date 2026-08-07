@@ -18,7 +18,7 @@ export interface ToolsStepResult {
     selectedTools: AgentToolOption[];
 }
 
-export type { PackageManifest, PackageInstaller, TargetAction, PluginManifest } from '@assets/types.js';
+export type { PackageManifest, PackageInstaller } from '@assets/types.js';
 
 export interface PackagesStepResult {
     installedPackages: string[];

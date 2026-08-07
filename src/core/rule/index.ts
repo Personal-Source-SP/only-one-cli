@@ -1,11 +1,10 @@
 import { existsSync } from 'node:fs';
-import { mkdir, cp, readFile } from 'node:fs/promises';
+import { mkdir, cp } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { AllowedToolId } from '@/constants/allowed-tools.js';
-import { getAllowedRuleTargets, type AllowedTarget } from '@/core/target-selection/catalog.js';
+import { type AllowedTarget } from '@/core/target-selection/catalog.js';
 import { executePackageActions } from '@/core/init/package-installer.js';
-import { executePluginActions } from '@/core/plugin/index.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { RULES } from '@assets/rules/index.js';
 import type { RuleManifest } from '@assets/types.js';
@@ -74,7 +73,6 @@ export const installRules = async (
     results: RuleInstallResult[];
     dependencySummary: {
         packages: string[];
-        plugins: { installed: string[]; actionRequired: string[]; failed: string[] };
     };
 }> => {
     const { deps, projectDir, selectedTargets, ruleIds, ruleManifests = RULES, overwriteList = [] } = request;
@@ -103,28 +101,10 @@ export const installRules = async (
         installedPackages = pkgResult.installedPackages;
     }
 
-    // 4. Execute plugin dependencies
-    let pluginSummary = { installed: [] as string[], actionRequired: [] as string[], failed: [] as string[] };
-    if (plan.plugins.length > 0) {
-        deps.stdout('\nInstalling rule plugin dependencies...');
-        const pluginResult = await executePluginActions({
-            deps,
-            projectDir,
-            selectedPluginIds: plan.plugins,
-            targetIds,
-            execFileAsync: request.execFileAsync,
-        });
-        pluginSummary = {
-            installed: pluginResult.summary.installed,
-            actionRequired: pluginResult.summary.actionRequired,
-            failed: pluginResult.summary.failed,
-        };
-    }
-
-    // 5. Pre-check existing rules
+    // 4. Pre-check existing rules
     const existingChecks = await checkExistingRules(projectDir, selectedTargets, ruleIds, ruleManifests);
 
-    // 6. Install rule files per target
+    // 5. Install rule files per target
     const results: RuleInstallResult[] = [];
 
     for (const target of selectedTargets) {
@@ -150,20 +130,6 @@ export const installRules = async (
                 }
             }
 
-            // Check if any plugin dependency failed for this target
-            const pluginFailedForTarget = (manifest.requiredPlugins || []).some((p) => pluginSummary.failed.includes(`${p}:${target.id}`));
-
-            if (pluginFailedForTarget) {
-                results.push({
-                    toolId: target.id,
-                    toolName: target.agent.name,
-                    ruleId,
-                    status: 'failed',
-                    error: `Dependency plugin failed for target ${target.id}`,
-                });
-                continue;
-            }
-
             const targetRulesDir = join(projectDir, target.agent.rulesDir);
             const destPath = join(targetRulesDir, manifest.sourceFile);
             const srcPath = join(rulesAssetsDir, manifest.sourceFile);
@@ -172,18 +138,13 @@ export const installRules = async (
                 await mkdir(targetRulesDir, { recursive: true });
                 await cp(srcPath, destPath, { force: true });
 
-                const hasManualPluginPending = (manifest.requiredPlugins || []).some((p) =>
-                    pluginSummary.actionRequired.includes(`${p} (${target.id})`),
-                );
-
-                const status = hasManualPluginPending ? 'installed_not_ready' : exists ? 'overwritten' : 'success';
+                const status = exists ? 'overwritten' : 'success';
 
                 results.push({
                     toolId: target.id,
                     toolName: target.agent.name,
                     ruleId,
                     status,
-                    details: hasManualPluginPending ? `Action required for plugin dependency on ${target.id}` : undefined,
                 });
             } catch (error: any) {
                 results.push({
@@ -201,7 +162,6 @@ export const installRules = async (
         results,
         dependencySummary: {
             packages: installedPackages,
-            plugins: pluginSummary,
         },
     };
 };

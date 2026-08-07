@@ -14,16 +14,7 @@ export const RULES: RuleManifest[] = [
         description: 'NestJS and full-stack architecture, strict TypeScript, public contracts, and verification guidelines',
         sourceFile: '02-nest-architecture-stack.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
-        requiredSkills: [
-            'only-one-nestjs-development',
-            'react-development',
-            'only-one-nextjs-development',
-            'only-one-next-dev-loop',
-            'only-one-next-cache-components-adoption',
-            'only-one-next-cache-components-optimizer',
-            'only-one-next-partial-prefetching-adoption',
-            'ui-ux-development',
-        ],
+        requiredSkills: ['only-one-nestjs-development', 'only-one-nextjs-development'],
     },
     {
         id: 'context-and-tools',

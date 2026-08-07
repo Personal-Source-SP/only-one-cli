@@ -7,7 +7,6 @@ import { DoctorView } from './views/DoctorView.js';
 import { HomeView } from './views/HomeView.js';
 import { InitView } from './views/InitView.js';
 import { McpView } from './views/McpView.js';
-import { PluginView } from './views/PluginView.js';
 import { RuleView } from './views/RuleView.js';
 import { SettingsView } from './views/SettingsView.js';
 import { SkillView } from './views/SkillView.js';
@@ -52,9 +51,6 @@ export const App: FC<AppProps> = ({ deps }) => {
             case 'rule':
                 setCurrentView('rule');
                 break;
-            case 'plugin':
-                setCurrentView('plugin');
-                break;
             case 'mcp':
                 setCurrentView('mcp');
                 break;
@@ -87,8 +83,6 @@ export const App: FC<AppProps> = ({ deps }) => {
                 return <WorkflowView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'rule':
                 return <RuleView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'plugin':
-                return <PluginView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'mcp':
                 return <McpView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'setting-vs':

@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { AllowedToolId } from '@/constants/allowed-tools.js';
 import { createRuleCommand } from '@/commands/rule/command.js';
-import { createPluginCommand } from '@/commands/plugin/command.js';
 import { installRules } from '@/core/rule/index.js';
 import { RULES } from '@assets/rules/index.js';
 import { getAllowedRuleTargets } from '@/core/target-selection/catalog.js';

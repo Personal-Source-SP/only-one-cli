@@ -55,22 +55,6 @@ export async function buildInitPlan(options: BuildInitPlanOptions): Promise<Init
         allItems.push(...skillItems, ...workflowItems, ...mcpItems);
     }
 
-    // Plugins per agent
-    for (const [toolId, pluginIds] of Object.entries(selections.pluginsPerAgent)) {
-        for (const pluginId of pluginIds) {
-            allItems.push({
-                key: `plugin:${toolId}:${pluginId}`,
-                category: 'plugin',
-                name: pluginId,
-                target: toolId,
-                origin: 'selected',
-                state: 'action-only',
-                reason: 'Plugin installation instructions / action required',
-                meta: { toolId, pluginId },
-            });
-        }
-    }
-
     // Rules per agent
     for (const [toolId, ruleIds] of Object.entries(selections.rulesPerAgent)) {
         for (const ruleId of ruleIds) {
