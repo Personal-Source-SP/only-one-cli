@@ -2,12 +2,18 @@ import type { ProgramDeps } from '@/cli/deps.js';
 import { Box, useApp, useInput } from 'ink';
 import { FC, useState } from 'react';
 import type { ViewState } from './types/index.js';
+import { ComboView } from './views/ComboView.js';
 import { DoctorView } from './views/DoctorView.js';
 import { HomeView } from './views/HomeView.js';
 import { InitView } from './views/InitView.js';
 import { McpView } from './views/McpView.js';
+import { PluginView } from './views/PluginView.js';
+import { RuleView } from './views/RuleView.js';
 import { SettingsView } from './views/SettingsView.js';
 import { SkillView } from './views/SkillView.js';
+import { StructureView } from './views/StructureView.js';
+import { UpdateView } from './views/UpdateView.js';
+import { WorkflowView } from './views/WorkflowView.js';
 
 interface AppProps {
     deps?: ProgramDeps;
@@ -73,13 +79,25 @@ export const App: FC<AppProps> = ({ deps }) => {
                 return <DoctorView onBack={() => setCurrentView('home')} />;
             case 'init':
                 return <InitView deps={deps} onBack={() => setCurrentView('home')} />;
+            case 'combo':
+                return <ComboView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'skill':
                 return <SkillView deps={deps} onBack={() => setCurrentView('home')} />;
+            case 'workflow':
+                return <WorkflowView deps={deps} onBack={() => setCurrentView('home')} />;
+            case 'rule':
+                return <RuleView deps={deps} onBack={() => setCurrentView('home')} />;
+            case 'plugin':
+                return <PluginView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'mcp':
                 return <McpView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'setting-vs':
             case 'extensions-vs':
                 return <SettingsView deps={deps} onBack={() => setCurrentView('home')} />;
+            case 'structure-generate':
+                return <StructureView deps={deps} onBack={() => setCurrentView('home')} />;
+            case 'update':
+                return <UpdateView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'home':
             default:
                 return <HomeView onSelectOption={handleSelectOption} />;
