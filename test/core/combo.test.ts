@@ -2,6 +2,11 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { COMBOS } from '@assets/combos/index.js';
+import { CONFIGS } from '@assets/configs/index.js';
+import { MCPS } from '@assets/mcps/index.js';
+import { PACKAGES } from '@assets/packages/index.js';
+import { PLUGINS } from '@assets/plugins/index.js';
+import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { WORKFLOWS } from '@assets/workflows/index.js';
 import { describe, expect, it } from 'vitest';
@@ -95,22 +100,71 @@ describe('combo manifest preflight', () => {
 });
 
 describe('prebuilt combo completeness', () => {
-    for (const comboId of ['frontend-flow', 'backend-flow']) {
-        it(`${comboId} includes workflow dependencies and shared utility workflows`, () => {
-            const combo = COMBOS.find(({ id }) => id === comboId);
-            expect(combo).toBeDefined();
-            expect(combo?.workflows).toEqual(expect.arrayContaining(['only-one-clockify', 'only-one-pr-git']));
+    const productionRegistries = {
+        packages: PACKAGES,
+        plugins: PLUGINS,
+        rules: RULES,
+        skills: SKILLS,
+        configs: CONFIGS,
+        workflows: WORKFLOWS,
+        mcps: MCPS,
+    };
 
-            const selectedWorkflows = WORKFLOWS.filter(({ name }) => combo?.workflows?.includes(name));
-            const requiredMcps = selectedWorkflows.flatMap(({ requiredMcps = [] }) => requiredMcps);
-            expect(combo?.mcps).toEqual(expect.arrayContaining(requiredMcps));
+    it('passes production registry preflight', () => {
+        expect(() => validateComboManifestReferences(COMBOS, productionRegistries)).not.toThrow();
+    });
 
-            const associatedSkills = SKILLS.filter(({ associatedWorkflows = [] }) =>
-                associatedWorkflows.some((workflow) => combo?.workflows?.includes(workflow)),
-            ).map(({ name }) => name);
-            expect(combo?.skills).toEqual(expect.arrayContaining(associatedSkills));
-        });
-    }
+    it.each([
+        {
+            comboId: 'frontend-flow',
+            technologySkill: 'only-one-nextjs-development',
+            architectureRule: 'next-architecture-stack',
+            stackMcps: ['fetch', 'tavily'],
+            forbiddenSkill: 'only-one-nestjs-development',
+        },
+        {
+            comboId: 'backend-flow',
+            technologySkill: 'only-one-nestjs-development',
+            architectureRule: 'nest-architecture-stack',
+            stackMcps: ['postgres'],
+            forbiddenSkill: undefined,
+        },
+    ])('$comboId resolves complete stack mapping', ({ comboId, technologySkill, architectureRule, stackMcps, forbiddenSkill }) => {
+        const combo = COMBOS.find(({ id }) => id === comboId);
+        expect(combo).toBeDefined();
+        if (!combo) return;
+
+        const plan = buildComboDependencyPlan(combo, productionRegistries);
+        expect(plan.skills).toContain(technologySkill);
+        expect(plan.rules).toEqual(expect.arrayContaining([architectureRule, 'context-and-tools']));
+        expect(plan.workflows).toEqual(
+            expect.arrayContaining(['only-one-ag-plan', 'only-one-implement-fast', 'only-one-clockify', 'only-one-pr-git']),
+        );
+        expect(plan.mcps).toEqual(expect.arrayContaining([...stackMcps, 'clockify', 'github']));
+        expect(plan.configs).toContain('openspec');
+        expect(plan.packages).toContain('@fission-ai/openspec');
+        expect(new Set(plan.skills).size).toBe(plan.skills.length);
+        expect(new Set(plan.workflows).size).toBe(plan.workflows.length);
+        expect(new Set(plan.mcps).size).toBe(plan.mcps.length);
+        if (forbiddenSkill) expect(plan.skills).not.toContain(forbiddenSkill);
+
+        for (const ruleId of plan.rules) {
+            const rule = RULES.find(({ id }) => id === ruleId);
+            expect(plan.skills).toEqual(expect.arrayContaining(rule?.requiredSkills ?? []));
+            expect(plan.mcps).toEqual(expect.arrayContaining(rule?.requiredMcps ?? []));
+        }
+        for (const workflowName of plan.workflows) {
+            const workflow = WORKFLOWS.find(({ name }) => name === workflowName);
+            expect(plan.mcps).toEqual(expect.arrayContaining(workflow?.requiredMcps ?? []));
+        }
+    });
+
+    it('contains no removed generic IDs', () => {
+        const referencedIds = COMBOS.flatMap((combo) => [...(combo.skills ?? []), ...(combo.rules ?? [])]);
+        expect(referencedIds).not.toContain('nextjs-development');
+        expect(referencedIds).not.toContain('nestjs-development');
+        expect(referencedIds).not.toContain('architecture-stack');
+    });
 });
 
 describe('combo component existence', () => {

@@ -3,10 +3,27 @@ import type { RuleManifest } from '../types.js';
 
 export const RULES: RuleManifest[] = [
     {
-        id: 'architecture-stack',
-        description: 'Framework-neutral architecture, strict TypeScript, runtime boundaries, public contracts, and verification guidelines',
-        sourceFile: '02-architecture-stack.md',
+        id: 'next-architecture-stack',
+        description: 'Next.js architecture, strict TypeScript, runtime boundaries, public contracts, and verification guidelines',
+        sourceFile: '02-next-architecture-stack.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
+        requiredSkills: ['only-one-nextjs-development'],
+    },
+    {
+        id: 'nest-architecture-stack',
+        description: 'NestJS and full-stack architecture, strict TypeScript, public contracts, and verification guidelines',
+        sourceFile: '02-nest-architecture-stack.md',
+        supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
+        requiredSkills: [
+            'only-one-nestjs-development',
+            'react-development',
+            'only-one-nextjs-development',
+            'only-one-next-dev-loop',
+            'only-one-next-cache-components-adoption',
+            'only-one-next-cache-components-optimizer',
+            'only-one-next-partial-prefetching-adoption',
+            'ui-ux-development',
+        ],
     },
     {
         id: 'context-and-tools',

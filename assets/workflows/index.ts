@@ -2,6 +2,11 @@ import type { WorkflowManifest } from '../types.js';
 
 export const WORKFLOWS: WorkflowManifest[] = [
     {
+        name: 'only-one-ag-plan',
+        description:
+            'Research current code and create a focused implementation plan with design options, architecture, code examples, and test cases.',
+    },
+    {
         name: 'only-one-clockify',
         description: 'Validate and log Clockify tasks using only-one-clockify-skill and Clockify MCP.',
         requiredMcps: ['clockify'],

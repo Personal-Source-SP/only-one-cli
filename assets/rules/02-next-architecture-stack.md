@@ -27,14 +27,7 @@ alwaysApply: true
 
 ## 4. Framework Skills
 
-- MUST read and follow `nestjs-development/SKILL.md` before creating or modifying NestJS controllers, services, modules, ORM repositories, entities, DTOs, validation, or backend error handling.
-- MUST read and follow `react-development/SKILL.md` before creating or modifying React components, hooks, client-side state, forms, or frontend data flows.
-- MUST read and follow `nextjs-development/SKILL.md` before creating or modifying Next.js routes, pages, layouts, client/server boundaries, server actions, or Next.js data fetching.
-- MUST read and follow `only-one-next-dev-loop/SKILL.md` when verifying changed Next.js runtime behavior in a running application.
-- MUST read and follow `only-one-next-cache-components-adoption/SKILL.md` only when enabling or migrating Cache Components.
-- MUST read and follow `only-one-next-cache-components-optimizer/SKILL.md` only when optimizing Cache Components route navigation or static shell behavior.
-- MUST read and follow `only-one-next-partial-prefetching-adoption/SKILL.md` only when enabling or migrating Partial Prefetching.
-- MUST read and follow `ui-ux-development/SKILL.md` before designing or materially changing a user interface.
+- MUST read and follow `only-one-nextjs-development/SKILL.md` before creating, modifying, or reviewing Next.js / React routes, pages, components, Refine hooks, forms, UI/UX, state, or frontend data flows.
 
 ## 5. Quality & Verification
 

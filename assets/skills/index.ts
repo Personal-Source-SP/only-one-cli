@@ -14,16 +14,16 @@ export const SKILLS: SkillManifest[] = [
         description: 'Interview the user relentlessly about a plan or design.',
     },
     {
-        name: 'nestjs-development',
-        description: 'Use when creating or modifying NestJS backend code.',
+        name: 'only-one-nestjs-development',
+        description: 'Use for NestJS development with selectively loaded architecture references.',
     },
     {
         name: 'react-development',
         description: 'Use when creating or modifying React frontend code.',
     },
     {
-        name: 'nextjs-development',
-        description: 'Use when creating or modifying Next.js routes or components.',
+        name: 'only-one-nextjs-development',
+        description: 'Use for Next.js and React development with selectively loaded references.',
     },
     {
         name: 'only-one-next-dev-loop',
@@ -56,4 +56,3 @@ export const SKILLS: SkillManifest[] = [
         associatedWorkflows: ['only-one-pr-git'],
     },
 ];
-
