@@ -50,6 +50,13 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
         description: 'Sync & install extensions for Antigravity / Cursor / VS Code',
     },
     {
+        label: 'Sync Git & Shell Profiles (git)',
+        value: 'git',
+        icon: '⚡',
+        description: 'Sync Git Bash, Zsh profiles, and shell alias modules',
+    },
+
+    {
         label: 'Scaffold Blueprint Structure (structure-generate)',
         value: 'structure-generate',
         icon: '🏗️',

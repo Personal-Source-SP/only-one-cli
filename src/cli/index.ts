@@ -14,7 +14,9 @@ import {
     createComboCommand,
     createTuiCommand,
     createPackageCommand,
+    createGitCommand,
 } from '@/commands/index.js';
+
 import { COLORS, VERSION } from '@/constants/index.js';
 import type { ProgramDeps } from './deps.js';
 
@@ -91,6 +93,7 @@ export function createProgram(deps: ProgramDeps) {
     program.addCommand(createDoctorCommand(deps));
     program.addCommand(createSettingVsCommand(deps));
     program.addCommand(createExtensionsVsCommand(deps));
+    program.addCommand(createGitCommand(deps));
 
     configureCommandHelp(program);
 

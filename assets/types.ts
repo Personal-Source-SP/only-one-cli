@@ -80,3 +80,13 @@ export interface ComboManifest {
     configs?: string[];
     workflows?: string[];
 }
+
+export interface GitAssetManifest {
+    id: string;
+    name: string;
+    description: string;
+    targetOs: ('win32' | 'darwin' | 'linux')[];
+    files: { src: string; dest: string }[];
+}
+
+

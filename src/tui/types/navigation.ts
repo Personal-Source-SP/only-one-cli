@@ -9,6 +9,7 @@ export type ViewState =
     | 'mcp'
     | 'setting-vs'
     | 'extensions-vs'
+    | 'git'
     | 'structure-generate'
     | 'update';
 

@@ -33,4 +33,7 @@ export type * from './combo/types.js';
 export { createPackageCommand } from './package/index.js';
 export type * from './package/types.js';
 
+export { createGitCommand } from './git/index.js';
+export type * from './git/types.js';
+
 export { createTuiCommand } from './tui/index.js';

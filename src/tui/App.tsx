@@ -13,6 +13,7 @@ import { SkillView } from './views/SkillView.js';
 import { StructureView } from './views/StructureView.js';
 import { UpdateView } from './views/UpdateView.js';
 import { WorkflowView } from './views/WorkflowView.js';
+import { GitView } from './views/GitView.js';
 
 interface AppProps {
     deps?: ProgramDeps;
@@ -60,6 +61,9 @@ export const App: FC<AppProps> = ({ deps }) => {
             case 'extensions-vs':
                 setCurrentView('extensions-vs');
                 break;
+            case 'git':
+                setCurrentView('git');
+                break;
             case 'structure-generate':
                 setCurrentView('structure-generate');
                 break;
@@ -88,6 +92,8 @@ export const App: FC<AppProps> = ({ deps }) => {
             case 'setting-vs':
             case 'extensions-vs':
                 return <SettingsView deps={deps} onBack={() => setCurrentView('home')} />;
+            case 'git':
+                return <GitView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'structure-generate':
                 return <StructureView deps={deps} onBack={() => setCurrentView('home')} />;
             case 'update':
