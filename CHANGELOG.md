@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.0.7 (2026-08-07)
+
+### Features
+
+- Added 6 dedicated Ink-based TUI view components (`ComboView`, `WorkflowView`, `RuleView`, `PluginView`, `StructureView`, `UpdateView`) in `src/tui/views/`.
+- Achieved strict 1-to-1 parity between terminal subcommands (`combo`, `workflow`, `rule`, `plugin`, `structure-generate`, `update`, `setting-vs`, `extensions-vs`) and interactive TUI menu dashboard.
+
+### Refactoring & Consolidation
+
+- Consolidated specialized Next.js sub-skills (`dev-loop`, `cache-components`, `partial-prefetching`) and standalone React/UI-UX skills into single master skill `only-one-nextjs-development`.
+- Removed deprecated extension `signageos.signageos-vscode-sops` from default VS Code library manifest.
+
 ## 0.0.5 (2026-07-27)
 
 ### Requirements

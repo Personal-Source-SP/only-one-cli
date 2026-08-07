@@ -1,6 +1,6 @@
 {
     "name": "only-one",
-    "version": "0.0.5",
+    "version": "0.0.7",
     "description": "Developer environment setups, AI agent workspace management, and editor configuration syncing.",
     "type": "module",
     "main": "./dist/src/index.js",
