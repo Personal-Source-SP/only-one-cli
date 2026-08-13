@@ -38,6 +38,8 @@ Activate these skills during research or planning when the trigger condition is 
 | **grill-me**          | Requirements are ambiguous, conflicting, or underspecified                                                          | Run before research to interview the user one question at a time until the goal is clear enough to plan. Ask only what cannot be answered by reading the codebase. |
 | **gherkin-authoring** | Section 5 test cases involve acceptance criteria or BDD-level behavior                                              | Use to draft or improve Gherkin scenarios embedded in the plan. Preserve domain language; avoid UI mechanics in step definitions.                                  |
 | **c4-diagrams**       | Section 3 architecture involves multiple components, containers, or external systems that are unclear in text alone | Use to produce an ASCII or Mermaid C4 diagram (context, container, or dynamic level) directly inside the plan. Do not generate external image files.               |
+| **system-design**     | Change involves high-scale distributed architecture, caching, capacity estimation, rate limiting, or backend trade-offs | Use to design resilient backend architecture, capacity calculations, caching strategies, and explicit edge-case failure modes in Section 3 & Section 4.          |
+| **ux-flow-designer** | Change involves user interaction, UI/UX flows, frontend components, or screen state transitions                     | Use to map out mandatory UI Flow Archetypes (Master-Detail, Stepper, Async Batch, Search, Auth) or Custom Flow Protocol, 5-State Matrix, and Mermaid diagrams.     |
 
 Do not force a skill if the trigger is not met. Use only the skill levels that answer the actual question.
 
