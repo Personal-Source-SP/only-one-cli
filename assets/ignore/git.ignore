@@ -4,8 +4,8 @@
 .claude/
 .cursor/
 
-# Openspec
-openspec/
-
 # Git Nexus
 .gitnexus/
+
+# Only One 
+only-one/
