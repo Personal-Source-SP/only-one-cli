@@ -17,7 +17,7 @@ export const COMBOS: ComboManifest[] = [
         ],
         configs: ['openspec'],
         rules: ['next-architecture-stack', 'context-and-tools'],
-        workflows: ['only-one-ag-plan', 'only-one-implement-fast', 'only-one-clockify', 'only-one-pr-git'],
+        workflows: ['only-one-ag-plan', 'only-one-clockify', 'only-one-pr-git'],
     },
     {
         id: 'backend-flow',
@@ -35,6 +35,6 @@ export const COMBOS: ComboManifest[] = [
         ],
         configs: ['openspec'],
         rules: ['nest-architecture-stack', 'context-and-tools'],
-        workflows: ['only-one-ag-plan', 'only-one-implement-fast', 'only-one-clockify', 'only-one-pr-git'],
+        workflows: ['only-one-ag-plan', 'only-one-clockify', 'only-one-pr-git'],
     },
 ];

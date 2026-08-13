@@ -131,9 +131,7 @@ describe('prebuilt combo completeness', () => {
         const plan = buildComboDependencyPlan(combo, productionRegistries);
         expect(plan.skills).toContain(technologySkill);
         expect(plan.rules).toEqual(expect.arrayContaining([architectureRule, 'context-and-tools']));
-        expect(plan.workflows).toEqual(
-            expect.arrayContaining(['only-one-ag-plan', 'only-one-implement-fast', 'only-one-clockify', 'only-one-pr-git']),
-        );
+        expect(plan.workflows).toEqual(expect.arrayContaining(['only-one-ag-plan', 'only-one-clockify', 'only-one-pr-git']));
         expect(plan.mcps).toEqual(expect.arrayContaining([...stackMcps, 'clockify', 'github']));
         expect(plan.configs).toContain('openspec');
         expect(plan.packages).toContain('@fission-ai/openspec');
