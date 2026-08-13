@@ -2,9 +2,18 @@ import type { WorkflowManifest } from '../types.js';
 
 export const WORKFLOWS: WorkflowManifest[] = [
     {
+        name: 'only-one-sync',
+        description:
+            'Check use cases against current codebase and sync: update changed, add new, mark deleted.',
+    },
+    {
         name: 'only-one-ag-plan',
         description:
             'Research current code and create a focused implementation plan with design options, architecture, code examples, and test cases.',
+    },
+    {
+        name: 'only-one-apply',
+        description: 'Implement tasks from an approved plan.md, working through each file change in order.',
     },
     {
         name: 'only-one-clockify',

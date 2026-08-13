@@ -22,11 +22,12 @@ Research relevant current code, then create one reviewable `implementation_plan.
 
 1. Start with files, symbols, selected code, errors, and acceptance criteria provided by the user.
 2. Read direct callers, dependencies, entities, DTOs, contracts, and tests needed to understand current behavior.
-3. Load and follow mandatory technology skills before analyzing affected code, such as the NestJS skill for NestJS changes or the Next.js skill for Next.js changes.
-4. Check existing repository patterns before proposing a new abstraction.
-5. Keep research bounded to the requested change. Do not scan unrelated repository areas.
-6. Do not modify source, dependencies, configuration, database state, or Git state.
-7. Preserve unrelated working-tree changes.
+3. Read `only-one/rules/rules.md` (and any rules in `only-one/rules/`) to strictly observe mandatory negative rules and lessons learned.
+4. Check `only-one/skills/` (and `.agents/skills/`) for relevant technology/domain skills (such as `only-one-nestjs-development`, `only-one-nextjs-development`). Read their `SKILL.md` before analyzing affected code.
+5. Check existing repository patterns before proposing a new abstraction.
+6. Keep research bounded to the requested change. Do not scan unrelated repository areas.
+7. Do not modify source, dependencies, configuration, database state, or Git state.
+8. Preserve unrelated working-tree changes.
 
 ## 2. Optional skills
 
@@ -42,19 +43,66 @@ Do not force a skill if the trigger is not met. Use only the skill levels that a
 
 ## 3. Create implementation plan
 
-### Storage path
+### Determine domain and storage path
 
-Save the plan as a user-facing artifact at:
+Before creating the plan, determine which domain this change belongs to:
+
+1. Search `only-one/domains/` for existing domains related to the change subject.
+2. Check if relevant use cases already exist in `only-one/domains/*/use-cases/`.
+3. Identify whether the change touches **one domain** or **multiple domains**.
+
+**Single-domain change** — save plan at:
 
 ```
-docs/tasks/<YYYY-MM-DD>_<kebab-case-slug>/plan.md
+only-one/domains/<domain>/tasks/<YYYY-MM-DD>_<kebab-case-slug>/plan.md
 ```
 
+**Cross-domain change (epic)** — save plan at:
+
+```
+only-one/epics/<YYYY-MM-DD>_<kebab-case-slug>/plan.md
+```
+
+- `<domain>`: the folder name of the matching domain (e.g., `washing-machine`, `billing`).
 - `YYYY-MM-DD`: today's date.
-- `<kebab-case-slug>`: a short English kebab-case description of the change (e.g., `soft-delete-washing-machine`).
-- Example: `docs/tasks/2026-08-10_soft-delete-washing-machine/plan.md`
+- `<kebab-case-slug>`: a short English kebab-case description of the change (e.g., `soft-delete-machine`).
+- Example: `only-one/domains/washing-machine/tasks/2026-08-10_soft-delete-machine/plan.md`
 
-Create the folder if it does not exist. Do not use `implementation_plan.md` at the project root.
+If no matching domain exists yet, propose a domain name derived from the change subject and create the folder.
+Create the task folder if it does not exist. Do not use `implementation_plan.md` at the project root.
+
+### Sync use cases before planning
+
+After resolving the domain, run the `only-one-sync` workflow for that domain before writing the plan.
+
+```bash
+# Check if use cases exist for the domain
+ls only-one/domains/<domain>/use-cases/*.md 2>/dev/null
+```
+
+- **If use case files exist**: run `/only-one-sync <domain>` inline and wait for it to complete. Do not proceed to the plan until sync is done.
+- **If no use case files exist** (new domain or empty catalog): skip sync and proceed directly to the plan.
+- **For cross-domain (epic)**: run sync for each affected domain in sequence.
+
+The sync ensures Section 1 of the plan describes verified, up-to-date current behavior — not stale documentation.
+
+### Frontmatter of plan.md
+
+Write this YAML frontmatter at the very top of the file, before all other content:
+
+```yaml
+---
+status: planned
+slug: <kebab-case-slug>
+domain: <domain>          # use list format for cross-domain: [domain1, domain2]
+started_at: <YYYY-MM-DD>
+completed_at: ~
+pr_url: ~
+branch: ~
+---
+```
+
+When the user approves the plan and implementation begins, update `status` to `in-progress` before making any code changes.
 
 ### Language
 
@@ -62,13 +110,20 @@ Write the plan content in **Vietnamese**. Preserve all code identifiers, file pa
 
 ### Walkthrough
 
-After implementation is complete, save the walkthrough at:
+After implementation is complete, save the walkthrough in the **same folder** as the plan:
 
 ```
-docs/tasks/<YYYY-MM-DD>_<kebab-case-slug>/walkthrough.md
+only-one/domains/<domain>/tasks/<YYYY-MM-DD>_<slug>/walkthrough.md
+# or for epics:
+only-one/epics/<YYYY-MM-DD>_<slug>/walkthrough.md
 ```
 
-Use the **same folder** as the plan. Write the walkthrough content in **Vietnamese**.
+Write the walkthrough content in **Vietnamese**.
+
+When creating the walkthrough, also update `plan.md` in the same folder:
+- `status`: set to `done`
+- `completed_at`: today's date
+- `pr_url` and `branch`: fill in if available
 
 ### Reasoning process (internal, not shown to user)
 
@@ -217,7 +272,7 @@ End with verified repository commands planned for test, lint, typecheck, or othe
 
 ## Guardrails
 
-- Create or update only `docs/tasks/<YYYY-MM-DD>_<slug>/plan.md` during this workflow. Do not create files outside that folder.
+- Create or update only the plan file at its resolved DDD path during this workflow. Do not create files outside `only-one/domains/` or `only-one/epics/`.
 - Do not invoke OpenSpec.
 - Do not create separate `proposal.md`, `spec.md`, `architecture.md`, `design.md`, `scaffold.md`, or `tasks.md` files.
 - Do not modify project source during planning.
@@ -228,3 +283,4 @@ End with verified repository commands planned for test, lint, typecheck, or othe
 - Keep plan depth proportional to change risk and complexity.
 - Draw UI mockups in ASCII/text within the plan for UI tasks; do not require or generate external image files.
 - Do not repeat artifact contents in chat. Link plan and mention only blockers or decisions requiring user input.
+- If domain is ambiguous, ask the user before writing the plan file — do not guess.
