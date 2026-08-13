@@ -113,14 +113,14 @@ describe('prebuilt combo completeness', () => {
             comboId: 'frontend-flow',
             technologySkill: 'only-one-nextjs-development',
             architectureRule: 'next-architecture-stack',
-            stackMcps: ['fetch', 'tavily'],
+            stackMcps: [],
             forbiddenSkill: 'only-one-nestjs-development',
         },
         {
             comboId: 'backend-flow',
             technologySkill: 'only-one-nestjs-development',
             architectureRule: 'nest-architecture-stack',
-            stackMcps: ['postgres'],
+            stackMcps: [],
             forbiddenSkill: undefined,
         },
     ])('$comboId resolves complete stack mapping', ({ comboId, technologySkill, architectureRule, stackMcps, forbiddenSkill }) => {
@@ -131,10 +131,6 @@ describe('prebuilt combo completeness', () => {
         const plan = buildComboDependencyPlan(combo, productionRegistries);
         expect(plan.skills).toContain(technologySkill);
         expect(plan.rules).toEqual(expect.arrayContaining([architectureRule, 'context-and-tools']));
-        expect(plan.workflows).toEqual(expect.arrayContaining(['only-one-ag-plan', 'only-one-clockify', 'only-one-pr-git']));
-        expect(plan.mcps).toEqual(expect.arrayContaining([...stackMcps, 'clockify', 'github']));
-        expect(plan.configs).toContain('openspec');
-        expect(plan.packages).toContain('@fission-ai/openspec');
         expect(new Set(plan.skills).size).toBe(plan.skills.length);
         expect(new Set(plan.workflows).size).toBe(plan.workflows.length);
         expect(new Set(plan.mcps).size).toBe(plan.mcps.length);
@@ -149,6 +145,26 @@ describe('prebuilt combo completeness', () => {
             const workflow = WORKFLOWS.find(({ name }) => name === workflowName);
             expect(plan.mcps).toEqual(expect.arrayContaining(workflow?.requiredMcps ?? []));
         }
+    });
+
+    it('mcp-flow resolves defined MCP tools', () => {
+        const combo = COMBOS.find(({ id }) => id === 'mcp-flow');
+        expect(combo).toBeDefined();
+        if (!combo) return;
+
+        const plan = buildComboDependencyPlan(combo, productionRegistries);
+        expect(plan.mcps).toEqual(expect.arrayContaining(['fetch', 'tavily', 'github', 'clockify', 'postgres']));
+    });
+
+    it('git-clockify-flow resolves skills, workflows and required MCPs', () => {
+        const combo = COMBOS.find(({ id }) => id === 'git-clockify-flow');
+        expect(combo).toBeDefined();
+        if (!combo) return;
+
+        const plan = buildComboDependencyPlan(combo, productionRegistries);
+        expect(plan.skills).toEqual(expect.arrayContaining(['only-one-clockify-skill', 'only-one-pr-git-skill']));
+        expect(plan.workflows).toEqual(expect.arrayContaining(['only-one-clockify', 'only-one-pr-git']));
+        expect(plan.mcps).toEqual(expect.arrayContaining(['clockify', 'github']));
     });
 
     it('contains no removed generic IDs', () => {

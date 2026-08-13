@@ -39,11 +39,6 @@ describe('combo command', () => {
             expect(output).toContain('Backend Flow Setup');
             expect(output).toContain("COMBO 'BACKEND FLOW SETUP' REPORT");
 
-            // Verify configuration template copy
-            const configPath = join(cwd, 'openspec', 'config.yaml');
-            expect(await readFile(configPath, 'utf8')).toContain('schema: intent-driven');
-            expect(existsSync(join(cwd, 'openspec', 'schemas', 'intent-driven', 'schema.yaml'))).toBe(true);
-
             // Verify skill copy
             const skillPath = join(cwd, '.cursor', 'skills', 'grill-me');
             expect(existsSync(skillPath)).toBe(true);
@@ -57,9 +52,8 @@ describe('combo command', () => {
         const prompts: Array<{ message: string; choices: Array<{ checked?: boolean }> }> = [];
 
         try {
-            await mkdir(join(cwd, '.cursor'), { recursive: true });
-            await mkdir(join(cwd, 'openspec'), { recursive: true });
-            await writeFile(join(cwd, 'openspec', 'config.yaml'), 'existing: true\n');
+            await mkdir(join(cwd, '.cursor', 'skills', 'grill-me'), { recursive: true });
+            await writeFile(join(cwd, '.cursor', 'skills', 'grill-me', 'SKILL.md'), 'existing: true\n');
             const program = createProgram({
                 cwd,
                 env: {},
@@ -103,8 +97,6 @@ describe('combo command', () => {
             expect(existsSync(join(cwd, '.cursor', 'rules', '01-context-and-tools.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-ag-plan.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(false);
-            expect(await readFile(join(cwd, 'openspec', 'config.yaml'), 'utf8')).toContain('schema: intent-driven');
-            expect(existsSync(join(cwd, 'openspec', 'schemas', 'intent-driven', 'schema.yaml'))).toBe(true);
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Workflows:');
         } finally {
