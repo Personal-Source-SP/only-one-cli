@@ -21,4 +21,26 @@ export const PACKAGES: PackageManifest[] = [
         },
         requirements: ['node', 'npm'],
     },
+    {
+        id: 'wondelai/skills/system-design',
+        description: 'System Design Interview & distributed architecture skill from wondelai/skills',
+        installer: {
+            kind: 'skills',
+            source: 'wondelai/skills/system-design',
+            skillName: 'system-design',
+            cliVersion: 'latest',
+        },
+        requirements: ['node', 'npx'],
+    },
+    {
+        id: 'ux-flow-designer',
+        description: 'UX Flow Designer & AI Design System skill from ThomasPraun/ux-flow-designer',
+        installer: {
+            kind: 'skills',
+            source: 'ThomasPraun/ux-flow-designer',
+            skillName: 'ux-flow-designer',
+            cliVersion: 'latest',
+        },
+        requirements: ['node', 'npx'],
+    },
 ];

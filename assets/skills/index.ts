@@ -31,4 +31,14 @@ export const SKILLS: SkillManifest[] = [
         description: 'Create or update a GitHub Pull Request from the current branch.',
         associatedWorkflows: ['only-one-pr-git'],
     },
+    {
+        name: 'system-design',
+        description:
+            'High-scale distributed system design framework enforcing production-grade resilience, edge case handling, capacity estimation, and component deep dives.',
+    },
+    {
+        name: 'ux-flow-designer',
+        description:
+            'Enforces strict UX standards, 5-state component matrix, WCAG accessibility, Mermaid flow diagrams, and AI Design System rules.',
+    },
 ];
