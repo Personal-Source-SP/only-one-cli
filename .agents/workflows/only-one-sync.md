@@ -24,15 +24,21 @@ Use cases document business behavior. Over time, code changes without updating u
 ## Step 1 — Resolve target domains
 
 **If a domain name is provided:**
-1. Verify `only-one/domains/<domain>/` exists.
-2. If not found: list available domains and report error. Stop.
+1. Check if `only-one/domains/<domain>/` exists.
+2. If not found: automatically create `only-one/domains/<domain>/use-cases/` directory structure.
 3. Proceed with that single domain.
 
 **If no domain is provided:**
-1. Ask the user:
-   > "Không có domain nào được chỉ định. Bạn có muốn sync tất cả domains không?"
-2. If **yes**: collect all folders under `only-one/domains/` as target domains.
-3. If **no**: ask which domain to sync and wait for selection.
+1. Check if `only-one/domains/` exists and contains domain directories.
+2. If `only-one/domains/` does not exist or has no domain subdirectories:
+   - Ask the user:
+     > "Chưa có domain nào trong `only-one/domains/`. Bạn muốn tạo và sync domain nào?"
+   - Once the user specifies a domain, create `only-one/domains/<domain>/use-cases/` and proceed with that domain.
+3. If `only-one/domains/` contains domain subdirectories:
+   - Ask the user:
+     > "Không có domain nào được chỉ định. Bạn có muốn sync tất cả domains không?"
+   - If **yes**: collect all folders under `only-one/domains/` as target domains.
+   - If **no**: ask which domain to sync and wait for selection.
 
 ---
 
@@ -207,4 +213,4 @@ Link each modified file. State only what changed — do not repeat file contents
 - Keep use case content behavior-focused. Do not copy implementation details (variable names, SQL, internal field names) into use case files.
 - Write report and descriptions in Vietnamese; keep code identifiers and file paths in English.
 - If a behavior is ambiguous — could belong to multiple use cases or no clear mapping exists — note it in the report and ask the user before acting.
-- If a domain directory has no `use-cases/` subfolder, create it before writing any files.
+- If a domain directory or `use-cases/` subfolder does not exist, create it automatically before scanning or writing any files (`mkdir -p only-one/domains/<domain>/use-cases/`).
