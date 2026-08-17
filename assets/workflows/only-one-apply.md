@@ -1,5 +1,5 @@
 ---
-description: "Implement tasks from a plan.md file, working through each file change in Section 3."
+description: "Implement tasks from a plan.html file, working through each file change in Section 3."
 ---
 
 ## Input
@@ -8,12 +8,12 @@ description: "Implement tasks from a plan.md file, working through each file cha
 /only-one-apply [<plan-path>]
 ```
 
-- **With path**: use the given `plan.md` path directly.
-- **Without path**: search `only-one/` for plans with `status: in-progress`, then `status: planned`. If multiple found, list them and ask the user to select one.
+- **With path**: use the given `plan.html` path directly.
+- **Without path**: search `only-one/` for plans with `content="in-progress"`, then `content="planned"`. If multiple found, list them and ask the user to select one.
 
 ## Role
 
-You are a Senior Software Engineer. Your responsibility: implement the changes described in a reviewed and approved `plan.md`, one file at a time, following Section 4 as detailed guidance. Do not redesign. Do not expand scope.
+You are a Senior Software Engineer. Your responsibility: implement the changes described in a reviewed and approved `plan.html`, one file at a time, following Section 4 as detailed guidance. Do not redesign. Do not expand scope.
 
 ## Purpose
 
@@ -29,14 +29,14 @@ Execute an approved plan by applying each file change in Section 3 order, using 
 
 **If no path is provided:**
 ```bash
-grep -rl "status: in-progress" only-one/ --include="plan.md" 2>/dev/null
-grep -rl "status: planned" only-one/ --include="plan.md" 2>/dev/null
+grep -rl 'content="in-progress"' only-one/ --include="plan.html" 2>/dev/null
+grep -rl 'content="planned"' only-one/ --include="plan.html" 2>/dev/null
 ```
 - Prefer `in-progress` over `planned`.
 - If multiple found, display the list and ask the user to select.
 - If none found, report: "No active plan found in only-one/." and stop.
 
-Read the full `plan.md` content including all five sections.
+Read the full `plan.html` content including all five sections.
 
 ---
 
@@ -52,7 +52,7 @@ Read the full `plan.md` content including all five sections.
 
 ## Step 2 — Validate plan is approved
 
-Check the frontmatter `status` field:
+Check the metadata `<meta name="status" content="...">` tag:
 
 - `planned` → ask: "Plan has not been started. Do you want to begin implementation?" Proceed only on confirmation.
 - `in-progress` → proceed immediately, resuming from where work left off.
@@ -62,13 +62,13 @@ Check the frontmatter `status` field:
 
 ## Step 3 — Set status to in-progress
 
-If `status` is `planned`, update `plan.md` frontmatter before making any code changes:
+If `status` is `planned`, update `plan.html` metadata before making any code changes:
 
-```yaml
-status: in-progress
+```html
+<meta name="status" content="in-progress">
 ```
 
-Also set `branch` if currently on a non-main branch and the field is `~`.
+Also update `<meta name="branch" content="...">` if currently on a non-main branch.
 
 ---
 
@@ -148,7 +148,7 @@ Issue: <description of the blocker>
 
 Options:
 1. <resolution option>
-2. Update plan.md and re-run /only-one-apply
+2. Update plan.html and re-run /only-one-apply
 3. Skip this task and continue
 ```
 
@@ -193,11 +193,11 @@ Review the implementation session:
 ## Guardrails
 
 - Do not start implementation before the user confirms if status is `planned`.
-- Update `status: in-progress` before the first code change — never after.
+- Update `<meta name="status" content="in-progress">` before the first code change — never after.
 - Implement in Section 3 order. Do not reorder tasks without a stated reason.
 - Use Section 4 as guidance, not as final code. Apply judgment for repository fit.
 - Do not expand scope beyond what Section 3 lists.
-- Do not modify `plan.md` content (sections 1–5) during implementation — only the frontmatter `status` and `branch` fields.
+- Do not modify `plan.html` content (sections 1–5) during implementation — only metadata `<meta>` fields.
 - If a design pattern from Section 4 conflicts with an existing repository pattern, prefer the existing pattern and note the deviation.
 - Preserve unrelated working-tree changes throughout.
 - Do not run test commands unless the plan's Section 5 specifies them and the user confirms.

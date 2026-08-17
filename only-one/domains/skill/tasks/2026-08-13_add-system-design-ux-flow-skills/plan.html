@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="status" content="done">
+  <meta name="slug" content="add-system-design-ux-flow-skills">
+  <meta name="domain" content="skill">
+  <meta name="started_at" content="2026-08-13">
+  <meta name="completed_at" content="2026-08-13">
+  <meta name="pr_url" content="">
+  <meta name="branch" content="">
+  <title>Plan: Thêm 2 bộ skill system-design và ux-flow-designer &amp; AI Design System</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1e293b;
+      --card-bg: #f8fafc;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --code-bg: #f1f5f9;
+      --code-fg: #0f172a;
+      --badge-bg: #e2e8f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --fg: #f8fafc;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --primary: #3b82f6;
+        --primary-light: #1e3a5f;
+        --code-bg: #1e293b;
+        --code-fg: #f8fafc;
+        --badge-bg: #334155;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--fg);
+      background-color: var(--bg);
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1, h2, h3, h4 { color: var(--fg); font-weight: 600; margin-top: 1.5rem; }
+    h1 { border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-top: 2rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--badge-bg);
+    }
+    .badge-status { background: #dbeafe; color: #1e40af; }
+    .badge-new { background: #dcfce7; color: #15803d; }
+    .badge-modify { background: #fef9c3; color: #854d0e; }
+    .badge-delete { background: #fee2e2; color: #991b1b; }
+    .callout {
+      border-left: 4px solid var(--primary);
+      background: var(--card-bg);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .callout-important { border-left-color: var(--warning); }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.9em; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid var(--border); padding: 0.6rem; text-align: left; }
+    th { background: var(--card-bg); }
+    .meta-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .meta-item { font-size: 0.9rem; }
+    .meta-label { font-weight: bold; color: var(--primary); }
+    ul.task-list { list-style: none; padding-left: 0; }
+    ul.task-list li { margin: 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <div class="meta-box">
+    <div class="meta-item"><span class="meta-label">Trạng thái:</span> <span class="badge badge-status">done</span></div>
+    <div class="meta-item"><span class="meta-label">Domain:</span> skill</div>
+    <div class="meta-item"><span class="meta-label">Slug:</span> add-system-design-ux-flow-skills</div>
+    <div class="meta-item"><span class="meta-label">Bắt đầu:</span> 2026-08-13</div>
+    <div class="meta-item"><span class="meta-label">Hoàn thành:</span> 2026-08-13</div>
+  </div>
+
+  <h1>Kế hoạch triển khai thêm 2 bộ skill: system-design và ux-flow-designer &amp; AI Design System</h1>
+
+  <p>Tài liệu kế hoạch triển khai bổ sung 2 bộ skill chuyên sâu vào hệ thống prebuilt skill của <code>only-one-cli</code>:</p>
+  <ol>
+    <li><code>system-design</code>: Skill hướng dẫn phân tích, thiết kế hệ thống phân tán quy mô lớn (High-Scale Distributed Systems), ước tính dung lượng (Back-of-the-envelope estimation), deep dive linh kiện kiến trúc và phân tích đánh đổi (Tradeoff Analysis).</li>
+    <li><code>ux-flow-designer</code>: Skill hướng dẫn thiết kế hành trình người dùng (User Flow), vẽ sơ đồ Mermaid, thiết kế Wireframe (ASCII &amp; Mobile-First HTML), kết hợp nguyên tắc AI Design System (Design Tokens, WCAG accessibility, spacing, typography scale, micro-interactions).</li>
+  </ol>
+
+  <div class="callout callout-important">
+    <strong>User Review Required:</strong>
+    <ul>
+      <li>Cả 2 skill sẽ được nhúng trực tiếp vào thư mục prebuilt asset (<code>assets/skills/</code>) của <code>only-one-cli</code>.</li>
+      <li>Mọi tên skill và thông tin frontmatter trong <code>assets/skills/&lt;skill-name&gt;/SKILL.md</code> sẽ được đồng bộ chính xác với <code>assets/skills/index.ts</code> để đảm bảo qua được bộ test tự động trong <code>test/core/skill-registry.test.ts</code>.</li>
+    </ul>
+  </div>
+
+  <h2>Section 1. Current state</h2>
+  <h3>Trạng thái hiện tại</h3>
+  <p>Hiện tại <code>only-one-cli</code> hỗ trợ 7 prebuilt skills tại thư mục <code>assets/skills/</code>:</p>
+  <ul>
+    <li><code>c4-diagrams</code></li>
+    <li><code>gherkin-authoring</code></li>
+    <li><code>grill-me</code></li>
+    <li><code>only-one-nestjs-development</code></li>
+    <li><code>only-one-nextjs-development</code></li>
+    <li><code>only-one-clockify-skill</code></li>
+    <li><code>only-one-pr-git-skill</code></li>
+  </ul>
+
+  <h2>Section 2. Design</h2>
+  <h3>Phương án 1 (Khuyên dùng): Tích hợp trực tiếp 2 Prebuilt Skills vào <code>assets/skills/</code></h3>
+  <p>Hoạt động ngay lập tức không cần kết nối mạng internet hoặc <code>npx</code> bên thứ ba khi chạy lệnh <code>only-one skill</code>.</p>
+
+  <h2>Section 3. Implementation architecture</h2>
+  <ul class="task-list">
+    <li><span class="badge badge-new">[NEW]</span> <code>assets/skills/system-design/SKILL.md</code></li>
+    <li><span class="badge badge-new">[NEW]</span> <code>assets/skills/ux-flow-designer/SKILL.md</code></li>
+    <li><span class="badge badge-modify">[MODIFY]</span> <code>assets/skills/index.ts</code></li>
+    <li><span class="badge badge-modify">[MODIFY]</span> <code>assets/types.ts</code></li>
+  </ul>
+
+  <h2>Section 4. Implementation code examples</h2>
+  <pre><code>export const SKILLS: SkillManifest[] = [
+    // ... các skill trước
+    {
+        name: 'system-design',
+        description: 'System design for large-scale distributed systems, capacity estimation, and architectural tradeoffs.',
+    },
+    {
+        name: 'ux-flow-designer',
+        description: 'Design comprehensive user flows, journeys, wireframes, and UI component specifications.',
+    },
+];</code></pre>
+
+  <h2>Section 5. Test cases</h2>
+  <h3>Automated Unit Tests</h3>
+  <ol>
+    <li><code>test/core/skill-registry.test.ts</code>: Xác minh tính nhất quán giữa <code>SKILLS</code> manifest trong <code>index.ts</code> và tệp <code>SKILL.md</code>.</li>
+    <li><code>test/commands/skill/skill.test.ts</code>: Xác minh cài đặt skill thành công.</li>
+  </ol>
+</body>
+</html>
