@@ -1,5 +1,5 @@
 ---
-description: "Check use cases against current codebase and sync: update changed, add new, mark deleted in HTML format."
+description: "Check use cases against current codebase and sync: update changed, add new, mark deleted."
 ---
 
 ## Input
@@ -49,10 +49,10 @@ Repeat this process for every target domain.
 ### 2a. Read existing use cases
 
 ```bash
-ls only-one/domains/<domain>/use-cases/*.html 2>/dev/null
+ls only-one/domains/<domain>/use-cases/*.md 2>/dev/null
 ```
 
-Read every `.html` file found (skip `index.html` or `README.html`). For each, record:
+Read every `.md` file found (skip `README.md`). For each, record:
 - `id`, `title`, `status`, `USE`/`WHEN` statement, preconditions, all scenarios.
 
 If no use case files exist, note: "No use cases yet for this domain."
@@ -125,79 +125,64 @@ Process each domain's classified items in this order: DELETED → CHANGED → NE
 
 ### DELETED use cases
 
-1. Delete the use case file or set `<meta name="status" content="deprecated">`.
-2. Git history preserves the full content.
+1. Delete the use case file.
+2. Git history preserves the full content — no need to keep the file.
 
 ### CHANGED use cases
 
-1. Open the use case file (`.html`).
+1. Open the use case file.
 2. Update scenarios to reflect current code behavior:
    - Add new scenarios that exist in code but were missing.
    - Modify scenarios where the behavior has changed.
-   - Remove scenarios that no longer apply.
+   - Remove scenarios that no longer apply — no need to comment them out.
 3. Update preconditions if they have changed.
-4. Update `<meta name="updated_at" content="<YYYY-MM-DD>">`.
+4. Update `updated_at` to today's date.
 
 ### NEW use cases
 
 1. Determine the correct use case title from the behavior description.
 2. Assign the next sequential ID in the domain (read existing IDs, pick next number).
-3. Create the file at `only-one/domains/<domain>/use-cases/<kebab-case-title>.html`:
+3. Create the file at `only-one/domains/<domain>/use-cases/<kebab-case-title>.md`:
 
-```html
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="id" content="UC-<DOMAIN-ABBR>-<NNN>">
-  <meta name="title" content="<Title in English>">
-  <meta name="domain" content="<domain>">
-  <meta name="status" content="draft">
-  <meta name="updated_at" content="<YYYY-MM-DD>">
-  <title>UC-<DOMAIN-ABBR>-<NNN>: <Title in English></title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem 1rem; color: #1e293b; }
-    h1, h2, h3, h4 { color: #0f172a; }
-    .meta-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
-    .scenario { background: #f8fafc; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
-    ul { padding-left: 1.5rem; }
-  </style>
-</head>
-<body>
-  <div class="meta-box">
-    <strong>ID:</strong> UC-<DOMAIN-ABBR>-<NNN> | <strong>Domain:</strong> <domain> | <strong>Status:</strong> draft | <strong>Updated:</strong> <YYYY-MM-DD>
-  </div>
+```markdown
+---
+id: UC-<DOMAIN-ABBR>-<NNN>
+title: <Title in English>
+domain: <domain>
+status: draft
+implemented_by: []
+updated_at: <YYYY-MM-DD>
+---
 
-  <h1><Title in English></h1>
+## USE <action — verb phrase>
+## WHEN <actor and context>
 
-  <h2>USE &lt;action — verb phrase&gt;</h2>
-  <h2>WHEN &lt;actor and context&gt;</h2>
+### Preconditions
+- <precondition>
 
-  <h3>Preconditions</h3>
-  <ul>
-    <li>&lt;precondition&gt;</li>
-  </ul>
+### Scenarios
 
-  <h3>Scenarios</h3>
-  <div class="scenario">
-    <h4>&lt;Scenario name&gt;</h4>
-    <ul>
-      <li><strong>GIVEN</strong> &lt;state or setup&gt;</li>
-      <li><strong>WHEN</strong> &lt;action taken&gt;</li>
-      <li><strong>THEN</strong> &lt;expected result&gt;</li>
-      <li><strong>AND</strong> &lt;additional outcome if needed&gt;</li>
-    </ul>
-  </div>
-</body>
-</html>
+#### <Scenario name>
+- GIVEN <state or setup>
+- WHEN <action taken>
+- THEN <expected result>
+- AND <additional outcome if needed>
 ```
 
 ### Update domain index
 
-After processing all items for a domain, update `only-one/domains/<domain>/use-cases/index.html` (or `README.md`):
+After processing all items for a domain, update `only-one/domains/<domain>/use-cases/README.md`:
 - Add rows for NEW use cases.
 - Remove rows for DELETED use cases.
+- If `README.md` does not exist, create it:
+
+```markdown
+# <Domain Name> — Use Cases
+
+| ID | Title | Status |
+|---|---|---|
+| UC-<ABBR>-<NNN> | <Title> | draft |
+```
 
 ---
 
@@ -211,7 +196,7 @@ After applying all changes, display a brief summary:
 ### Domain: <domain-name>
 - ✏️ Updated: <n> use cases
 - 🆕 Created: <n> use cases
-- 🗑️ Deprecated: <n> use cases
+- 🗑️ Deleted: <n> use cases
 - ✅ Already in sync: <n> use cases
 ```
 
@@ -222,7 +207,9 @@ Link each modified file. State only what changed — do not repeat file contents
 ## Guardrails
 
 - Do not apply any changes before the user confirms in Step 3.
+- Do not delete use case files — only set `status: deprecated` if preferred or delete as per team convention.
 - Do not modify application source code. Only read it.
 - Do not create use case files outside `only-one/domains/`.
-- Keep use case content behavior-focused.
+- Keep use case content behavior-focused. Do not copy implementation details (variable names, SQL, internal field names) into use case files.
 - Write report and descriptions in Vietnamese; keep code identifiers and file paths in English.
+- If a behavior is ambiguous — could belong to multiple use cases or no clear mapping exists — note it in the report and ask the user before acting.

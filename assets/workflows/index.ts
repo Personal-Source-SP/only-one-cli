@@ -13,7 +13,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        description: 'Implement tasks from an approved plan.html, working through each file change in order.',
+        description: 'Implement tasks from an approved plan.md, working through each file change in order.',
     },
     {
         name: 'only-one-clockify',

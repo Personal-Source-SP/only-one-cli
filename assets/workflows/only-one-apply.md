@@ -1,5 +1,5 @@
 ---
-description: "Implement tasks from a plan.html file, working through each file change in Section 3."
+description: "Implement tasks from a plan.md file, working through each file change in Section 3."
 ---
 
 ## Input
@@ -8,12 +8,12 @@ description: "Implement tasks from a plan.html file, working through each file c
 /only-one-apply [<plan-path>]
 ```
 
-- **With path**: use the given `plan.html` path directly.
-- **Without path**: search `only-one/` for plans with `content="in-progress"`, then `content="planned"`. If multiple found, list them and ask the user to select one.
+- **With path**: use the given `plan.md` path directly.
+- **Without path**: search `only-one/` for plans with `status: in-progress`, then `status: planned`. If multiple found, list them and ask the user to select one.
 
 ## Role
 
-You are a Senior Software Engineer. Your responsibility: implement the changes described in a reviewed and approved `plan.html`, one file at a time, following Section 4 as detailed guidance. Do not redesign. Do not expand scope.
+You are a Senior Software Engineer. Your responsibility: implement the changes described in a reviewed and approved `plan.md`, one file at a time, following Section 4 as detailed guidance. Do not redesign. Do not expand scope.
 
 ## Purpose
 
@@ -29,14 +29,14 @@ Execute an approved plan by applying each file change in Section 3 order, using 
 
 **If no path is provided:**
 ```bash
-grep -rl 'content="in-progress"' only-one/ --include="plan.html" 2>/dev/null
-grep -rl 'content="planned"' only-one/ --include="plan.html" 2>/dev/null
+grep -rl "status: in-progress" only-one/ --include="plan.md" 2>/dev/null
+grep -rl "status: planned" only-one/ --include="plan.md" 2>/dev/null
 ```
 - Prefer `in-progress` over `planned`.
 - If multiple found, display the list and ask the user to select.
 - If none found, report: "No active plan found in only-one/." and stop.
 
-Read the full `plan.html` content including all five sections.
+Read the full `plan.md` content including all five sections.
 
 ---
 
@@ -52,7 +52,7 @@ Read the full `plan.html` content including all five sections.
 
 ## Step 2 — Validate plan is approved
 
-Check the metadata `<meta name="status" content="...">` tag:
+Check the frontmatter `status` field:
 
 - `planned` → ask: "Plan has not been started. Do you want to begin implementation?" Proceed only on confirmation.
 - `in-progress` → proceed immediately, resuming from where work left off.
@@ -62,13 +62,13 @@ Check the metadata `<meta name="status" content="...">` tag:
 
 ## Step 3 — Set status to in-progress
 
-If `status` is `planned`, update `plan.html` metadata before making any code changes:
+If `status` is `planned`, update `plan.md` frontmatter before making any code changes:
 
-```html
-<meta name="status" content="in-progress">
+```yaml
+status: in-progress
 ```
 
-Also update `<meta name="branch" content="...">` if currently on a non-main branch.
+Also set `branch` if currently on a non-main branch and the field is `~`.
 
 ---
 
@@ -148,7 +148,7 @@ Issue: <description of the blocker>
 
 Options:
 1. <resolution option>
-2. Update plan.html and re-run /only-one-apply
+2. Update plan.md and re-run /only-one-apply
 3. Skip this task and continue
 ```
 
@@ -159,28 +159,27 @@ Wait for user guidance before continuing.
 ## Step 6b — Verification (Kiểm thử xác thực)
 
 Sau khi hoàn thành tất cả task sửa code:
-1. Đọc **Section 5. Test cases** trong `plan.html`.
+1. Đọc **Section 5. Test cases** trong `plan.md`.
 2. Chạy các lệnh kiểm thử và build đã được định nghĩa trong kế hoạch (ví dụ `npm test`, `npm run build`, linting).
 3. Đảm bảo toàn bộ test cases đều PASS. Nếu phát sinh lỗi, sửa ngay trước khi chuyển sang Step 7.
 
 ---
 
-## Step 7 — Tạo `walkthrough.html` và Hoàn tất Kế hoạch
+## Step 7 — Tạo `walkthrough.md` và Hoàn tất Kế hoạch
 
-1. **Tạo file `walkthrough.html`**:
-   Lưu file `walkthrough.html` tại **cùng thư mục** với `plan.html`:
-   - Single-domain: `only-one/domains/<domain>/tasks/<YYYY-MM-DD>_<slug>/walkthrough.html`
-   - Cross-domain (epic): `only-one/epics/<YYYY-MM-DD>_<slug>/walkthrough.html`
-   - Định dạng HTML độc lập có nhúng CSS (hỗ trợ dark/light mode) tương tự cấu trúc của `plan.html`.
+1. **Tạo file `walkthrough.md`**:
+   Lưu file `walkthrough.md` tại **cùng thư mục** với `plan.md`:
+   - Single-domain: `only-one/domains/<domain>/tasks/<YYYY-MM-DD>_<slug>/walkthrough.md`
+   - Cross-domain (epic): `only-one/epics/<YYYY-MM-DD>_<slug>/walkthrough.md`
    - Nội dung viết bằng tiếng Việt:
      - Tóm tắt các thay đổi đã thực hiện (kèm link clickable tới file).
      - Chi tiết các kịch bản test đã chạy và kết quả xác thực.
      - Code diffs / kết quả trực quan minh chứng hoàn thành.
 
-2. **Cập nhật metadata trong `plan.html`**:
-   - Cập nhật `<meta name="status" content="done">`
-   - Cập nhật `<meta name="completed_at" content="<YYYY-MM-DD>">` (ngày hiện tại)
-   - Cập nhật `<meta name="branch" content="...">` và `<meta name="pr_url" content="...">` nếu có.
+2. **Cập nhật frontmatter trong `plan.md`**:
+   - `status: done`
+   - `completed_at: <YYYY-MM-DD>` (ngày hiện tại)
+   - `branch: <branch-name>` và `pr_url: <url>` nếu có.
 
 ---
 
@@ -210,8 +209,8 @@ Files changed:
 - ✓ [DELETE] path/to/file
 
 Artifacts:
-- Plan: only-one/domains/<domain>/tasks/<date>_<slug>/plan.html (status: done)
-- Walkthrough: only-one/domains/<domain>/tasks/<date>_<slug>/walkthrough.html
+- Plan: only-one/domains/<domain>/tasks/<date>_<slug>/plan.md (status: done)
+- Walkthrough: only-one/domains/<domain>/tasks/<date>_<slug>/walkthrough.md
 ```
 
 ---
@@ -219,11 +218,11 @@ Artifacts:
 ## Guardrails
 
 - Do not start implementation before the user confirms if status is `planned`.
-- Update `<meta name="status" content="in-progress">` before the first code change — never after.
+- Update `status: in-progress` before the first code change — never after.
 - Implement in Section 3 order. Do not reorder tasks without a stated reason.
 - Use Section 4 as guidance, not as final code. Apply judgment for repository fit.
 - Do not expand scope beyond what Section 3 lists.
-- Do not modify `plan.html` content (sections 1–5) during implementation — only metadata `<meta>` fields.
+- Do not modify `plan.md` content (sections 1–5) during implementation — only the frontmatter `status` and `branch` fields.
 - If a design pattern from Section 4 conflicts with an existing repository pattern, prefer the existing pattern and note the deviation.
 - Preserve unrelated working-tree changes throughout.
-- Always run verification tests defined in Section 5 and generate `walkthrough.html` upon task completion.
+- Always run verification tests defined in Section 5 and generate `walkthrough.md` upon task completion.
