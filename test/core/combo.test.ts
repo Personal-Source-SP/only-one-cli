@@ -121,7 +121,7 @@ describe('prebuilt combo completeness', () => {
             technologySkill: 'only-one-nestjs-development',
             architectureRule: 'nest-architecture-stack',
             stackMcps: [],
-            forbiddenSkill: undefined,
+            forbiddenSkill: 'only-one-nextjs-development',
         },
     ])('$comboId resolves complete stack mapping', ({ comboId, technologySkill, architectureRule, stackMcps, forbiddenSkill }) => {
         const combo = COMBOS.find(({ id }) => id === comboId);
