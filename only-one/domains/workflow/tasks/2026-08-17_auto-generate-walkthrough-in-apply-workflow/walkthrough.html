@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="status" content="done">
+  <meta name="slug" content="auto-generate-walkthrough-in-apply-workflow">
+  <meta name="domain" content="workflow">
+  <meta name="started_at" content="2026-08-17">
+  <meta name="completed_at" content="2026-08-17">
+  <meta name="pr_url" content="">
+  <meta name="branch" content="">
+  <title>Walkthrough: auto-generate-walkthrough-in-apply-workflow</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1e293b;
+      --card-bg: #f8fafc;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --code-bg: #f1f5f9;
+      --code-fg: #0f172a;
+      --badge-bg: #e2e8f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --fg: #f8fafc;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --primary: #3b82f6;
+        --primary-light: #1e3a5f;
+        --code-bg: #1e293b;
+        --code-fg: #f8fafc;
+        --badge-bg: #334155;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--fg);
+      background-color: var(--bg);
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1, h2, h3, h4 { color: var(--fg); font-weight: 600; margin-top: 1.5rem; }
+    h1 { border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-top: 2rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--badge-bg);
+    }
+    .badge-status { background: #dcfce7; color: #15803d; }
+    .callout {
+      border-left: 4px solid var(--primary);
+      background: var(--card-bg);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 6px 6px 0;
+    }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.9em; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid var(--border); padding: 0.6rem; text-align: left; }
+    th { background: var(--card-bg); }
+    .meta-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .meta-item { font-size: 0.9rem; }
+    .meta-label { font-weight: bold; color: var(--primary); }
+  </style>
+</head>
+<body>
+
+  <h1>Walkthrough: Tự động tạo Walkthrough và Hoàn tất Kế hoạch trong Workflow `only-one-apply`</h1>
+
+  <div class="meta-box">
+    <div class="meta-item"><span class="meta-label">Domain:</span> workflow</div>
+    <div class="meta-item"><span class="meta-label">Task:</span> auto-generate-walkthrough-in-apply-workflow</div>
+    <div class="meta-item"><span class="meta-label">Status:</span> <span class="badge badge-status">done</span></div>
+    <div class="meta-item"><span class="meta-label">Completed:</span> 2026-08-17</div>
+  </div>
+
+  <h2>1. Tổng quan thay đổi</h2>
+  <p>Đã khắc phục lỗi không tạo file walkthrough khi chạy <code>/only-one-apply</code>:</p>
+  <ul>
+    <li><strong>Loại bỏ phụ thuộc không tồn tại</strong>: Xóa bỏ hoàn toàn câu lệnh tham chiếu ảo <code>Run /only-one-done...</code> khỏi workflow.</li>
+    <li><strong>Quy trình khép kín tự động</strong>: Tích hợp trực tiếp các bước chạy kiểm thử (Step 6b), tự động tạo <code>walkthrough.html</code> (Step 7), cập nhật <code>plan.html</code> sang <code>status="done"</code> (Step 7), và đúc rút Negative Rules (Step 7b) vào ngay cuối quy trình <code>/only-one-apply</code>.</li>
+  </ul>
+
+  <h2>2. Danh sách các file đã cập nhật</h2>
+  <ul>
+    <li><a href="file:///Users/kiem/Sources/Personal/only-one-cli/assets/workflows/only-one-apply.md">assets/workflows/only-one-apply.md</a> — Cập nhật quy trình hoàn tất tự động tạo walkthrough và đóng plan.</li>
+    <li><a href="file:///Users/kiem/Sources/Personal/only-one-cli/.agents/workflows/only-one-apply.md">.agents/workflows/only-one-apply.md</a> — Đồng bộ nội dung workflow trong workspace.</li>
+  </ul>
+
+  <h2>3. Kết quả xác thực</h2>
+  <ul>
+    <li><strong>TypeScript Compilation & Prettier Format</strong>: <code>npm run build</code> hoàn tất thành công.</li>
+    <li><strong>Test Suite</strong>: <code>npm test</code> đạt <strong>100% PASS</strong> (45 test files, 179 unit/integration tests).</li>
+  </ul>
+
+  <pre><code>Test Files  45 passed | 2 skipped (47)
+     Tests  179 passed | 4 skipped (183)
+  Duration  3.66s</code></pre>
+
+</body>
+</html>

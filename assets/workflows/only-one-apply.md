@@ -156,9 +156,46 @@ Wait for user guidance before continuing.
 
 ---
 
-## Step 7 — On completion
+## Step 6b — Verification (Kiểm thử xác thực)
 
-When all tasks are done, display:
+Sau khi hoàn thành tất cả task sửa code:
+1. Đọc **Section 5. Test cases** trong `plan.html`.
+2. Chạy các lệnh kiểm thử và build đã được định nghĩa trong kế hoạch (ví dụ `npm test`, `npm run build`, linting).
+3. Đảm bảo toàn bộ test cases đều PASS. Nếu phát sinh lỗi, sửa ngay trước khi chuyển sang Step 7.
+
+---
+
+## Step 7 — Tạo `walkthrough.html` và Hoàn tất Kế hoạch
+
+1. **Tạo file `walkthrough.html`**:
+   Lưu file `walkthrough.html` tại **cùng thư mục** với `plan.html`:
+   - Single-domain: `only-one/domains/<domain>/tasks/<YYYY-MM-DD>_<slug>/walkthrough.html`
+   - Cross-domain (epic): `only-one/epics/<YYYY-MM-DD>_<slug>/walkthrough.html`
+   - Định dạng HTML độc lập có nhúng CSS (hỗ trợ dark/light mode) tương tự cấu trúc của `plan.html`.
+   - Nội dung viết bằng tiếng Việt:
+     - Tóm tắt các thay đổi đã thực hiện (kèm link clickable tới file).
+     - Chi tiết các kịch bản test đã chạy và kết quả xác thực.
+     - Code diffs / kết quả trực quan minh chứng hoàn thành.
+
+2. **Cập nhật metadata trong `plan.html`**:
+   - Cập nhật `<meta name="status" content="done">`
+   - Cập nhật `<meta name="completed_at" content="<YYYY-MM-DD>">` (ngày hiện tại)
+   - Cập nhật `<meta name="branch" content="...">` và `<meta name="pr_url" content="...">` nếu có.
+
+---
+
+## Step 7b — Cập nhật Negative Rules (Lessons Learned)
+
+Đánh giá lại phiên làm việc:
+1. Nếu phát hiện sai sót, giả định sai, build/lint errors hoặc lỗi lặp lại, ghi nhận vào `only-one/rules/rules.md` (tạo file nếu chưa có).
+2. Định dạng: `**[NEVER]** <Hành động cần tránh> — <Lý do / Ngữ cảnh>`.
+3. Thông báo nếu có quy tắc mới được thêm.
+
+---
+
+## Step 8 — Báo cáo Hoàn tất (Completion Summary)
+
+Hiển thị thông báo kết thúc:
 
 ```
 ## Implementation Complete
@@ -172,21 +209,10 @@ Files changed:
 - ✓ [MODIFY] path/to/file
 - ✓ [DELETE] path/to/file
 
-Run `/only-one-done` to create the walkthrough and finalize the plan.
+Artifacts:
+- Plan: only-one/domains/<domain>/tasks/<date>_<slug>/plan.html (status: done)
+- Walkthrough: only-one/domains/<domain>/tasks/<date>_<slug>/walkthrough.html
 ```
-
-Do **not** update `status` to `done` here. That is handled by `/only-one-done`.
-
----
-
-## Step 7b — Update negative rules (Lessons Learned)
-
-Review the implementation session:
-1. Identify any mistakes, incorrect assumptions, build/lint errors, or user corrections encountered during this apply run.
-2. If any new negative rules ("what NOT to do") or anti-patterns were discovered, append them to `only-one/rules/rules.md` (create `only-one/rules/rules.md` if it does not exist).
-3. Format each rule clearly as a negative constraint:
-   - **[NEVER]** `<Action to avoid>` — `<Reason / Context>`
-4. Display a notice if new rules were added to `only-one/rules/rules.md`.
 
 ---
 
@@ -200,4 +226,4 @@ Review the implementation session:
 - Do not modify `plan.html` content (sections 1–5) during implementation — only metadata `<meta>` fields.
 - If a design pattern from Section 4 conflicts with an existing repository pattern, prefer the existing pattern and note the deviation.
 - Preserve unrelated working-tree changes throughout.
-- Do not run test commands unless the plan's Section 5 specifies them and the user confirms.
+- Always run verification tests defined in Section 5 and generate `walkthrough.html` upon task completion.
