@@ -99,6 +99,8 @@ describe('combo command', () => {
             expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(false);
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Workflows:');
+            expect(writes.join('\n')).toContain('Initializing UI/UX Pro Max CLI...');
+            expect(writes.join('\n')).toContain('UI/UX Pro Max initialized successfully for Cursor');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

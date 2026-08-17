@@ -215,6 +215,28 @@ const SKILLS_CLI_TARGETS: Record<string, string> = {
     windsurf: 'windsurf',
 };
 
+export const UIPRO_AI_TARGETS: Record<string, string> = {
+    antigravity: 'antigravity',
+    cursor: 'cursor',
+    claude: 'claude',
+    codex: 'codex',
+    windsurf: 'windsurf',
+    'github-copilot': 'copilot',
+    gemini: 'gemini',
+    opencode: 'opencode',
+    continue: 'continue',
+    kilocode: 'kilocode',
+    cline: 'roocode',
+    roocode: 'roocode',
+    codebuddy: 'codebuddy',
+    factory: 'droid',
+    auggie: 'augment',
+    kiro: 'kiro',
+    qoder: 'qoder',
+    trae: 'trae',
+    warp: 'warp',
+};
+
 const externalSkillPath = (projectDir: string, tool: AgentToolOption, skillName: string): string | undefined =>
     tool.skillsDir ? join(projectDir, tool.skillsDir, 'skills', skillName, 'SKILL.md') : undefined;
 
@@ -488,6 +510,29 @@ export const installCombo = async (params: {
                 openspecResult.status = 'failed';
                 openspecResult.error = `OpenSpec initialization failed: ${message}`;
                 deps.stdout(`    ✗ ${openspecResult.error}`);
+            }
+        }
+
+        // Initialize UI/UX Pro Max whenever its package is available, including an existing global installation.
+        const uiuxResult = results.packages.find((pkg) => pkg.name === 'ui-ux-pro-max-cli');
+        if (uiuxResult && uiuxResult.status !== 'failed' && selectedTools.length > 0) {
+            deps.stdout('\nInitializing UI/UX Pro Max CLI...');
+            for (const tool of selectedTools) {
+                const aiTarget = UIPRO_AI_TARGETS[tool.value];
+                if (!aiTarget) continue;
+                try {
+                    deps.stdout(`  Running: npx ui-ux-pro-max-cli init --ai ${aiTarget} --force`);
+                    await execFileAsync('npx', ['ui-ux-pro-max-cli', 'init', '--ai', aiTarget, '--force'], {
+                        cwd: projectDir,
+                        shell: true,
+                    });
+                    deps.stdout(`    ✓ UI/UX Pro Max initialized successfully for ${tool.name}`);
+                } catch (error) {
+                    const message = error instanceof Error ? error.message : String(error);
+                    uiuxResult.status = 'failed';
+                    uiuxResult.error = `UI/UX Pro Max initialization failed for ${tool.name}: ${message}`;
+                    deps.stdout(`    ✗ ${uiuxResult.error}`);
+                }
             }
         }
     }
