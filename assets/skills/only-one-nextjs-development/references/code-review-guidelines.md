@@ -45,8 +45,9 @@ Tài liệu hướng dẫn quy trình và tiêu chí Review Code dưới góc nh
 - Kiểm tra nội dung tiếng Việt và tiếng Anh rõ nghĩa, đúng thuật ngữ sản phẩm.
 - Kiểm tra đầy đủ label, placeholder, validation message, button text, table column title.
 
-### 7. Kiểm tra Trải nghiệm Vận hành (UX & Edge Cases)
-- Thao tác chính dễ tìm, ít bước thừa.
+### 7. Kiểm tra Trải nghiệm Vận hành & UI/UX (UX & Edge Cases)
+- Đối chiếu với [ui-ux-guidelines.md](ui-ux-guidelines.md) và checklist của skill [ui-ux-pro-max](../ui-ux-pro-max/SKILL.md) về độ tương phản màu, trạng thái Empty/Error, responsive và accessibility.
+- Thao tác chính dễ tìm, ít bước thừa, tuân thủ Priority Cascade (`@/components` > `antd` > `TailwindCSS`).
 - Layout hợp lý, responsive tốt trên Mobile, Tablet, Desktop.
 - Đảm bảo người dùng không bị mất dữ liệu dở chừng (ví dụ: lỡ đóng Drawer/Modal).
 

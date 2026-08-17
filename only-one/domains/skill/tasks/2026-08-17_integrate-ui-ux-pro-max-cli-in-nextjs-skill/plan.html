@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="status" content="in-progress">
+  <meta name="slug" content="integrate-ui-ux-pro-max-cli-in-nextjs-skill">
+  <meta name="domain" content="skill">
+  <meta name="started_at" content="2026-08-17">
+  <meta name="completed_at" content="">
+  <meta name="pr_url" content="">
+  <meta name="branch" content="">
+  <title>Plan: integrate-ui-ux-pro-max-cli-in-nextjs-skill</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1e293b;
+      --card-bg: #f8fafc;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --code-bg: #f1f5f9;
+      --code-fg: #0f172a;
+      --badge-bg: #e2e8f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --fg: #f8fafc;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --primary: #3b82f6;
+        --primary-light: #1e3a5f;
+        --code-bg: #1e293b;
+        --code-fg: #f8fafc;
+        --badge-bg: #334155;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--fg);
+      background-color: var(--bg);
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1, h2, h3, h4 { color: var(--fg); font-weight: 600; margin-top: 1.5rem; }
+    h1 { border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+    h2 { border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; margin-top: 2rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--badge-bg);
+    }
+    .badge-status { background: #dbeafe; color: #1e40af; }
+    .badge-new { background: #dcfce7; color: #15803d; }
+    .badge-modify { background: #fef9c3; color: #854d0e; }
+    .badge-delete { background: #fee2e2; color: #991b1b; }
+    .callout {
+      border-left: 4px solid var(--primary);
+      background: var(--card-bg);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .callout-important { border-left-color: var(--warning); }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.9em; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid var(--border); padding: 0.6rem; text-align: left; }
+    th { background: var(--card-bg); }
+    .meta-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .meta-item { font-size: 0.9rem; }
+    .meta-label { font-weight: bold; color: var(--primary); }
+    .task-list { list-style: none; padding-left: 0; }
+    .task-list li { margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+
+  <h1>Kế hoạch: Tích hợp Tham chiếu Skill `ui-ux-pro-max` vào `only-one-nextjs-development`</h1>
+
+  <div class="meta-box">
+    <div class="meta-item"><span class="meta-label">Domain:</span> skill</div>
+    <div class="meta-item"><span class="meta-label">Task:</span> integrate-ui-ux-pro-max-cli-in-nextjs-skill</div>
+    <div class="meta-item"><span class="meta-label">Status:</span> <span class="badge badge-status">planned</span></div>
+    <div class="meta-item"><span class="meta-label">Date:</span> 2026-08-17</div>
+  </div>
+
+  <h2>Section 1. Hiện trạng (Current State)</h2>
+  
+  <p>Hiện tại trong hệ sinh thái <code>only-one-cli</code>:</p>
+  <ul>
+    <li><strong>Gói cài đặt</strong>: <code>ui-ux-pro-max-cli</code> được cài đặt tự động qua <code>frontend-flow</code> combo hoặc <code>only-one init package ui-ux-pro-max-cli</code>, tạo ra một skill hoàn chỉnh tên là <code>ui-ux-pro-max</code> (đặt tại <code>.agents/skills/ui-ux-pro-max/</code>, <code>.cursor/skills/ui-ux-pro-max/</code>,...) với đầy đủ tài liệu hướng dẫn (<code>SKILL.md</code>), dữ liệu thiết kế (<code>data/</code>) và công cụ tìm kiếm (<code>scripts/search.py</code>).</li>
+    <li><strong>Skill Frontend Master</strong>: Skill <code>assets/skills/only-one-nextjs-development/</code> quản lý quy chuẩn phát triển frontend theo kiến trúc phân tách reference (lazy-loading).</li>
+    <li><strong>Vấn đề hiện tại</strong>:
+      <ul>
+        <li>Trong <code>references/ui-ux-guidelines.md</code> (dòng 5-6), việc nhắc đến skill bị sai tên (<code>ux-ui-pro-max</code> thay vì <code>ui-ux-pro-max</code>) và chưa có hướng dẫn rõ ràng về <em>khi nào kích hoạt/tham chiếu</em> sang skill <code>ui-ux-pro-max</code>.</li>
+        <li><strong>Nguyên tắc Tối ưu Context & DRY</strong>: Không nên viết lại toàn bộ cơ chế hoạt động hay cú pháp lệnh nội bộ của <code>ui-ux-pro-max</code> trong <code>only-one-nextjs-development</code>. Thay vào đó, chỉ cần <strong>tham chiếu trực tiếp (reference link / trigger directive)</strong> sang <code>ui-ux-pro-max</code> khi phát sinh nhu cầu thiết kế/audit, giữ cho tài liệu Frontend tinh gọn và tập trung vào các quy ước đặc thù của dự án (Priority Cascade: <code>@/components</code> &gt; <code>antd</code> &gt; <code>TailwindCSS</code>).</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>Section 2. Thiết kế (Design: Reference-based Integration)</h2>
+
+  <p><strong>Triết lý thiết kế:</strong> Phân định rõ ràng trách nhiệm giữa 2 skills:</p>
+  <ul>
+    <li><strong><code>ui-ux-pro-max</code></strong>: Chịu trách nhiệm về Trí tuệ Thiết kế (Design Intelligence), bộ dữ liệu bảng màu, typography pairings, UX guidelines, biểu đồ charts, và cơ chế tìm kiếm CLI của nó.</li>
+    <li><strong><code>only-one-nextjs-development</code></strong>: Chịu trách nhiệm về kiến trúc Next.js/React, thứ tự ưu tiên tái sử dụng components (Priority Cascade), Refine hooks, Barrel exports, coding standards, và <em>chỉ dẫn Agent chủ động mở skill <code>ui-ux-pro-max</code></em> khi bắt đầu công việc liên quan đến giao diện/UI/UX.</li>
+  </ul>
+
+  <div class="callout">
+    <strong>Giải pháp:</strong> Bổ sung tham chiếu trực tiếp đến <code>ui-ux-pro-max</code> trong <code>SKILL.md</code> và <code>references/ui-ux-guidelines.md</code> cùng bảng kích hoạt (Trigger Matrix) rõ ràng, không trùng lặp mô tả kỹ thuật của công cụ.
+  </div>
+
+  <h2>Section 3. Kiến trúc triển khai (Implementation Architecture)</h2>
+
+  <ul class="task-list">
+    <li><span class="badge badge-modify">[MODIFY]</span> <code>assets/skills/only-one-nextjs-development/SKILL.md</code> - Cập nhật bảng điều hướng Master Reference Routing Matrix và bổ sung liên kết tham chiếu sang skill <code>ui-ux-pro-max</code>.</li>
+    <li><span class="badge badge-modify">[MODIFY]</span> <code>assets/skills/only-one-nextjs-development/references/ui-ux-guidelines.md</code> - Cập nhật đúng tên skill <code>ui-ux-pro-max</code>, định nghĩa rõ các tình huống cần mở skill <code>ui-ux-pro-max</code> (lên layout mới, chọn màu/font, a11y audit, chart selection), và giữ nguyên trọng tâm là Priority Cascade.</li>
+    <li><span class="badge badge-modify">[MODIFY]</span> <code>assets/skills/only-one-nextjs-development/references/code-review-guidelines.md</code> - Thêm chỉ dẫn tham khảo checklist của <code>ui-ux-pro-max</code> khi review UI/UX.</li>
+  </ul>
+
+  <h2>Section 4. Chi tiết mã nguồn & Nội dung tham chiếu (Implementation Code Examples)</h2>
+
+  <h3>1. [MODIFY] <code>assets/skills/only-one-nextjs-development/references/ui-ux-guidelines.md</code></h3>
+  <p>Cập nhật mục 1 thành cơ chế tham chiếu trực tiếp:</p>
+
+  <pre><code># UI/UX & Styling Guidelines
+
+## Quy chuẩn Giao diện & Trải nghiệm Người dùng
+
+### 1. Kích hoạt Trí tuệ Thiết kế (Tham chiếu Skill `ui-ux-pro-max`)
+Khi thực hiện các công việc liên quan đến giao diện, Agent BẮT BUỘC tham chiếu và sử dụng skill [ui-ux-pro-max](../ui-ux-pro-max/SKILL.md) (hoặc `.agents/skills/ui-ux-pro-max/SKILL.md` / `.cursor/skills/ui-ux-pro-max/SKILL.md` trong workspace) theo các trường hợp sau:
+
+| Nhiệm vụ UI/UX | Khi nào cần mở skill `ui-ux-pro-max`? |
+| :--- | :--- |
+| **Thiết kế Trang / Feature mới** | Tham khảo phong cách thiết kế tổng thể (Design System), bố cục layout và SaaS patterns. |
+| **Phối màu & Typography** | Tra cứu bảng màu chuẩn (Palette profiles), độ tương phản và font pairings. |
+| **Trải nghiệm Người dùng (UX)** | Tra cứu quy chuẩn micro-interactions, 5 trạng thái component (Loading, Empty, Error, Success, Skeleton), và form/table ergonomics. |
+| **Biểu đồ & Data Visualization** | Tra cứu loại biểu đồ (Chart types) phù hợp với loại dữ liệu cần trực quan hóa. |
+| **Accessibility (a11y) & Audit** | Đối chiếu checklist tương thích thiết bị, độ tương phản màu WCAG AA và phím điều hướng. |
+
+---
+
+### 2. Thứ tự Ưu tiên Tái sử dụng Component & Styling (Priority Cascade)
+
+BẮT BUỘC tuân thủ nghiêm ngặt thứ tự ưu tiên 3 cấp dưới đây khi phát triển UI:
+
+$$\text{1. Common Components (@/components)} \longrightarrow \text{2. Ant Design (@/antd)} \longrightarrow \text{3. TailwindCSS}$$
+
+1. **Cấp 1 (Ưu tiên cao nhất - `@/components`)**:
+   - Khảo sát và tái sử dụng toàn bộ các components dùng chung đã đóng gói sẵn trong `src/components/` (`ListWrapper`, `ListTable`, `FilterPanel`, `CardAction`, `CustomDrawerForm`, `CustomInputForm`, `CustomSelectInput`, `CustomModal`, `UploadImage`,...).
+2. **Cấp 2 (Ưu tiên thứ hai - Ant Design `antd`)**:
+   - Nếu `@/components` không có wrapper sẵn, sử dụng các nguyên mẫu UI components từ thư viện Ant Design (`Button`, `Table`, `Tag`, `Typography`, `Card`, `Space`, `Drawer`, `Modal`, `Form`, `Input`, `Select`, `Badge`,...).
+3. **Cấp 3 (Ưu tiên thứ ba - TailwindCSS)**:
+   - CHỈ sử dụng TailwindCSS cho việc sắp xếp bố cục layout (Flexbox, Grid, spacing gap/margin/padding), cấu hình responsive breakpoints hoặc custom styling khi Cấp 1 và Cấp 2 không đáp ứng đủ.
+
+- **Color Constants**: Tái sử dụng các hằng số màu sắc chuẩn trong ứng dụng (`ACTIVE_STATUS_COLORS`, `BOOLEAN_TAG_COLORS`).
+
+---
+
+### 3. Responsive & Accessibility (a11y)
+- Kiểm tra hiển thị tương thích tốt trên cả Mobile, Tablet và Desktop.
+- Đảm bảo các phần tử tương tác có thể điều khiển bằng bàn phím (Keyboard operable) và hiển thị rõ trạng thái Focus.
+- Các nút chỉ chứa icon (Icon-only buttons) BẮT BUỘC phải có `Tooltip` hoặc thuộc tính `aria-label`.
+</code></pre>
+
+  <h3>2. [MODIFY] <code>assets/skills/only-one-nextjs-development/SKILL.md</code></h3>
+  <p>Cập nhật dòng định hướng trong Routing Matrix:</p>
+  <pre><code>| **UI/UX Design, Accessibility, Styling, Ant Design & Skill `ui-ux-pro-max`** | [references/ui-ux-guidelines.md](references/ui-ux-guidelines.md) |</code></pre>
+
+  <h3>3. [MODIFY] <code>assets/skills/only-one-nextjs-development/references/code-review-guidelines.md</code></h3>
+  <p>Bổ sung tham chiếu `ui-ux-pro-max` trong mục review giao diện:</p>
+  <pre><code>- **Review UI/UX**: Đối chiếu với [ui-ux-guidelines.md](ui-ux-guidelines.md) và checklist của skill [ui-ux-pro-max](../ui-ux-pro-max/SKILL.md) về độ tương phản màu, trạng thái Empty/Error, responsive và accessibility.</code></pre>
+
+  <h2>Section 5. Kịch bản kiểm thử (Test Cases)</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Mã TC</th>
+        <th>Mục tiêu</th>
+        <th>Tiền điều kiện</th>
+        <th>Thao tác kiểm thử</th>
+        <th>Kết quả kỳ vọng</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>TC-01</strong></td>
+        <td>Xác thực tính chính xác của reference link</td>
+        <td>Đã sửa <code>SKILL.md</code> và <code>references/ui-ux-guidelines.md</code></td>
+        <td>Kiểm tra tên skill <code>ui-ux-pro-max</code> và đường dẫn tham chiếu</td>
+        <td>Tên skill chính xác là <code>ui-ux-pro-max</code>, không còn <code>ux-ui-pro-max</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>TC-02</strong></td>
+        <td>Đảm bảo tính tinh gọn (Token Efficiency)</td>
+        <td>Đọc file <code>references/ui-ux-guidelines.md</code></td>
+        <td>Đếm số dòng & kích thước file</td>
+        <td>File ngắn gọn (&lt;45 dòng), không chứa mã nguồn duplicate từ skill khác.</td>
+      </tr>
+      <tr>
+        <td><strong>TC-03</strong></td>
+        <td>Kiểm tra build & test toàn dự án</td>
+        <td>Codebase sau khi cập nhật</td>
+        <td>Chạy <code>npm run build</code> và <code>npm test</code></td>
+        <td>100% tests pass và TypeScript build thành công.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Các lệnh xác thực</h3>
+  <pre><code>npm run build
+npm test</code></pre>
+
+</body>
+</html>

@@ -22,7 +22,7 @@ Chỉ dùng `view_file` để đọc **đúng file reference** tương ứng v�
 | **i18n Translations (`useTranslation`) & Constants** | [references/i18n-and-constants.md](references/i18n-and-constants.md) |
 | **Next.js Router (App Router vs Pages Router, RSC/Client Boundary)** | [references/app-and-pages-router.md](references/app-and-pages-router.md) |
 | **React State, Hooks (`useMemo`, `useCallback`, `useEffect`), Async UI** | [references/react-state-and-hooks.md](references/react-state-and-hooks.md) |
-| **UI/UX Design, Accessibility, Styling & Ant Design** | [references/ui-ux-guidelines.md](references/ui-ux-guidelines.md) |
+| **UI/UX Design, Accessibility, Styling, Ant Design & Skill `ui-ux-pro-max`** | [references/ui-ux-guidelines.md](references/ui-ux-guidelines.md) |
 | **Runtime Browser Verification & Debugging Dev Loop** | [references/next-runtime-dev-loop.md](references/next-runtime-dev-loop.md) |
 | **Next.js Caching, Performance & Partial Prefetching** | [references/next-cache-and-performance.md](references/next-cache-and-performance.md) |
 | **Review Code theo nghiệp vụ (BA/Product Review) / Quality Audit** | [references/code-review-guidelines.md](references/code-review-guidelines.md) |
