@@ -211,10 +211,11 @@ describe('init command', () => {
             expect(existsSync(gitignorePath)).toBe(true);
 
             const gitignoreContent = await import('node:fs/promises').then((fs) => fs.readFile(gitignorePath, 'utf-8'));
-            expect(gitignoreContent).toContain('# AI project settings');
-            expect(gitignoreContent).toContain('.agent/');
+            expect(gitignoreContent).toContain('.agents/');
             expect(gitignoreContent).toContain('# Only One');
             expect(gitignoreContent).toContain('only-one/');
+            expect(gitignoreContent).not.toContain('.agent/');
+            expect(gitignoreContent).not.toContain('.gitnexus/');
             expect(gitignoreContent).not.toContain('adr/');
         } finally {
             await rm(cwd, { recursive: true, force: true });

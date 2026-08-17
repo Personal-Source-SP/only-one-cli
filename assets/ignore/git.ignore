@@ -1,11 +1,7 @@
 # AI project settings
-.agent/
 .agents/
 .claude/
 .cursor/
 
-# Git Nexus
-.gitnexus/
-
-# Only One 
+# Only One
 only-one/
