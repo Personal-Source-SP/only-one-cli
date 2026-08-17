@@ -10,9 +10,7 @@ export interface PlanConfigOptions {
     configFilesMap?: Record<string, { src: string; dest: string }>;
 }
 
-export const DEFAULT_CONFIG_MAP: Record<string, { src: string; dest: string }> = {
-    openspec: { src: 'templates/openspec/config.yaml', dest: 'openspec/config.yaml' },
-};
+export const DEFAULT_CONFIG_MAP: Record<string, { src: string; dest: string }> = {};
 
 export async function planConfigs(options: PlanConfigOptions): Promise<PlannedItem[]> {
     const { projectDir, selectedConfigNames, origin = 'selected', reason, configFilesMap = DEFAULT_CONFIG_MAP } = options;

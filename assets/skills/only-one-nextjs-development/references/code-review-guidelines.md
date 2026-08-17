@@ -7,7 +7,7 @@ Tài liệu hướng dẫn quy trình và tiêu chí Review Code dưới góc nh
 ## 1. Bối cảnh & Nguyên tắc Review
 
 - **Tư duy Product Engineer / BA**: Sản phẩm là product vận hành thật, không phải bài tập làm theo checklist kỹ thuật đơn thuần. Code triển khai phải đúng luồng nghiệp vụ, không làm sai lệch hành vi sản phẩm, và không tạo rủi ro cho người dùng cuối.
-- **Phạm vi đối chiếu**: Reviewer phải đối chiếu thay đổi với yêu cầu nghiệp vụ (OpenSpec, Acceptance Criteria, Tickets), luồng người dùng (User Flow), hợp đồng dữ liệu (API Contracts) và các trường hợp biên (Edge Cases).
+- **Phạm vi đối chiếu**: Reviewer phải đối chiếu thay đổi với yêu cầu nghiệp vụ (Specs, Acceptance Criteria, Tickets), luồng người dùng (User Flow), hợp đồng dữ liệu (API Contracts) và các trường hợp biên (Edge Cases).
 
 ---
 

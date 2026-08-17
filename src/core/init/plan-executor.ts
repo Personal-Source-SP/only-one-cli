@@ -62,8 +62,9 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
     const configItems = plan.items.filter((i) => i.category === 'config');
     for (const item of configItems) {
         try {
-            const srcRel = item.meta?.src || 'templates/openspec/config.yaml';
-            const destRel = item.meta?.dest || 'openspec/config.yaml';
+            const srcRel = item.meta?.src;
+            const destRel = item.meta?.dest;
+            if (!srcRel || !destRel) continue;
             const packageRoot = resolvePackageRoot(import.meta.url);
             const absSrc = join(packageRoot, 'assets', srcRel);
             const absDest = join(plan.projectDir, destRel);

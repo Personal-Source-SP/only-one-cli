@@ -37,16 +37,19 @@ describe('Package & Config Planners (Tasks 2.1 - 2.6)', () => {
     it('plans configs without side effects and detects existing config file', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'config-plan-test-'));
         try {
-            await mkdir(join(cwd, 'openspec'), { recursive: true });
-            await writeFile(join(cwd, 'openspec/config.yaml'), 'existing config');
+            await mkdir(join(cwd, 'custom'), { recursive: true });
+            await writeFile(join(cwd, 'custom/config.json'), 'existing config');
 
             const items = await planConfigs({
                 projectDir: cwd,
-                selectedConfigNames: ['openspec'],
+                selectedConfigNames: ['custom'],
+                configFilesMap: {
+                    custom: { src: 'templates/custom.json', dest: 'custom/config.json' },
+                },
             });
 
             expect(items.length).toBe(1);
-            expect(items[0].key).toBe('config:openspec');
+            expect(items[0].key).toBe('config:custom');
             expect(items[0].state).toBe('existing');
         } finally {
             await rm(cwd, { recursive: true, force: true });

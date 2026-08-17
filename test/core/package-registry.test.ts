@@ -18,13 +18,9 @@ describe('Package Registry Model (Task 1.1, 1.4 & 1.5)', () => {
         expect(superpowers).toBeUndefined();
     });
 
-    it('OpenSpec and UI/UX Pro Max maintain npm installer strategy', () => {
+    it('OpenSpec is excluded and UI/UX Pro Max maintains npm installer strategy', () => {
         const openspec = PACKAGES.find((p) => p.id === '@fission-ai/openspec' || p.id === 'openspec');
-        expect(openspec).toBeDefined();
-        expect(openspec?.installer.kind).toBe('npm');
-        if (openspec?.installer.kind === 'npm') {
-            expect(openspec.installer.packageName).toBe('@fission-ai/openspec');
-        }
+        expect(openspec).toBeUndefined();
 
         const uiux = PACKAGES.find((p) => p.id === 'ui-ux-pro-max-cli');
         expect(uiux).toBeDefined();

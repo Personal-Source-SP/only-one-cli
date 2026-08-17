@@ -7,7 +7,6 @@ import { promisify } from 'node:util';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
 import { checkExistingWorkflows, installWorkflows, type WorkflowInstallResult } from '@/core/workflow/index.js';
-import { normalizeOpenSpecAntigravityOutput } from '@/core/openspec/normalize-antigravity.js';
 import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import type {
@@ -44,7 +43,7 @@ export type ComboComponentStatus = 'installed' | 'missing' | 'partial' | 'not-ap
 
 export interface ExistingComboComponent {
     type: 'package' | 'skill' | 'config' | 'mcp' | 'rule' | 'workflow';
-    id: string; // e.g. "package:@fission-ai/openspec", "skill:cursor:c4-diagrams", "config:openspec", "mcp:cursor:github"
+    id: string; // e.g. "package:ui-ux-pro-max-cli", "skill:cursor:c4-diagrams", "config:eslint", "mcp:cursor:github"
     name: string; // Name of package, skill, config, or mcp
     toolId?: string; // If skill/mcp, which tool/ide
     label: string; // User-friendly description
@@ -489,27 +488,6 @@ export const installCombo = async (params: {
                     status: 'failed',
                     error: err instanceof Error ? err.message : String(err),
                 });
-            }
-        }
-
-        // Initialize OpenSpec whenever its package is available, including an existing global installation.
-        const openspecResult = results.packages.find((pkg) => pkg.name === '@fission-ai/openspec');
-        if (openspecResult && openspecResult.status !== 'failed') {
-            deps.stdout('\nInitializing OpenSpec CLI...');
-            const toolIds = selectedTools.map((t) => t.value).join(',');
-            const toolsArg = toolIds || 'none';
-            try {
-                deps.stdout(`  Running: npx openspec init --tools ${toolsArg} --force`);
-                await execFileAsync('npx', ['openspec', 'init', '--tools', toolsArg, '--force'], { cwd: projectDir, shell: true });
-                if (selectedTools.some((tool) => tool.value === 'antigravity')) {
-                    await normalizeOpenSpecAntigravityOutput(projectDir);
-                }
-                deps.stdout('    ✓ OpenSpec CLI initialized successfully');
-            } catch (error) {
-                const message = error instanceof Error ? error.message : String(error);
-                openspecResult.status = 'failed';
-                openspecResult.error = `OpenSpec initialization failed: ${message}`;
-                deps.stdout(`    ✗ ${openspecResult.error}`);
             }
         }
 

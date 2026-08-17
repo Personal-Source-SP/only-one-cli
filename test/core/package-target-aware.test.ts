@@ -16,12 +16,12 @@ describe('Package Verification & Non-TTY Reinstall Safety (Tasks 4.1 & 4.3)', ()
             deps: deps as ProgramDeps,
             projectDir: '/tmp/test-project',
             packageManifests: PACKAGES,
-            selectedPackageIds: ['@fission-ai/openspec'],
+            selectedPackageIds: ['ui-ux-pro-max-cli'],
             overwriteList: [], // empty overwriteList -> non-TTY skip
             execFileAsync: execFileSpy,
         });
 
-        expect(result.summary.skipped).toContain('@fission-ai/openspec');
+        expect(result.summary.skipped).toContain('ui-ux-pro-max-cli');
         expect(execFileSpy).not.toHaveBeenCalled();
     });
 
@@ -37,12 +37,12 @@ describe('Package Verification & Non-TTY Reinstall Safety (Tasks 4.1 & 4.3)', ()
             deps: deps as ProgramDeps,
             projectDir: '/tmp/test-project',
             packageManifests: PACKAGES,
-            selectedPackageIds: ['@fission-ai/openspec'],
-            overwriteList: ['@fission-ai/openspec'],
+            selectedPackageIds: ['ui-ux-pro-max-cli'],
+            overwriteList: ['ui-ux-pro-max-cli'],
             execFileAsync: execFileSpy,
         });
 
-        expect(result.summary.installed).toContain('@fission-ai/openspec');
+        expect(result.summary.installed).toContain('ui-ux-pro-max-cli');
         expect(execFileSpy).toHaveBeenCalled();
     });
 });

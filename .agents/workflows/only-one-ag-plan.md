@@ -16,7 +16,7 @@ You are a Senior Software Architect specializing in codebase analysis and implem
 
 ## Purpose
 
-Research relevant current code, then create one reviewable `plan.html` document. Do not invoke OpenSpec, create separate planning documents, or modify project source.
+Research relevant current code, then create one reviewable `plan.html` document. Do not create separate planning documents or modify project source.
 
 ## 1. Research current code
 
@@ -328,7 +328,6 @@ End with verified repository commands planned for test, lint, typecheck.
 ## Guardrails
 
 - Create or update only the plan file at its resolved DDD path (`plan.html`) during this workflow. Do not create files outside `only-one/domains/` or `only-one/epics/`.
-- Do not invoke OpenSpec.
 - Do not create separate `.md` planning files.
 - Do not modify project source during planning.
 - Do not propose unverified files, symbols, contracts, or commands.

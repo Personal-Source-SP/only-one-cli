@@ -32,7 +32,7 @@ describe('installAgentArtifacts', () => {
             expect(result.tools[0]?.command?.installed).toBe(true);
 
             const skill = await readFile(join(projectDir, '.cursor', 'skills', 'only-one-structure-generate', 'SKILL.md'), 'utf-8');
-            expect(skill).toContain('Do NOT run `openspec` CLI');
+            expect(skill).toContain('Do NOT include domain entities');
             expect(skill).toContain('structure/');
             expect(skill).toContain('generatedBy: "0.3.1-test"');
         } finally {

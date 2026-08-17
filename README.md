@@ -1,12 +1,11 @@
 # only-one
 
-CLI for developer environment setup, AI agent workspace management, OpenSpec workflows, and supported editor configuration synchronization.
+CLI for developer environment setup, AI agent workspace management, workflows, and supported editor configuration synchronization.
 
 ## Requirements
 
 - **Node.js 22+**
 - Git
-- `@fission-ai/openspec` for OpenSpec projects; `only-one init` can install it when needed
 
 ## Install
 
@@ -21,7 +20,7 @@ npm install -g only-one
 only-one init
 
 # Apply predefined package, plugin, skill, rule, workflow, and MCP setup
-only-one combo idsd-flow
+only-one combo frontend-flow
 
 # Check environment readiness
 only-one doctor
@@ -54,27 +53,6 @@ only-one init combo [path] [names]
 only-one init mcp [names]
 ```
 
-OpenSpec setup normalizes Antigravity output, reports initialization failures, and avoids copying symlinked legacy skills.
-
-## OpenSpec profiles
-
-- `frontend-flow` installs `openspec-fe`, selecting `intent-driven-fe`.
-- `backend-flow` installs `openspec-be`, selecting `intent-driven-be`.
-- Both config assets copy to project `openspec/`; select one profile per initialization. Do not combine both assets in one project because they share destination.
-
-Use OpenSpec directly; FE/BE planning and implementation slash workflows are not installed:
-
-```bash
-openspec propose <change-name>
-openspec instructions proposal --change <change-name> --json
-openspec instructions specs --change <change-name> --json
-openspec instructions design --change <change-name> --json
-openspec instructions tasks --change <change-name> --json
-openspec apply <change-name>
-```
-
-Read returned instructions before creating each artifact or applying work. Installed profile schema defines artifact format, required skill/tool gates, phase acceptance, feedback rework, and checkbox tracking.
-
 ### `skill`
 
 Manage and synchronize custom agent skills for selected tools.
@@ -93,7 +71,7 @@ Manage and synchronize bundled agent workflows.
 only-one workflow [path] [names] --tool cursor
 ```
 
-Bundled workflows cover bounded feature planning, TDD implementation, evidence-driven bug fixes, accessible UI work, GitHub pull requests, Clockify logging, and OpenSpec propose/apply/archive/explore flows. Implementation workflows include approval gates, code intelligence discovery, verification, and safe worktree cleanup guidance.
+Bundled workflows cover bounded feature planning, TDD implementation, evidence-driven bug fixes, accessible UI work, GitHub pull requests, and Clockify logging. Implementation workflows include approval gates, code intelligence discovery, verification, and safe worktree cleanup guidance.
 
 ### `plugin`
 
@@ -150,8 +128,9 @@ only-one package [path] [names]
 
 Bundled package definitions include:
 
-- `@fission-ai/openspec`: global npm package
 - `ui-ux-pro-max-cli`: global npm package
+- `wondelai/skills/system-design`: system design skills
+- `ux-flow-designer`: UX flow designer skills
 
 ### `structure-generate`
 
@@ -225,10 +204,6 @@ Initialization can merge bundled Git, Docker, and npm ignore templates. Git igno
 ### Clockify
 
 `only-one-clockify` requires its bundled skill, Clockify MCP server, and `CLOCKIFY_API_KEY`. Task lines use `[Label] Description | start-endh`; validation checks GMT+7 time ranges and overlaps before logging.
-
-### OpenSpec
-
-Bundled propose, apply, archive, and explore workflows support change artifacts, approval gates, test-driven execution, archive synchronization, and safe cleanup of eligible AI worktrees.
 
 ## Compatibility
 

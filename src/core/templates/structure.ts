@@ -76,7 +76,6 @@ Structure the markdown file with these sections:
 6. **Verify** the file exists and summarize for the user.
 
 **Guardrails**
-- Do NOT run \`openspec\` CLI or create \`openspec/changes/\`
 - Do NOT include domain entities, user stories, or feature names
 - Do NOT paste raw source code
 - Ask before overwrite unless the user requested regeneration

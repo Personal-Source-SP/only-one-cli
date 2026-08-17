@@ -16,7 +16,7 @@ export function createDoctorCommand(deps: ProgramDeps): Command {
                 `  ${COLORS.cli.command('$ only-one doctor')}\n` +
                 `  ${COLORS.cli.command('$ only-one doctor --editor cursor')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
-                `  - ${COLORS.dim('Checks Node.js, npm, nvm, GitNexus, OpenSpec, target IDE settings, MCP, skills, rules, ignore files, and extensions.')}`,
+                `  - ${COLORS.dim('Checks Node.js, npm, nvm, GitNexus, target IDE settings, MCP, skills, rules, ignore files, and extensions.')}`,
         )
         .action(async (options: DoctorCommandOptions) => {
             let targetEditorId = options.editor;

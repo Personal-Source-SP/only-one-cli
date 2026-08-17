@@ -68,7 +68,7 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
         });
     }
 
-    // 2. Thư viện & Tools: GitNexus, OpenSpec
+    // 2. Thư viện & Tools: GitNexus
     try {
         const gitNexusVer = execFileSync('gitnexus', ['--version'], { encoding: 'utf-8' }).trim();
         results.push({
@@ -86,26 +86,6 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
             detail: 'not found',
             required: false,
             remediation: 'Install gitnexus global CLI or check path',
-        });
-    }
-
-    try {
-        const openspecVer = execFileSync('openspec', ['--version'], { encoding: 'utf-8' }).trim();
-        results.push({
-            category: 'Libraries',
-            name: 'OpenSpec',
-            ok: true,
-            detail: openspecVer,
-            required: false,
-        });
-    } catch {
-        results.push({
-            category: 'Libraries',
-            name: 'OpenSpec',
-            ok: false,
-            detail: 'not found',
-            required: false,
-            remediation: 'Install openspec via `npm install -g @openspec/cli`',
         });
     }
 

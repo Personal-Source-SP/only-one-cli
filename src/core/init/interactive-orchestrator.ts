@@ -3,6 +3,7 @@ import { selectAllowedAgentTargets } from '@/core/target-selection/wrappers.js';
 import { select } from '@inquirer/prompts';
 import { readComboManifests } from '@/core/combo/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
+import { CONFIGS } from '@assets/configs/index.js';
 import { readMcpManifests } from '@/core/mcp/registry.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { RULES } from '@assets/rules/index.js';
@@ -95,10 +96,13 @@ export async function promptInitSelections(
             });
         }
 
-        selectedConfigs = await deps.prompts.checkbox({
-            message: 'Select configuration templates to generate (optional, empty to skip):',
-            choices: [{ name: 'openspec — OpenSpec project configuration', value: 'openspec', checked: true }],
-        });
+        const configChoices = Object.values(CONFIGS).map((c) => ({ name: `${c.name} — ${c.description}`, value: c.name }));
+        if (configChoices.length > 0) {
+            selectedConfigs = await deps.prompts.checkbox({
+                message: 'Select configuration templates to generate (optional, empty to skip):',
+                choices: configChoices,
+            });
+        }
 
         const { manifests: mcpManifests } = await readMcpManifests();
         selectedMcps = await deps.prompts.checkbox({
