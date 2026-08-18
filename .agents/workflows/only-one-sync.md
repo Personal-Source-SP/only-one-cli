@@ -1,50 +1,45 @@
 ---
-description: "Check use cases against current codebase and sync: update changed, add new, mark deleted."
+description: "Sync domain use cases from tasks (if present) and current codebase for a specific domain, then clean up consolidated tasks."
 ---
 
 ## Input
 
 ```text
-/only-one-sync [<domain>]
+/only-one-sync <domain>
 ```
 
-- **With domain**: sync use cases for that specific domain only.
-- **Without domain**: ask if the user wants to sync all domains; if confirmed, sync all.
+- **`<domain>` (Required)**: The specific domain name to synchronize (e.g., `auth`, `billing`, `washing-machine`).
+- **If no domain is provided**: Stop immediately. List available domains found under `only-one/domains/` and ask the user to specify a domain before proceeding. Batch syncing all domains at once is not supported.
 
 ## Role
 
-You are a Domain Analyst. Your responsibility: compare the living use case catalog against the current codebase, identify what has drifted, and bring both sides into sync. Do not implement application features.
+You are a Domain Analyst. Your responsibility: analyze domain tasks (if any) and current codebase implementation, update or rewrite the domain use cases to reflect reality, and clean up consolidated task folders after user confirmation. Do not implement application features.
 
 ## Purpose
 
-Use cases document business behavior. Over time, code changes without updating use cases, or use cases describe behaviors that no longer exist. This workflow detects and resolves that drift.
+Use cases document business behavior and serve as the Single Source of Truth for domain logic. Over time, as tasks are completed and code changes, use cases may become outdated or task records may accumulate. This workflow consolidates changes into use cases and keeps the domain workspace clean and organized.
 
 ---
 
-## Step 1 — Resolve target domains
+## Step 1 — Resolve target domain
 
-**If a domain name is provided:**
-1. Check if `only-one/domains/<domain>/` exists.
-2. If not found: automatically create `only-one/domains/<domain>/use-cases/` directory structure.
-3. Proceed with that single domain.
-
-**If no domain is provided:**
-1. Check if `only-one/domains/` exists and contains domain directories.
-2. If `only-one/domains/` does not exist or has no domain subdirectories:
-   - Ask the user:
-     > "Chưa có domain nào trong `only-one/domains/`. Bạn muốn tạo và sync domain nào?"
-   - Once the user specifies a domain, create `only-one/domains/<domain>/use-cases/` and proceed with that domain.
-3. If `only-one/domains/` contains domain subdirectories:
-   - Ask the user:
-     > "Không có domain nào được chỉ định. Bạn có muốn sync tất cả domains không?"
-   - If **yes**: collect all folders under `only-one/domains/` as target domains.
-   - If **no**: ask which domain to sync and wait for selection.
+1. **Validate domain argument**:
+   - If `<domain>` argument is missing:
+     - Scan `only-one/domains/` to find existing domain directories.
+     - Display a prompt with the available domains:
+       > "Please specify a domain to synchronize (e.g., `/only-one-sync <domain>`)."
+       > "Available domains: `<domain1>`, `<domain2>`, ..."
+     - Stop workflow execution immediately.
+2. **Check domain directory**:
+   - Verify if `only-one/domains/<domain>/` exists.
+   - If not found: automatically create `only-one/domains/<domain>/use-cases/` and `only-one/domains/<domain>/tasks/` directories.
+3. Proceed to analyze the target domain.
 
 ---
 
-## Step 2 — Analyze each domain
+## Step 2 — Analyze domain
 
-Repeat this process for every target domain.
+Execute the following 4 analysis steps in sequence:
 
 ### 2a. Read existing use cases
 
@@ -53,96 +48,110 @@ ls only-one/domains/<domain>/use-cases/*.md 2>/dev/null
 ```
 
 Read every `.md` file found (skip `README.md`). For each, record:
-- `id`, `title`, `status`, `USE`/`WHEN` statement, preconditions, all scenarios.
+- `id`, `title`, `status`, `USE`/`WHEN` statement, preconditions, and all scenarios (`GIVEN` / `WHEN` / `THEN`).
 
 If no use case files exist, note: "No use cases yet for this domain."
 
-### 2b. Scan codebase for domain behaviors
+### 2b. Scan and read domain tasks (Optional)
 
-Search for behavioral entry points related to this domain:
-- REST controllers, route handlers, service methods, command handlers, event listeners.
-- Look for the domain name as a keyword in file paths and class names first.
-- Then read relevant files to understand what each entry point does.
+```bash
+ls -d only-one/domains/<domain>/tasks/*/ 2>/dev/null
+```
 
-For each entry point found, derive:
-- **What it does** (the behavior in plain language).
-- **Who calls it** (actor or system).
-- **When it is triggered** (precondition or context).
-- **Outcome** (success and failure paths).
+- **If task directories exist**:
+  - Read `plan.md` and `walkthrough.md` files in each task folder (prioritizing tasks with `status: done` or recently completed tasks).
+  - Extract: Business objectives, logic changes, new flows, scenarios, edge cases, and acceptance criteria that have been implemented.
+  - Mark these task folders in the `Consolidated Tasks` list for cleanup after sync.
+- **If NO tasks exist (empty directory or no tasks created yet)**:
+  - Note: "No tasks found in domain."
+  - Continue seamlessly to Step 2c without throwing errors or blocking execution.
 
-Keep search bounded to the domain scope. Do not read unrelated modules.
+### 2c. Scan codebase for domain behaviors
 
-### 2c. Classify
+Search for behavioral entry points and business logic related directly to this domain in the source code:
+- REST controllers, route handlers, GraphQL resolvers.
+- Service methods, command/query handlers, event listeners, background job processors.
+- Entities, DTOs, domain models, validation schemas.
+- Unit and integration tests associated with the domain.
 
-Compare use cases against codebase findings. Assign each item a classification:
+For each behavior found in code, derive:
+- **Behavior in plain language** (What it actually does).
+- **Actor** (Who triggers it or which system event initiates it).
+- **Preconditions & Context** (Required state or setup).
+- **Outcomes** (Success path, error handling, returned data/events).
+
+### 2d. Classify & consolidate
+
+Cross-reference findings from Tasks (if any) and the actual Codebase against Existing Use Cases. Assign each item a classification:
 
 | Classification | Condition |
 |---|---|
-| `CHANGED` | Use case exists; code behavior has diverged from documented scenarios |
-| `NEW` | Behavior found in code; no use case covers it |
-| `DELETED` | Use case exists; behavior no longer present in code |
-| `IN_SYNC` | Use case accurately reflects current code behavior |
+| `CHANGED` | Use case exists; code behavior or task logic has diverged from documented scenarios |
+| `NEW` | Behavior found in tasks/code; no use case currently covers it |
+| `DELETED` | Use case exists; behavior is no longer present in code / feature removed |
+| `IN_SYNC` | Use case accurately reflects current code and task behavior |
+
+Compile the list of `Tasks to Clean Up`: Path of task folders to be deleted after user confirmation.
 
 ---
 
 ## Step 3 — Present sync report
 
-After analyzing all target domains, present a combined report in **Vietnamese**. Keep code identifiers and file paths in **English**.
+Present a structured sync report in **Vietnamese** (keep code identifiers, symbol names, and file paths in **English**).
 
 ### Report format
 
-```
+```markdown
 ## Sync Report
 
 ### Domain: <domain-name>
 
 #### ✏️ CHANGED (<n>)
-- <UC-ID> <Title> — <mô tả ngắn gọn điều gì đã thay đổi trong code>
-  ...
+- <UC-ID> <Title> — <brief description of changes in code and tasks>
 
 #### 🆕 NEW (<n>)
-- Behavior: <mô tả behavior mới phát hiện trong code> (found in <file/symbol>)
-  ...
+- Behavior: <description of new behavior found> (found in <file/symbol/task>)
 
 #### 🗑️ DELETED (<n>)
-- <UC-ID> <Title> — <mô tả lý do: symbol/file đã bị xoá hoặc đổi tên>
-  ...
+- <UC-ID> <Title> — <reason: symbol/feature removed from codebase>
 
 #### ✅ IN SYNC (<n>)
 - <UC-ID>, <UC-ID>, ...
+
+#### 🧹 TASKS TO CLEAN UP (<n>)
+- only-one/domains/<domain>/tasks/<YYYY-MM-DD_slug>/
+- ...
+(Or display "None" if no task folders exist)
 ```
 
-End the report with:
-> **Bạn có muốn áp dụng các thay đổi trên không?**
+### Review Gate (User Confirmation)
 
-Do not apply any changes before the user confirms.
+Conclude the report with a clear confirmation question:
+- **If there are tasks to clean up**:
+  > **Bạn có muốn áp dụng các thay đổi use case và xóa danh sách task đã đồng bộ ở trên không?**
+- **If there are no tasks**:
+  > **Bạn có muốn áp dụng các thay đổi use case ở trên không?**
+
+**STRICT RULE: Do not apply any file modifications or delete any task directories before the user explicitly confirms.**
 
 ---
 
 ## Step 4 — Apply sync (on user confirmation only)
 
-Process each domain's classified items in this order: DELETED → CHANGED → NEW.
+Once the user confirms, execute changes in the following sequence:
 
-### DELETED use cases
+### 4a. Process Use Cases
 
-1. Delete the use case file.
-2. Git history preserves the full content — no need to keep the file.
-
-### CHANGED use cases
-
-1. Open the use case file.
-2. Update scenarios to reflect current code behavior:
-   - Add new scenarios that exist in code but were missing.
-   - Modify scenarios where the behavior has changed.
-   - Remove scenarios that no longer apply — no need to comment them out.
-3. Update preconditions if they have changed.
-4. Update `updated_at` to today's date.
-
-### NEW use cases
-
-1. Determine the correct use case title from the behavior description.
-2. Assign the next sequential ID in the domain (read existing IDs, pick next number).
-3. Create the file at `only-one/domains/<domain>/use-cases/<kebab-case-title>.md`:
+1. **DELETED use cases**:
+   - Delete the corresponding use case file in `only-one/domains/<domain>/use-cases/<file>.md`.
+2. **CHANGED use cases**:
+   - Open the use case file.
+   - Update preconditions and adjust/add scenarios (`GIVEN` / `WHEN` / `THEN`) to match current code and task logic.
+   - Remove obsolete scenarios.
+   - Update `updated_at: <YYYY-MM-DD>` in the frontmatter.
+3. **NEW use cases**:
+   - Determine the Title and assign the next sequential ID in the domain (e.g. `UC-<DOMAIN>-<NNN>`).
+   - Create a new file at `only-one/domains/<domain>/use-cases/<kebab-case-title>.md`:
 
 ```markdown
 ---
@@ -169,28 +178,29 @@ updated_at: <YYYY-MM-DD>
 - AND <additional outcome if needed>
 ```
 
-### Update domain index
+### 4b. Update Domain Index
 
-After processing all items for a domain, update `only-one/domains/<domain>/use-cases/README.md`:
+Update `only-one/domains/<domain>/use-cases/README.md`:
 - Add rows for NEW use cases.
 - Remove rows for DELETED use cases.
-- If `README.md` does not exist, create it:
+- Update Titles and Statuses if changed.
 
-```markdown
-# <Domain Name> — Use Cases
+### 4c. Clean up Consolidated Task Folders
 
-| ID | Title | Status |
-|---|---|---|
-| UC-<ABBR>-<NNN> | <Title> | draft |
-```
+- If the `TASKS TO CLEAN UP` list contains task folders:
+  - Delete the consolidated task directories:
+    ```bash
+    rm -rf only-one/domains/<domain>/tasks/<folder_name>
+    ```
+- If no tasks were processed, skip this step.
 
 ---
 
 ## Step 5 — Report completion
 
-After applying all changes, display a brief summary:
+Display a completion summary:
 
-```
+```markdown
 ## Sync Complete
 
 ### Domain: <domain-name>
@@ -198,18 +208,21 @@ After applying all changes, display a brief summary:
 - 🆕 Created: <n> use cases
 - 🗑️ Deleted: <n> use cases
 - ✅ Already in sync: <n> use cases
+- 🧹 Tasks cleaned up: <n> task folders
+
+All business logic has been successfully synchronized into the Use Cases catalog.
 ```
 
-Link each modified file. State only what changed — do not repeat file contents.
+Provide clickable links to all modified and created use case files.
 
 ---
 
 ## Guardrails
 
-- Do not apply any changes before the user confirms in Step 3.
-- Do not delete use case files — only set `status: deprecated` if preferred or delete as per team convention.
-- Do not modify application source code. Only read it.
-- Do not create use case files outside `only-one/domains/`.
-- Keep use case content behavior-focused. Do not copy implementation details (variable names, SQL, internal field names) into use case files.
-- Write report and descriptions in Vietnamese; keep code identifiers and file paths in English.
-- If a behavior is ambiguous — could belong to multiple use cases or no clear mapping exists — note it in the report and ask the user before acting.
+- A specific `<domain>` argument is mandatory when calling `/only-one-sync`. Never auto-sync all domains.
+- Never apply file changes or delete tasks before explicit user confirmation in Step 3.
+- Reading tasks is optional — if `tasks/` is empty or missing, continue sync seamlessly using codebase analysis.
+- Only delete task directories after their logic has been fully consolidated into `use-cases/` and approved by the user.
+- Do not modify application source code (read-only analysis).
+- Write report descriptions in Vietnamese for user clarity; keep all identifiers, file paths, and code symbols in English.
+- Keep use case content focused on business behavior (`GIVEN` / `WHEN` / `THEN`), avoiding internal technical details (e.g., local variables, internal SQL queries).

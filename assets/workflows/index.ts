@@ -4,7 +4,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-sync',
         description:
-            'Check use cases against current codebase and sync: update changed, add new, mark deleted.',
+            'Sync domain use cases from tasks (if present) and current codebase for a specific domain, then clean up consolidated tasks.',
     },
     {
         name: 'only-one-ag-plan',
