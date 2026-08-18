@@ -48,7 +48,7 @@ ls only-one/domains/<domain>/use-cases/*.md 2>/dev/null
 ```
 
 Read every `.md` file found (skip `README.md`). For each, record:
-- `id`, `title`, `status`, `USE`/`WHEN` statement, preconditions, and all scenarios (`GIVEN` / `WHEN` / `THEN`).
+- `id`, `title`, `status`, `created_at`, `updated_at`, `USE`/`WHEN` statement, preconditions, and all scenarios (`GIVEN` / `WHEN` / `THEN`).
 
 If no use case files exist, note: "No use cases yet for this domain."
 
@@ -148,7 +148,8 @@ Once the user confirms, execute changes in the following sequence:
    - Open the use case file.
    - Update preconditions and adjust/add scenarios (`GIVEN` / `WHEN` / `THEN`) to match current code and task logic.
    - Remove obsolete scenarios.
-   - Update `updated_at: <YYYY-MM-DD>` in the frontmatter.
+   - Preserve `created_at` (or initialize with today's date if missing).
+   - Update `updated_at: <YYYY-MM-DD>` in the frontmatter to today's date.
 3. **NEW use cases**:
    - Determine the Title and assign the next sequential ID in the domain (e.g. `UC-<DOMAIN>-<NNN>`).
    - Create a new file at `only-one/domains/<domain>/use-cases/<kebab-case-title>.md`:
@@ -160,6 +161,7 @@ title: <Title in English>
 domain: <domain>
 status: draft
 implemented_by: []
+created_at: <YYYY-MM-DD>
 updated_at: <YYYY-MM-DD>
 ---
 
@@ -181,9 +183,18 @@ updated_at: <YYYY-MM-DD>
 ### 4b. Update Domain Index
 
 Update `only-one/domains/<domain>/use-cases/README.md`:
-- Add rows for NEW use cases.
+- Add rows for NEW use cases with their `updated_at` date.
 - Remove rows for DELETED use cases.
-- Update Titles and Statuses if changed.
+- Update Titles, Statuses, and `Updated At` dates for CHANGED use cases.
+- If `README.md` does not exist, create it:
+
+```markdown
+# <Domain Name> — Use Cases
+
+| ID | Title | Status | Updated At |
+|---|---|---|---|
+| UC-<ABBR>-<NNN> | <Title> | draft | <YYYY-MM-DD> |
+```
 
 ### 4c. Clean up Consolidated Task Folders
 
