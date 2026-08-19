@@ -30,7 +30,7 @@ export const WorkflowView: FC<WorkflowViewProps> = ({ deps, onBack }) => {
             label: 'Sync Standard Workflows',
             value: 'sync-workflows',
             icon: '⚡',
-            description: 'Sync only-one-ag-plan, clockify, and pr-git workflows to .agents/workflows/',
+            description: 'Sync only-one-plan, clockify, and pr-git workflows to .agents/workflows/',
         },
     ];
 

@@ -4,9 +4,7 @@ import { checkExistingMcps } from '@/core/mcp/index.js';
 import { checkExistingSkills } from '@/core/skill/index.js';
 import { checkExistingWorkflows } from '@/core/workflow/index.js';
 import { getAllowedAgentTargets } from '@/core/target-selection/catalog.js';
-import { SKILLS } from '@assets/skills/index.js';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { WORKFLOWS } from '@assets/workflows/index.js';
 
 export interface PlanMcpOptions {
     targetIdeIds: string[];
@@ -61,7 +59,6 @@ export async function planSkills(
     const workflowItems: PlannedItem[] = [];
     const mcpItems: PlannedItem[] = [];
 
-    // Filter tools to those that have skills directory in project
     const allowedTargets = getAllowedAgentTargets();
     const activeTools = allowedTargets
         .map((t) => t.agent)
@@ -87,49 +84,83 @@ export async function planSkills(
         }
     }
 
-    // Expand associated workflows & required MCPs
-    const associatedWorkflows = new Set<string>();
+    return { skillItems, workflowItems, mcpItems };
+}
+
+export interface PlanWorkflowOptions {
+    projectDir: string;
+    selectedTools: string[];
+    selectedWorkflowNames: string[];
+    origin?: ItemOrigin;
+    reason?: string;
+}
+
+export async function planWorkflows(
+    options: PlanWorkflowOptions,
+): Promise<{ workflowItems: PlannedItem[]; skillItems: PlannedItem[]; mcpItems: PlannedItem[] }> {
+    const { projectDir, selectedTools, selectedWorkflowNames, origin = 'selected', reason } = options;
+
+    const workflowItems: PlannedItem[] = [];
+    const allowedTargets = getAllowedAgentTargets();
+    const activeTools = allowedTargets
+        .map((t) => t.agent)
+        .filter((agent): agent is NonNullable<typeof agent> => agent !== undefined && selectedTools.includes(agent.value));
+
+    const existingWfs = await checkExistingWorkflows(projectDir, activeTools, selectedWorkflowNames);
+
+    for (const tool of activeTools) {
+        for (const wfName of selectedWorkflowNames) {
+            const existing = existingWfs.find((w) => w.toolId === tool.value && w.workflowName === wfName);
+            const isExisting = existing ? existing.exists : false;
+
+            workflowItems.push({
+                key: `workflow:${tool.value}:${wfName}`,
+                category: 'workflow',
+                name: wfName,
+                target: tool.value,
+                origin,
+                state: isExisting ? 'existing' : 'new',
+                reason,
+                meta: { toolId: tool.value, workflowName: wfName },
+            });
+        }
+    }
+
+    // Expand required skills & required MCPs from workflows
+    const requiredSkills = new Set<string>();
     const requiredMcps = new Set<string>();
 
-    for (const skillName of selectedSkillNames) {
-        const skillMeta = SKILLS.find((s) => s.name === skillName);
-        if (skillMeta?.associatedWorkflows) {
-            for (const wf of skillMeta.associatedWorkflows) associatedWorkflows.add(wf);
+    for (const wfName of selectedWorkflowNames) {
+        const wfMeta = WORKFLOWS.find((w) => w.name === wfName);
+        if (wfMeta?.requiredSkills) {
+            for (const s of wfMeta.requiredSkills) requiredSkills.add(s);
+        }
+        if (wfMeta?.requiredMcps) {
+            for (const m of wfMeta.requiredMcps) requiredMcps.add(m);
         }
     }
 
-    if (associatedWorkflows.size > 0) {
-        const wfList = Array.from(associatedWorkflows);
-        const existingWfs = await checkExistingWorkflows(projectDir, activeTools, wfList);
-
-        for (const tool of activeTools) {
-            for (const wfName of wfList) {
-                const existing = existingWfs.find((w) => w.toolId === tool.value && w.workflowName === wfName);
-                const isExisting = existing ? existing.exists : false;
-
-                workflowItems.push({
-                    key: `workflow:${tool.value}:${wfName}`,
-                    category: 'workflow',
-                    name: wfName,
-                    target: tool.value,
-                    origin: 'auto-required',
-                    state: isExisting ? 'existing' : 'new',
-                    reason: `Associated with skill(s)`,
-                    meta: { toolId: tool.value, workflowName: wfName },
-                });
-            }
-        }
+    let skillItems: PlannedItem[] = [];
+    if (requiredSkills.size > 0) {
+        const planned = await planSkills({
+            projectDir,
+            selectedTools,
+            selectedSkillNames: Array.from(requiredSkills),
+            origin: 'auto-required',
+            reason: 'Required by workflow(s)',
+        });
+        skillItems = planned.skillItems;
     }
 
+    let mcpItems: PlannedItem[] = [];
     if (requiredMcps.size > 0) {
-        const expandedMcps = await planMcps({
+        mcpItems = await planMcps({
             targetIdeIds: selectedTools,
             selectedMcpNames: Array.from(requiredMcps),
             origin: 'auto-required',
-            reason: 'Required by skill(s)',
+            reason: 'Required by workflow(s)',
         });
-        mcpItems.push(...expandedMcps);
     }
 
-    return { skillItems, workflowItems, mcpItems };
+    return { workflowItems, skillItems, mcpItems };
 }

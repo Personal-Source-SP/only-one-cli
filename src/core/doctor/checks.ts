@@ -457,3 +457,34 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
         },
     ];
 }
+
+export async function checkSkillsFreshness(projectDir: string = process.cwd()): Promise<CheckResult> {
+    try {
+        const { checkAllSkillsFreshness } = await import('@/core/skill/remote/inspector.js');
+        const reports = await checkAllSkillsFreshness(projectDir);
+        const outdated = reports.filter((r) => r.state === 'update-available');
+
+        if (outdated.length > 0) {
+            return {
+                name: 'skills-freshness',
+                ok: true,
+                detail: `${outdated.length} skill(s) have updates available (${outdated.map((s) => s.skillName).join(', ')})`,
+                required: false,
+                remediation: `Run 'only-one skill update' to update skills to latest upstream versions`,
+            };
+        }
+        return {
+            name: 'skills-freshness',
+            ok: true,
+            detail: 'All installed skills are up-to-date',
+            required: false,
+        };
+    } catch {
+        return {
+            name: 'skills-freshness',
+            ok: true,
+            detail: 'Skipped skill freshness check (offline or no lockfile)',
+            required: false,
+        };
+    }
+}

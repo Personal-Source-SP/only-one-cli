@@ -1,7 +1,6 @@
 import { existsSync } from 'node:fs';
 import { mkdir, cp, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { updateGitignore } from '@/core/init/gitignore.js';
@@ -9,8 +8,10 @@ import { buildPrGitCommandContent, buildClockifyCommandContent } from '@/core/te
 import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import { generateCommand } from '@/core/command-generation/generator.js';
 import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
-
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+import { SKILLS } from '@assets/skills/index.js';
+import { fetchSkillContentFromGitHub } from './remote/github-fetcher.js';
+import { saveSkillToLockfile } from './remote/lockfile.js';
 
 const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/skills');
 
@@ -93,7 +94,28 @@ export const installSkills = async (request: {
 
             try {
                 await mkdir(toolSkillsDir, { recursive: true });
-                await cp(srcPath, destPath, { recursive: true, force: true });
+                await mkdir(destPath, { recursive: true });
+
+                const manifest = SKILLS.find((s) => s.name === skillName);
+
+                if (manifest?.sourceType === 'github' && manifest.source && manifest.skillPath) {
+                    // Fetch remote skill from GitHub
+                    const { content, hash } = await fetchSkillContentFromGitHub(manifest.source, manifest.skillPath);
+                    await writeFile(join(destPath, 'SKILL.md'), content, 'utf-8');
+                    await saveSkillToLockfile(projectDir, skillName, {
+                        name: skillName,
+                        description: manifest.description,
+                        source: manifest.source,
+                        sourceType: 'github',
+                        skillPath: manifest.skillPath,
+                        computedHash: hash,
+                    });
+                } else if (existsSync(srcPath)) {
+                    // Copy local built-in skill
+                    await cp(srcPath, destPath, { recursive: true, force: true });
+                } else {
+                    throw new Error(`Skill source not found for '${skillName}'`);
+                }
 
                 let commandContent = null;
                 let commandId = '';

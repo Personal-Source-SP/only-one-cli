@@ -28,4 +28,3 @@ Use skill `only-one-clockify-skill` to validate or log Clockify time entries thr
 5. In log mode, wait for explicit user confirmation before deleting or creating entries.
 
 If skill `only-one-clockify-skill` or MCP `clockify` is unavailable, stop and tell the user to run `only-one init` or `only-one init mcp clockify`.
-

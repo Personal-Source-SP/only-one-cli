@@ -1,11 +1,8 @@
-import { confirm } from '@inquirer/prompts';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { installSkills } from '@/core/skill/index.js';
-import { checkExistingWorkflows, installWorkflows } from '@/core/workflow/index.js';
-import { SKILLS } from '@assets/skills/index.js';
 import type { SkillCommandOptions } from '../types.js';
 
 export const executeAndReportSkillsStep = async (
@@ -68,53 +65,4 @@ export const executeAndReportSkillsStep = async (
     deps.stdout('\n==================================================\n');
 
     await writeIgnoreTemplates(projectDir, ignoreTargets);
-
-    const installedSkillNames = [...successes, ...overwrites].map((r) => r.skillName);
-    const workflowsToPrompt = new Set<string>();
-
-    for (const skillName of installedSkillNames) {
-        const skillMeta = SKILLS.find((s) => s.name === skillName);
-        if (skillMeta?.associatedWorkflows) {
-            for (const wf of skillMeta.associatedWorkflows) {
-                workflowsToPrompt.add(wf);
-            }
-        }
-    }
-
-    if (workflowsToPrompt.size > 0 && deps.prompts?.checkbox) {
-        const wfList = Array.from(workflowsToPrompt);
-        const checks = await checkExistingWorkflows(projectDir, targetTools, wfList);
-        const missingWorkflows = Array.from(new Set(checks.filter((w) => !w.exists).map((w) => w.workflowName)));
-
-        if (missingWorkflows.length > 0) {
-            const confirmFn = deps.prompts?.confirm ?? confirm;
-            const installWfs = await confirmFn({
-                message: `The installed skills are associated with workflow(s): ${missingWorkflows.join(', ')}. Would you like to install them?`,
-                default: true,
-            });
-
-            if (installWfs) {
-                deps.stdout('\nSyncing workflows...');
-                const wfResults = await installWorkflows({
-                    deps,
-                    projectDir,
-                    selectedTools: targetTools,
-                    workflowNames: missingWorkflows,
-                    overwriteList: missingWorkflows.map((w) => targetTools.map((t) => `${t.value}:${w}`)).flat(),
-                    noIgnore: options.ignore === false,
-                });
-
-                deps.stdout('\n==================================================');
-                deps.stdout('               WORKFLOWS SYNC REPORT');
-                deps.stdout('==================================================');
-                for (const r of wfResults) {
-                    const statusColor = r.status === 'success' ? COLORS.success : r.status === 'skipped' ? COLORS.dim : COLORS.error;
-                    deps.stdout(
-                        `  - ${COLORS.secondary(r.workflowName)} -> ${COLORS.primary(r.toolName)}: ${statusColor(r.status)}${r.error ? ` (${r.error})` : ''}`,
-                    );
-                }
-                deps.stdout('==================================================\n');
-            }
-        }
-    }
 };

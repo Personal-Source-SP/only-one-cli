@@ -6,7 +6,7 @@ import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
 const packageRoot = resolvePackageRoot(import.meta.url);
 const skillsDir = join(packageRoot, 'assets/skills');
-const shippedSkillNames = readdirSync(skillsDir, { withFileTypes: true })
+const shippedLocalSkillNames = readdirSync(skillsDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .sort();
@@ -18,18 +18,24 @@ const readFrontmatterName = (skillName: string): string | undefined => {
 };
 
 describe('skill registry integrity', () => {
-    it('keeps manifest names unique and aligned with shipped directories', () => {
+    it('keeps manifest names unique and distinguishes remote vs local skills', () => {
         const manifestNames = SKILLS.map(({ name }) => name);
-
         expect(new Set(manifestNames).size).toBe(manifestNames.length);
-        expect([...manifestNames].sort()).toEqual(shippedSkillNames);
+
+        const localSkills = SKILLS.filter((s) => s.sourceType !== 'github').map((s) => s.name);
+        expect([...localSkills].sort()).toEqual(shippedLocalSkillNames);
     });
 
-    it('requires SKILL.md with frontmatter name matching each manifest', () => {
-        for (const { name } of SKILLS) {
-            const skillPath = join(skillsDir, name, 'SKILL.md');
-            expect(existsSync(skillPath), `${name} must ship SKILL.md`).toBe(true);
-            expect(readFrontmatterName(name)).toBe(name);
+    it('requires local SKILL.md with frontmatter name matching each local manifest', () => {
+        for (const skill of SKILLS) {
+            if (skill.sourceType === 'github') {
+                expect(skill.source).toBeDefined();
+                expect(skill.skillPath).toBeDefined();
+            } else {
+                const skillPath = join(skillsDir, skill.name, 'SKILL.md');
+                expect(existsSync(skillPath), `${skill.name} must ship local SKILL.md`).toBe(true);
+                expect(readFrontmatterName(skill.name)).toBe(skill.name);
+            }
         }
     });
 

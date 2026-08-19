@@ -47,14 +47,17 @@ export interface VsLibraryManifest {
 }
 
 export interface SkillManifest {
-    name: string; // exact skill folder name, e.g. "only-one-clockify-skill"
+    name: string; // exact skill name, e.g. "only-one-clockify-skill"
     description: string;
-    associatedWorkflows?: string[]; // workflows that rely on this skill
+    source?: string; // remote repository, e.g. "addyosmani/agent-skills"
+    sourceType?: 'github' | 'local';
+    skillPath?: string; // path in repo, e.g. "skills/performance-optimization/SKILL.md"
 }
 
 export interface WorkflowManifest {
     name: string; // exact workflow file name (without .md), e.g. "only-one-clockify"
     description: string;
+    requiredSkills?: string[]; // skills required by this workflow
     requiredMcps?: string[]; // MCPs required by this workflow
 }
 

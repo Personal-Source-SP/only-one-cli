@@ -19,7 +19,7 @@ describe('workflow registry integrity', () => {
         }
     });
 
-    it('registers only-one-ag-plan', () => {
-        expect(WORKFLOWS.filter(({ name }) => name === 'only-one-ag-plan')).toHaveLength(1);
+    it('registers only-one-plan', () => {
+        expect(WORKFLOWS.filter(({ name }) => name === 'only-one-plan')).toHaveLength(1);
     });
 });

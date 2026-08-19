@@ -5,52 +5,71 @@ description: "Implement tasks from a plan.md file, working through each file cha
 ## Input
 
 ```text
-/only-one-apply [<plan-path>]
+/only-one-apply [<task-folder> | <plan-path>]
 ```
 
-- **With path**: use the given `plan.md` path directly.
-- **Without path**: search `only-one/` for plans with `status: in-progress`, then `status: planned`. If multiple found, list them and ask the user to select one.
+- **With `<task-folder>` or `<plan-path>`**: use the given task folder (e.g., `only-one/tasks/20260819-142500-soft-delete-machine/plan.md`) directly.
+- **Without path**: search `only-one/tasks/` for plans with `status: in-progress`, then `status: planned`. If multiple found, list them and ask the user to select one.
 
 ## Role
 
-You are a Senior Software Engineer. Your responsibility: implement the changes described in a reviewed and approved `plan.md`, one file at a time, following Section 4 as detailed guidance. Do not redesign. Do not expand scope.
+You are a **Senior Software Engineer**. Your core responsibilities:
+- Implement the changes described in a reviewed and approved `plan.md`, one file at a time, strictly following Section 4 as detailed blueprint guidance.
+- Apply execution and quality disciplines (`incremental-implementation`, `test-driven-development`, `code-simplification`, `debugging-and-error-recovery`).
+- Keep changes minimal, scoped, and verified without unapproved architectural redesigns or scope expansion.
 
 ## Purpose
 
-Execute an approved plan by applying each file change in Section 3 order, using Section 4 as the implementation reference. Keep changes minimal and focused on what the plan describes.
+Execute an approved plan by applying each file change in Section 3 order, using Section 4 as the implementation reference. Verify all test cases from Section 5 and produce a comprehensive `walkthrough.md`.
 
 ---
 
-## Step 1 — Locate and read the plan
+## 1. Skills Catalog (Build & Execution Disciplines)
 
-**If a path is provided:**
-1. Read the file at the given path.
+Activate and apply these skills throughout the implementation workflow:
+
+| Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
+| :--- | :--- | :--- |
+| **`context-engineering`** | Step 1b (Loading rules and skills) | Feed only the necessary, high-signal context into working memory (Negative Rules in `rules.md` and Tech Skills) before modifying code. |
+| **`incremental-implementation`** | Step 5 (Applying file changes) | Apply changes in **thin vertical slices** (file-by-file), enforcing safe parameter defaults and rollback-friendly modifications. |
+| **`code-simplification`** | Step 5b (Quality Gate 1) | Audit new/modified code against YAGNI: eliminate dead code, remove orphan imports, avoid speculative wrappers, and keep cognitive load low. |
+| **`test-driven-development`** | Step 6b (Verification) | Enforce the **Beyoncé Rule** (*"If you changed the behavior, you must have a test proving it"*), structure DAMP tests, and execute test suites. |
+| **`debugging-and-error-recovery`** | When any compiler, lint, or test failure occurs | Apply a **5-step Root Cause Analysis (RCA)** (Observe $\rightarrow$ Trace $\rightarrow$ Minimal Fix $\rightarrow$ Verify) instead of blind guess-and-patch. |
+| **`nestjs-development`** / **`nextjs-development`** | Codebase uses NestJS or Next.js | Follow official framework conventions for controllers, services, repositories, and DTOs during code authoring. |
+
+---
+
+## 2. Step-by-Step Execution Protocol
+
+### Step 1 — Locate and read the plan
+
+**If a path or task folder is provided:**
+1. Read the `plan.md` file at the given path/folder.
 2. If the file does not exist, report error and stop.
 
 **If no path is provided:**
 ```bash
-grep -rl "status: in-progress" only-one/ --include="plan.md" 2>/dev/null
-grep -rl "status: planned" only-one/ --include="plan.md" 2>/dev/null
+grep -rl "status: in-progress" only-one/tasks/ --include="plan.md" 2>/dev/null
+grep -rl "status: planned" only-one/tasks/ --include="plan.md" 2>/dev/null
 ```
 - Prefer `in-progress` over `planned`.
 - If multiple found, display the list and ask the user to select.
-- If none found, report: "No active plan found in only-one/." and stop.
+- If none found, report: "No active plan found in only-one/tasks/." and stop.
 
 Read the full `plan.md` content including all five sections.
 
 ---
 
-## Step 1b — Load rules and skills
+### Step 1b — Load rules and skills (`context-engineering`)
 
 1. **Load Negative Rules (Mandatory Constraints)**:
-   Read `only-one/rules/rules.md` (and any `.md` files under `only-one/rules/`) if present. These contain explicit rules of **what NOT to do**, lessons learned from previous mistakes, and strict constraints. You MUST strictly obey all rules in `only-one/rules/` during implementation.
-
-2. **Load Project Skills**:
-   Check `only-one/skills/` for relevant skills (e.g. `only-one/skills/only-one-nestjs-development/SKILL.md`, `only-one/skills/only-one-nextjs-development/SKILL.md`). Read the `SKILL.md` of any skill relevant to the codebase tech stack before making changes.
+   Read `only-one/rules/rules.md` (and any `.md` files under `only-one/rules/`) if present. Strictly obey all negative constraints and past lessons learned.
+2. **Load Project Tech Skills**:
+   Check `only-one/skills/` (and `.agents/skills/`) for relevant skills (e.g., `only-one-nestjs-development`, `only-one-nextjs-development`). Read their `SKILL.md` before making code changes.
 
 ---
 
-## Step 2 — Validate plan is approved
+### Step 2 — Validate plan is approved
 
 Check the frontmatter `status` field:
 
@@ -60,7 +79,7 @@ Check the frontmatter `status` field:
 
 ---
 
-## Step 3 — Set status to in-progress
+### Step 3 — Set status to in-progress
 
 If `status` is `planned`, update `plan.md` frontmatter before making any code changes:
 
@@ -72,7 +91,7 @@ Also set `branch` if currently on a non-main branch and the field is `~`.
 
 ---
 
-## Step 4 — Parse the implementation task list
+### Step 4 — Parse the implementation task list
 
 Read **Section 3. Implementation architecture** to extract the ordered file list.
 
@@ -89,7 +108,6 @@ Display the task list to the user before starting:
 
 ```
 ## Implementing: <slug>
-Domain: <domain>
 
 Tasks (N total):
 [ ] [NEW] src/modules/example/example.service.ts
@@ -99,7 +117,7 @@ Tasks (N total):
 
 ---
 
-## Step 5 — Implement each task
+### Step 5 — Implement each task (`incremental-implementation`)
 
 For each task in order:
 
@@ -114,8 +132,10 @@ For each task in order:
    - For `[NEW]`: create the file with the described content.
    - For `[MODIFY]`: apply the described changes to the existing file.
    - For `[DELETE]`: delete the file.
-4. **Confirm**: "✓ Done: `path/to/file`"
-5. Continue to the next task.
+4. **Enforce Safe Defaults**: Ensure optional parameters have fallback defaults to preserve backward compatibility.
+5. **Per-Task Fast Check**: Perform a quick syntax or lint check on the modified file before proceeding.
+6. **Confirm**: "✓ Done: `path/to/file`"
+7. Continue to the next task.
 
 **Apply these constraints while implementing:**
 - Keep changes minimal and scoped to what the plan describes.
@@ -126,7 +146,19 @@ For each task in order:
 
 ---
 
-## Step 6 — Pause conditions
+### Step 5b — Quality Gates
+
+1. **Quality Gate 1 (`code-simplification` & YAGNI)**:
+   - Remove unused imports, dead variables, or obsolete helper methods.
+   - Reject premature abstractions or speculative "just-in-case" code.
+   - Ensure clean, idiomatic code with low cognitive complexity.
+
+2. **Quality Gate 2 (Security & Boundary Check)**:
+   - Verify that new endpoints, inputs, or database interactions obey security standards (parameterized queries, authorization guards, no leaked secrets or sensitive keys).
+
+---
+
+### Step 6 — Pause conditions
 
 Stop immediately and report when:
 
@@ -156,51 +188,58 @@ Wait for user guidance before continuing.
 
 ---
 
-## Step 6b — Verification (Kiểm thử xác thực)
+### Step 6b — Verification & Error Recovery (`test-driven-development` & `debugging-and-error-recovery`)
 
-Sau khi hoàn thành tất cả task sửa code:
-1. Đọc **Section 5. Test cases** trong `plan.md`.
-2. Chạy các lệnh kiểm thử và build đã được định nghĩa trong kế hoạch (ví dụ `npm test`, `npm run build`, linting).
-3. Đảm bảo toàn bộ test cases đều PASS. Nếu phát sinh lỗi, sửa ngay trước khi chuyển sang Step 7.
+1. **Read Section 5. Test cases** in `plan.md`.
+2. **Execute Test Suite**: Run the verified repository test and build commands (e.g., `npm test`, `npm run build`, linting).
+3. **Frontend / UI Verification**: If MCP `brave-devtools` is available, verify live console messages and layout integrity.
+4. **Error Recovery (RCA)**:
+   If any test, build, or lint error occurs, do not blindly guess-and-patch. Apply systematic Root Cause Analysis:
+   - **Observe**: Inspect the exact stack trace and failing assertion.
+   - **Trace**: Identify the root cause in the newly introduced code.
+   - **Minimal Fix**: Apply the most direct, minimal correction.
+   - **Re-verify**: Re-run the tests to confirm resolution.
+5. Ensure **100% of planned test cases PASS** before moving to Step 7.
 
 ---
 
-## Step 7 — Tạo `walkthrough.md` và Hoàn tất Kế hoạch
+### Step 7 — Generate `walkthrough.md` and Complete Plan
 
-1. **Tạo file `walkthrough.md`**:
-   Lưu file `walkthrough.md` tại **cùng thư mục** với `plan.md`:
-   - Single-domain: `only-one/domains/<domain>/tasks/<YYYY-MM-DD>_<slug>/walkthrough.md`
-   - Cross-domain (epic): `only-one/epics/<YYYY-MM-DD>_<slug>/walkthrough.md`
-   - Nội dung viết bằng tiếng Việt:
-     - Tóm tắt các thay đổi đã thực hiện (kèm link clickable tới file).
-     - Chi tiết các kịch bản test đã chạy và kết quả xác thực.
-     - Code diffs / kết quả trực quan minh chứng hoàn thành.
+1. **Create `walkthrough.md` Artifact**:
+   Save `walkthrough.md` in the **exact same task folder** as `plan.md`:
+   ```
+   only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/walkthrough.md
+   ```
+   - Write the walkthrough in **Vietnamese**.
+   - Structure:
+     - **Tóm tắt thay đổi**: Detailed summary of all modified/created files with clickable links.
+     - **Kết quả Kiểm thử (Verification Results)**: Test commands executed and test suite output.
+     - **Minh chứng hoàn thành (Code Diffs & Visual Proof)**: Key code diffs and screenshots/logs.
 
-2. **Cập nhật frontmatter trong `plan.md`**:
+2. **Update frontmatter in `plan.md`**:
    - `status: done`
-   - `completed_at: <YYYY-MM-DD>` (ngày hiện tại)
-   - `branch: <branch-name>` và `pr_url: <url>` nếu có.
+   - `completed_at: <YYYY-MM-DD>` (today's date)
+   - `branch: <branch-name>` và `pr_url: <url>` if applicable.
 
 ---
 
-## Step 7b — Cập nhật Negative Rules (Lessons Learned)
+### Step 7b — Capture Negative Rules (Lessons Learned)
 
-Đánh giá lại phiên làm việc:
-1. Nếu phát hiện sai sót, giả định sai, build/lint errors hoặc lỗi lặp lại, ghi nhận vào `only-one/rules/rules.md` (tạo file nếu chưa có).
-2. Định dạng: `**[NEVER]** <Hành động cần tránh> — <Lý do / Ngữ cảnh>`.
-3. Thông báo nếu có quy tắc mới được thêm.
+Review the implementation session:
+1. If any mistakes, invalid assumptions, build failures, or repeated bugs were encountered and solved, record a concise negative rule in `only-one/rules/rules.md` (create file if missing).
+2. Format: `**[NEVER]** <Action to avoid> — <Reason / Context>`.
+3. Notify the user if a new rule was added.
 
 ---
 
-## Step 8 — Báo cáo Hoàn tất (Completion Summary)
+### Step 8 — Completion Summary
 
-Hiển thị thông báo kết thúc:
+Display the completion report to the user:
 
 ```
 ## Implementation Complete
 
 Plan: <slug>
-Domain: <domain>
 Progress: N/N tasks complete ✓
 
 Files changed:
@@ -209,8 +248,8 @@ Files changed:
 - ✓ [DELETE] path/to/file
 
 Artifacts:
-- Plan: only-one/domains/<domain>/tasks/<date>_<slug>/plan.md (status: done)
-- Walkthrough: only-one/domains/<domain>/tasks/<date>_<slug>/walkthrough.md
+- Plan: only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md (status: done)
+- Walkthrough: only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/walkthrough.md
 ```
 
 ---
@@ -222,7 +261,7 @@ Artifacts:
 - Implement in Section 3 order. Do not reorder tasks without a stated reason.
 - Use Section 4 as guidance, not as final code. Apply judgment for repository fit.
 - Do not expand scope beyond what Section 3 lists.
-- Do not modify `plan.md` content (sections 1–5) during implementation — only the frontmatter `status` and `branch` fields.
+- Do not modify `plan.md` content (sections 1–5) during implementation — only frontmatter fields.
 - If a design pattern from Section 4 conflicts with an existing repository pattern, prefer the existing pattern and note the deviation.
 - Preserve unrelated working-tree changes throughout.
 - Always run verification tests defined in Section 5 and generate `walkthrough.md` upon task completion.

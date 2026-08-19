@@ -95,7 +95,7 @@ describe('combo command', () => {
 
             expect(existsSync(join(cwd, '.cursor', 'rules', '02-next-architecture-stack.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'rules', '01-context-and-tools.md'))).toBe(true);
-            expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-ag-plan.md'))).toBe(true);
+            expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(false);
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Workflows:');
