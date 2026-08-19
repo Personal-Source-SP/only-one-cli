@@ -1,5 +1,5 @@
 ---
-description: "Sync domain use cases from tasks (if present) and current codebase for a specific domain, then clean up consolidated tasks."
+description: "Sync domain use cases from completed tasks (status: done) and current codebase for a specific domain, then clean up consolidated completed tasks."
 ---
 
 ## Input
@@ -13,11 +13,11 @@ description: "Sync domain use cases from tasks (if present) and current codebase
 
 ## Role
 
-You are a Domain Analyst. Your responsibility: analyze domain tasks (if any) and current codebase implementation, update or rewrite the domain use cases to reflect reality, and clean up consolidated task folders after user confirmation. Do not implement application features.
+You are a Domain Analyst. Your responsibility: analyze completed domain tasks (`status: done`, if any) and current codebase implementation, update or rewrite the domain use cases to reflect reality, and clean up consolidated completed task folders after user confirmation. Do not implement application features.
 
 ## Purpose
 
-Use cases document business behavior and serve as the Single Source of Truth for domain logic. Over time, as tasks are completed and code changes, use cases may become outdated or task records may accumulate. This workflow consolidates changes into use cases and keeps the domain workspace clean and organized.
+Use cases document business behavior and serve as the Single Source of Truth for domain logic. Over time, as tasks are completed and code changes, use cases may become outdated or task records may accumulate. This workflow consolidates changes from completed tasks (`status: done`) and the codebase into use cases, cleans up consolidated completed task folders after user confirmation, and leaves in-progress/planned tasks intact.
 
 ---
 
@@ -52,18 +52,21 @@ Read every `.md` file found (skip `README.md`). For each, record:
 
 If no use case files exist, note: "No use cases yet for this domain."
 
-### 2b. Scan and read domain tasks (Optional)
+### 2b. Scan and read completed domain tasks (Optional)
 
 ```bash
 ls -d only-one/domains/<domain>/tasks/*/ 2>/dev/null
 ```
 
 - **If task directories exist**:
-  - Read `plan.md` and `walkthrough.md` files in each task folder (prioritizing tasks with `status: done` or recently completed tasks).
-  - Extract: Business objectives, logic changes, new flows, scenarios, edge cases, and acceptance criteria that have been implemented.
-  - Mark these task folders in the `Consolidated Tasks` list for cleanup after sync.
-- **If NO tasks exist (empty directory or no tasks created yet)**:
-  - Note: "No tasks found in domain."
+  - For each task directory, inspect `plan.md` frontmatter:
+    - **If `status: done`**:
+      - Read `plan.md` and `walkthrough.md` to extract: Business objectives, logic changes, new flows, scenarios, edge cases, and acceptance criteria that have been implemented.
+      - Mark this completed task folder in the `Consolidated Tasks` list for cleanup after sync.
+    - **If `status: planned`, `status: in-progress`, or NOT `done`**:
+      - **Skip this task directory completely**. Do NOT extract logic into use cases and do NOT add to cleanup list. Preserve it untouched in the workspace.
+- **If NO completed tasks exist (empty directory, no tasks created yet, or all tasks are still planned/in-progress)**:
+  - Note: "No completed tasks to consolidate in domain."
   - Continue seamlessly to Step 2c without throwing errors or blocking execution.
 
 ### 2c. Scan codebase for domain behaviors
@@ -82,16 +85,16 @@ For each behavior found in code, derive:
 
 ### 2d. Classify & consolidate
 
-Cross-reference findings from Tasks (if any) and the actual Codebase against Existing Use Cases. Assign each item a classification:
+Cross-reference findings from Completed Tasks (`status: done`, if any) and the actual Codebase against Existing Use Cases. Assign each item a classification:
 
 | Classification | Condition |
 |---|---|
-| `CHANGED` | Use case exists; code behavior or task logic has diverged from documented scenarios |
-| `NEW` | Behavior found in tasks/code; no use case currently covers it |
+| `CHANGED` | Use case exists; code behavior or completed task logic has diverged from documented scenarios |
+| `NEW` | Behavior found in completed tasks/code; no use case currently covers it |
 | `DELETED` | Use case exists; behavior is no longer present in code / feature removed |
-| `IN_SYNC` | Use case accurately reflects current code and task behavior |
+| `IN_SYNC` | Use case accurately reflects current code and completed task behavior |
 
-Compile the list of `Tasks to Clean Up`: Path of task folders to be deleted after user confirmation.
+Compile the list of `Tasks to Clean Up`: Path of completed task folders (`status: done`) to be deleted after user confirmation.
 
 ---
 
@@ -119,17 +122,17 @@ Present a structured sync report in **Vietnamese** (keep code identifiers, symbo
 - <UC-ID>, <UC-ID>, ...
 
 #### 🧹 TASKS TO CLEAN UP (<n>)
-- only-one/domains/<domain>/tasks/<YYYY-MM-DD_slug>/
+- only-one/domains/<domain>/tasks/<YYYY-MM-DD_slug>/ (status: done)
 - ...
-(Or display "None" if no task folders exist)
+(Or display "None" if no completed task folders exist)
 ```
 
 ### Review Gate (User Confirmation)
 
 Conclude the report with a clear confirmation question:
-- **If there are tasks to clean up**:
-  > **Bạn có muốn áp dụng các thay đổi use case và xóa danh sách task đã đồng bộ ở trên không?**
-- **If there are no tasks**:
+- **If there are completed tasks to clean up**:
+  > **Bạn có muốn áp dụng các thay đổi use case và xóa danh sách task hoàn thành đã đồng bộ ở trên không?**
+- **If there are no completed tasks**:
   > **Bạn có muốn áp dụng các thay đổi use case ở trên không?**
 
 **STRICT RULE: Do not apply any file modifications or delete any task directories before the user explicitly confirms.**
@@ -196,14 +199,15 @@ Update `only-one/domains/<domain>/use-cases/README.md`:
 | UC-<ABBR>-<NNN> | <Title> | draft | <YYYY-MM-DD> |
 ```
 
-### 4c. Clean up Consolidated Task Folders
+### 4c. Clean up Consolidated Completed Task Folders
 
 - If the `TASKS TO CLEAN UP` list contains task folders:
-  - Delete the consolidated task directories:
+  - Delete only the consolidated completed task directories (`status: done`):
     ```bash
-    rm -rf only-one/domains/<domain>/tasks/<folder_name>
+    rm -rf only-one/domains/<domain>/tasks/<completed_folder_name>
     ```
-- If no tasks were processed, skip this step.
+- Tasks with `status: planned` or `status: in-progress` MUST NEVER be deleted.
+- If no completed tasks were processed, skip this step.
 
 ---
 
@@ -219,7 +223,7 @@ Display a completion summary:
 - 🆕 Created: <n> use cases
 - 🗑️ Deleted: <n> use cases
 - ✅ Already in sync: <n> use cases
-- 🧹 Tasks cleaned up: <n> task folders
+- 🧹 Completed tasks cleaned up: <n> task folders
 
 All business logic has been successfully synchronized into the Use Cases catalog.
 ```
@@ -232,8 +236,9 @@ Provide clickable links to all modified and created use case files.
 
 - A specific `<domain>` argument is mandatory when calling `/only-one-sync`. Never auto-sync all domains.
 - Never apply file changes or delete tasks before explicit user confirmation in Step 3.
-- Reading tasks is optional — if `tasks/` is empty or missing, continue sync seamlessly using codebase analysis.
-- Only delete task directories after their logic has been fully consolidated into `use-cases/` and approved by the user.
+- Only sync and clean up tasks marked with `status: done`. Never delete or consolidate tasks that are in `status: planned`, `status: in-progress`, or any non-done state.
+- Reading tasks is optional — if `tasks/` has no completed tasks or is missing, continue sync seamlessly using codebase analysis.
+- Only delete task directories after their completed logic has been fully consolidated into `use-cases/` and approved by the user.
 - Do not modify application source code (read-only analysis).
 - Write report descriptions in Vietnamese for user clarity; keep all identifiers, file paths, and code symbols in English.
 - Keep use case content focused on business behavior (`GIVEN` / `WHEN` / `THEN`), avoiding internal technical details (e.g., local variables, internal SQL queries).
