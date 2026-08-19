@@ -392,6 +392,7 @@ export const checkExistingComboComponents = async (params: {
     const mcps = new Set<string>(plan.mcps);
     if (plan.skills.includes('only-one-pr-git-skill')) mcps.add('github');
     if (plan.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
+    if (plan.skills.includes('only-one-intranet-skill')) mcps.add('zodinet-timesheet');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
         const supportedIdeIds: string[] = selectedTools
@@ -604,6 +605,7 @@ export const installCombo = async (params: {
     const mcps = new Set<string>(plan.mcps);
     if (plan.skills.includes('only-one-pr-git-skill')) mcps.add('github');
     if (plan.skills.includes('only-one-clockify-skill')) mcps.add('clockify');
+    if (plan.skills.includes('only-one-intranet-skill')) mcps.add('zodinet-timesheet');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
         const mcpIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');

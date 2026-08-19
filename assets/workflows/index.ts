@@ -57,9 +57,16 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredMcps: ['clockify'],
     },
     {
+        name: 'only-one-intranet',
+        description: 'Validate, log Intranet timesheet entries, and output monthly summary using only-one-intranet-skill and zodinet-timesheet MCP.',
+        requiredSkills: ['only-one-intranet-skill'],
+        requiredMcps: ['zodinet-timesheet'],
+    },
+    {
         name: 'only-one-pr-git',
         description: 'Create or update a GitHub PR from current branch using only-one-pr-git-skill and GitHub MCP.',
         requiredSkills: ['only-one-pr-git-skill'],
         requiredMcps: ['github'],
     },
 ];
+

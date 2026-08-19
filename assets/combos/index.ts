@@ -85,6 +85,7 @@ export const COMBOS: ComboManifest[] = [
             'only-one-debug',
             'only-one-review',
             'only-one-clockify',
+            'only-one-intranet',
             'only-one-pr-git',
         ],
     },
@@ -92,7 +93,7 @@ export const COMBOS: ComboManifest[] = [
         id: 'mcp-flow',
         name: 'MCP Flow Setup',
         description: 'Model Context Protocol (MCP) servers toolkit',
-        mcps: ['fetch', 'tavily', 'github', 'clockify', 'postgres'],
+        mcps: ['fetch', 'tavily', 'github', 'clockify', 'zodinet-timesheet', 'postgres'],
     },
     {
         id: 'git-clockify-flow',
@@ -101,4 +102,12 @@ export const COMBOS: ComboManifest[] = [
         skills: ['only-one-clockify-skill', 'only-one-pr-git-skill'],
         workflows: ['only-one-clockify', 'only-one-pr-git'],
     },
+    {
+        id: 'git-intranet-flow',
+        name: 'Git & Intranet Flow Setup',
+        description: 'GitHub PR and Intranet Timesheet logging integration toolkit',
+        skills: ['only-one-intranet-skill', 'only-one-pr-git-skill'],
+        workflows: ['only-one-intranet', 'only-one-pr-git'],
+    },
 ];
+

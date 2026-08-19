@@ -3,6 +3,7 @@ import type { CommandContent } from '@/core/command-generation/types.js';
 export enum AgentWorkflowCommandId {
     Ui = 'only-one-ui',
     Clockify = 'only-one-clockify',
+    Intranet = 'only-one-intranet',
     PrGit = 'only-one-pr-git',
 }
 
@@ -15,10 +16,12 @@ export enum PrGitTag {
 
 export const PR_GIT_SKILL_NAME = 'only-one-pr-git-skill';
 export const CLOCKIFY_SKILL_NAME = 'only-one-clockify-skill';
+export const INTRANET_SKILL_NAME = 'only-one-intranet-skill';
 
 export const PR_GIT_DEFAULT_BRANCH = 'main';
 export const PR_GIT_DEFAULT_TAG = PrGitTag.Feat;
 export const CLOCKIFY_DEFAULT_TASKS_PER_DAY = 2;
+export const INTRANET_DEFAULT_TASKS_PER_DAY = 2;
 
 export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps: string[]; skills: string[] }> = {
     [AgentWorkflowCommandId.Ui]: {
@@ -32,6 +35,10 @@ export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps:
     [AgentWorkflowCommandId.Clockify]: {
         mcps: ['clockify'],
         skills: [CLOCKIFY_SKILL_NAME],
+    },
+    [AgentWorkflowCommandId.Intranet]: {
+        mcps: ['zodinet-timesheet'],
+        skills: [INTRANET_SKILL_NAME],
     },
 };
 
@@ -92,6 +99,36 @@ const buildClockifyCommandBody =
 If skill \`${CLOCKIFY_SKILL_NAME}\` or MCP \`clockify\` is unavailable, stop and tell the user to run \`only-one init\` or \`only-one init mcp clockify\`.
 `;
 
+const buildIntranetCommandBody =
+    (): string => `Use skill \`${INTRANET_SKILL_NAME}\` to validate, preview, log work entries, and review timesheet balance through the configured \`zodinet-timesheet\` MCP server.
+
+## Input
+
+\`\`\`text
+/only-one-intranet --date <DD/MM/YYYY> --project <project-name> [--tasks-per-day <number>] [--validate]
+
+[Carwash API] Implement task description | 9-13h
+[Carwash Portal] Implement task description | 13-17h
+\`\`\`
+
+- \`--date\` is required and MUST use \`DD/MM/YYYY\`.
+- \`--project\` is required and MUST match an assigned Intranet project name.
+- \`--tasks-per-day\` is optional. Default: \`${INTRANET_DEFAULT_TASKS_PER_DAY}\`.
+- \`--validate\` is optional and MUST prevent every mutation.
+- Remaining non-empty lines after options are the task list.
+
+## Required behavior
+
+1. Load and follow skill \`${INTRANET_SKILL_NAME}\`.
+2. Validate required options and task format before timesheet mutations.
+3. Preview project, adjusted dates, slots, descriptions, replacements, skipped tasks, and total hours.
+4. In \`--validate\` mode, stop after preview and validation result.
+5. In log mode, wait for explicit user confirmation before deleting or creating entries.
+6. After logging completes, query \`get_my_timesheet_summary\` and render the post-log summary report.
+
+If skill \`${INTRANET_SKILL_NAME}\` or MCP \`zodinet-timesheet\` is unavailable, stop and tell the user to run \`only-one init\` or \`only-one init mcp zodinet-timesheet\`.
+`;
+
 const buildUiCommandBody = (): string => `Use this workflow only for web or mobile UI work.
 
 ## Input
@@ -139,8 +176,19 @@ export const buildClockifyCommandContent = (): CommandContent => ({
     tags: ['only-one', 'clockify', 'mcp', 'time-tracking'],
 });
 
+export const buildIntranetCommandContent = (): CommandContent => ({
+    body: buildIntranetCommandBody(),
+    category: 'Workflow',
+    description:
+        'Validate, log Intranet timesheet entries, and output monthly summary using only-one-intranet-skill and zodinet-timesheet MCP.',
+    id: AgentWorkflowCommandId.Intranet,
+    name: AgentWorkflowCommandId.Intranet,
+    tags: ['only-one', 'intranet', 'timesheet', 'mcp', 'time-tracking'],
+});
+
 export const buildAgentWorkflowCommandContents = (): CommandContent[] => [
     buildPrGitCommandContent(),
     buildClockifyCommandContent(),
+    buildIntranetCommandContent(),
     buildUiCommandContent(),
 ];

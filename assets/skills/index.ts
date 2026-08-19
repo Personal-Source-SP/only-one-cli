@@ -152,8 +152,14 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
     },
     {
+        name: 'only-one-intranet-skill',
+        description: 'Validate and log Intranet timesheet entries from task lines using the zodinet-timesheet MCP.',
+        sourceType: 'local',
+    },
+    {
         name: 'only-one-pr-git-skill',
         description: 'Create or update a GitHub Pull Request from the current branch.',
         sourceType: 'local',
     },
 ];
+

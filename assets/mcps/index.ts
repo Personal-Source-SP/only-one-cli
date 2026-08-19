@@ -72,4 +72,21 @@ export const MCPS: McpManifest[] = [
             },
         },
     },
+    {
+        id: 'zodinet-timesheet',
+        server: {
+            command: 'npx',
+            args: [
+                '-y',
+                'mcp-remote',
+                'https://intranet-api.vn02.zodinet.tech/api/mcp',
+                '--header',
+                'Authorization:Bearer ${TIMESHEET_PAT}',
+            ],
+            env: {
+                TIMESHEET_PAT: '',
+            },
+        },
+    },
 ];
+
