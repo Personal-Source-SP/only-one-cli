@@ -156,15 +156,17 @@ describe('prebuilt combo completeness', () => {
         expect(plan.mcps).toEqual(expect.arrayContaining(['fetch', 'tavily', 'github', 'clockify', 'postgres']));
     });
 
-    it('git-clockify-flow resolves skills, workflows and required MCPs', () => {
-        const combo = COMBOS.find(({ id }) => id === 'git-clockify-flow');
+    it('git-timesheet-flow resolves skills, workflows and required MCPs', () => {
+        const combo = COMBOS.find(({ id }) => id === 'git-timesheet-flow');
         expect(combo).toBeDefined();
         if (!combo) return;
 
         const plan = buildComboDependencyPlan(combo, productionRegistries);
-        expect(plan.skills).toEqual(expect.arrayContaining(['only-one-clockify-skill', 'only-one-pr-git-skill']));
-        expect(plan.workflows).toEqual(expect.arrayContaining(['only-one-clockify', 'only-one-pr-git']));
-        expect(plan.mcps).toEqual(expect.arrayContaining(['clockify', 'github']));
+        expect(plan.skills).toEqual(
+            expect.arrayContaining(['only-one-clockify-skill', 'only-one-intranet-skill', 'only-one-pr-git-skill']),
+        );
+        expect(plan.workflows).toEqual(expect.arrayContaining(['only-one-clockify', 'only-one-intranet', 'only-one-pr-git']));
+        expect(plan.mcps).toEqual(expect.arrayContaining(['clockify', 'zodinet-timesheet', 'github']));
     });
 
     it('contains no removed generic IDs', () => {

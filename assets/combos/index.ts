@@ -96,18 +96,11 @@ export const COMBOS: ComboManifest[] = [
         mcps: ['fetch', 'tavily', 'github', 'clockify', 'zodinet-timesheet', 'postgres'],
     },
     {
-        id: 'git-clockify-flow',
-        name: 'Git & Clockify Flow Setup',
-        description: 'GitHub PR and Clockify time logging integration toolkit',
-        skills: ['only-one-clockify-skill', 'only-one-pr-git-skill'],
-        workflows: ['only-one-clockify', 'only-one-pr-git'],
-    },
-    {
-        id: 'git-intranet-flow',
-        name: 'Git & Intranet Flow Setup',
-        description: 'GitHub PR and Intranet Timesheet logging integration toolkit',
-        skills: ['only-one-intranet-skill', 'only-one-pr-git-skill'],
-        workflows: ['only-one-intranet', 'only-one-pr-git'],
+        id: 'git-timesheet-flow',
+        name: 'Git & Timesheet Flow Setup',
+        description: 'GitHub PR, Clockify, and Intranet Timesheet logging integration toolkit',
+        skills: ['only-one-clockify-skill', 'only-one-intranet-skill', 'only-one-pr-git-skill'],
+        workflows: ['only-one-clockify', 'only-one-intranet', 'only-one-pr-git'],
     },
 ];
 

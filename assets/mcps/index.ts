@@ -29,27 +29,10 @@ export const MCPS: McpManifest[] = [
         },
     },
     {
-        id: 'gitnexus',
-        server: {
-            command: 'npx',
-            args: ['-y', 'gitnexus@latest', 'mcp'],
-        },
-    },
-    {
         id: 'memory',
         server: {
             command: 'npx',
             args: ['-y', '@modelcontextprotocol/server-memory'],
-        },
-    },
-    {
-        id: 'notion',
-        server: {
-            command: 'npx',
-            args: ['-y', '@modelcontextprotocol/server-notion'],
-            env: {
-                NOTION_API_KEY: '',
-            },
         },
     },
     {

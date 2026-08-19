@@ -31,11 +31,7 @@ export const antigravityMcpAdapter: McpIdeAdapter = {
     codec: jsonCodec,
     id: McpIdeId.Antigravity,
     name: 'Antigravity',
-    getConfigPath(homeDir, platform) {
-        if (platform === 'darwin') return join(homeDir, 'Library', 'Application Support', 'Antigravity IDE', 'User', 'mcp.json');
-        if (platform === 'win32') return join(homeDir, 'AppData', 'Roaming', 'Antigravity IDE', 'User', 'mcp.json');
-        throw new Error(`Antigravity MCP global config is unsupported on ${platform}`);
-    },
+    getConfigPath: (homeDir) => join(homeDir, '.gemini', 'config', 'mcp_config.json'),
     getMcpServers: getRootMcpServers,
     setMcpServers: setRootMcpServers,
 };
