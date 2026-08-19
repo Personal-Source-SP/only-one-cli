@@ -55,8 +55,11 @@ Activate these skills during research or planning when their trigger conditions 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
 | **`c4-diagrams`** | Section 3 architecture involves multiple components, modules, or complex data flows | Produce clean Mermaid or ASCII C4 / Sequence diagrams directly inside Section 3. |
+| **`system-design`** | Distributed systems, microservices, high-scale architectures, or caching/partitioning strategies | Guide distributed architecture decisions, resilience patterns, data partitioning, and scalability trade-offs in Section 2 & 3. |
 | **`api-and-interface-design`** | Designing or modifying REST/GraphQL APIs, DTOs, or module boundaries | Enforce Contract-first design, Hyrum's Law (hide internal details), error semantics, and boundary validation in Section 3 & 4. |
 | **`frontend-ui-engineering`** | Building or modifying user-facing frontend components | Design component architecture, state management (server vs local), 5-state matrix (Loading, Error, Empty, Success, Idle), and accessibility in Section 2 & 3. |
+| **`ui-ux-pro-max`** *(via `ui-ux-pro-max-cli`)* | User interface creation, redesign, component styling, or UI/UX audit | Enforce design intelligence (color palette, typography, spacing rhythm, WCAG contrast/accessibility, UX heuristics) in Section 2 & 3. |
+| **`ux-flow-designer`** | Multi-step interactive workflows, user journeys, or design system tokens | Map user journey flows, interaction state transitions, and design system component standards in Section 2 & 3. |
 | **`source-driven-development`** | Introducing new library APIs or framework methods | Ground all code signatures in verified official documentation in Section 4 to prevent API hallucination. |
 | **`doubt-driven-development`** | High-stakes architectural decisions, critical transactional flows, or unfamiliar complex code | Perform an adversarial Red-Team sanity check (`CLAIM` $\rightarrow$ `DOUBT` $\rightarrow$ `RECONCILE`) on critical design points in Section 2. |
 | **`gherkin-authoring`** | Section 5 test cases define acceptance criteria or BDD-level scenarios | Author high-quality Gherkin scenarios (`GIVEN` / `WHEN` / `THEN`) validating Success Metrics in Section 5. |
@@ -122,9 +125,9 @@ Describe only verified current behavior directly from the codebase (deepening Se
 
 #### Section 2. Detailed Design
 Detail the technical design grounded in the chosen Option from `concept.md`:
-- Detailed operation mechanics and architectural decisions.
+- Detailed operation mechanics and architectural decisions (`system-design` if distributed).
 - Affected layers and module boundaries.
-- UI/UX layout concept (**ASCII wireframe** & component state flow) whenever frontend/UI changes are involved (`frontend-ui-engineering`).
+- UI/UX layout concept (**ASCII wireframe** & component state flow) whenever frontend/UI changes are involved (`frontend-ui-engineering`, `ui-ux-pro-max`, `ux-flow-designer`). Ground designs in verified design tokens, spacing, and WCAG accessibility standards.
 - Trade-offs, complexity evaluation, risk mitigation, and adversarial Red-Team checks (`doubt-driven-development`).
 
 #### Section 3. Implementation Architecture
@@ -139,7 +142,7 @@ Describe the scaffold at directory and file level:
 - Responsibility of each file in one concise line.
 - Request, processing, persistence, and response flow.
 - Affected API contracts, entities, DTOs, and event payloads (`api-and-interface-design`).
-- UI mockups (ASCII / text wireframes) drawing component hierarchy and key states directly in markdown blocks.
+- UI mockups (ASCII / text wireframes) drawing component hierarchy, key states, and design guidelines (`ui-ux-pro-max`, `frontend-ui-engineering`) directly in markdown blocks.
 - Mermaid C4 or sequence diagram when multiple components interact (`c4-diagrams`).
 
 #### Section 4. Implementation Code Examples
