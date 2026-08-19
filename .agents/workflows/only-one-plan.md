@@ -97,7 +97,7 @@ branch: ~
 
 ### Language
 
-Write the plan content in **Vietnamese**. Preserve all code identifiers, file paths, commands, and error strings in English.
+Write the plan content in **English by default** (or in another language if explicitly requested by the user). Preserve all code identifiers, file paths, commands, and error strings in English.
 
 ### Internal Reasoning Process (Not shown in plan output)
 
@@ -113,21 +113,21 @@ Before generating the plan, work through these steps internally:
 
 The plan must contain these five main sections in this exact order:
 
-#### Section 1. Hiện trạng (Current State)
+#### Section 1. Current State
 Describe only verified current behavior directly from the codebase (deepening Section 2 of `concept.md`):
 - Current execution flow with clickable file and line links as evidence.
 - Participating files, symbols, dependencies, and data flow.
 - Core problem or limitation being addressed.
 - **Explicit list of behaviors that must remain unchanged** (preventing regressions).
 
-#### Section 2. Thiết kế chi tiết (Detailed Design)
+#### Section 2. Detailed Design
 Detail the technical design grounded in the chosen Option from `concept.md`:
 - Detailed operation mechanics and architectural decisions.
 - Affected layers and module boundaries.
 - UI/UX layout concept (**ASCII wireframe** & component state flow) whenever frontend/UI changes are involved (`frontend-ui-engineering`).
 - Trade-offs, complexity evaluation, risk mitigation, and adversarial Red-Team checks (`doubt-driven-development`).
 
-#### Section 3. Kiến trúc Triển khai (Implementation Architecture)
+#### Section 3. Implementation Architecture
 Describe the scaffold at directory and file level:
 - Target directory tree showing relevant existing and planned paths.
 - **Label every planned file change**:
@@ -142,7 +142,7 @@ Describe the scaffold at directory and file level:
 - UI mockups (ASCII / text wireframes) drawing component hierarchy and key states directly in markdown blocks.
 - Mermaid C4 or sequence diagram when multiple components interact (`c4-diagrams`).
 
-#### Section 4. Code Mẫu Minh họa (Implementation Code Examples)
+#### Section 4. Implementation Code Examples
 Describe every file listed in Section 3 in the exact same order:
 - Repeat its `[NEW]`, `[MODIFY]`, or `[DELETE]` label and exact path.
 - Summary of what the file will do and why it changes.
@@ -152,16 +152,16 @@ Describe every file listed in Section 3 in the exact same order:
 - Provide concise illustrative code snippets for important methods, interfaces, types, or configurations grounded in official documentation (`source-driven-development`).
 - Explicitly state when no code example is needed for obvious manifests, exports, or deletions.
 
-#### Section 5. Kịch bản Kiểm thử (Test Cases)
+#### Section 5. Test Cases
 Cover test cases directly validating the **Success Metrics** and **Scope Boundaries** from `concept.md`:
 - Test levels: Unit tests, integration tests, E2E tests.
 - Coverage: Happy paths, validation and error paths, boundary cases, regression cases, authorization & concurrency cases (`gherkin-authoring`).
 - For every test case, state:
-  - **Mục tiêu (Objective)**
-  - **Tiền điều kiện (Precondition / Setup)**
-  - **Hành động (Action)**
-  - **Kết quả kỳ vọng (Expected result)**
-  - **File test đề xuất (Proposed test file)**
+  - **Objective**
+  - **Precondition / Setup**
+  - **Action**
+  - **Expected result**
+  - **Proposed test file**
 - End with verified repository commands for testing, linting, and typechecking (`npm test`, `npm run lint`). Do not invent commands.
 
 ---

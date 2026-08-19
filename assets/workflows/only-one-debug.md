@@ -95,6 +95,10 @@ Activate and apply these skills throughout the debugging lifecycle:
 
 ## 3. Summary Report
 
+### Language
+
+Write the summary report and explanations in **English by default** (or in another language if explicitly requested by the user). Preserve all code identifiers, file paths, commands, stack traces, and error strings in English.
+
 After completing the fix, display a concise markdown summary:
 
 ```markdown

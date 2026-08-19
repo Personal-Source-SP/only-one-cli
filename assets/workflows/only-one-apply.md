@@ -210,11 +210,11 @@ Wait for user guidance before continuing.
    ```
    only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/walkthrough.md
    ```
-   - Write the walkthrough in **Vietnamese**.
-   - Structure:
-     - **Tóm tắt thay đổi**: Detailed summary of all modified/created files with clickable links.
-     - **Kết quả Kiểm thử (Verification Results)**: Test commands executed and test suite output.
-     - **Minh chứng hoàn thành (Code Diffs & Visual Proof)**: Key code diffs and screenshots/logs.
+    - Write the walkthrough in **English by default** (or in another language if explicitly requested by the user).
+    - Structure:
+      - **Summary of Changes**: Detailed summary of all modified/created files with clickable links.
+      - **Verification Results**: Test commands executed and test suite output.
+      - **Completion Evidence (Code Diffs & Visual Proof)**: Key code diffs and screenshots/logs.
 
 2. **Update frontmatter in `plan.md`**:
    - `status: done`

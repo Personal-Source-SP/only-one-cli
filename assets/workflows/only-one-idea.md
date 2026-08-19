@@ -69,7 +69,8 @@ Read the `SKILL.md` of each skill before executing when the trigger condition is
 ### Step 4 — Author & Save Technical Proposal (`concept.md`)
 
 1. **Activate `spec-driven-development`**: Read `SKILL.md` of `spec-driven-development`. Consolidate all findings from Steps 1, 2, and 3 into `concept.md` following the template below.
-2. **Determine Task Folder**:
+2. **Language**: Write the document in **English by default** (or in another language if explicitly requested by the user). Preserve all code identifiers, file paths, commands, and error strings in English.
+3. **Determine Task Folder**:
    Create a dedicated task folder using a sortable timestamp and kebab-case description:
    ```
    only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/concept.md
