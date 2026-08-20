@@ -1,6 +1,6 @@
 # only-one
 
-CLI for developer environment setup, AI agent workspace management, workflows, and supported editor configuration synchronization.
+CLI for developer environment setup, AI agent workspace management, workflows, remote skills synchronization, and editor configuration syncing.
 
 ## Requirements
 
@@ -53,15 +53,36 @@ only-one init combo [path] [names]
 only-one init mcp [names]
 ```
 
-### `skill`
+### `combo`
 
-Manage and synchronize custom agent skills for selected tools.
+Initialize a project from predefined combinations of packages, plugins, skills, rules, workflows, configurations, and MCP servers.
 
 ```bash
-only-one skill [path] [names] --tool cursor
+only-one combo [path] [names]
+only-one combo frontend-flow
+only-one combo backend-flow
+only-one combo full-sdlc-flow
+only-one combo git-timesheet-flow
+only-one combo mcp-flow
 ```
 
-Supported command-facing agent targets are Antigravity, Claude, Cursor, and Codex.
+Predefined combos include:
+
+- `frontend-flow`: Next.js & React frontend toolkit with UI engineering and verification workflows.
+- `backend-flow`: NestJS backend toolkit with architecture design, security hardening, and API standards.
+- `full-sdlc-flow`: End-to-end SDLC enterprise toolkit (Ideation, 5-section planning, quality gates, timesheets, and review).
+- `git-timesheet-flow`: GitHub PR, Clockify, and Intranet Timesheet logging integration.
+- `mcp-flow`: Complete Model Context Protocol (MCP) server suite.
+
+### `skill`
+
+Manage and synchronize local and remote custom agent skills for selected tools.
+
+```bash
+only-one skill [path] [names] --tool cursor,antigravity
+```
+
+Supports automatic GitHub skill fetching with lockfile tracking (`only-one/skills-lock.json`). Supported targets: Antigravity, Claude, Cursor, and Codex.
 
 ### `workflow`
 
@@ -71,27 +92,32 @@ Manage and synchronize bundled agent workflows.
 only-one workflow [path] [names] --tool cursor
 ```
 
-Bundled workflows cover bounded feature planning, TDD implementation, evidence-driven bug fixes, accessible UI work, GitHub pull requests, and Clockify logging. Implementation workflows include approval gates, code intelligence discovery, verification, and safe worktree cleanup guidance.
+Standardized workflows include:
 
-### `plugin`
-
-Install target-specific agent plugins.
-
-```bash
-only-one plugin [path] [ids]
-```
-
-Plugin installation follows each target's supported method. Manual commands are printed when automated installation is unavailable.
+- `only-one-idea`: Explore, refine, and validate rough ideas or vague requirements.
+- `only-one-plan`: Research codebase and create a focused 5-section implementation plan.
+- `only-one-apply`: Implement tasks from an approved plan with TDD and automated walkthrough creation.
+- `only-one-debug`: Systematic 5-step Root Cause Analysis (RCA) and minimal verified bug fixes.
+- `only-one-review`: 5-axis code health, security, simplicity, and performance review.
+- `only-one-archive`: Distill completed tasks into concise single-file archives (`only-one/archives/`).
+- `only-one-clean`: Consolidate related archives and purge stale task files.
+- `only-one-clockify`: Validate task time entries and log to Clockify.
+- `only-one-intranet`: Validate and log Intranet timesheet entries with monthly summary output.
+- `only-one-pr-git`: Create or update GitHub PRs with quality gate checks.
 
 ### `rule`
 
-Manage and copy persistent agent rules.
+Manage and copy persistent agent rules to target configuration directories.
 
 ```bash
 only-one rule [path] [ids]
 ```
 
-Rules provide reusable architecture, tooling, testing, review, and workflow constraints for supported agents.
+Available rules:
+
+- `next-architecture-stack`: Next.js architecture guidelines, TypeScript boundaries, and verification standards.
+- `nest-architecture-stack`: NestJS backend architecture, public contracts, and testing rules.
+- `context-and-tools`: Context minimization and dependency discovery before code modifications.
 
 ### `mcp`
 
@@ -99,42 +125,28 @@ Merge global MCP server definitions into supported agent configurations.
 
 ```bash
 only-one mcp [names] --ide antigravity,claude,cursor,codex
-only-one mcp github,clockify
-only-one mcp code intelligence --ide antigravity,claude,cursor
+only-one mcp github,clockify,zodinet-timesheet,tavily,fetch,postgres,memory
 ```
 
-MCP synchronization supports Antigravity, Claude, Cursor, and Codex JSON or TOML configuration formats. Existing malformed selected configurations fail before writes.
-
-code intelligence runs `npx -y code intelligence@latest mcp` with `code intelligence_MCP_READ_ONLY=1` by default. Run `npx code intelligence analyze` in target repository before agent code discovery.
-
-### `combo`
-
-Initialize project from predefined combinations of packages, plugins, skills, rules, workflows, configurations, and MCP servers.
-
-```bash
-only-one combo [path] [names]
-only-one combo idsd-flow
-```
-
-Before installation, combo preflight groups dependencies as installed, missing, partial, or unsupported. Existing components remain unchecked by default during overwrite confirmation.
+MCP synchronization supports Antigravity, Claude, Cursor, and Codex JSON or TOML formats. Existing malformed configurations are checked before writes.
 
 ### `package`
 
-Install packages from typed package registry with environment validation and interactive selection.
+Install packages from the typed package registry with environment validation.
 
 ```bash
 only-one package [path] [names]
 ```
 
-Bundled package definitions include:
+Bundled packages:
 
-- `ui-ux-pro-max-cli`: global npm package
-- `wondelai/skills/system-design`: system design skills
-- `ux-flow-designer`: UX flow designer skills
+- `ui-ux-pro-max-cli`: Global UI/UX auditing and design intelligence tool.
+- `wondelai/skills/system-design`: System design interview and distributed architecture skill.
+- `ux-flow-designer`: UX flow designer & AI design system skill.
 
 ### `structure-generate`
 
-Scaffold structural blueprint for agent code discovery.
+Scaffold structural blueprint markdown for AI agent code discovery.
 
 ```bash
 only-one structure-generate [path]
@@ -144,7 +156,7 @@ only-one structure-generate --status
 
 ### `update`
 
-Refresh installed agent skills and workflow templates.
+Refresh installed agent skills, lockfiles, and workflow templates.
 
 ```bash
 only-one update [path] [--force]
@@ -152,7 +164,7 @@ only-one update [path] [--force]
 
 ### `tui`
 
-Launch interactive terminal dashboard.
+Launch the full-featured interactive terminal dashboard.
 
 ```bash
 only-one tui
@@ -176,7 +188,7 @@ only-one setting-vs [settings] --editors antigravity,cursor
 
 - Source settings win on key conflicts.
 - Target-only settings remain unchanged.
-- Writes use backup journal and rollback on failure or recoverable termination.
+- Writes use backup journal and rollback on failure.
 
 ### `extensions-vs`
 
@@ -186,7 +198,6 @@ Install missing bundled extension IDs through Antigravity or Cursor CLI.
 only-one extensions-vs [extensions] --editors antigravity,cursor
 ```
 
-- Existing extensions remain installed.
 - Only missing selected extensions are installed.
 - Progress increases monotonically from 0 to 100.
 - Interrupted runs recover from `.only-one/vs-sync-journal.json`.
@@ -199,19 +210,25 @@ Initialization can merge bundled Git, Docker, and npm ignore templates. Git igno
 
 ### GitHub Pull Requests
 
-`only-one-pr-git` requires its bundled skill, GitHub MCP server, and `GITHUB_PERSONAL_ACCESS_TOKEN` in selected agent MCP environment.
+`only-one-pr-git` requires its bundled skill, GitHub MCP server, and `GITHUB_PERSONAL_ACCESS_TOKEN`.
 
 ### Clockify
 
-`only-one-clockify` requires its bundled skill, Clockify MCP server, and `CLOCKIFY_API_KEY`. Task lines use `[Label] Description | start-endh`; validation checks GMT+7 time ranges and overlaps before logging.
+`only-one-clockify` requires its bundled skill, Clockify MCP server, and `CLOCKIFY_API_KEY`. Task lines follow `[Label] Description | start-endh`.
+
+### Intranet Timesheet
+
+`only-one-intranet` requires its bundled skill, `zodinet-timesheet` remote MCP server, and `TIMESHEET_PAT`.
+
+### Task Lifecycle (Archive & Clean)
+
+`only-one-archive` and `only-one-clean` manage historical task documentation in `only-one/archives/` using frontmatter metadata.
 
 ## Compatibility
 
-Command-facing agent targets are Antigravity, Claude, Cursor, and Codex. Explicit unsupported target IDs fail before side effects.
-
-`setting-vs` and `extensions-vs` support Antigravity and Cursor only.
-
-Codex TOML writes preserve configuration semantics but may rewrite comments and formatting.
+- Agent targets: **Antigravity**, **Claude**, **Cursor**, and **Codex**.
+- Editor sync (`setting-vs`, `extensions-vs`): **Antigravity** and **Cursor**.
+- OS: **macOS**, **Windows**, and **Linux** (CLI / target config sync).
 
 ## JSON Output
 
@@ -230,3 +247,14 @@ npm test
 npm run build
 npm run publish:local
 ```
+
+## Author
+
+**Kiem Nguyen**
+
+- Email: [kiem.nguyen@zodinet.com](mailto:contact.kiem.nguyen@gmail.com)
+- GitHub: [@Personal-Source-SP](https://github.com/Personal-Source-SP)
+
+## License
+
+MIT © [Kiem Nguyen](mailto:contact.kiem.nguyen@gmail.com)

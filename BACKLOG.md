@@ -2,55 +2,63 @@
 
 Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp của `only-one`.
 
-## Đã có — CLI foundation
+## Đã có — CLI foundation (v1.0.0)
 
 - [x] **Project initialization** — `init` chạy luồng cài đặt workspace theo bước, hỗ trợ chọn agent target, bỏ qua bước, và xác nhận trước khi thực thi.
-- [x] **OpenSpec bootstrap** — Cài `@fission-ai/openspec` global khi cần, chạy OpenSpec initialization, và đồng bộ skill đã chọn.
-- [x] **Package installer** — `init package` cài package registry; hiện có `@fission-ai/openspec` và `ui-ux-pro-max-cli`.
-- [x] **Configuration sync** — `init configs` sao chép project config templates; hiện có OpenSpec config.
-- [x] **Combo setup** — `combo` và `init combo` cài bundle định sẵn; hiện có `idsd-flow` gồm OpenSpec, config, và kỹ năng IDSD.
-- [x] **Agent target selection** — Dùng selection flow chung, chỉ hỗ trợ Antigravity, Claude, Cursor, Codex; reject target không hợp lệ trước side effect.
+- [x] **Package installer** — `package` và `init package` cài package từ typed registry: `ui-ux-pro-max-cli`, `wondelai/skills/system-design`, `ux-flow-designer`.
+- [x] **Combo setup** — `combo` và `init combo` cài bộ bundle cấu hình định sẵn: `frontend-flow`, `backend-flow`, `full-sdlc-flow`, `git-timesheet-flow`, `mcp-flow`.
+- [x] **Agent target selection** — Hỗ trợ 4 agent targets chính: Antigravity, Claude, Cursor, Codex; tự động kiểm tra và reject target không hợp lệ trước khi áp dụng side effect.
 - [x] **Machine-readable output** — Hỗ trợ `--json` cho command output.
-- [x] **Environment diagnostics** — `doctor` kiểm tra trạng thái môi trường CLI.
-- [x] **Asset refresh** — `update` làm mới skill/template agent đã cài trong project.
+- [x] **Environment diagnostics** — `doctor` kiểm tra trạng thái môi trường (Node.js, Git, CLI paths).
+- [x] **Asset refresh** — `update` làm mới skill và workflow templates đã cài trong project.
 
-## Đã có — Agent workspace management
+## Đã có — Agent workspace & SDLC workflows
 
-- [x] **Skill management** — `skill` và `init skill` phát hiện, chọn, và đồng bộ custom skills cho agent targets.
-- [x] **Bundled skills** — Cung cấp `c4-diagrams`, `gherkin-authoring`, `grill-me`, `only-one-clockify-skill`, `only-one-pr-git-skill`.
-- [x] **Skill consolidation** — Consolidated specialized Next.js and standalone React/UI-UX skills into single master skill `only-one-nextjs-development`.
-- [x] **Full TUI command parity** — `only-one tui` fully maps 1-to-1 to all 13 subcommands with dedicated interactive Ink views (`ComboView`, `WorkflowView`, `RuleView`, `PluginView`, `StructureView`, `UpdateView`).
-- [x] **Workflow management** — `workflow` cài và đồng bộ agent workflows cùng dependencies.
-- [x] **Clockify workflow** — `only-one-clockify` xác thực task time entry và dùng Clockify MCP để ghi time.
-- [x] **GitHub PR workflow** — `only-one-pr-git` tạo hoặc cập nhật GitHub PR bằng GitHub MCP.
-- [x] **Plugin management** — `plugin` quản lý plugin theo target; hiện có Superpowers.
-- [x] **Superpowers install** — Tự chạy `agy plugin install` trên Antigravity; hướng dẫn command/UI chính thức cho Claude, Cursor, Codex.
-- [x] **Rule management** — `rule` cài persistent agent rules vào native path của từng target.
-- [x] **Context minimization rule** — Cung cấp rule `context-minimization`, tự kiểm tra dependency OpenSpec, Superpowers, code intelligence trước khi cài.
+- [x] **Remote skill synchronization** — Tự động fetch và inspect remote skills từ GitHub (`addyosmani/agent-skills`, `mattpocock/skills`, `bdfinst/agentic-dev-team`) và lưu trữ lockfile tại `only-one/skills-lock.json`.
+- [x] **Lockfile multi-path resolution** — Tự động phát hiện và migrate lockfile linh hoạt giữa thư mục gốc và thư mục `only-one/`.
+- [x] **Curated SDLC skills (22 skills)**:
+  - *Define*: `interview-me`, `idea-refine`, `spec-driven-development`, `grill-me`.
+  - *Architecture & Design*: `c4-diagrams`, `api-and-interface-design`, `frontend-ui-engineering`, `source-driven-development`, `doubt-driven-development`, `gherkin-authoring`.
+  - *Build & Implementation*: `context-engineering`, `incremental-implementation`, `test-driven-development`, `debugging-and-error-recovery`.
+  - *Review & Quality*: `code-review-and-quality`, `code-simplification`, `security-and-hardening`, `performance-optimization`.
+  - *Local Custom*: `only-one-nestjs-development`, `only-one-nextjs-development`, `only-one-clockify-skill`, `only-one-intranet-skill`, `only-one-pr-git-skill`.
+- [x] **Task lifecycle management**:
+  - `only-one-archive`: chưng cất task đã hoàn thành thành single-file archive markdown (`only-one/archives/YYYYMMDD-HHMMSS-<name>.md`) kèm YAML frontmatter, cập nhật rules và dọn dẹp task folders.
+  - `only-one-clean`: tổng hợp archive liên quan, đối chiếu logic sâu với codebase thực tế, và dọn dẹp tài liệu cũ/stale.
+- [x] **Standardized SDLC workflows (10 workflows)**:
+  - `only-one-idea`: làm rõ và thẩm định ý tưởng ban đầu trước khi lập kế hoạch.
+  - `only-one-plan`: nghiên cứu codebase và tạo kế hoạch 5 phần (User Review, Open Questions, Proposed Changes, Verification Plan, Automated Tests).
+  - `only-one-apply`: triển khai từng file theo plan đã duyệt, TDD, tự động tạo walkthrough documentation.
+  - `only-one-debug`: phân tích RCA 5 bước và sửa lỗi tối giản kèm kiểm chứng.
+  - `only-one-review`: review toàn diện 5 trục (health, security, simplicity, performance, PR readiness).
+  - `only-one-clockify`: xác thực task time entry GMT+7 và log vào Clockify qua MCP.
+  - `only-one-intranet`: xác thực và log timesheet Intranet, xuất báo cáo tháng qua `zodinet-timesheet` MCP.
+  - `only-one-pr-git`: tạo/cập nhật GitHub Pull Request với pre-review quality gates.
+  - `only-one-archive` & `only-one-clean`: quản lý vòng đời task và lưu trữ tri thức.
+- [x] **Full TUI command parity** — `only-one tui` giao diện terminal tương tác 1-1 với toàn bộ 13 subcommands thông qua Ink components (`ComboView`, `WorkflowView`, `RuleView`, `StructureView`, `UpdateView`, `DoctorView`, `McpView`, `SkillView`, `InitView`, `GitView`, `SettingsView`).
+- [x] **Rule management** — Cài persistent agent rules: `next-architecture-stack`, `nest-architecture-stack`, `context-and-tools`.
 
 ## Đã có — MCP management
 
-- [x] **MCP sync** — `mcp` và `init mcp` chọn MCP server và merge global config vào Antigravity, Claude, Cursor, Codex.
-- [x] **Multi-format config** — Đọc/ghi JSON cho Antigravity, Claude, Cursor và TOML cho Codex.
-- [x] **Pre-write validation** — Dừng trước khi ghi khi selected existing configuration malformed.
-- [x] **MCP registry** — Cung cấp Clockify, Fetch, code intelligence, GitHub, Memory, Notion, Postgres, Tavily manifests.
-- [x] **code intelligence safety** — Cấu hình code intelligence MCP read-only mặc định qua `code intelligence_MCP_READ_ONLY=1`.
+- [x] **MCP sync** — `mcp` và `init mcp` chọn MCP server và merge config vào Antigravity, Claude, Cursor, Codex.
+- [x] **Multi-format config** — Đọc/ghi JSON (Antigravity, Claude, Cursor) và TOML (Codex).
+- [x] **Pre-write validation** — Dừng trước khi ghi nếu file cấu hình hiện tại bị malformed/syntax error.
+- [x] **MCP registry** — Cung cấp sẵn manifests: `clockify`, `fetch`, `github`, `memory`, `postgres`, `tavily`, `zodinet-timesheet`.
 
 ## Đã có — Editor synchronization
 
 - [x] **VS settings sync** — `setting-vs` merge source settings vào Antigravity hoặc Cursor trên macOS/Windows; source thắng conflict, target-only keys giữ lại.
-- [x] **Interactive settings selection** — Chọn setting keys và xác nhận overwrite trước khi ghi; hỗ trợ `--force` khi cần.
-- [x] **VS extensions sync** — `extensions-vs` phát hiện và chỉ cài extension thiếu trên Antigravity hoặc Cursor.
-- [x] **Extension manifest** — Cung cấp `claude-code`, `gruvbox`, `vscode-icons` và extension IDs đã cấu hình.
-- [x] **Transactional safety** — Journal `.only-one/vs-sync-journal.json`, rollback khi lỗi, và recovery cho run bị gián đoạn.
+- [x] **Interactive settings selection** — Chọn setting keys và xác nhận overwrite trước khi ghi; hỗ trợ `--force`.
+- [x] **VS extensions sync** — `extensions-vs` phát hiện và cài extension còn thiếu trên Antigravity hoặc Cursor CLI.
+- [x] **Extension manifest** — Cung cấp `claude-code`, `gruvbox`, `vscode-icons` và extension IDs tùy biến.
+- [x] **Transactional safety** — Journal `.only-one/vs-sync-journal.json`, rollback khi lỗi, recovery cho run bị gián đoạn.
 - [x] **Progress reporting** — Báo tiến độ monotonic từ 0 đến 100 khi cài extensions.
 
 ## Đã có — Project tooling
 
 - [x] **Structure generation** — `structure-generate` tạo structural blueprint markdown cho agent discovery.
-- [x] **Ignore template sync** — Chọn và thêm Git, Docker, npm ignore templates; rule đã tồn tại không bị ghi lại.
-- [x] **Command orchestration** — Các pipeline init/MCP tách thành action steps và planning phase trước execution.
-- [x] **Cross-platform paths** — Có abstraction path/runtime cho macOS và Windows ở editor sync.
+- [x] **Ignore template sync** — Merge Git, Docker, npm ignore templates; rule đã tồn tại không bị ghi đè.
+- [x] **Cross-platform paths** — Abstraction path/runtime an toàn cho macOS và Windows.
 
 ## P0 — Release reliability
 
@@ -60,14 +68,10 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 ## P1 — Cross-platform and agent parity
 
 - [ ] **VS sync trên Linux** — Hỗ trợ phát hiện paths settings và extension CLI của Antigravity/Cursor trên Linux, giữ transaction journal và rollback.
-- [ ] **Plugin install tự động** — Tự động cài Superpowers cho Claude, Cursor, Codex khi host có CLI/API hỗ trợ; fallback sang hướng dẫn chính thức khi không hỗ trợ.
-- [ ] **MCP config validation** — Bổ sung `only-one doctor` checks cho credentials, binary availability, malformed config, và code intelligence index trước khi sync.
+- [ ] **MCP config validation** — Bổ sung `only-one doctor` checks cho credentials, binary availability, malformed config trước khi sync.
 
-## P2 — Template ecosystem
+## P2 — Ecosystem expansion
 
-- [ ] **Ignore templates mở rộng** — Bổ sung template Python, Java, Go, Rust, Next.js; multi-select, preview, và không ghi rule đã tồn tại.
-- [ ] **Workflow catalog** — Liệt kê metadata, requirements, compatibility workflow trước khi cài; hỗ trợ chọn nhiều workflow trong một phiên.
-- [ ] **Asset update channels** — Đồng bộ có chọn lọc skills, workflows, rules, plugins theo version manifest, kèm changelog và rollback.
-
-> [!NOTE]
-> Mỗi mục chưa làm cần proposal OpenSpec trước khi triển khai.
+- [ ] **Ignore templates mở rộng** — Bổ sung template Python, Java, Go, Rust, Next.js; multi-select, preview.
+- [ ] **Workflow catalog** — Liệt kê metadata, requirements, compatibility workflow tương tác trong TUI.
+- [ ] **Asset update channels** — Đồng bộ có chọn lọc skills, workflows, rules theo version manifest, kèm changelog và rollback.

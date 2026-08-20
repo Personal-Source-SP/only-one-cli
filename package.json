@@ -1,7 +1,9 @@
 {
     "name": "only-one",
-    "version": "0.0.7",
+    "version": "1.0.0",
     "description": "Developer environment setups, AI agent workspace management, and editor configuration syncing.",
+    "author": "Kiem Nguyen <contact.kiem.nguyen@gmail.com>",
+    "license": "MIT",
     "type": "module",
     "main": "./dist/src/index.js",
     "bin": {

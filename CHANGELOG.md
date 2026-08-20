@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.0 (2026-08-20)
+
+### Major Highlights
+
+- **Remote Skill Synchronization & Lockfile**: Native remote GitHub skill fetching, inspection, and lockfile resolution (`only-one/skills-lock.json`) with deterministic hash verification.
+- **Task Lifecycle Workflows**: End-to-end task distillation via `only-one-archive` and maintenance via `only-one-clean` with YAML frontmatter markdown archives (`only-one/archives/`).
+- **Full SDLC & Timesheet Integration**: Standardized 10 workflows with English terminology, quality gates, and automated walkthrough generation, plus Intranet and Clockify timesheet integrations.
+
+### Features
+
+- **Remote Skill Engine**: Added `github-fetcher`, `inspector`, and `lockfile` modules in `src/core/skill/remote/` allowing automated synchronization of remote GitHub skills.
+- **Task Lifecycle Management**: Added `only-one-archive` and `only-one-clean` workflows for structured task distillation into single-file archives and live-code consolidation.
+- **Intranet Timesheet Integration**: Added `only-one-intranet` workflow and `only-one-intranet-skill` integrated with the `zodinet-timesheet` remote MCP.
+- **Curated Engineering Skills**: Expanded skill catalog to 22 skills spanning all SDLC phases (Define, Architecture, Build, Review, Quality Gates).
+- **Curated Architecture Combos**: Reorganized combos into `frontend-flow`, `backend-flow`, `full-sdlc-flow`, `git-timesheet-flow`, and `mcp-flow`.
+- **Package Registry Additions**: Added `ui-ux-pro-max-cli`, `wondelai/skills/system-design`, and `ThomasPraun/ux-flow-designer`.
+- **Architecture Rules**: Added `next-architecture-stack`, `nest-architecture-stack`, and `context-and-tools` persistent rules.
+
+### Refactoring & Improvements
+
+- Standardized all bundled workflow templates to English defaults and terminology.
+- Migrated skills lockfile path to `only-one/skills-lock.json` with multi-path resolution and backward compatibility.
+- Consolidated timesheet combo definitions and removed legacy/unused MCP presets.
+- Updated Antigravity configuration paths to match current target specs.
+
 ## 0.0.7 (2026-08-07)
 
 ### Features
