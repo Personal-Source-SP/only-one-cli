@@ -51,7 +51,10 @@ Read the `SKILL.md` of each skill before executing when the trigger condition is
 
 1. **Codebase First (Ground Truth Priority)**:
     - Directly inspect relevant controllers, services, handlers, entities, DTOs, and tests in the source code. The active codebase is the sole ground truth.
-2. **Extract Current Logic**:
+2. **Historical Context & Rules Survey**:
+    - Read `only-one/rules.md` to identify negative constraints relevant to the domain.
+    - Check `only-one/archives/*.md` to review prior architecture decisions and data flows for related modules.
+3. **Extract Current Logic**:
     - Trace current data flow: entry point, transformation, persistence, and existing bottlenecks/limitations (with clickable file/symbol links).
     - For greenfield features, explicitly note: _"New Feature — No existing logic"_.
 
@@ -159,6 +162,8 @@ flowchart TD
 
 - User confirms the chosen option in `concept.md`.
 - Run `/only-one-plan <task-folder>` to generate the 5-section `plan.md` in the same task folder.
+- Execute the plan with `/only-one-apply <task-folder>`.
+- After verification and PR, distill and clean up with `/only-one-archive <task-folder>`.
 ````
 
 ---

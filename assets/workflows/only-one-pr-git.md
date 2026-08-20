@@ -107,6 +107,9 @@ Activate and apply these skills throughout the PR workflow:
 - **Title**: `<tag>: <title>`
 - **Base Branch**: `<base-branch>` ⟵ **Source**: `<current-branch>`
 - **Quality Gate**: `Passed` (or `Bypassed by user`)
+
+### Next Steps:
+- After merging this Pull Request, run `/only-one-archive` to distill the completed task into `only-one/archives/` and clean up the working task directory.
 ```
 
 ---

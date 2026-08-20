@@ -64,4 +64,30 @@ describe('Workflow Command Unit & Integration Tests', () => {
 
         await rmP(testProjectDir, { recursive: true, force: true });
     });
+
+    it('installs only-one-archive and only-one-clean workflows properly', async () => {
+        const deps: Partial<ProgramDeps> = {
+            stdout: () => {},
+            prompts: {
+                checkbox: async (opts) => {
+                    if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
+                    return [];
+                },
+            },
+        };
+
+        await rmP(testProjectDir, { recursive: true, force: true });
+        await mkdirP(testProjectDir, { recursive: true });
+
+        const cmd = createWorkflowCommand(deps as ProgramDeps);
+        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-archive,only-one-clean']);
+
+        const archiveDest = join(testProjectDir, '.agents/workflows/only-one-archive.md');
+        const cleanDest = join(testProjectDir, '.agents/workflows/only-one-clean.md');
+
+        expect(existsSync(archiveDest)).toBe(true);
+        expect(existsSync(cleanDest)).toBe(true);
+
+        await rmP(testProjectDir, { recursive: true, force: true });
+    });
 });

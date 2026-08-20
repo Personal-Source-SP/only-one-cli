@@ -63,7 +63,7 @@ Read the full `plan.md` content including all five sections.
 ### Step 1b — Load rules and skills (`context-engineering`)
 
 1. **Load Negative Rules (Mandatory Constraints)**:
-   Read `only-one/rules/rules.md` (and any `.md` files under `only-one/rules/`) if present. Strictly obey all negative constraints and past lessons learned.
+   Read `only-one/rules.md` if present. Strictly obey all negative constraints and past lessons learned.
 2. **Load Project Tech Skills**:
    Check `only-one/skills/` (and `.agents/skills/`) for relevant skills (e.g., `only-one-nestjs-development`, `only-one-nextjs-development`). Read their `SKILL.md` before making code changes.
 
@@ -212,9 +212,10 @@ Wait for user guidance before continuing.
    ```
     - Write the walkthrough in **English by default** (or in another language if explicitly requested by the user).
     - Structure:
-      - **Summary of Changes**: Detailed summary of all modified/created files with clickable links.
-      - **Verification Results**: Test commands executed and test suite output.
-      - **Completion Evidence (Code Diffs & Visual Proof)**: Key code diffs and screenshots/logs.
+      - **1. Summary of Changes**: Detailed summary of all modified/created files with clickable links.
+      - **2. Verification Results**: Test commands executed and test suite output.
+      - **3. Completion Evidence (Code Diffs & Visual Proof)**: Key code diffs and screenshots/logs.
+      - **4. User Constraints & Lessons Learned**: Specific feedback, warnings, constraints, or anti-patterns communicated by user or discovered during execution.
 
 2. **Update frontmatter in `plan.md`**:
    - `status: done`
@@ -226,9 +227,14 @@ Wait for user guidance before continuing.
 ### Step 7b — Capture Negative Rules (Lessons Learned)
 
 Review the implementation session:
-1. If any mistakes, invalid assumptions, build failures, or repeated bugs were encountered and solved, record a concise negative rule in `only-one/rules/rules.md` (create file if missing).
-2. Format: `**[NEVER]** <Action to avoid> — <Reason / Context>`.
-3. Notify the user if a new rule was added.
+1. Extract all negative rules, anti-patterns, or user constraints from Section 4 of `walkthrough.md`.
+2. Record them directly into `only-one/rules.md` (create file if missing).
+3. Format:
+   ```markdown
+   - **[NEVER]** <Action to avoid> — <Reason / Context>
+   - **[AVOID]** <Anti-pattern to avoid> — <Reason / Context>
+   ```
+4. Notify the user if a new rule was added.
 
 ---
 
@@ -250,6 +256,10 @@ Files changed:
 Artifacts:
 - Plan: only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md (status: done)
 - Walkthrough: only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/walkthrough.md
+
+Next Steps:
+- Review changes and open PR with `/only-one-pr-git`.
+- Distill and clean up working task folder with `/only-one-archive only-one/tasks/<YYYYMMDD-HHmmss>-<slug>`.
 ```
 
 ---

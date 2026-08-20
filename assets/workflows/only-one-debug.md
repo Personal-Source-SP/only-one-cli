@@ -54,7 +54,7 @@ Activate and apply these skills throughout the debugging lifecycle:
 ### Step 2 — Localize & Isolate
 
 1. Trace the execution call graph, data transformations, and state transitions leading to the failure.
-2. Inspect recent Git modifications (`git log -n 5`, `git diff`) in the affected subsystem to identify recent regressions.
+2. Inspect recent Git modifications (`git log -n 5`, `git diff`) and check `only-one/archives/*.md` for the affected module to understand recent design assumptions.
 3. Narrow down the culprit to a specific function, boundary condition, or invariant violation.
 
 ---
@@ -87,8 +87,12 @@ Activate and apply these skills throughout the debugging lifecycle:
 
 ### Step 5b — Capture Negative Rule (Lessons Learned)
 
-1. If the bug was caused by a subtle trap, invalid assumption, or common anti-pattern, record a negative rule in `only-one/rules/rules.md`.
-2. Format: `**[NEVER]** <Action to avoid> — <Reason / Bug context>`.
+1. If the bug was caused by a subtle trap, invalid assumption, or common anti-pattern, record a negative rule in `only-one/rules.md`.
+2. Format:
+   ```markdown
+   - **[NEVER]** <Action to avoid> — <Reason / Bug context>
+   - **[AVOID]** <Anti-pattern to avoid> — <Reason / Bug context>
+   ```
 3. Notify the user of the new rule recorded.
 
 ---

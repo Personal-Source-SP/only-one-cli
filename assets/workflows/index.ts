@@ -68,5 +68,15 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredSkills: ['only-one-pr-git-skill'],
         requiredMcps: ['github'],
     },
+    {
+        name: 'only-one-archive',
+        description: 'Distill completed tasks into concise single-file archives, sync rules, and clean task folders.',
+        requiredSkills: ['spec-driven-development', 'code-simplification', 'context-engineering'],
+    },
+    {
+        name: 'only-one-clean',
+        description: 'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
+        requiredSkills: ['source-driven-development', 'doubt-driven-development', 'code-simplification'],
+    },
 ];
 

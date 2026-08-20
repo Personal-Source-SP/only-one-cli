@@ -40,11 +40,12 @@ Read `concept.md` from the target task folder (`only-one/tasks/*-<slug>/concept.
 ### 1b. Research Current Code
 1. Start with files, symbols, errors, and requirements from `concept.md` or user input.
 2. Read direct callers, dependencies, entities, DTOs, contracts, and tests in the codebase to verify exact current behavior.
-3. Read `only-one/rules/rules.md` (and any rules in `only-one/rules/`) to strictly observe mandatory negative rules and past lessons learned.
-4. Check `only-one/skills/` (and `.agents/skills/`) for relevant technology skills (e.g., `only-one-nestjs-development`, `only-one-nextjs-development`). Read their `SKILL.md` before analyzing affected code.
-5. Check existing repository patterns before proposing a new abstraction.
-6. Keep research bounded to the requested change; do not scan unrelated repository areas.
-7. Do not modify source code, dependencies, configuration, database state, or Git state.
+3. Read `only-one/rules.md` to strictly observe mandatory negative rules and past lessons learned.
+4. Check `only-one/archives/*.md` for past architecture decisions, data flows, and contracts of related modules.
+5. Check `only-one/skills/` (and `.agents/skills/`) for relevant technology skills (e.g., `only-one-nestjs-development`, `only-one-nextjs-development`). Read their `SKILL.md` before analyzing affected code.
+6. Check existing repository patterns before proposing a new abstraction.
+7. Keep research bounded to the requested change; do not scan unrelated repository areas.
+8. Do not modify source code, dependencies, configuration, database state, or Git state.
 
 ---
 
