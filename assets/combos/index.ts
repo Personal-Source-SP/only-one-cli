@@ -27,6 +27,8 @@ export const COMBOS: ComboManifest[] = [
             'only-one-apply',
             'only-one-debug',
             'only-one-review',
+            'only-one-archive',
+            'only-one-clean',
         ],
     },
     {
@@ -54,6 +56,8 @@ export const COMBOS: ComboManifest[] = [
             'only-one-apply',
             'only-one-debug',
             'only-one-review',
+            'only-one-archive',
+            'only-one-clean',
         ],
     },
     {
@@ -84,6 +88,8 @@ export const COMBOS: ComboManifest[] = [
             'only-one-apply',
             'only-one-debug',
             'only-one-review',
+            'only-one-archive',
+            'only-one-clean',
             'only-one-clockify',
             'only-one-intranet',
             'only-one-pr-git',
