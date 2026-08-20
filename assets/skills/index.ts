@@ -35,9 +35,7 @@ export const SKILLS: SkillManifest[] = [
     {
         name: 'c4-diagrams',
         description: 'Use when explaining existing code architecture, visualizing a new system, or creating C4-style diagrams in ASCII/Mermaid.',
-        source: 'bdfinst/agentic-dev-team',
-        sourceType: 'github',
-        skillPath: '.agents/skills/c4-diagrams/SKILL.md',
+        sourceType: 'local',
     },
     {
         name: 'api-and-interface-design',
@@ -70,9 +68,7 @@ export const SKILLS: SkillManifest[] = [
     {
         name: 'gherkin-authoring',
         description: 'Use when drafting, reviewing, or improving Gherkin BDD scenarios.',
-        source: 'bdfinst/agentic-dev-team',
-        sourceType: 'github',
-        skillPath: '.agents/skills/gherkin-authoring/SKILL.md',
+        sourceType: 'local',
     },
 
     // --- 3. Build & Implementation Skills (Write the code) ---

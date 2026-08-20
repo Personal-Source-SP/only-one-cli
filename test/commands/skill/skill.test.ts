@@ -65,7 +65,7 @@ describe('skill command', () => {
             expect(output).toContain('c4-diagrams');
 
             const skillPath = join(cwd, '.cursor', 'skills', 'c4-diagrams');
-            expect(existsSync(skillPath)).toBe(true);
+            expect(existsSync(join(skillPath, 'SKILL.md'))).toBe(true);
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
