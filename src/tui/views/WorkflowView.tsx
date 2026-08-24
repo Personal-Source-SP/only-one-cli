@@ -1,11 +1,12 @@
 import React, { FC, useState } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
+import { Box, Text } from 'ink';
 import { SelectMenu } from '../components/SelectMenu.js';
-import { BACK_KEY_INPUTS } from '../constants/index.js';
-import type { MenuItem } from '../types/index.js';
+import { TaskRunnerView } from '../components/TaskRunnerView.js';
+import { WORKFLOWS } from '@assets/workflows/index.js';
+import { installWorkflows } from '@/core/workflow/index.js';
+import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { MenuItem } from '../types/index.js';
 
 interface WorkflowViewProps {
     deps?: ProgramDeps;
@@ -13,59 +14,70 @@ interface WorkflowViewProps {
 }
 
 export const WorkflowView: FC<WorkflowViewProps> = ({ deps, onBack }) => {
-    const [step, setStep] = useState<'select' | 'running' | 'done'>('select');
-    const [statusText, setStatusText] = useState('');
+    const [selectedWfName, setSelectedWfName] = useState<string | null>(null);
 
-    useInput((input, key) => {
-        const isBackOrQuit = BACK_KEY_INPUTS.includes(input);
-        const isConfirmExit = key.return && ['select', 'done'].includes(step);
-
-        if (isBackOrQuit || isConfirmExit) {
-            onBack();
-        }
-    });
-
-    const workflowItems: MenuItem[] = [
+    const workflowMenuItems: MenuItem[] = [
         {
-            label: 'Sync Standard Workflows',
-            value: 'sync-workflows',
+            label: 'Sync All Workflows',
+            value: 'all',
             icon: '⚡',
-            description: 'Sync only-one-plan, clockify, and pr-git workflows to .agents/workflows/',
+            description: `Sync all ${WORKFLOWS.length} official workflow templates`,
         },
+        ...WORKFLOWS.map((wf) => ({
+            label: wf.name,
+            value: wf.name,
+            icon: '⚡',
+            description: wf.description,
+        })),
     ];
 
-    const handleSelect = (item: MenuItem) => {
-        setStep('running');
-        setStatusText(`Synchronizing agent workflows (${item.label})...`);
+    const handleRunWorkflowSync = async (log: (msg: string) => void) => {
+        log(`Preparing workflow sync...`);
+        const wfNames = selectedWfName === 'all' ? WORKFLOWS.map((w) => w.name) : [selectedWfName!];
 
-        setTimeout(() => {
-            setStep('done');
-            setStatusText(`Agent workflows synchronized successfully! ⚡`);
-        }, 1200);
+        const targetTools = getAllowedVsSettingsTargets().map((t) => ({
+            value: t.id,
+            name: t.vs?.name || t.id,
+            description: '',
+            skillsDir: t.id === 'antigravity' ? '.agents' : `.agents/${t.id}`,
+            ruleExt: 'md' as const,
+        }));
+
+        if (deps) {
+            const results = await installWorkflows({
+                deps: {
+                    ...deps,
+                    stdout: (msg) => log(msg),
+                },
+                projectDir: process.cwd(),
+                selectedTools: targetTools,
+                workflowNames: wfNames,
+                overwriteList: wfNames,
+            });
+
+            log(`Sync completed: ${results.filter((r) => r.status === 'success').length} installed.`);
+        } else {
+            log(`Synced workflows: ${wfNames.join(', ')}`);
+        }
     };
 
+    if (selectedWfName) {
+        const title = selectedWfName === 'all' ? 'All Workflow Templates' : selectedWfName;
+        return (
+            <Box flexDirection="column" paddingX={1}>
+                <TaskRunnerView title={`Sync Workflow: ${title}`} runTask={handleRunWorkflowSync} onDone={onBack} />
+            </Box>
+        );
+    }
+
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="magenta">
-                ⚡ Agent Workflows Management
-            </Text>
-
-            {step === 'select' && <SelectMenu items={workflowItems} onSelect={handleSelect} />}
-
-            {step === 'running' && (
-                <Box marginY={1}>
-                    <Text color="cyan">⏳ {statusText}</Text>
-                </Box>
-            )}
-
-            {step === 'done' && (
-                <Box marginY={1}>
-                    <Text color="green">✔ {statusText}</Text>
-                </Box>
-            )}
-
-            <Footer hints={step === 'select' ? ['Enter Select', 'b Back', 'q Exit'] : ['Enter/b Back to Menu']} />
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="cyan">
+                    ⚡ Select Workflow Template to Sync:
+                </Text>
+            </Box>
+            <SelectMenu items={workflowMenuItems} onSelect={(item) => setSelectedWfName(item.value)} />
         </Box>
     );
 };

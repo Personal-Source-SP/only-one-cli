@@ -1,7 +1,9 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import { Box, useApp, useInput } from 'ink';
-import { FC, useState } from 'react';
-import type { ViewState } from './types/index.js';
+import React, { FC } from 'react';
+import { Header } from './components/Header.js';
+import { Footer } from './components/Footer.js';
+import { RouterProvider, useRouter } from './router/RouterContext.js';
 import { ComboView } from './views/ComboView.js';
 import { DoctorView } from './views/DoctorView.js';
 import { HomeView } from './views/HomeView.js';
@@ -19,94 +21,75 @@ interface AppProps {
     deps?: ProgramDeps;
 }
 
-export const App: FC<AppProps> = ({ deps }) => {
+const AppInner: FC<AppProps> = ({ deps }) => {
     const { exit } = useApp();
-    const [currentView, setCurrentView] = useState<ViewState>('home');
+    const { currentRoute, history, activePane, pop } = useRouter();
 
-    useInput((input) => {
-        if (input === 'q' && currentView === 'home') {
+    const isHome = currentRoute.view === 'home';
+
+    useInput((input, key) => {
+        if (activePane === 'search') return;
+
+        if (input === 'q' && isHome) {
             exit();
+            return;
+        }
+
+        if (!isHome && (input === 'b' || key.escape)) {
+            pop();
         }
     });
 
-    const handleSelectOption = (value: string) => {
-        switch (value) {
-            case 'exit':
-                exit();
-                break;
+    const renderView = () => {
+        switch (currentRoute.view) {
             case 'doctor':
-                setCurrentView('doctor');
-                break;
+                return <DoctorView onBack={pop} />;
             case 'init':
-                setCurrentView('init');
-                break;
+                return <InitView deps={deps} onBack={pop} />;
             case 'combo':
-                setCurrentView('combo');
-                break;
+                return <ComboView deps={deps} onBack={pop} />;
             case 'skill':
-                setCurrentView('skill');
-                break;
+                return <SkillView deps={deps} onBack={pop} />;
             case 'workflow':
-                setCurrentView('workflow');
-                break;
+                return <WorkflowView deps={deps} onBack={pop} />;
             case 'rule':
-                setCurrentView('rule');
-                break;
+                return <RuleView deps={deps} onBack={pop} />;
             case 'mcp':
-                setCurrentView('mcp');
-                break;
+                return <McpView deps={deps} onBack={pop} />;
             case 'setting-vs':
-                setCurrentView('setting-vs');
-                break;
             case 'extensions-vs':
-                setCurrentView('extensions-vs');
-                break;
+                return <SettingsView deps={deps} onBack={pop} />;
             case 'git':
-                setCurrentView('git');
-                break;
+                return <GitView deps={deps} onBack={pop} />;
             case 'structure-generate':
-                setCurrentView('structure-generate');
-                break;
+                return <StructureView deps={deps} onBack={pop} />;
             case 'update':
-                setCurrentView('update');
-                break;
+                return <UpdateView deps={deps} onBack={pop} />;
+            case 'home':
+            default:
+                return <HomeView />;
         }
     };
 
-    const renderView = () => {
-        switch (currentView) {
-            case 'doctor':
-                return <DoctorView onBack={() => setCurrentView('home')} />;
-            case 'init':
-                return <InitView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'combo':
-                return <ComboView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'skill':
-                return <SkillView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'workflow':
-                return <WorkflowView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'rule':
-                return <RuleView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'mcp':
-                return <McpView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'setting-vs':
-            case 'extensions-vs':
-                return <SettingsView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'git':
-                return <GitView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'structure-generate':
-                return <StructureView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'update':
-                return <UpdateView deps={deps} onBack={() => setCurrentView('home')} />;
-            case 'home':
-            default:
-                return <HomeView onSelectOption={handleSelectOption} />;
-        }
-    };
+    const breadcrumbTrail = history.map((entry) => entry.title);
+
+    const footerHints = isHome
+        ? ['[Tab] Switch Pane', '[↑/↓] Navigate', '[/] Search', '[Enter] Open', '[q] Quit']
+        : ['[Enter] Run', '[b/Esc] Back to Dashboard', '[q] Quit'];
 
     return (
         <Box flexDirection="column" padding={1}>
+            <Header breadcrumb={breadcrumbTrail} />
             {renderView()}
+            <Footer hints={footerHints} activePane={activePane} />
         </Box>
+    );
+};
+
+export const App: FC<AppProps> = ({ deps }) => {
+    return (
+        <RouterProvider>
+            <AppInner deps={deps} />
+        </RouterProvider>
     );
 };

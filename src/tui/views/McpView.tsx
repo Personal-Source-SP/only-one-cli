@@ -1,11 +1,13 @@
 import React, { FC, useState } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
+import { Box, Text } from 'ink';
 import { SelectMenu } from '../components/SelectMenu.js';
-import { BACK_KEY_INPUTS, MCP_MENU_ITEMS } from '../constants/index.js';
-import type { MenuItem } from '../types/index.js';
+import { TaskRunnerView } from '../components/TaskRunnerView.js';
+import { MCPS } from '@assets/mcps/index.js';
+import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
+import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { MenuItem } from '../types/index.js';
+import { homedir } from 'node:os';
 
 interface McpViewProps {
     deps?: ProgramDeps;
@@ -13,47 +15,58 @@ interface McpViewProps {
 }
 
 export const McpView: FC<McpViewProps> = ({ deps, onBack }) => {
-    const [step, setStep] = useState<'select' | 'running' | 'done'>('select');
-    const [statusText, setStatusText] = useState('');
+    const [selectedMcpId, setSelectedMcpId] = useState<string | null>(null);
 
-    useInput((input, key) => {
-        if (BACK_KEY_INPUTS.includes(input) && ['select', 'done'].includes(step)) {
-            onBack();
-        }
-    });
+    const mcpMenuItems: MenuItem[] = [
+        {
+            label: 'Sync All MCP Servers',
+            value: 'all',
+            icon: '🌐',
+            description: `Sync all ${MCPS.length} registered MCP server configurations`,
+        },
+        ...MCPS.map((m) => ({
+            label: m.id,
+            value: m.id,
+            icon: '🌐',
+            description: `Configure ${m.id} Model Context Protocol server`,
+        })),
+    ];
 
-    const handleSelect = (item: MenuItem) => {
-        setStep('running');
-        setStatusText(`Processing ${item.label}...`);
+    const handleRunMcpSync = async (log: (msg: string) => void) => {
+        log(`Configuring MCP servers...`);
+        const targetMcps = selectedMcpId === 'all' ? MCPS : MCPS.filter((m) => m.id === selectedMcpId);
+        const ideIds = getAllowedVsSettingsTargets().map((t) => t.id);
 
-        setTimeout(() => {
-            setStep('done');
-            setStatusText(`MCP task '${item.label}' completed!`);
-        }, 1000);
+        const results = await syncMcpGlobalConfig({
+            cwd: process.cwd(),
+            homeDir: homedir(),
+            platform: process.platform,
+            ideIds,
+            manifests: targetMcps,
+            write: (msg: string) => log(msg),
+            overwriteList: targetMcps.map((m) => m.id),
+        });
+
+        log(`Sync completed: ${results.results.length} IDE configs updated.`);
     };
 
+    if (selectedMcpId) {
+        const title = selectedMcpId === 'all' ? 'All MCP Servers' : selectedMcpId;
+        return (
+            <Box flexDirection="column" paddingX={1}>
+                <TaskRunnerView title={`Configure MCP: ${title}`} runTask={handleRunMcpSync} onDone={onBack} />
+            </Box>
+        );
+    }
+
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="magenta">
-                🔌 Model Context Protocol (MCP) Manager
-            </Text>
-
-            {step === 'select' && <SelectMenu items={MCP_MENU_ITEMS} onSelect={handleSelect} />}
-
-            {step === 'running' && (
-                <Box marginY={1}>
-                    <Text color="yellow">⏳ {statusText}</Text>
-                </Box>
-            )}
-
-            {step === 'done' && (
-                <Box marginY={1}>
-                    <Text color="green">✔ {statusText}</Text>
-                </Box>
-            )}
-
-            <Footer hints={['Enter Select', 'b Back', 'q Exit']} />
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="magenta">
+                    🌐 Select MCP Server to Configure:
+                </Text>
+            </Box>
+            <SelectMenu items={mcpMenuItems} onSelect={(item) => setSelectedMcpId(item.value)} />
         </Box>
     );
 };

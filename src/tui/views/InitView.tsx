@@ -1,9 +1,11 @@
 import React, { FC, useState } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
+import { Box, Text } from 'ink';
 import { SelectMenu } from '../components/SelectMenu.js';
-import { BACK_KEY_INPUTS, INIT_MENU_ITEMS } from '../constants/index.js';
+import { TaskRunnerView } from '../components/TaskRunnerView.js';
+import { INIT_MENU_ITEMS } from '../constants/index.js';
+import { buildInitPlan } from '@/core/init/plan-builder.js';
+import { executeInitPlan } from '@/core/init/plan-executor.js';
+import { getAllowedAgentTargets } from '@/core/target-selection/index.js';
 import type { MenuItem } from '../types/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 
@@ -13,51 +15,67 @@ interface InitViewProps {
 }
 
 export const InitView: FC<InitViewProps> = ({ deps, onBack }) => {
-    const [step, setStep] = useState<'select' | 'running' | 'done'>('select');
-    const [statusText, setStatusText] = useState('');
+    const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
-    useInput((input, key) => {
-        const isBackOrQuit = BACK_KEY_INPUTS.includes(input);
-        const isConfirmExit = key.return && ['select', 'done'].includes(step);
+    const handleRunInit = async (log: (msg: string) => void) => {
+        if (!selectedItem) return;
 
-        if (isBackOrQuit || isConfirmExit) {
-            onBack();
-        }
-    });
+        log(`Building initialization plan for ${selectedItem.label}...`);
+        const agentTargets = getAllowedAgentTargets();
+        const selectedTools = agentTargets.map((t) => t.id);
 
-    const handleSelect = async (item: MenuItem) => {
-        setStep('running');
-        setStatusText(`Initializing workspace (${item.label})...`);
+        const selections = {
+            selectedTools,
+            mode: 'custom' as const,
+            packages: [],
+            configs: selectedItem.value === 'full' || selectedItem.value === 'rules' ? ['cursorrules'] : [],
+            mcps: [],
+            skills: selectedItem.value === 'full' || selectedItem.value === 'workflows' ? ['c4-diagrams'] : [],
+            rulesPerAgent: {},
+        };
 
-        // Simulating async task execution or calling core logic
-        setTimeout(() => {
-            setStep('done');
-            setStatusText(`Workspace (${item.label}) initialized successfully! 🎉`);
-        }, 1200);
+        const plan = await buildInitPlan({
+            projectDir: process.cwd(),
+            selections,
+        });
+
+        log(`Executing plan with ${plan.items.length} items...`);
+        const runDeps: ProgramDeps = deps ?? {
+            stdout: (msg: string) => log(msg),
+            stderr: (msg: string) => log(`[stderr] ${msg}`),
+            cwd: process.cwd(),
+            env: process.env,
+            fetcher: globalThis.fetch,
+        };
+
+        await executeInitPlan({
+            deps: {
+                ...runDeps,
+                stdout: (msg) => log(msg),
+            },
+            plan,
+            noIgnore: false,
+        });
+
+        log('Workspace initialization complete.');
     };
 
+    if (selectedItem) {
+        return (
+            <Box flexDirection="column" paddingX={1}>
+                <TaskRunnerView title={`Workspace Initialization: ${selectedItem.label}`} runTask={handleRunInit} onDone={onBack} />
+            </Box>
+        );
+    }
+
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="yellow">
-                🚀 Workspace Initializer
-            </Text>
-
-            {step === 'select' && <SelectMenu items={INIT_MENU_ITEMS} onSelect={handleSelect} />}
-
-            {step === 'running' && (
-                <Box marginY={1}>
-                    <Text color="cyan">⏳ {statusText}</Text>
-                </Box>
-            )}
-
-            {step === 'done' && (
-                <Box marginY={1} flexDirection="column">
-                    <Text color="green">✔ {statusText}</Text>
-                </Box>
-            )}
-
-            <Footer hints={step === 'select' ? ['Enter Select', 'b Back', 'q Exit'] : ['Enter/b Back to Menu']} />
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="yellow">
+                    🚀 Workspace Initializer Options:
+                </Text>
+            </Box>
+            <SelectMenu items={INIT_MENU_ITEMS} onSelect={(item) => setSelectedItem(item)} />
         </Box>
     );
 };

@@ -1,11 +1,14 @@
 import React, { FC, useState } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
+import { Box, Text } from 'ink';
 import { SelectMenu } from '../components/SelectMenu.js';
-import { BACK_KEY_INPUTS, SETTINGS_MENU_ITEMS } from '../constants/index.js';
-import type { MenuItem } from '../types/index.js';
+import { TaskRunnerView } from '../components/TaskRunnerView.js';
+import { SETTINGS_MENU_ITEMS } from '../constants/index.js';
+import { syncVsSettings } from '@/core/vs/settings-sync.js';
+import { syncVsExtensions } from '@/core/vs/extensions-sync.js';
+import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { MenuItem } from '../types/index.js';
+import { homedir } from 'node:os';
 
 interface SettingsViewProps {
     deps?: ProgramDeps;
@@ -13,47 +16,53 @@ interface SettingsViewProps {
 }
 
 export const SettingsView: FC<SettingsViewProps> = ({ deps, onBack }) => {
-    const [step, setStep] = useState<'select' | 'running' | 'done'>('select');
-    const [statusText, setStatusText] = useState('');
+    const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
-    useInput((input, key) => {
-        if (BACK_KEY_INPUTS.includes(input) && ['select', 'done'].includes(step)) {
-            onBack();
+    const handleRunSettingsSync = async (log: (msg: string) => void) => {
+        if (!selectedItem) return;
+
+        const isExtensions = selectedItem.value.includes('extension') || selectedItem.value.includes('vscode');
+        const editorIds = getAllowedVsSettingsTargets().map((t) => t.id as any);
+
+        if (isExtensions) {
+            log(`Syncing editor extensions for ${editorIds.join(', ')}...`);
+            await syncVsExtensions({
+                cwd: process.cwd(),
+                editorIds,
+                write: (line) => log(line),
+                force: true,
+            });
+            log('Editor extensions sync complete.');
+        } else {
+            log(`Syncing editor settings for ${editorIds.join(', ')}...`);
+            await syncVsSettings({
+                cwd: process.cwd(),
+                editorIds,
+                homeDir: homedir(),
+                platform: process.platform as any,
+                write: (line) => log(line),
+                force: true,
+            });
+            log('Editor settings sync complete.');
         }
-    });
-
-    const handleSelect = (item: MenuItem) => {
-        setStep('running');
-        setStatusText(`Synchronizing editor settings (${item.label})...`);
-
-        setTimeout(() => {
-            setStep('done');
-            setStatusText(`Editor settings synchronized successfully!`);
-        }, 1000);
     };
 
+    if (selectedItem) {
+        return (
+            <Box flexDirection="column" paddingX={1}>
+                <TaskRunnerView title={selectedItem.label} runTask={handleRunSettingsSync} onDone={onBack} />
+            </Box>
+        );
+    }
+
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="blue">
-                ⚙️ Editor Settings & Extensions Sync
-            </Text>
-
-            {step === 'select' && <SelectMenu items={SETTINGS_MENU_ITEMS} onSelect={handleSelect} />}
-
-            {step === 'running' && (
-                <Box marginY={1}>
-                    <Text color="yellow">⏳ {statusText}</Text>
-                </Box>
-            )}
-
-            {step === 'done' && (
-                <Box marginY={1}>
-                    <Text color="green">✔ {statusText}</Text>
-                </Box>
-            )}
-
-            <Footer hints={['Enter Select', 'b Back', 'q Exit']} />
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="blue">
+                    ⚙️ Editor Settings & Extensions Options:
+                </Text>
+            </Box>
+            <SelectMenu items={SETTINGS_MENU_ITEMS} onSelect={(item) => setSelectedItem(item)} />
         </Box>
     );
 };

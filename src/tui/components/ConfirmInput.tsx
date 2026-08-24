@@ -5,22 +5,28 @@ import { NO_KEY_INPUTS, YES_KEY_INPUTS } from '../constants/index.js';
 interface ConfirmInputProps {
     label: string;
     onConfirm: (result: boolean) => void;
+    isActive?: boolean;
 }
 
-export const ConfirmInput: React.FC<ConfirmInputProps> = ({ label, onConfirm }) => {
+export const ConfirmInput: React.FC<ConfirmInputProps> = ({ label, onConfirm, isActive = true }) => {
     const [selected, setSelected] = useState<boolean>(true);
 
-    useInput((input, key) => {
-        if (key.leftArrow || key.rightArrow) {
-            setSelected((prev) => !prev);
-        } else if (YES_KEY_INPUTS.includes(input)) {
-            onConfirm(true);
-        } else if (NO_KEY_INPUTS.includes(input)) {
-            onConfirm(false);
-        } else if (key.return) {
-            onConfirm(selected);
-        }
-    });
+    useInput(
+        (input, key) => {
+            if (!isActive) return;
+
+            if (key.leftArrow || key.rightArrow) {
+                setSelected((prev) => !prev);
+            } else if (YES_KEY_INPUTS.includes(input)) {
+                onConfirm(true);
+            } else if (NO_KEY_INPUTS.includes(input)) {
+                onConfirm(false);
+            } else if (key.return) {
+                onConfirm(selected);
+            }
+        },
+        { isActive },
+    );
 
     return (
         <Box flexDirection="column" marginY={1}>

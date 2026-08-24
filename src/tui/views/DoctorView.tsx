@@ -1,7 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
 import { SelectMenu } from '../components/SelectMenu.js';
 import { runDoctorChecksStep } from '@/commands/doctor/actions/index.js';
 import type { CheckResult } from '@/core/doctor/checks.js';
@@ -34,12 +32,11 @@ export const DoctorView: FC<DoctorViewProps> = ({ onBack }) => {
     }, [selectedEditor]);
 
     useInput((input, key) => {
+        if (!selectedEditor) return;
+
         if (key.return || BACK_KEY_INPUTS.includes(input)) {
-            if (selectedEditor && !loading) {
-                // If already showing results, back goes to editor select
+            if (!loading) {
                 setSelectedEditor(null);
-            } else {
-                onBack();
             }
         }
     });
@@ -54,18 +51,17 @@ export const DoctorView: FC<DoctorViewProps> = ({ onBack }) => {
         ];
 
         return (
-            <Box flexDirection="column">
-                <Header />
-                <Text bold color="cyan">
-                    🩺 Select Target IDE to Check:
-                </Text>
+            <Box flexDirection="column" paddingX={1}>
+                <Box marginY={0}>
+                    <Text bold color="cyan">
+                        🩺 Select Target IDE to Check:
+                    </Text>
+                </Box>
                 <SelectMenu items={ideOptions} onSelect={(item) => setSelectedEditor(item.value)} />
-                <Footer hints={['↑/↓ Navigate', 'Enter Select', 'b Back', 'q Exit']} />
             </Box>
         );
     }
 
-    // Group results by category
     const categorized = results.reduce<Record<string, CheckResult[]>>((acc, item) => {
         const cat = item.category || 'General';
         if (!acc[cat]) acc[cat] = [];
@@ -74,11 +70,12 @@ export const DoctorView: FC<DoctorViewProps> = ({ onBack }) => {
     }, {});
 
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="cyan">
-                🩺 Environment Readiness Doctor ({selectedEditor.toUpperCase()})
-            </Text>
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="cyan">
+                    🩺 Diagnostic Results ({selectedEditor.toUpperCase()})
+                </Text>
+            </Box>
 
             {loading ? (
                 <Box marginY={1}>
@@ -98,13 +95,12 @@ export const DoctorView: FC<DoctorViewProps> = ({ onBack }) => {
                                         <Box>
                                             <Text color={result.ok ? 'green' : 'red'}>{result.ok ? '✔ ' : '✖ '}</Text>
                                             <Text bold color={result.ok ? 'green' : 'red'}>
-                                                {result.name}:
+                                                {result.name}
                                             </Text>
-                                            <Text color="white"> {result.detail}</Text>
                                         </Box>
-                                        {result.remediation && (
-                                            <Box marginLeft={4}>
-                                                <Text color="yellow">💡 {result.remediation}</Text>
+                                        {result.detail && (
+                                            <Box marginLeft={2}>
+                                                <Text color="gray">{result.detail}</Text>
                                             </Box>
                                         )}
                                     </Box>
@@ -112,10 +108,22 @@ export const DoctorView: FC<DoctorViewProps> = ({ onBack }) => {
                             </Box>
                         );
                     })}
+
+                    <Box marginTop={1}>
+                        <Text color="gray">
+                            Press{' '}
+                            <Text bold color="yellow">
+                                [Enter]
+                            </Text>{' '}
+                            or{' '}
+                            <Text bold color="yellow">
+                                [b]
+                            </Text>{' '}
+                            to choose another IDE
+                        </Text>
+                    </Box>
                 </Box>
             )}
-
-            <Footer hints={['Enter/b Back to IDE Selection', 'q Exit']} />
         </Box>
     );
 };

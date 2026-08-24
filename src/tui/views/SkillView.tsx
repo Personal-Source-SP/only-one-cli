@@ -1,11 +1,12 @@
 import React, { FC, useState } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
+import { Box, Text } from 'ink';
 import { SelectMenu } from '../components/SelectMenu.js';
-import { BACK_KEY_INPUTS, SKILL_MENU_ITEMS } from '../constants/index.js';
-import type { MenuItem } from '../types/index.js';
+import { TaskRunnerView } from '../components/TaskRunnerView.js';
+import { SKILLS } from '@assets/skills/index.js';
+import { installSkills } from '@/core/skill/index.js';
+import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { MenuItem } from '../types/index.js';
 
 interface SkillViewProps {
     deps?: ProgramDeps;
@@ -13,47 +14,70 @@ interface SkillViewProps {
 }
 
 export const SkillView: FC<SkillViewProps> = ({ deps, onBack }) => {
-    const [step, setStep] = useState<'select' | 'running' | 'done'>('select');
-    const [statusText, setStatusText] = useState('');
+    const [selectedSkillName, setSelectedSkillName] = useState<string | null>(null);
 
-    useInput((input, key) => {
-        if (BACK_KEY_INPUTS.includes(input) && ['select', 'done'].includes(step)) {
-            onBack();
+    const skillMenuItems: MenuItem[] = [
+        {
+            label: 'Sync All Built-in Skills',
+            value: 'all',
+            icon: '⚡',
+            description: `Sync all ${SKILLS.length} official agent skills to workspace`,
+        },
+        ...SKILLS.map((s) => ({
+            label: s.name,
+            value: s.name,
+            icon: '🧩',
+            description: s.description,
+        })),
+    ];
+
+    const handleRunSkillSync = async (log: (msg: string) => void) => {
+        log(`Preparing skill sync...`);
+        const skillNames = selectedSkillName === 'all' ? SKILLS.map((s) => s.name) : [selectedSkillName!];
+
+        const targetTools = getAllowedVsSettingsTargets().map((t) => ({
+            value: t.id,
+            name: t.vs?.name || t.id,
+            description: '',
+            skillsDir: t.id === 'antigravity' ? '.agents' : `.agents/${t.id}`,
+            ruleExt: 'md' as const,
+        }));
+
+        if (deps) {
+            const results = await installSkills({
+                deps: {
+                    ...deps,
+                    stdout: (msg) => log(msg),
+                },
+                projectDir: process.cwd(),
+                selectedTools: targetTools,
+                skillNames,
+                overwriteList: skillNames,
+            });
+
+            log(`Sync completed: ${results.filter((r) => r.status === 'success').length} installed.`);
+        } else {
+            log(`Synced skills: ${skillNames.join(', ')}`);
         }
-    });
-
-    const handleSelect = (item: MenuItem) => {
-        setStep('running');
-        setStatusText(`Executing ${item.label}...`);
-
-        setTimeout(() => {
-            setStep('done');
-            setStatusText(`Completed: ${item.label} successfully!`);
-        }, 1000);
     };
 
+    if (selectedSkillName) {
+        const title = selectedSkillName === 'all' ? 'All Built-in Skills' : selectedSkillName;
+        return (
+            <Box flexDirection="column" paddingX={1}>
+                <TaskRunnerView title={`Sync Skill: ${title}`} runTask={handleRunSkillSync} onDone={onBack} />
+            </Box>
+        );
+    }
+
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="cyan">
-                🧩 Agent Skills Manager
-            </Text>
-
-            {step === 'select' && <SelectMenu items={SKILL_MENU_ITEMS} onSelect={handleSelect} />}
-
-            {step === 'running' && (
-                <Box marginY={1}>
-                    <Text color="yellow">⏳ {statusText}</Text>
-                </Box>
-            )}
-
-            {step === 'done' && (
-                <Box marginY={1}>
-                    <Text color="green">✔ {statusText}</Text>
-                </Box>
-            )}
-
-            <Footer hints={['Enter Select', 'b Back', 'q Exit']} />
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="cyan">
+                    🧩 Select Agent Skill to Sync:
+                </Text>
+            </Box>
+            <SelectMenu items={skillMenuItems} onSelect={(item) => setSelectedSkillName(item.value)} />
         </Box>
     );
 };

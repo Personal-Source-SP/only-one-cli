@@ -6,22 +6,28 @@ interface TextInputProps {
     placeholder?: string;
     onSubmit: (value: string) => void;
     onCancel?: () => void;
+    isActive?: boolean;
 }
 
-export const TextInput: React.FC<TextInputProps> = ({ label, placeholder, onSubmit, onCancel }) => {
+export const TextInput: React.FC<TextInputProps> = ({ label, placeholder, onSubmit, onCancel, isActive = true }) => {
     const [value, setValue] = useState('');
 
-    useInput((input, key) => {
-        if (key.return) {
-            onSubmit(value);
-        } else if (key.escape && onCancel) {
-            onCancel();
-        } else if (key.backspace || key.delete) {
-            setValue((prev) => prev.slice(0, -1));
-        } else if (!key.ctrl && !key.meta && input && input.length === 1) {
-            setValue((prev) => prev + input);
-        }
-    });
+    useInput(
+        (input, key) => {
+            if (!isActive) return;
+
+            if (key.return) {
+                onSubmit(value);
+            } else if (key.escape && onCancel) {
+                onCancel();
+            } else if (key.backspace || key.delete) {
+                setValue((prev) => prev.slice(0, -1));
+            } else if (!key.ctrl && !key.meta && input && input.length === 1) {
+                setValue((prev) => prev + input);
+            }
+        },
+        { isActive },
+    );
 
     return (
         <Box flexDirection="column" marginY={1}>

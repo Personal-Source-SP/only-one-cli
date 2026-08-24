@@ -5,22 +5,29 @@ import type { MenuItem } from '../types/index.js';
 interface SelectMenuProps {
     items: MenuItem[];
     onSelect: (item: MenuItem) => void;
+    isActive?: boolean;
 }
 
-export const SelectMenu: React.FC<SelectMenuProps> = ({ items, onSelect }) => {
+export const SelectMenu: React.FC<SelectMenuProps> = ({ items, onSelect, isActive = true }) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
 
-    useInput((input, key) => {
-        if (key.upArrow) {
-            setSelectedIndex((prev) => (prev > 0 ? prev - 1 : items.length - 1));
-        } else if (key.downArrow) {
-            setSelectedIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0));
-        } else if (key.return) {
-            if (items[selectedIndex]) {
-                onSelect(items[selectedIndex]);
+    useInput(
+        (input, key) => {
+            if (!isActive || items.length === 0) return;
+
+            if (key.upArrow) {
+                setSelectedIndex((prev) => (prev > 0 ? prev - 1 : items.length - 1));
+            } else if (key.downArrow) {
+                setSelectedIndex((prev) => (prev < items.length - 1 ? prev + 1 : 0));
+            } else if (key.return) {
+                const item = items[selectedIndex];
+                if (item) {
+                    onSelect(item);
+                }
             }
-        }
-    });
+        },
+        { isActive },
+    );
 
     return (
         <Box flexDirection="column" marginY={1}>

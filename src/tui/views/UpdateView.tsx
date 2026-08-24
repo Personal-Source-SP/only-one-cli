@@ -1,11 +1,10 @@
 import React, { FC, useState } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
+import { Box, Text } from 'ink';
 import { SelectMenu } from '../components/SelectMenu.js';
-import { BACK_KEY_INPUTS } from '../constants/index.js';
-import type { MenuItem } from '../types/index.js';
+import { TaskRunnerView } from '../components/TaskRunnerView.js';
+import { updateArtifactsStep } from '@/commands/update/actions/step-2-update-artifacts.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { MenuItem } from '../types/index.js';
 
 interface UpdateViewProps {
     deps?: ProgramDeps;
@@ -13,17 +12,7 @@ interface UpdateViewProps {
 }
 
 export const UpdateView: FC<UpdateViewProps> = ({ deps, onBack }) => {
-    const [step, setStep] = useState<'select' | 'running' | 'done'>('select');
-    const [statusText, setStatusText] = useState('');
-
-    useInput((input, key) => {
-        const isBackOrQuit = BACK_KEY_INPUTS.includes(input);
-        const isConfirmExit = key.return && ['select', 'done'].includes(step);
-
-        if (isBackOrQuit || isConfirmExit) {
-            onBack();
-        }
-    });
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
     const updateItems: MenuItem[] = [
         {
@@ -34,38 +23,44 @@ export const UpdateView: FC<UpdateViewProps> = ({ deps, onBack }) => {
         },
     ];
 
-    const handleSelect = (item: MenuItem) => {
-        setStep('running');
-        setStatusText(`Refreshing skills and templates (${item.label})...`);
+    const handleRunUpdate = async (log: (msg: string) => void) => {
+        log('Checking and refreshing workspace artifacts...');
+        const runDeps: ProgramDeps = deps ?? {
+            stdout: (msg: string) => log(msg),
+            stderr: (msg: string) => log(`[stderr] ${msg}`),
+            cwd: process.cwd(),
+            env: process.env,
+            fetcher: globalThis.fetch,
+        };
 
-        setTimeout(() => {
-            setStep('done');
-            setStatusText(`Skills and templates refreshed successfully! 🔄`);
-        }, 1200);
+        await updateArtifactsStep(
+            {
+                ...runDeps,
+                stdout: (msg) => log(msg),
+            },
+            process.cwd(),
+            { force: true },
+            false,
+        );
+        log('Workspace artifacts refreshed successfully.');
     };
 
+    if (selectedAction) {
+        return (
+            <Box flexDirection="column" paddingX={1}>
+                <TaskRunnerView title="Refresh Skills & Templates" runTask={handleRunUpdate} onDone={onBack} />
+            </Box>
+        );
+    }
+
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="green">
-                🔄 Refresh Skills & Templates
-            </Text>
-
-            {step === 'select' && <SelectMenu items={updateItems} onSelect={handleSelect} />}
-
-            {step === 'running' && (
-                <Box marginY={1}>
-                    <Text color="cyan">⏳ {statusText}</Text>
-                </Box>
-            )}
-
-            {step === 'done' && (
-                <Box marginY={1}>
-                    <Text color="green">✔ {statusText}</Text>
-                </Box>
-            )}
-
-            <Footer hints={step === 'select' ? ['Enter Select', 'b Back', 'q Exit'] : ['Enter/b Back to Menu']} />
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="green">
+                    🔄 Refresh Skills & Templates:
+                </Text>
+            </Box>
+            <SelectMenu items={updateItems} onSelect={(item) => setSelectedAction(item.value)} />
         </Box>
     );
 };

@@ -1,11 +1,13 @@
 import React, { FC, useState } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Header } from '../components/Header.js';
-import { Footer } from '../components/Footer.js';
+import { Box, Text } from 'ink';
 import { SelectMenu } from '../components/SelectMenu.js';
-import { BACK_KEY_INPUTS } from '../constants/index.js';
-import type { MenuItem } from '../types/index.js';
+import { TaskRunnerView } from '../components/TaskRunnerView.js';
+import { COMBOS } from '@assets/combos/index.js';
+import { installCombo } from '@/core/combo/index.js';
+import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { MenuItem } from '../types/index.js';
+import { homedir } from 'node:os';
 
 interface ComboViewProps {
     deps?: ProgramDeps;
@@ -13,65 +15,64 @@ interface ComboViewProps {
 }
 
 export const ComboView: FC<ComboViewProps> = ({ deps, onBack }) => {
-    const [step, setStep] = useState<'select' | 'running' | 'done'>('select');
-    const [statusText, setStatusText] = useState('');
+    const [selectedComboId, setSelectedComboId] = useState<string | null>(null);
 
-    useInput((input, key) => {
-        const isBackOrQuit = BACK_KEY_INPUTS.includes(input);
-        const isConfirmExit = key.return && ['select', 'done'].includes(step);
+    const comboMenuItems: MenuItem[] = COMBOS.map((c) => ({
+        label: c.name,
+        value: c.id,
+        icon: '✨',
+        description: c.description,
+    }));
 
-        if (isBackOrQuit || isConfirmExit) {
-            onBack();
+    const selectedCombo = COMBOS.find((c) => c.id === selectedComboId);
+
+    const handleRunCombo = async (log: (msg: string) => void) => {
+        if (!selectedCombo) return;
+
+        log(`Applying combo "${selectedCombo.name}"...`);
+        const targetTools = getAllowedVsSettingsTargets().map((t) => ({
+            value: t.id,
+            name: t.vs?.name || t.id,
+            description: '',
+            ruleExt: 'md' as const,
+        }));
+
+        if (deps) {
+            const results = await installCombo({
+                deps: {
+                    ...deps,
+                    stdout: (msg) => log(msg),
+                },
+                projectDir: process.cwd(),
+                homeDir: homedir(),
+                platform: process.platform,
+                selectedTools: targetTools,
+                combo: selectedCombo,
+                overwriteList: [],
+                noIgnore: false,
+            });
+            log(`Applied ${results.rules.length} rules, ${results.skills?.length ?? 0} skills.`);
+        } else {
+            log(`Combo ${selectedCombo.name} loaded.`);
         }
-    });
-
-    const comboMenuItems: MenuItem[] = [
-        {
-            label: 'NestJS Backend Combo',
-            value: 'nestjs-backend',
-            icon: '📦',
-            description: 'Apply NestJS skills, DTOs, MikroORM, and backend rules',
-        },
-        {
-            label: 'Next.js Fullstack Combo',
-            value: 'nextjs-fullstack',
-            icon: '🚀',
-            description: 'Apply Next.js App Router skills, Refine hooks, and UI guidelines',
-        },
-    ];
-
-    const handleSelect = (item: MenuItem) => {
-        setStep('running');
-        setStatusText(`Applying predefined combo (${item.label})...`);
-
-        setTimeout(() => {
-            setStep('done');
-            setStatusText(`Combo (${item.label}) applied successfully! ✨`);
-        }, 1200);
     };
 
+    if (selectedComboId && selectedCombo) {
+        return (
+            <Box flexDirection="column" paddingX={1}>
+                <TaskRunnerView title={`Apply Combo: ${selectedCombo.name}`} runTask={handleRunCombo} onDone={onBack} />
+            </Box>
+        );
+    }
+
     return (
-        <Box flexDirection="column">
-            <Header />
-            <Text bold color="cyan">
-                ✨ Predefined Combos & Stacks
-            </Text>
-
-            {step === 'select' && <SelectMenu items={comboMenuItems} onSelect={handleSelect} />}
-
-            {step === 'running' && (
-                <Box marginY={1}>
-                    <Text color="yellow">⏳ {statusText}</Text>
-                </Box>
-            )}
-
-            {step === 'done' && (
-                <Box marginY={1}>
-                    <Text color="green">✔ {statusText}</Text>
-                </Box>
-            )}
-
-            <Footer hints={step === 'select' ? ['Enter Select', 'b Back', 'q Exit'] : ['Enter/b Back to Menu']} />
+        <Box flexDirection="column" paddingX={1}>
+            <Box marginY={0}>
+                <Text bold color="cyan">
+                    ✨ Select Predefined Combo:
+                </Text>
+            </Box>
+            <SelectMenu items={comboMenuItems} onSelect={(item) => setSelectedComboId(item.value)} />
         </Box>
     );
 };

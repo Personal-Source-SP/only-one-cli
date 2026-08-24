@@ -1,17 +1,4 @@
-export type ViewState =
-    | 'home'
-    | 'doctor'
-    | 'init'
-    | 'combo'
-    | 'skill'
-    | 'workflow'
-    | 'rule'
-    | 'mcp'
-    | 'setting-vs'
-    | 'extensions-vs'
-    | 'git'
-    | 'structure-generate'
-    | 'update';
+export * from '../router/types.js';
 
 export interface MenuItem {
     label: string;
