@@ -39,3 +39,18 @@
   > *"The workflow transitions seamlessly from high-level concept into concrete implementation tasks."*
 - **Origin Task**: 20260824-102100-enhance-archive-with-english-learning
 
+### 6. To safeguard against [risk] by [doing something]
+- **Meaning (VI)**: Phòng ngừa và bảo vệ hệ thống trước một rủi ro/sai sót bằng cách thực hiện một biện pháp cụ thể.
+- **Grammar / Usage**: `safeguard against [unintended behavior / data loss] by [action]`
+- **Engineering Example**:
+  > *"Step 0 incorporates validation checks to safeguard against premature archiving of in-progress tasks."*
+- **Origin Task**: 20260824-102930-integrate-pre-clean-auto-archive
+
+### 7. To eliminate the risk of [something] by [doing something]
+- **Meaning (VI)**: Triệt tiêu, loại bỏ hoàn toàn nguy cơ xảy ra lỗi/vấn đề bằng một cơ chế đảm bảo.
+- **Grammar / Usage**: `eliminate the risk of [issue / inconsistency] by [action]`
+- **Engineering Example**:
+  > *"Adding Step 0 eliminates the risk of orphaned tasks by ensuring auto-archiving occurs before cleanup."*
+- **Origin Task**: 20260824-102930-integrate-pre-clean-auto-archive
+
+

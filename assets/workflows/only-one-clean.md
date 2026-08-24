@@ -13,6 +13,7 @@ description: "Consolidate related archives, verify deep logic against codebase, 
 ## Role
 
 You are a **Principal Systems Auditor & Architecture Curator**. Your core responsibilities:
+- Automatically archive completed tasks from `only-one/tasks/` before performing cleanup.
 - Audit all archived knowledge records in `only-one/archives/` against the active codebase (Ground Truth).
 - Consolidate fragmented records of the same domain into unified living documents.
 - Ruthlessly purge stale, outdated, or obsolete documentation to ensure AI and developers always access 100% accurate system memory.
@@ -25,6 +26,7 @@ Activate and apply these skills throughout the clean workflow:
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
+| **`task-lifecycle-resolution`** | Step 0 (Pre-clean task auto-archive) | Scans `only-one/tasks/` for completed tasks with `status: done` and triggers `/only-one-archive` protocol before clean. |
 | **`code-simplification`** | Step 1 (Consolidation) | Merges multiple related archive records of the same domain into one clean file, eliminating duplicate context. |
 | **`source-driven-development`** | Step 2 (Codebase Audit) | Inspects active source code to ground all documented logic against actual codebase truth. |
 | **`doubt-driven-development`** | Step 2 (Sanity Check & Purging) | Applies adversarial inquiry to identify stale logic and commands immediate deletion of dead documentation. |
@@ -32,6 +34,24 @@ Activate and apply these skills throughout the clean workflow:
 ---
 
 ## 2. Step-by-Step Execution Protocol
+
+### Step 0 — Pre-Clean Auto-Archive (`task-lifecycle-resolution`)
+
+1. Scan `only-one/tasks/` for task folders where `plan.md` has `status: done`.
+2. For each completed task folder found:
+   - If `--dry-run` is active:
+     - Log: `[DRY-RUN] Found completed task: <slug> (would execute /only-one-archive)`.
+   - Otherwise:
+     - Execute the full `/only-one-archive` protocol on that task:
+       1. Append negative rules to `only-one/rules.md`.
+       2. Append English learning patterns to `only-one/learn/<topic>.md`.
+       3. Author single distilled record `only-one/archives/<timestamp>-<slug>.md`.
+       4. Remove raw task directory `rm -rf only-one/tasks/<slug>`.
+3. Check for tasks with `status: in-progress` or `status: planned`:
+   - Log notice: `ℹ️ Preserved active/planned task: <slug>`.
+   - Never archive or delete in-progress or planned tasks.
+
+---
 
 ### Step 1 — Domain Grouping & Consolidation (`code-simplification`)
 
@@ -76,6 +96,7 @@ Display the clean report:
 ## 🧹 Archive Cleanup & Verification Complete
 
 ### Summary
+- **Auto-Archived Tasks**: W completed tasks archived in Step 0
 - **Total Archives Scanned**: N
 - **Consolidated Records**: X domain files generated
 - **Purged Obsolete Records**: Y stale files deleted
@@ -93,6 +114,8 @@ Display the clean report:
 
 ## Guardrails
 
+- Always auto-archive tasks with `status: done` in `only-one/tasks/` as Step 0 before performing archive consolidation and cleanup.
+- Never modify, archive, or delete tasks with `status: in-progress` or `status: planned` during `/only-one-clean`.
 - Never retain an archive whose underlying code or module has been deleted from the repository.
 - Always ground logic verification in real source code files, never in speculative assumptions.
 - Maintain timestamps representing the clean execution moment for newly consolidated records.
