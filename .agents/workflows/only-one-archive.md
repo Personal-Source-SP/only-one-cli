@@ -18,6 +18,7 @@ description: "Distill completed tasks into concise single-file archives, sync ru
 You are a **Software Knowledge & Release Architect**. Your core responsibilities:
 - Distill completed task folders into concise, living system knowledge records (`only-one/archives/<timestamp>-<slug>.md`).
 - Extract user constraints, warnings, and lessons learned into `only-one/rules.md`.
+- Extract and categorize technical English structures and expressions into `only-one/learn/<topic>.md`.
 - Ensure clean workspace hygiene by removing temporary raw task directories while preserving permanent architectural context and audit links.
 
 ---
@@ -31,6 +32,7 @@ Activate and apply these skills throughout the archiving workflow:
 | **`spec-driven-development`** | Step 4 (Authoring archive markdown) | Consolidates Problem Statement, Architecture Decisions, and Test Evidence into a structured single-file specification (`only-one/archives/<timestamp>-<slug>.md`). |
 | **`code-simplification`** | Step 4 (Distillation) | Prunes transient code diffs and keeps document concise (< 50-100 lines) for optimal agent token efficiency. |
 | **`context-engineering`** | Step 2 (Distilling rules) | Formats negative constraints and lessons learned into high-signal `[NEVER]` / `[AVOID]` rules inside `only-one/rules.md`. |
+| **`english-learning-extraction`** | Step 2b (Distilling learning notes) | Scans task history, extracts 2–5 high-value technical English expressions, and appends them to thematic topics in `only-one/learn/` with Vietnamese translations. |
 
 ---
 
@@ -58,6 +60,29 @@ Activate and apply these skills throughout the archiving workflow:
    - **[AVOID]** <Anti-pattern to avoid> — <Reason / Context>
    ```
    *(Ensure deduplication against existing rules).*
+
+---
+
+### Step 2b — Extract & Distill Technical English Learning (`english-learning-extraction`)
+
+1. Review the task's conversation history, `concept.md`, `plan.md`, and `walkthrough.md`.
+2. Extract 2–5 high-signal technical English patterns (grammar structures, professional idioms, technical expressions) used during the task.
+3. Identify the matching standard topic file in `only-one/learn/`:
+   - `architecture-and-design.md`
+   - `debugging-and-troubleshooting.md`
+   - `code-review-and-refactoring.md`
+   - `workflow-and-automation.md`
+   - `general-engineering.md` (fallback)
+4. Check for existing entries in the target file to avoid duplication.
+5. Append new entries following the standard schema:
+   ```markdown
+   ### N. <Grammar Pattern or Idiomatic Expression>
+   - **Meaning (VI)**: <Giải nghĩa tiếng Việt ngắn gọn, chính xác>
+   - **Grammar / Usage**: `<Syntax breakdown>`
+   - **Engineering Example**:
+     > *"<Real-world example sentence in software context>"*
+   - **Origin Task**: `<timestamp>-<slug>`
+   ```
 
 ---
 
@@ -131,6 +156,7 @@ Display the archive completion report:
 
 - **Archived Record**: `only-one/archives/<timestamp>-<slug>.md` (status: active)
 - **Rules Updated**: `only-one/rules.md` (N rules synced)
+- **Learning Notes Synced**: `only-one/learn/<topic>.md` (+N patterns synced)
 - **Cleaned Task Folder**: `only-one/tasks/<timestamp>-<slug>/` (deleted)
 ```
 
@@ -141,3 +167,5 @@ Display the archive completion report:
 - Never delete a task directory before confirming the archive markdown file has been written.
 - Ensure distilled archive documents remain concise (< 100 lines) by omitting full raw code diffs.
 - Always preserve `only-one/rules.md` at root and avoid creating nested rule directories.
+- Always extract and record high-value technical English patterns into `only-one/learn/<topic>.md` with Vietnamese explanations before purging task directories.
+- Avoid adding trivial everyday vocabulary to `only-one/learn/`; focus strictly on professional engineering expressions, compound terms, and sentence structures.
