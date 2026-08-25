@@ -67,5 +67,27 @@
   > *"We enforced strict alphabetical ordering in the extension list to prevent diff thrashing across concurrent contributions."*
 - **Origin Task**: `20260825-105800-sync-vs-assets-antigravity`
 
+### 10. To enrich [A] with [B]
+- **Meaning (VI)**: Làm phong phú / bổ sung giá trị cho A bằng thành phần B.
+- **Grammar / Usage**: `enrich [document / workflow / system] with [capabilities / notes]`
+- **Engineering Example**:
+  > *"We enriched the idea and planning workflows with interactive English coaching capabilities."*
+- **Origin Task**: `20260825-110600-interactive-english-learning-workflows`
+
+### 11. To foster continuous learning throughout [process]
+- **Meaning (VI)**: Thúc đẩy việc học hỏi liên tục và tự nhiên trong suốt toàn bộ quy trình.
+- **Grammar / Usage**: `foster continuous learning throughout [lifecycle / conversation]`
+- **Engineering Example**:
+  > *"Integrating live rephrasing into chat turns fosters continuous learning throughout the feature design lifecycle."*
+- **Origin Task**: `20260825-110600-interactive-english-learning-workflows`
+
+### 12. To bridge the gap between [A] and [B]
+- **Meaning (VI)**: Thu hẹp khoảng cách / tạo cầu nối liền mạch giữa hai giai đoạn hoặc khái niệm A và B.
+- **Grammar / Usage**: `bridge the gap between [informal ideas] and [formal specifications]`
+- **Engineering Example**:
+  > *"Live conversational coaching bridges the gap between rough ideas and rigorous English technical specifications."*
+- **Origin Task**: `20260825-110600-interactive-english-learning-workflows`
+
+
 
 

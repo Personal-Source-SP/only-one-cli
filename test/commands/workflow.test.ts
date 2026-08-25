@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { createWorkflowCommand } from '@/commands/workflow/command.js';
 import { mkdir, rm, writeFile, existsSync } from 'node:fs';
-import { mkdir as mkdirP, rm as rmP } from 'node:fs/promises';
+import { mkdir as mkdirP, rm as rmP, readFile as fsReadFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const testProjectDir = join(process.cwd(), 'tmp/workflow-command-test');
@@ -89,5 +89,18 @@ describe('Workflow Command Unit & Integration Tests', () => {
         expect(existsSync(cleanDest)).toBe(true);
 
         await rmP(testProjectDir, { recursive: true, force: true });
+    });
+
+    it('ensures only-one-idea and only-one-plan contain English learning specifications', async () => {
+        const ideaContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-idea.md'), 'utf-8');
+        const planContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-plan.md'), 'utf-8');
+
+        expect(ideaContent).toContain('conversational-english-coaching');
+        expect(ideaContent).toContain('english-learning-extraction');
+        expect(ideaContent).toContain('## 7. Technical English Key Patterns');
+
+        expect(planContent).toContain('conversational-english-coaching');
+        expect(planContent).toContain('english-learning-extraction');
+        expect(planContent).toContain('Section 6. Technical English Key Patterns');
     });
 });
