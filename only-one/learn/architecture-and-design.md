@@ -24,3 +24,18 @@
 - **Engineering Example**:
   > *"Asynchronous processing yields higher throughput at the cost of eventual consistency."*
 - **Origin Task**: Initial Seed
+
+### 4. To eliminate race conditions across [nested components]
+- **Meaning (VI)**: Triệt tiêu các điều kiện tranh chấp (race condition) giữa các component lồng nhau thông qua cơ chế khóa focus hoặc router điều hướng tập trung.
+- **Grammar / Usage**: `eliminate race conditions across [subsystems / components / handlers]`
+- **Engineering Example**:
+  > *"We centralized input handling into a router context to eliminate race conditions across nested terminal components."*
+- **Origin Task**: `20260824-103830-tui-modernization`
+
+### 5. To mitigate [undesired behavior] through [technique]
+- **Meaning (VI)**: Giảm thiểu / hạn chế hành vi không mong muốn (ví dụ: giật màn hình, nghẽn mạng) bằng một kỹ thuật cụ thể.
+- **Grammar / Usage**: `mitigate [issue] through / by [optimization technique]`
+- **Engineering Example**:
+  > *"The layout memoizes preview cards to mitigate screen flickering during rapid cursor navigation."*
+- **Origin Task**: `20260824-103830-tui-modernization`
+

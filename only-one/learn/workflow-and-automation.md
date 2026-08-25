@@ -53,4 +53,19 @@
   > *"Adding Step 0 eliminates the risk of orphaned tasks by ensuring auto-archiving occurs before cleanup."*
 - **Origin Task**: 20260824-102930-integrate-pre-clean-auto-archive
 
+### 8. To achieve 100% parity between [A] and [B]
+- **Meaning (VI)**: Đạt được sự đồng nhất và tương đương hoàn toàn (100%) giữa cấu hình/dữ liệu A và môi trường thực tế B.
+- **Grammar / Usage**: `achieve parity between [manifest / schema] and [target environment]`
+- **Engineering Example**:
+  > *"The manifest was updated to achieve 100% parity between the repository asset library and the active Antigravity IDE configuration."*
+- **Origin Task**: `20260825-105800-sync-vs-assets-antigravity`
+
+### 9. To prevent diff thrashing by [technique]
+- **Meaning (VI)**: Ngăn ngừa sự xáo trộn diff không cần thiết khi commit code bằng việc áp dụng quy tắc sắp xếp chuẩn hóa (như sắp xếp alphabet).
+- **Grammar / Usage**: `prevent diff thrashing by [sorting / normalizing entries]`
+- **Engineering Example**:
+  > *"We enforced strict alphabetical ordering in the extension list to prevent diff thrashing across concurrent contributions."*
+- **Origin Task**: `20260825-105800-sync-vs-assets-antigravity`
+
+
 
