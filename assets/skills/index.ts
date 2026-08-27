@@ -68,6 +68,20 @@ export const SKILLS: SkillManifest[] = [
         skillPath: 'skills/api-and-interface-design/SKILL.md',
     },
     {
+        name: 'frontend-ui-engineering',
+        description: 'Component architecture, design systems, 5-state matrix, and WCAG accessibility.',
+        source: 'addyosmani/agent-skills',
+        sourceType: 'github',
+        skillPath: 'skills/frontend-ui-engineering/SKILL.md',
+    },
+    {
+        name: 'source-driven-development',
+        description: 'Enforce source-verified APIs and grounded documentation.',
+        source: 'addyosmani/agent-skills',
+        sourceType: 'github',
+        skillPath: 'skills/source-driven-development/SKILL.md',
+    },
+    {
         name: 'doubt-driven-development',
         description: 'Stress-test high-stakes design choices via CLAIM -> DOUBT -> RECONCILE loops.',
         source: 'addyosmani/agent-skills',

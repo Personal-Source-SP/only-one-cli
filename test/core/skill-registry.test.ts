@@ -48,9 +48,9 @@ describe('skill registry integrity', () => {
         expect(existsSync(join(skillsDir, 'nestjs-development'))).toBe(false);
     });
 
-    it('registers the 8 curated mattpocock/skills (7 new + grill-me) with valid paths', () => {
+    it('registers the 11 curated mattpocock/skills with valid paths', () => {
         const mattSkills = SKILLS.filter((s) => s.source === 'mattpocock/skills');
-        expect(mattSkills).toHaveLength(8);
+        expect(mattSkills).toHaveLength(11);
 
         const expectedNames = [
             'grill-me',
@@ -61,6 +61,9 @@ describe('skill registry integrity', () => {
             'codebase-design',
             'diagnosing-bugs',
             'handoff',
+            'prototype',
+            'wizard',
+            'resolving-merge-conflicts',
         ];
 
         const mattSkillNames = mattSkills.map((s) => s.name);
