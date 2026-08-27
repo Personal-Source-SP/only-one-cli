@@ -48,6 +48,30 @@ describe('skill registry integrity', () => {
         expect(existsSync(join(skillsDir, 'nestjs-development'))).toBe(false);
     });
 
+    it('registers the 8 curated mattpocock/skills (7 new + grill-me) with valid paths', () => {
+        const mattSkills = SKILLS.filter((s) => s.source === 'mattpocock/skills');
+        expect(mattSkills).toHaveLength(8);
+
+        const expectedNames = [
+            'grill-me',
+            'grill-with-docs',
+            'domain-modeling',
+            'wait-what',
+            'to-tickets',
+            'codebase-design',
+            'diagnosing-bugs',
+            'handoff',
+        ];
+
+        const mattSkillNames = mattSkills.map((s) => s.name);
+        expect(mattSkillNames.sort()).toEqual(expectedNames.sort());
+
+        for (const skill of mattSkills) {
+            expect(skill.sourceType).toBe('github');
+            expect(skill.skillPath).toMatch(/^skills\/(engineering|productivity)\/[a-z-]+\/SKILL\.md$/);
+        }
+    });
+
     it('does not ship obsolete subagent-driven-development', () => {
         expect(SKILLS.some(({ name }) => name === 'subagent-driven-development')).toBe(false);
         expect(existsSync(join(skillsDir, 'subagent-driven-development'))).toBe(false);

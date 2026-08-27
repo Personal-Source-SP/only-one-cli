@@ -3,14 +3,17 @@ import type { WorkflowManifest } from '../types.js';
 export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-idea',
-        description: 'Explore, refine, and validate rough ideas or vague requirements before creating an implementation plan.',
-        requiredSkills: ['interview-me', 'idea-refine', 'spec-driven-development', 'c4-diagrams'],
+        description:
+            'Clarify business problems, define strict scope boundaries, build domain models, and produce a lean concept.md specification.',
+        requiredSkills: ['grill-with-docs', 'domain-modeling', 'interview-me', 'idea-refine', 'wait-what'],
     },
     {
         name: 'only-one-plan',
         description:
             'Research current code and create a focused implementation plan with design options, architecture, code examples, and test cases.',
         requiredSkills: [
+            'to-tickets',
+            'codebase-design',
             'c4-diagrams',
             'api-and-interface-design',
             'frontend-ui-engineering',
@@ -34,6 +37,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
         name: 'only-one-debug',
         description: 'Perform systematic Root Cause Analysis (RCA) and deliver a minimal verified fix for a bug.',
         requiredSkills: [
+            'diagnosing-bugs',
             'debugging-and-error-recovery',
             'doubt-driven-development',
             'test-driven-development',
@@ -71,7 +75,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-archive',
         description: 'Distill completed tasks into concise single-file archives, sync rules, and clean task folders.',
-        requiredSkills: ['spec-driven-development', 'code-simplification', 'context-engineering'],
+        requiredSkills: ['handoff', 'spec-driven-development', 'code-simplification', 'context-engineering'],
     },
     {
         name: 'only-one-clean',

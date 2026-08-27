@@ -131,7 +131,58 @@ export const SKILLS: SkillManifest[] = [
         skillPath: 'skills/performance-optimization/SKILL.md',
     },
 
-    // --- 5. Local Custom Only-One Skills ---
+    // --- 5. Matt Pocock Workflow-Enhancing Skills ---
+    {
+        name: 'grill-with-docs',
+        description: 'Grilling session that sharpens domain terminology and records CONTEXT.md and ADRs inline.',
+        source: 'mattpocock/skills',
+        sourceType: 'github',
+        skillPath: 'skills/engineering/grill-with-docs/SKILL.md',
+    },
+    {
+        name: 'domain-modeling',
+        description: 'Actively build and sharpen domain models, challenge glossary terms, and update CONTEXT.md and ADRs.',
+        source: 'mattpocock/skills',
+        sourceType: 'github',
+        skillPath: 'skills/engineering/domain-modeling/SKILL.md',
+    },
+    {
+        name: 'wait-what',
+        description: 'Re-pitch complex or unclear explanations in plain English using project domain glossary.',
+        source: 'mattpocock/skills',
+        sourceType: 'github',
+        skillPath: 'skills/productivity/wait-what/SKILL.md',
+    },
+    {
+        name: 'to-tickets',
+        description: 'Break any plan or spec into a set of tracer-bullet tickets with explicit blocking edges.',
+        source: 'mattpocock/skills',
+        sourceType: 'github',
+        skillPath: 'skills/engineering/to-tickets/SKILL.md',
+    },
+    {
+        name: 'codebase-design',
+        description: 'Design deep modules with small interfaces at clean seams, testable through that interface.',
+        source: 'mattpocock/skills',
+        sourceType: 'github',
+        skillPath: 'skills/engineering/codebase-design/SKILL.md',
+    },
+    {
+        name: 'diagnosing-bugs',
+        description: 'Disciplined diagnosis loop for hard bugs: build red feedback loop, minimize, hypothesize, instrument, and fix.',
+        source: 'mattpocock/skills',
+        sourceType: 'github',
+        skillPath: 'skills/engineering/diagnosing-bugs/SKILL.md',
+    },
+    {
+        name: 'handoff',
+        description: 'Compact current conversation into a handoff document so another agent can continue seamlessly.',
+        source: 'mattpocock/skills',
+        sourceType: 'github',
+        skillPath: 'skills/productivity/handoff/SKILL.md',
+    },
+
+    // --- 6. Local Custom Only-One Skills ---
     {
         name: 'only-one-nestjs-development',
         description: 'Use for NestJS development with selectively loaded architecture references.',
@@ -158,4 +209,5 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
     },
 ];
+
 
