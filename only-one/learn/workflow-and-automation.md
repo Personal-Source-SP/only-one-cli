@@ -88,6 +88,56 @@
   > *"Live conversational coaching bridges the gap between rough ideas and rigorous English technical specifications."*
 - **Origin Task**: `20260825-110600-interactive-english-learning-workflows`
 
+### 13. Lean scoping / Scope boundary enforcement
+- **Meaning (VI)**: Tinh giản việc định nghĩa yêu cầu và siết chặt ranh giới phạm vi (In-Scope vs Explicit Out-of-Scope) để ngăn chặn phình phạm vi (Scope Creep).
+- **Grammar / Usage**: `<Adjective + Noun phrase>` — Thuật ngữ quản trị phạm vi dự án.
+- **Engineering Example**:
+  > *"Refactoring the idea workflow enforces lean scoping, allowing the team to align on boundaries in minutes without premature code tracing."*
+- **Origin Task**: `20260827-134510-integrate-matt-pocock-skills`
+
+### 14. Lossless session handoff
+- **Meaning (VI)**: Bàn giao phiên làm việc không làm thất thoát ngữ cảnh hoặc thông tin quan trọng giữa các phiên làm việc của AI / lập trình viên.
+- **Grammar / Usage**: `Lossless + <Handoff/Transition>` — Thuật ngữ vay mượn từ xử lý dữ liệu không mất mát.
+- **Engineering Example**:
+  > *"The handoff skill generates a structured session state document enabling lossless session handoffs across agent boundaries."*
+- **Origin Task**: `20260827-134510-integrate-matt-pocock-skills`
+
+### 15. Tracer-bullet tickets
+- **Meaning (VI)**: Các tác vụ mỏng xuyên suốt mọi tầng kiến trúc để kiểm chứng giả định kỹ thuật nhanh nhất có khai báo quan hệ phụ thuộc (blocking edges).
+- **Grammar / Usage**: `Tracer-bullet + <Task/Ticket>` — Ẩn dụ kỹ thuật từ The Pragmatic Programmer.
+- **Engineering Example**:
+  > *"The to-tickets skill decomposes the plan into tracer-bullet tickets declaring explicit blocking edges."*
+- **Origin Task**: `20260827-134510-integrate-matt-pocock-skills`
+
+### 16. High-signal minimal context
+- **Meaning (VI)**: Ngữ cảnh tối thiểu nhưng chứa lượng thông tin giá trị cao; loại bỏ mọi chi tiết thừa gây nhiễu và phân tâm cho AI model.
+- **Grammar / Usage**: `High-signal [Noun Phrase]` — Dữ liệu chất lượng cao, không nhiễu.
+- **Engineering Example**:
+  > *"Context engineering ensures we feed the agent a high-signal minimal context, preventing hallucination during code generation."*
+- **Origin Task**: `20260827-142500-optimize-workflows-skills-catalog`
+
+### 17. Machine-parseable blueprint
+- **Meaning (VI)**: Bản vẽ / thiết kế kỹ thuật có cấu trúc chuẩn hóa cao giúp máy/AI bóc tách dữ liệu nhanh chóng và chuẩn xác tuyệt đối.
+- **Grammar / Usage**: `[Adjective] blueprint` — Bản vẽ kỹ thuật máy đọc được.
+- **Engineering Example**:
+  > *"The Task Matrix serves as a machine-parseable blueprint, allowing the agent to ingest implementation steps in milliseconds."*
+- **Origin Task**: `20260827-144600-bilingual-hybrid-doc-mode-and-english-immersion`
+
+### 18. Fast-path indexing
+- **Meaning (VI)**: Cơ chế chỉ mục đường tắt cho phép nhảy thẳng đến dữ liệu cần thiết mà không phải duyệt qua toàn bộ nội dung dài.
+- **Grammar / Usage**: `[Noun-adj] indexing` — Kỹ thuật truy cập nhanh theo chỉ mục.
+- **Engineering Example**:
+  > *"Fast-path indexing empowers `/only-one-apply` to execute file modifications in strict dependency order with targeted test verification."*
+- **Origin Task**: `20260827-144600-bilingual-hybrid-doc-mode-and-english-immersion`
+
+### 19. To reconcile [A] against [B] / Lossless Resumption
+- **Meaning (VI)**: Đối chiếu, chỉnh sửa và đồng bộ A cho khớp hoàn toàn với nguồn chuẩn B / Khả năng tiếp tục công việc bị gián đoạn mà không làm mất mát ngữ cảnh.
+- **Grammar / Usage**: `reconcile A against B` / `lossless resumption of <process>`
+- **Engineering Example**:
+  > *"We must reconcile workflow manifest definitions against the skill registry to prevent dangling references and ensure lossless resumption."*
+- **Origin Task**: `20260827-152000-refine-workflows-and-manifest-alignment`
+
+
 
 
 

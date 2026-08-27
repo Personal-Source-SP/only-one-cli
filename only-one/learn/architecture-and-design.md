@@ -39,3 +39,18 @@
   > *"The layout memoizes preview cards to mitigate screen flickering during rapid cursor navigation."*
 - **Origin Task**: `20260824-103830-tui-modernization`
 
+### 6. Seam-driven architecture
+- **Meaning (VI)**: Kiến trúc phân ranh giới rõ ràng; chia tách hệ thống tại các điểm nối (seams) tự nhiên để tối đa hóa khả năng kiểm thử độc lập và module hóa.
+- **Grammar / Usage**: `[Adjective]-driven [Noun]` — Mô hình thiết kế lấy ranh giới/đường nối làm trọng tâm.
+- **Engineering Example**:
+  > *"By placing the database adapter behind a clean interface, we created an easily testable seam-driven architecture."*
+- **Origin Task**: `20260827-142500-optimize-workflows-skills-catalog`
+
+### 7. Dual-layer architecture
+- **Meaning (VI)**: Kiến trúc tài liệu 2 lớp; phân tách rõ ràng giữa lớp thân thiện với con người (Human-friendly) và lớp ma trận tối ưu hóa cho máy/AI (Machine-readable) bóc tách nhanh.
+- **Grammar / Usage**: `Dual-layer [Noun]` — Cấu trúc phân tách 2 tầng.
+- **Engineering Example**:
+  > *"Adopting a dual-layer architecture bridges human cognitive ergonomics and machine parsing efficiency."*
+- **Origin Task**: `20260827-144600-bilingual-hybrid-doc-mode-and-english-immersion`
+
+

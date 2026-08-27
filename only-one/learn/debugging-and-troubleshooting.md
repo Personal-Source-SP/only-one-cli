@@ -24,3 +24,11 @@
 - **Engineering Example**:
   > *"The QA engineer managed to reproduce the deadlock consistently under concurrent load."*
 - **Origin Task**: Initial Seed
+
+### 4. Red feedback loop
+- **Meaning (VI)**: Vòng phản hồi kiểm thử đỏ; quy trình bắt buộc phải viết hoặc chạy một automated test thất bại để tái hiện chính xác lỗi trước khi thực hiện sửa mã nguồn.
+- **Grammar / Usage**: `[Adjective] feedback loop` — Chu trình lặp kiểm chứng.
+- **Engineering Example**:
+  > *"Before writing the bug fix, establish a reliable red feedback loop that reliably fails on the reported issue."*
+- **Origin Task**: `20260827-142500-optimize-workflows-skills-catalog`
+

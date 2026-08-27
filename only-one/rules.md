@@ -9,3 +9,6 @@
 - **[ALWAYS]** Viết toàn bộ tài liệu kỹ thuật (`concept.md`, `plan.md`, `walkthrough.md`) bằng tiếng Anh chuẩn kỹ thuật.
 - **[NEVER]** Không đưa từ vựng thông dụng tầm thường hoặc thiếu giải nghĩa tiếng Việt và ví dụ kỹ thuật thực tế vào `only-one/learn/`. Chỉ chắt lọc các mẫu câu, cấu trúc ngữ pháp và thuật ngữ kỹ thuật có giá trị tái sử dụng cao.
 - **[NEVER]** Không đặt `useInput` toàn cục bắt phím `Enter` ở wrapper cha khi component con cũng có `useInput` mà không qua router/focus lock, để tránh lỗi race condition gây thoát view trước khi action kịp thực thi.
+- **[ALWAYS]** Khai báo Machine-Readable Task Matrix đầy đủ các cột (`Order`, `Status`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`) trong Section 3 của `plan.md`.
+- **[ALWAYS]** Đảm bảo `assets/skills/index.ts`, `assets/workflows/index.ts` và `.agents/workflows/*.md` luôn đồng bộ 100% về danh mục kỹ năng (`SKILLS` và `requiredSkills`), tuyệt đối không để sót tham chiếu không tồn tại (dangling references).
+
