@@ -39,9 +39,9 @@ Prevent context loss when the context window is near capacity or when transition
 
 ---
 
-### Step 2 — Generate `handoff.md`
+### Step 2 — Generate `handoff.md` (Song ngữ Lai)
 
-Save the handoff artifact directly inside the active task folder:
+Save the handoff artifact directly inside the active task folder (**Diễn giải bằng Tiếng Việt + thuật ngữ Tiếng Anh**):
 ```
 only-one/tasks/<active-task-folder>/handoff.md
 ```
@@ -49,39 +49,40 @@ only-one/tasks/<active-task-folder>/handoff.md
 Using the structured template:
 
 ```markdown
-# Session Handoff Document
+# Tài liệu Bàn giao Phiên làm việc (Session Handoff Document)
 
-## 1. Core Objective & Scope
-- **Task Slug**: `<kebab-case-slug>`
-- **Objective**: <Brief 1-2 sentence description of what we are building/fixing>
-- **Plan Reference**: `plan.md` (Status: `in-progress`)
+## 1. Mục tiêu Cốt lõi & Phạm vi (Core Objective & Scope)
+- **Mã Task**: `<kebab-case-slug>`
+- **Mục tiêu**: <Tóm tắt 1-2 câu về những gì đang xây dựng/sửa đổi>
+- **Tài liệu Kế hoạch**: `plan.md` (Trạng thái: `in-progress`)
 
-## 2. Current Progress & Completed Seams
-- **Files Modified & Verified**:
-  - `path/to/file1.ts` (Done & tested)
-  - `path/to/file2.ts` (Done & tested)
-- **Tests Passing**: <Summary of unit/integration test status>
+## 2. Tiến độ Hiện tại & Các phần Đã Xong (Current Progress)
+- **Các file đã sửa đổi & nghiệm thu**:
+  - `path/to/file1.ts` (Hoàn thành & đã test)
+  - `path/to/file2.ts` (Hoàn thành & đã test)
+- **Trạng thái Kiểm thử**: <Tóm tắt kết quả unit/integration tests>
 
-## 3. Immediate Next Step
-- **Target File**: `path/to/next_file.ts` (Order: X in Section 3 of plan.md)
-- **Action Required**: <Specific function or interface to implement next>
-- **Fast Test Command**: `<npm test path/to/test.ts>`
+## 3. Bước Tiếp theo Cần làm Ngay (Immediate Next Step)
+- **File Mục tiêu**: `path/to/next_file.ts` (Order: X trong Section 3 của plan.md)
+- **Hành động Cần thực hiện**: <Hàm hoặc interface cụ thể cần implement tiếp>
+- **Lệnh Test Nhanh**: `<npm test path/to/test.ts>`
 
-## 4. Key Decisions, Gotchas & Invariants
-- <Important design decisions made during this session>
-- <Subtle traps or negative rules observed>
-- <Any open questions or notes for the incoming agent>
+## 4. Quyết định Then chốt, Bẫy ngầm & Ràng buộc (Gotchas & Invariants)
+- <Các quyết định thiết kế quan trọng đưa ra trong session>
+- <Bẫy ngầm hoặc quy tắc âm cần tuân thủ>
+- <Ghi chú hoặc câu hỏi còn mở cho Agent tiếp quản>
 ```
 
 ---
 
 ## 3. Confirmation
 
-Display a brief message informing the user that the handoff document is ready and can be referenced in the next session with `/only-one-apply`.
+Inform the user that the handoff document is ready and the next agent can resume work seamlessly with `/only-one-apply`.
 
 ---
 
 ## Guardrails
 
+- **Enforce Bilingual Hybrid Handoff**: Write the handoff narrative in Vietnamese while preserving technical terms and file paths in English.
 - Keep `handoff.md` concise, structured, and high-signal.
 - Always include the exact next file, order number, and fast test command.

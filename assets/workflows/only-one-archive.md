@@ -87,12 +87,12 @@ Activate and apply these skills throughout the archiving workflow:
 
 ### Step 4 — Author Single Distilled Archive (`code-simplification`)
 1. Create directory `only-one/archives/` if it does not exist.
-2. Generate target file: `only-one/archives/<timestamp>-<slug>.md` using the task's timestamp prefix:
+2. Generate target file: `only-one/archives/<timestamp>-<slug>.md` using the task's timestamp prefix (**Song ngữ Lai: Diễn giải bằng Tiếng Việt + thuật ngữ Tiếng Anh**):
 
 ```markdown
 ---
 id: <timestamp>-<slug>
-title: <Task Title>
+title: <Tên Task / Tính năng>
 archived_at: <YYYY-MM-DD>
 status: active
 references:
@@ -102,22 +102,22 @@ affected_modules:
   - <module-2>
 ---
 
-# Archive: <Task Title>
+# Archive: <Tên Task / Tính năng>
 
-## 1. Problem & Core Value
-- **Problem**: <Concise summary of problem solved>
-- **Value**: <Primary benefit to system/users>
+## 1. Problem & Core Value (Bài toán & Giá trị Cốt lõi)
+- **Vấn đề (Problem)**: <Tóm tắt ngắn gọn vấn đề đã được giải quyết>
+- **Giá trị (Value)**: <Lợi ích cốt lõi mang lại cho hệ thống/người dùng>
 
-## 2. Key Architecture & Decisions
-- **Approach**: <High-level technical solution>
-- **Diagram**: <Mermaid diagram if applicable>
+## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
+- **Hướng tiếp cận (Approach)**: <Giải pháp kỹ thuật tổng quan>
+- **Sơ đồ (Diagram)**: <Sơ đồ Mermaid nếu có>
 
-## 3. Scope & Key Changes
-- List of modified components and files (clickable links).
+## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
+- Danh sách các module và file đã sửa đổi (kèm liên kết clickable).
 
-## 4. Verification Evidence & PR
-- **Test Status**: 100% Passed.
-- **PR URL**: <PR link or branch name>
+## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu & PR)
+- **Trạng thái Test**: 100% Passed.
+- **PR URL / Branch**: <Liên kết PR hoặc tên branch>
 ```
 
 ---
@@ -135,18 +135,19 @@ affected_modules:
 Display the archive completion report:
 
 ```markdown
-## 📦 Task Archive Complete
+## 📦 Hoàn tất Lưu trữ Task (Task Archive Complete)
 
-- **Archived Record**: `only-one/archives/<timestamp>-<slug>.md` (status: active)
-- **Rules Updated**: `only-one/rules.md` (N rules synced)
-- **Learning Notes Synced**: `only-one/learn/<topic>.md` (+N patterns synced)
-- **Cleaned Task Folder**: `only-one/tasks/<timestamp>-<slug>/` (deleted)
+- **Tài liệu Lưu trữ**: `only-one/archives/<timestamp>-<slug>.md` (status: active)
+- **Quy tắc Cập nhật**: `only-one/rules.md` (Đã đồng bộ N quy tắc mới)
+- **Sổ tay Tiếng Anh**: `only-one/learn/<topic>.md` (Đã lưu +N mẫu câu mới)
+- **Dọn dẹp Thư mục Task**: `only-one/tasks/<timestamp>-<slug>/` (Đã xóa)
 ```
 
 ---
 
 ## Guardrails
 
+- **Enforce Bilingual Hybrid Documentation**: Author archive summaries and problem descriptions in Vietnamese; preserve code symbols, file paths, and technical terms in English.
 - Never delete a task directory before confirming the archive markdown file has been written.
 - Ensure distilled archive documents remain concise (< 100 lines).
 - Always preserve `only-one/rules.md` and `only-one/learn/`.

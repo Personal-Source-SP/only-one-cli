@@ -102,9 +102,10 @@ For each pending row in the Task Matrix:
    npm test
    npm run lint
    ```
-2. Author `only-one/tasks/<task-folder>/walkthrough.md` summarizing:
-   - Modified files and verification results.
-   - Test execution evidence and manual testing instructions.
+2. Author `only-one/tasks/<task-folder>/walkthrough.md` in **Bilingual Hybrid Mode**:
+   - Write explanations, summary of changes, and verification narrative in **Vietnamese**.
+   - Preserve all technical terms, variable/function names, file paths, and test commands in **English**.
+   - Detail test execution evidence (Pass/Fail) and manual testing instructions.
 3. Update `plan.md` frontmatter:
    ```yaml
    status: done
@@ -115,6 +116,7 @@ For each pending row in the Task Matrix:
 
 ## Guardrails
 
+- **Enforce Bilingual Hybrid Walkthrough**: Write narrative in Vietnamese while preserving English technical terms.
 - Prioritize parsing Section 3.1 Task Matrix for sub-second ingestion.
 - Execute `Fast Test Command` per file before proceeding to the next.
 - Maintain Beyoncé Rule at all times.

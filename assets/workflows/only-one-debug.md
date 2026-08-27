@@ -87,25 +87,26 @@ Activate and apply these skills throughout the debugging lifecycle:
 
 ---
 
-## 3. Summary Report
+## 3. Summary Report (Bilingual Hybrid)
 
-After completing the fix, display a concise markdown summary:
+After completing the fix, display a concise markdown summary in Vietnamese narrative with English technical terms:
 
 ```markdown
-## Debug & RCA Summary
+## Debug & RCA Summary (Tổng kết Phân tích Nguyên nhân Gốc rễ)
 
-- **Symptom**: <Description of reported error / failing behavior>
-- **Root Cause**: <Explanation of the underlying mechanical cause>
-- **Fix Applied**: <Files modified and surgical changes made>
-- **Regression Guard**: <Test case added to prevent recurrence>
-- **Verification**: `PASS` (Full test suite executed cleanly)
-- **Lessons Learned**: <New negative rule recorded in rules.md, if applicable>
+- **Triệu chứng lỗi (Symptom)**: <Mô tả lỗi hoặc hành vi bất thường được ghi nhận>
+- **Nguyên nhân gốc rễ (Root Cause)**: <Giải thích bản chất cơ học gây ra lỗi bên dưới mã nguồn>
+- **Giải pháp xử lý (Fix Applied)**: <Danh sách file và thay đổi tối giản (surgical patch) đã áp dụng>
+- **Chốt chặn chống suy thoái (Regression Guard)**: <Test case tự động đã bổ sung để ngăn chặn lỗi tái diễn>
+- **Kết quả nghiệm thu (Verification)**: `PASS` (Toàn bộ test suite chạy thành công)
+- **Bài học kinh nghiệm (Lessons Learned)**: <Quy tắc âm mới ghi nhận vào rules.md, nếu có>
 ```
 
 ---
 
 ## Guardrails
 
+- **Enforce Bilingual Hybrid Summary**: Explain RCA, hypotheses, and summary in Vietnamese; keep code, file paths, and technical terms in English.
 - Never apply a fix without first reproducing the failure with a red feedback loop.
 - Never perform unrelated refactoring in a bug fix.
 - Always include an automated regression test.

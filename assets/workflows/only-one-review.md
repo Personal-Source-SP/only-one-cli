@@ -48,37 +48,38 @@ To prevent context bleed between checking business logic and analyzing code qual
 
 ---
 
-## 3. Review Output Format
+## 3. Review Output Format (Bilingual Hybrid)
 
-Produce a structured markdown review report:
+Produce a structured markdown review report with Vietnamese explanations and English technical details:
 
 ```markdown
-# 5-Axis Pre-PR Review Report
+# Báo cáo Đánh giá Mã nguồn Pre-PR (5-Axis Review Report)
 
-## 1. Summary
-- **Branch Inspected**: `<current-branch>` against `<base-branch>`
-- **Files Inspected**: `N` files (`+X / -Y` lines)
-- **Change Sizing**: `Optimal (<200 lines)` | `Oversized (Consider splitting)`
-- **Overall Verdict**: `READY TO MERGE` | `CHANGES REQUESTED` | `WARNINGS FOUND`
+## 1. Tổng quan (Summary)
+- **Branch Đánh giá**: `<current-branch>` so với `<base-branch>`
+- **Số lượng File**: `N` files (`+X / -Y` lines)
+- **Kích thước Thay đổi**: `Tối ưu (<200 lines)` | `Quá lớn (Cân nhắc tách nhỏ PR)`
+- **Kết luận Chung**: `READY TO MERGE` (Sẵn sàng) | `CHANGES REQUESTED` (Cần sửa đổi) | `WARNINGS FOUND` (Có cảnh báo)
 
-## 2. Findings Matrix
+## 2. Ma trận Vấn đề Phát hiện (Findings Matrix)
 
-| Severity | Axis | File | Issue & Actionable Recommendation |
+| Mức độ (Severity) | Trục Đánh giá (Axis) | File | Vấn đề & Khuyến nghị Khắc phục cụ thể |
 | :--- | :--- | :--- | :--- |
-| 🔴 **BLOCKER** | Security (`security-and-hardening`) | `src/auth/guard.ts` | Missing tenant ID authorization check (IDOR vulnerability). |
-| 🟡 **WARNING** | Performance (`performance-optimization`) | `src/users/users.service.ts` | Potential N+1 query when fetching user roles in loop. |
-| 🔵 **SUGGESTION** | Simplicity (`code-simplification`) | `src/common/utils.ts` | Flatten nested ternary operator with guard clauses. |
-| ⚪ **NIT** | Quality (`code-review-and-quality`) | `src/users/dto.ts` | Fix typo in property JSDoc comment. |
+| 🔴 **BLOCKER** | Security (`security-and-hardening`) | `src/auth/guard.ts` | Thiếu kiểm tra phân quyền tenant ID (lỗ hổng IDOR). |
+| 🟡 **WARNING** | Performance (`performance-optimization`) | `src/users/users.service.ts` | Nguy cơ truy vấn N+1 khi lặp qua danh sách roles. |
+| 🔵 **SUGGESTION** | Simplicity (`code-simplification`) | `src/common/utils.ts` | Làm phẳng toán tử 3 ngôi lồng nhau bằng guard clauses. |
+| ⚪ **NIT** | Quality (`code-review-and-quality`) | `src/users/dto.ts` | Sửa lỗi chính tả trong JSDoc comment. |
 
-## 3. Next Steps
-- Address all 🔴 **BLOCKER** items before opening PR.
-- Run `/only-one-pr-git` to create the GitHub Pull Request once verified.
+## 3. Các bước tiếp theo (Next Steps)
+- Xử lý dứt điểm các mục 🔴 **BLOCKER** trước khi mở PR.
+- Chạy `/only-one-pr-git` để tạo GitHub Pull Request sau khi hoàn tất kiểm tra.
 ```
 
 ---
 
 ## Guardrails
 
+- **Enforce Bilingual Hybrid Report**: Author review narrative and recommendations in Vietnamese; preserve code symbols, file paths, severity labels, and snippet diffs in English.
 - Focus on the code diff between `base-branch` and the current branch (`git diff <base-branch>...HEAD`), while verifying working tree state (`git status`) to ensure no uncommitted or untracked changes are overlooked.
 - Categorize issues strictly by severity: `BLOCKER`, `WARNING`, `SUGGESTION`, `NIT`.
 - Do not perform source code modifications during the review workflow.

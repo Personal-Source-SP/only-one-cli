@@ -82,6 +82,7 @@ For each conflicted file:
 
 ## Guardrails
 
+- **Enforce Bilingual Hybrid Explanation**: Explain conflict causes and resolution strategy in Vietnamese; keep git commands, code diffs, and commit messages in English.
 - Never execute `git merge --abort` or `git rebase --abort` unless explicitly instructed by the user.
 - Never arbitrarily discard one side of a conflict without verifying its intent.
 - Always execute test suites before finalizing the merge commit.
