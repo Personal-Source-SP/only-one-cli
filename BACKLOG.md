@@ -2,7 +2,7 @@
 
 Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp của `only-one`.
 
-## Đã có — CLI foundation (v1.0.0)
+## Đã có — CLI foundation (v1.0.3)
 
 - [x] **Project initialization** — `init` chạy luồng cài đặt workspace theo bước, hỗ trợ chọn agent target, bỏ qua bước, và xác nhận trước khi thực thi.
 - [x] **Package installer** — `package` và `init package` cài package từ typed registry: `ui-ux-pro-max-cli`, `wondelai/skills/system-design`, `ux-flow-designer`.

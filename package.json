@@ -1,6 +1,6 @@
 {
     "name": "only-one",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "description": "Developer environment setups, AI agent workspace management, and editor configuration syncing.",
     "author": "Kiem Nguyen <contact.kiem.nguyen@gmail.com>",
     "license": "MIT",

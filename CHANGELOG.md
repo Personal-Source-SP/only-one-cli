@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.3 (2026-08-27)
+
+### Improvements
+
+- **CLI Help & Metadata Update**: Updated CLI help texts, command examples (`package`, `git`, `tui`), and synced version to 1.0.3.
+- **Workflow & Skills Alignment**: Refined workflow descriptions, step-by-step skill execution bindings, and standardized SDLC guidelines across all bundled workflow assets.
+
 ## 1.0.0 (2026-08-20)
 
 ### Major Highlights
