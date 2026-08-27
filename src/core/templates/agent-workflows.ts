@@ -12,6 +12,12 @@ export enum PrGitTag {
     Fix = 'fix',
     Refactor = 'refactor',
     Style = 'style',
+    Chore = 'chore',
+    Docs = 'docs',
+    Test = 'test',
+    Perf = 'perf',
+    Ci = 'ci',
+    Build = 'build',
 }
 
 export const PR_GIT_SKILL_NAME = 'only-one-pr-git-skill';
@@ -42,7 +48,18 @@ export const AGENT_WORKFLOW_DEPENDENCIES: Record<AgentWorkflowCommandId, { mcps:
     },
 };
 
-export const SUPPORTED_PR_GIT_TAGS: PrGitTag[] = [PrGitTag.Feat, PrGitTag.Fix, PrGitTag.Refactor, PrGitTag.Style];
+export const SUPPORTED_PR_GIT_TAGS: PrGitTag[] = [
+    PrGitTag.Feat,
+    PrGitTag.Fix,
+    PrGitTag.Refactor,
+    PrGitTag.Style,
+    PrGitTag.Chore,
+    PrGitTag.Docs,
+    PrGitTag.Test,
+    PrGitTag.Perf,
+    PrGitTag.Ci,
+    PrGitTag.Build,
+];
 
 const buildPrGitCommandBody =
     (): string => `Use skill \`${PR_GIT_SKILL_NAME}\` to create or update a GitHub Pull Request through the configured \`github\` MCP server.

@@ -115,10 +115,10 @@ Provide the scaffold at directory and file level with an explicit **Machine-Read
 
 ### 3.1 Machine-Readable Task Matrix & Dependency Graph
 
-| Order | Action | File Path | Target Symbols / AST Seams | Depends On | Fast Test Command |
-| :---: | :---: | :--- | :--- | :--- | :--- |
-| **1** | `[NEW]` | `path/to/file.ts` | `Class.methodName` | `None` | `npm test path/to/file.test.ts` |
-| **2** | `[MODIFY]` | `path/to/caller.ts` | `Caller.handler` | `Order 1` | `npm test path/to/caller.test.ts` |
+| Order | Status | Action | File Path | Target Symbols / AST Seams | Depends On | Fast Test Command |
+| :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| **1** | `[ ]` | `[NEW]` | `path/to/file.ts` | `Class.methodName` | `None` | `npm test path/to/file.test.ts` |
+| **2** | `[ ]` | `[MODIFY]` | `path/to/caller.ts` | `Caller.handler` | `Order 1` | `npm test path/to/caller.test.ts` |
 
 - Scaffold directory tree.
 - Request, processing, persistence, and response flow.
@@ -127,7 +127,7 @@ Provide the scaffold at directory and file level with an explicit **Machine-Read
 Describe every file listed in Section 3 in exact same order:
 - Repeat its label, exact path, order, and `Depends on`.
 - Summary of what the file will do and why it changes.
-- Provide clean code snippets with `// [TARGET SEAM]` and `// [RATIONALE]` comments indicating precise replacement locations.
+- Provide clean code snippets with `// [TARGET SEAM]` and `// [RATIONALE]` comments indicating precise replacement locations. Keep snippets focused on signatures, modified functions, and AST insertion points rather than dumping entire unchanged files to prevent context bloat.
 
 #### Section 5. Test Cases
 Cover test cases directly validating the **Success Metrics** and **Scope Boundaries**:

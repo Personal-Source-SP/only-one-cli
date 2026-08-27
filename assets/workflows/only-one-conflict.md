@@ -74,7 +74,7 @@ For each conflicted file:
 
 ### Step 4 — Complete Git Operation
 1. Finalize the operation:
-   - For merge: `git commit -m "chore(git): resolve merge conflicts"`
+   - For merge: `git commit --no-edit` (or provide a descriptive commit message preserving branch intent)
    - For rebase: `git rebase --continue`
 2. Confirm clean working tree: `git status`.
 

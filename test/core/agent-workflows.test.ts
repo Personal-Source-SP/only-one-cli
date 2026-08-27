@@ -26,7 +26,7 @@ describe('agent workflow command sources', () => {
         expect(command.body).toContain(PR_GIT_DEFAULT_BRANCH);
         expect(command.body).toContain(`--tag`);
         expect(command.body).toContain(PR_GIT_DEFAULT_TAG);
-        expect(SUPPORTED_PR_GIT_TAGS).toEqual(['feat', 'fix', 'refactor', 'style']);
+        expect(SUPPORTED_PR_GIT_TAGS).toEqual(['feat', 'fix', 'refactor', 'style', 'chore', 'docs', 'test', 'perf', 'ci', 'build']);
         expect(command.body).toContain('Reject bracketed or uppercase tags');
         expect(command.body).toContain('only-one-pr-git-skill');
         expect(command.body).toContain('github');

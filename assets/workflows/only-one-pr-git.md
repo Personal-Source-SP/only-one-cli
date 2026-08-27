@@ -10,7 +10,7 @@ description: Create or update a GitHub PR from current branch with mandatory 5-a
 
 - `--branch`: Base branch to merge into. Default: `main`.
 - `--tag`: Conventional Commit type for PR title. Default: `feat`.
-- Supported tags: `feat`, `fix`, `refactor`, `style`.
+- Supported tags: `feat`, `fix`, `refactor`, `style`, `chore`, `docs`, `test`, `perf`, `ci`, `build`.
 - Reject bracketed or uppercase tags (e.g. `[FEAT]`, `FEAT`).
 
 ## Role

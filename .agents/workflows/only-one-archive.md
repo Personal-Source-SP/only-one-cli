@@ -59,7 +59,7 @@ Activate and apply these skills throughout the archiving workflow:
 ---
 
 ### Step 2b — Extract & Distill Technical English Learning (`english-learning-extraction`)
-1. Read **Section 6. Technical English Key Patterns** from `plan.md` (or Section 7 from `concept.md`).
+1. Read **Section 6. Technical English Key Patterns** from `plan.md` (or Section 5 from `concept.md`).
 2. Identify the matching topic file in `only-one/learn/`:
    - `architecture-and-design.md`
    - `debugging-and-troubleshooting.md`

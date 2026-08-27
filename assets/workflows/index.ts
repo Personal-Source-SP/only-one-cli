@@ -5,7 +5,16 @@ export const WORKFLOWS: WorkflowManifest[] = [
         name: 'only-one-idea',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
-        requiredSkills: ['grill-with-docs', 'grill-me', 'domain-modeling', 'interview-me', 'idea-refine', 'wait-what'],
+        requiredSkills: [
+            'grill-with-docs',
+            'grill-me',
+            'domain-modeling',
+            'interview-me',
+            'idea-refine',
+            'wait-what',
+            'conversational-english-coaching',
+            'english-learning-extraction',
+        ],
     },
     {
         name: 'only-one-plan',
@@ -21,6 +30,8 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'source-driven-development',
             'doubt-driven-development',
             'gherkin-authoring',
+            'conversational-english-coaching',
+            'english-learning-extraction',
         ],
     },
     {
@@ -33,8 +44,6 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'code-simplification',
             'test-driven-development',
             'diagnosing-bugs',
-            'prototype',
-            'wizard',
         ],
     },
     {
@@ -95,12 +104,17 @@ export const WORKFLOWS: WorkflowManifest[] = [
         name: 'only-one-archive',
         description:
             'Distill completed tasks into concise single-file archives, sync rules, extract technical English notes, and clean task folders.',
-        requiredSkills: ['handoff', 'code-simplification', 'context-engineering'],
+        requiredSkills: ['handoff', 'code-simplification', 'context-engineering', 'english-learning-extraction'],
     },
     {
         name: 'only-one-clean',
         description:
             'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
-        requiredSkills: ['source-driven-development', 'doubt-driven-development', 'code-simplification'],
+        requiredSkills: [
+            'task-lifecycle-resolution',
+            'source-driven-development',
+            'doubt-driven-development',
+            'code-simplification',
+        ],
     },
 ];

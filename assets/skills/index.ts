@@ -215,4 +215,19 @@ export const SKILLS: SkillManifest[] = [
         description: 'Create or update a GitHub Pull Request from current branch.',
         sourceType: 'local',
     },
+    {
+        name: 'conversational-english-coaching',
+        description: 'Rephrase user thoughts into natural, professional technical English during interactive turns.',
+        sourceType: 'local',
+    },
+    {
+        name: 'english-learning-extraction',
+        description: 'Extract technical English patterns, grammar structures, and real-world examples into learn topics.',
+        sourceType: 'local',
+    },
+    {
+        name: 'task-lifecycle-resolution',
+        description: 'Resolve and auto-archive completed tasks before running clean and maintenance workflows.',
+        sourceType: 'local',
+    },
 ];

@@ -78,17 +78,19 @@ Check the frontmatter `status` field:
 ### Step 3 — Fast-Path Parse Machine-Readable Task Matrix
 
 1. Jump directly to **Section 3.1 Machine-Readable Task Matrix & Dependency Graph** in `plan.md`.
-2. Extract the ordered sequence: `Order`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`.
+2. Extract the ordered sequence: `Order`, `Status`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`.
+3. Skip rows already marked `[x]` (Done), identify the first pending row `[ ]` or in-progress row `[/]`.
 
 ---
 
 ### Step 4 — Apply File Changes Incrementally (`incremental-implementation`)
 
-For each row in the Task Matrix:
-1. Verify that all prerequisite files (`Depends On`) have been successfully applied and verified.
-2. Locate the corresponding section in **Section 4. Implementation Code Examples** and apply the code modification at the exact `// [TARGET SEAM]`.
-3. Run the row's **`Fast Test Command`** immediately:
-   - If test passes: proceed to next row.
+For each pending row in the Task Matrix:
+1. Verify that all prerequisite files (`Depends On`) have been successfully applied and verified (`[x]`).
+2. Mark the row's `Status` as `[/]` (in-progress) in `plan.md`.
+3. Locate the corresponding section in **Section 4. Implementation Code Examples** and apply the code modification at the exact `// [TARGET SEAM]`.
+4. Run the row's **`Fast Test Command`** immediately:
+   - If test passes: mark row `Status` as `[x]` (done) in `plan.md` and proceed to next row.
    - If test fails: activate `diagnosing-bugs` (Red Feedback Loop $\rightarrow$ Instrument $\rightarrow$ Fix).
 
 ---

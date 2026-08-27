@@ -79,6 +79,6 @@ Produce a structured markdown review report:
 
 ## Guardrails
 
-- Focus exclusively on the code diff between `base-branch` and the current branch (`git diff <base-branch>...HEAD`).
+- Focus on the code diff between `base-branch` and the current branch (`git diff <base-branch>...HEAD`), while verifying working tree state (`git status`) to ensure no uncommitted or untracked changes are overlooked.
 - Categorize issues strictly by severity: `BLOCKER`, `WARNING`, `SUGGESTION`, `NIT`.
 - Do not perform source code modifications during the review workflow.

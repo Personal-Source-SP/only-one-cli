@@ -97,7 +97,7 @@ describe('Workflow Command Unit & Integration Tests', () => {
 
         expect(ideaContent).toContain('conversational-english-coaching');
         expect(ideaContent).toContain('english-learning-extraction');
-        expect(ideaContent).toContain('## 7. Technical English Key Patterns');
+        expect(ideaContent).toContain('## 5. Technical English Key Patterns');
 
         expect(planContent).toContain('conversational-english-coaching');
         expect(planContent).toContain('english-learning-extraction');
