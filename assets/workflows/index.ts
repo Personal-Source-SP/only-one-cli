@@ -4,16 +4,17 @@ export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-idea',
         description:
-            'Clarify business problems, define strict scope boundaries, build domain models, and produce a lean concept.md specification.',
-        requiredSkills: ['grill-with-docs', 'domain-modeling', 'interview-me', 'idea-refine', 'wait-what'],
+            'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
+        requiredSkills: ['grill-with-docs', 'grill-me', 'domain-modeling', 'interview-me', 'idea-refine', 'wait-what'],
     },
     {
         name: 'only-one-plan',
         description:
-            'Research current code and create a focused implementation plan with design options, architecture, code examples, and test cases.',
+            'Research current code and create a focused implementation plan with task dependency graphs (to-tickets), deep module design, architecture, code examples, and test cases.',
         requiredSkills: [
             'to-tickets',
             'codebase-design',
+            'grill-me',
             'c4-diagrams',
             'api-and-interface-design',
             'frontend-ui-engineering',
@@ -24,21 +25,22 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        description: 'Implement tasks from an approved plan.md, working through each file change in order.',
+        description: 'Implement tasks from an approved plan.md, working through each file change in dependency order.',
         requiredSkills: [
             'context-engineering',
             'incremental-implementation',
             'code-simplification',
             'test-driven-development',
-            'debugging-and-error-recovery',
+            'diagnosing-bugs',
+            'prototype',
+            'wizard',
         ],
     },
     {
         name: 'only-one-debug',
-        description: 'Perform systematic Root Cause Analysis (RCA) and deliver a minimal verified fix for a bug.',
+        description: 'Perform systematic Root Cause Analysis (RCA) and deliver a minimal verified fix using disciplined red feedback loops.',
         requiredSkills: [
             'diagnosing-bugs',
-            'debugging-and-error-recovery',
             'doubt-driven-development',
             'test-driven-development',
             'code-simplification',
@@ -46,13 +48,23 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-review',
-        description: 'Perform comprehensive code health, security, and performance review before opening a PR.',
+        description: 'Perform comprehensive 5-axis code health, security, simplicity, and performance review using dual-perspective audit.',
         requiredSkills: [
             'code-review-and-quality',
             'code-simplification',
             'security-and-hardening',
             'performance-optimization',
         ],
+    },
+    {
+        name: 'only-one-handoff',
+        description: 'Compact current conversation and task state into a seamless handoff document for agent switching.',
+        requiredSkills: ['handoff'],
+    },
+    {
+        name: 'only-one-conflict',
+        description: 'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
+        requiredSkills: ['resolving-merge-conflicts'],
     },
     {
         name: 'only-one-clockify',
@@ -75,7 +87,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-archive',
         description: 'Distill completed tasks into concise single-file archives, sync rules, and clean task folders.',
-        requiredSkills: ['handoff', 'spec-driven-development', 'code-simplification', 'context-engineering'],
+        requiredSkills: ['handoff', 'code-simplification', 'context-engineering'],
     },
     {
         name: 'only-one-clean',
@@ -83,4 +95,3 @@ export const WORKFLOWS: WorkflowManifest[] = [
         requiredSkills: ['source-driven-development', 'doubt-driven-development', 'code-simplification'],
     },
 ];
-

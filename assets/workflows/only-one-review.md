@@ -1,5 +1,5 @@
 ---
-description: Perform comprehensive 5-axis code health, security, simplicity, and performance review on branch changes before opening a PR.
+description: Perform comprehensive 5-axis code health, security, simplicity, and performance review on branch changes before opening a PR using isolated review perspectives.
 ---
 
 ## Input
@@ -16,7 +16,7 @@ You are a **Principal Staff Engineer** conducting a rigorous 5-axis code review 
 
 ## Purpose
 
-Inspect all modified files on the current branch against production-grade quality, security, performance, and simplicity standards using the **Review — Quality gates before merge** disciplines.
+Inspect all modified files on the current branch against production-grade quality, security, performance, and simplicity standards using the **Review — Quality gates before merge** disciplines and parallel review perspectives (Spec Fidelity vs Code Quality).
 
 ---
 
@@ -33,34 +33,20 @@ Activate and apply these four core skills during the review process:
 
 ---
 
-## 2. 5-Axis Code Review Protocol
+## 2. Parallel Review Protocol (Dual-Perspective Review)
 
-### Axis 1: Correctness & Logic Integrity (`code-review-and-quality`)
-- Does the branch diff fulfill the requirements and architecture defined in `plan.md`?
-- Are edge cases (null/empty states, network timeouts, concurrent requests) handled gracefully?
-- Are error semantics clean, with informative messages and proper HTTP status mapping?
-- Is change sizing appropriate, or should this large PR be split into smaller vertical slices?
+To prevent context bleed between checking business logic and analyzing code quality, conduct the inspection through two complementary lenses:
 
-### Axis 2: Security & Hardening (`security-and-hardening`)
-- **Injection & Sanitization**: Are database queries strictly parameterized? Any raw SQL or command injection risks?
-- **Access Control & IDOR**: Are authentication and authorization guards applied to all new/modified endpoints?
-- **Secrets & Data Exposure**: Does any response leak internal stack traces, private API keys, credentials, or sensitive PII?
-- **Boundary Validation**: Is incoming payload validated at the system boundary before reaching domain logic?
+### Lens A: Spec & Correctness Audit
+- **Spec Conformance**: Does the branch diff faithfully implement the requirements and architecture defined in `plan.md` and `concept.md`?
+- **Edge Cases & Error Semantics**: Are null/empty states, network timeouts, and concurrent requests handled gracefully?
+- **Behavioral Regressions**: Are invariants and existing caller expectations preserved?
 
-### Axis 3: Simplicity & Clean Code (`code-simplification`)
-- **Chesterton's Fence**: If existing code was removed or modified, was its original intent fully understood?
-- **YAGNI & Dead Code**: Are there speculative abstractions, unused imports, or dead helper functions?
-- **Rule of 500 & Cognitive Load**: Are files kept under 500 lines? Can deeply nested conditionals be flattened using early returns / guard clauses?
-- **Readability**: Are naming conventions intuitive and self-documenting?
-
-### Axis 4: Performance & Optimization (`performance-optimization`)
-- **Database & I/O**: Are there N+1 query patterns? Are foreign keys and query filters indexed properly?
-- **Frontend & Rendering**: Any unnecessary re-renders, un-memoized expensive calculations, or layout shifts (CLS)?
-- **Caching & Budgets**: Are expensive computations or third-party responses cached with appropriate TTLs?
-
-### Axis 5: Test Coverage & Verification (`code-review-and-quality`)
-- Do unit/integration tests cover both the happy paths and failure/edge cases?
-- Do all existing and new tests pass with 100% success (`npm test`)?
+### Lens B: Quality, Security & Performance Audit
+- **Security & Hardening**: Parameterized queries, auth guards, IDOR prevention, secrets hygiene, and boundary validation.
+- **Simplicity & Clean Code**: Chesterton's Fence, Rule of 500 (<500 lines), YAGNI, early returns, no speculative wrappers.
+- **Performance**: N+1 database queries, un-memoized heavy operations, excessive re-renders, caching with appropriate TTLs.
+- **Test Coverage**: Beyoncé Rule compliance, DAMP unit/integration tests passing 100%.
 
 ---
 
