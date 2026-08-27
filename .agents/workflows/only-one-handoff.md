@@ -46,7 +46,7 @@ Save the handoff artifact directly inside the active task folder:
 only-one/tasks/<active-task-folder>/handoff.md
 ```
 
-Using the following structured template:
+Using the structured template:
 
 ```markdown
 # Session Handoff Document
@@ -63,9 +63,9 @@ Using the following structured template:
 - **Tests Passing**: <Summary of unit/integration test status>
 
 ## 3. Immediate Next Step
-- **Target File**: `path/to/next_file.ts` (Order: X in Section 3)
+- **Target File**: `path/to/next_file.ts` (Order: X in Section 3 of plan.md)
 - **Action Required**: <Specific function or interface to implement next>
-- **Verification Command**: `<npm test path/to/test.ts>`
+- **Fast Test Command**: `<npm test path/to/test.ts>`
 
 ## 4. Key Decisions, Gotchas & Invariants
 - <Important design decisions made during this session>
@@ -83,5 +83,5 @@ Display a brief message informing the user that the handoff document is ready an
 
 ## Guardrails
 
-- Keep `handoff.md` concise, structured, and high-signal (avoid dumping raw conversation logs).
-- Always include the exact next file and verification command to ensure seamless resumption.
+- Keep `handoff.md` concise, structured, and high-signal.
+- Always include the exact next file, order number, and fast test command.

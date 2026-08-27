@@ -10,7 +10,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-plan',
         description:
-            'Research current code and create a focused implementation plan with task dependency graphs (to-tickets), deep module design, architecture, code examples, and test cases.',
+            'Research current code and create a focused 6-section implementation plan with Machine-Readable Task Matrix, deep module design, architecture, code examples, and test cases.',
         requiredSkills: [
             'to-tickets',
             'codebase-design',
@@ -25,7 +25,8 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        description: 'Implement tasks from an approved plan.md, working through each file change in dependency order.',
+        description:
+            'Implement tasks from an approved plan.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
         requiredSkills: [
             'context-engineering',
             'incremental-implementation',
@@ -38,7 +39,8 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
-        description: 'Perform systematic Root Cause Analysis (RCA) and deliver a minimal verified fix using disciplined red feedback loops.',
+        description:
+            'Perform systematic Root Cause Analysis (RCA) and deliver a minimal verified fix using disciplined red feedback loops.',
         requiredSkills: [
             'diagnosing-bugs',
             'doubt-driven-development',
@@ -48,7 +50,8 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-review',
-        description: 'Perform comprehensive 5-axis code health, security, simplicity, and performance review using dual-perspective audit.',
+        description:
+            'Perform comprehensive 5-axis code health, security, simplicity, and performance review using dual-perspective audit.',
         requiredSkills: [
             'code-review-and-quality',
             'code-simplification',
@@ -58,12 +61,14 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-handoff',
-        description: 'Compact current conversation and task state into a seamless handoff document for agent switching.',
+        description:
+            'Compact current conversation and task state into a seamless handoff document for agent switching or context refreshment.',
         requiredSkills: ['handoff'],
     },
     {
         name: 'only-one-conflict',
-        description: 'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
+        description:
+            'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
         requiredSkills: ['resolving-merge-conflicts'],
     },
     {
@@ -74,24 +79,28 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-intranet',
-        description: 'Validate, log Intranet timesheet entries, and output monthly summary using only-one-intranet-skill and zodinet-timesheet MCP.',
+        description:
+            'Validate, log Intranet timesheet entries, and output monthly summary using only-one-intranet-skill and zodinet-timesheet MCP.',
         requiredSkills: ['only-one-intranet-skill'],
         requiredMcps: ['zodinet-timesheet'],
     },
     {
         name: 'only-one-pr-git',
-        description: 'Create or update a GitHub PR from current branch using only-one-pr-git-skill and GitHub MCP.',
+        description:
+            'Create or update a GitHub PR from current branch with mandatory 5-axis pre-review quality gate using GitHub MCP.',
         requiredSkills: ['only-one-pr-git-skill'],
         requiredMcps: ['github'],
     },
     {
         name: 'only-one-archive',
-        description: 'Distill completed tasks into concise single-file archives, sync rules, and clean task folders.',
+        description:
+            'Distill completed tasks into concise single-file archives, sync rules, extract technical English notes, and clean task folders.',
         requiredSkills: ['handoff', 'code-simplification', 'context-engineering'],
     },
     {
         name: 'only-one-clean',
-        description: 'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
+        description:
+            'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
         requiredSkills: ['source-driven-development', 'doubt-driven-development', 'code-simplification'],
     },
 ];

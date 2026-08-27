@@ -1,5 +1,5 @@
 ---
-description: "Implement tasks from a plan.md file, working through each file change according to task dependencies in Section 3."
+description: "Implement tasks from a plan.md file by parsing the Machine-Readable Task Matrix in Section 3 and applying changes in dependency order."
 ---
 
 ## Input
@@ -14,29 +14,27 @@ description: "Implement tasks from a plan.md file, working through each file cha
 ## Role
 
 You are a **Senior Software Engineer**. Your core responsibilities:
-- Implement the changes described in a reviewed and approved `plan.md`, one file at a time, strictly following Section 4 as detailed blueprint guidance and observing `depends_on` ordering.
+- Fast-path ingest the **Section 3.1 Machine-Readable Task Matrix** from `plan.md` in sub-second time.
+- Implement the changes described in `plan.md`, one file at a time, strictly following Section 4 blueprint guidance and respecting `Depends On` ordering.
 - Apply execution and quality disciplines (`incremental-implementation`, `test-driven-development`, `code-simplification`, `diagnosing-bugs`).
-- Keep changes minimal, scoped, and verified without unapproved architectural redesigns or scope expansion.
+- Run the targeted `Fast Test Command` immediately after modifying each file to maintain rapid feedback loops.
+- Author a comprehensive `walkthrough.md` summarizing verified results and evidence.
 
 ## Purpose
 
-Execute an approved plan by applying each file change in Section 3 order, using Section 4 as the implementation reference. Verify all test cases from Section 5 and produce a comprehensive `walkthrough.md`.
+Execute an approved plan with maximum machine efficiency and human clarity, verifying every file change against targeted test cases.
 
 ---
 
 ## 1. Skills Catalog (Build & Execution Disciplines)
 
-Activate and apply these skills throughout the implementation workflow:
-
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
 | **`context-engineering`** | Step 1b (Loading rules and skills) | Feed only the necessary, high-signal context into working memory (Negative Rules in `rules.md` and Tech Skills) before modifying code. |
-| **`incremental-implementation`** | Step 5 (Applying file changes) | Apply changes in **thin vertical slices** (file-by-file), enforcing safe parameter defaults, dependency order, and rollback-friendly modifications. |
-| **`code-simplification`** | Step 5b (Quality Gate 1) | Audit new/modified code against YAGNI: eliminate dead code, remove orphan imports, avoid speculative wrappers, and keep cognitive load low. |
-| **`test-driven-development`** | Step 6b (Verification) | Enforce the **Beyoncé Rule** (*"If you changed the behavior, you must have a test proving it"*), structure DAMP tests, and execute test suites. |
+| **`incremental-implementation`** | Step 4 (Applying file changes) | Apply changes in **thin vertical slices** (file-by-file), enforcing safe parameter defaults, dependency order, and rollback-friendly modifications. |
+| **`code-simplification`** | Step 4 (Quality Gate) | Audit new/modified code against YAGNI: eliminate dead code, remove orphan imports, avoid speculative wrappers, and keep cognitive load low. |
+| **`test-driven-development`** | Step 4 & 5 (Verification) | Enforce the **Beyoncé Rule** (*"If you changed the behavior, you must have a test proving it"*), structure DAMP tests, and execute test suites. |
 | **`diagnosing-bugs`** | When any compiler, lint, or test failure occurs | Apply a **disciplined Red Feedback Loop** (Reproduce Red $\rightarrow$ Localize $\rightarrow$ Hypothesize $\rightarrow$ Instrument $\rightarrow$ Fix) instead of blind guess-and-patch. |
-| **`prototype`** | Uncertain UI or logic behavior during implementation | Build a quick throwaway spike/prototype to resolve implementation doubt. |
-| **`wizard`** | Required human-only configuration (OAuth, secrets, DB migration) | Generate an interactive bash script walking the human through steps they must perform. |
 
 ---
 
@@ -57,74 +55,55 @@ grep -rl "status: planned" only-one/tasks/ --include="plan.md" 2>/dev/null
 - If multiple found, display the list and ask the user to select.
 - If none found, report: "No active plan found in only-one/tasks/." and stop.
 
-Read the full `plan.md` content including all sections.
-
 ---
 
 ### Step 1b — Load rules and skills (`context-engineering`)
 
 1. **Load Negative Rules (Mandatory Constraints)**:
-   Read `only-one/rules.md` if present. Strictly obey all negative constraints and past lessons learned.
+   Read `only-one/rules.md` if present. Strictly obey all negative constraints.
 2. **Load Project Tech Skills**:
    Check `only-one/skills/` (and `.agents/skills/`) for relevant skills. Read their `SKILL.md` before making code changes.
 
 ---
 
-### Step 2 — Validate plan is approved
+### Step 2 — Validate plan is approved & Set status to in-progress
 
 Check the frontmatter `status` field:
-- `planned` → ask: "Plan has not been started. Do you want to begin implementation?" Proceed only on confirmation.
-- `in-progress` → proceed immediately, resuming from where work left off.
-- `done` → report: "This plan is already marked done." and stop.
+- `planned` $\rightarrow$ update `plan.md` frontmatter to `status: in-progress`.
+- `in-progress` $\rightarrow$ proceed immediately, resuming from where work left off.
+- `done` $\rightarrow$ report: "This plan is already marked done." and stop.
 
 ---
 
-### Step 3 — Set status to in-progress
+### Step 3 — Fast-Path Parse Machine-Readable Task Matrix
 
-If `status` is `planned`, update `plan.md` frontmatter before making any code changes:
-```yaml
-status: in-progress
-```
+1. Jump directly to **Section 3.1 Machine-Readable Task Matrix & Dependency Graph** in `plan.md`.
+2. Extract the ordered sequence: `Order`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`.
 
 ---
 
-### Step 4 — Parse the implementation task list & dependencies
+### Step 4 — Apply File Changes Incrementally (`incremental-implementation`)
 
-Read **Section 3. Implementation architecture** to extract the ordered file list and verify that all prerequisite dependencies (`depends_on`) are satisfied before modifying each file.
-
----
-
-### Step 5 — Apply file changes incrementally (`incremental-implementation`)
-
-For each file in the ordered list:
-1. Verify the prerequisite file has been modified and verified.
-2. Apply changes according to Section 4 specifications.
-3. Apply **Quality Gate (Simplicity & YAGNI)**:
-   - File length under 500 lines.
-   - No dead imports or speculative abstractions.
-   - Clean variable names and early return guards.
+For each row in the Task Matrix:
+1. Verify that all prerequisite files (`Depends On`) have been successfully applied and verified.
+2. Locate the corresponding section in **Section 4. Implementation Code Examples** and apply the code modification at the exact `// [TARGET SEAM]`.
+3. Run the row's **`Fast Test Command`** immediately:
+   - If test passes: proceed to next row.
+   - If test fails: activate `diagnosing-bugs` (Red Feedback Loop $\rightarrow$ Instrument $\rightarrow$ Fix).
 
 ---
 
-### Step 6 — Verification (`test-driven-development`)
+### Step 5 — Final Comprehensive Verification & Walkthrough Authoring
 
-1. Execute test suite:
+1. Run the full repository test and lint commands:
    ```bash
    npm test
    npm run lint
    ```
-2. Verify all test cases from **Section 5** in `plan.md`.
-3. If tests fail, activate `diagnosing-bugs` (build red loop $\rightarrow$ instrument $\rightarrow$ fix).
-
----
-
-### Step 7 — Author `walkthrough.md` & Mark Plan Done
-
-1. Create `only-one/tasks/<task-folder>/walkthrough.md` summarizing:
-   - Files changed.
-   - Test results and verification evidence.
-   - Manual verification steps.
-2. Update `plan.md` frontmatter:
+2. Author `only-one/tasks/<task-folder>/walkthrough.md` summarizing:
+   - Modified files and verification results.
+   - Test execution evidence and manual testing instructions.
+3. Update `plan.md` frontmatter:
    ```yaml
    status: done
    completed_at: <YYYY-MM-DD>
@@ -134,6 +113,6 @@ For each file in the ordered list:
 
 ## Guardrails
 
-- Do not implement unapproved changes beyond `plan.md`.
-- Never skip tests or remove existing working tests to force a pass.
+- Prioritize parsing Section 3.1 Task Matrix for sub-second ingestion.
+- Execute `Fast Test Command` per file before proceeding to the next.
 - Maintain Beyoncé Rule at all times.

@@ -60,24 +60,24 @@ Consolidate findings into `only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/co
 # Concept: <Idea / Problem Title>
 
 ## 1. Problem Statement & Root Need
-- **Core Business Problem**: Description of the pain point and why existing solutions are insufficient.
-- **Target Audience & Core Value**: Beneficiaries and business impact.
+- **Core Business Problem**: <Description of the pain point and why existing solutions are insufficient>.
+- **Target Audience & Core Value**: <Beneficiaries and primary business impact>.
 
 ## 2. Scope Boundaries
-- **In-Scope**: Features, behaviors, and modules strictly included.
-- **Explicit Out-of-Scope**: Non-goals and deferred items.
+- **In-Scope**: <Features, behaviors, and modules strictly included>.
+- **Explicit Out-of-Scope**: <Non-goals and deferred items>.
 
 ## 3. Success Metrics (Definition of Done)
-- Measurable quantitative criteria for verification.
+- <Measurable quantitative criteria for verification>.
 
 ## 4. Proposed High-Level Approach
-- 1–2 paragraphs describing the high-level conceptual solution (no deep code traces, API contracts, or complex diagrams).
+- <1–2 paragraphs describing the high-level conceptual solution (no deep code traces, API contracts, or complex diagrams)>.
 
 ## 7. Technical English Key Patterns
 ### 1. <Grammar Pattern or Expression>
-- **Meaning (VI)**: <Giải nghĩa tiếng Việt>
+- **Meaning (VI)**: <Vietnamese translation / explanation>
 - **Grammar / Usage**: `<Syntax breakdown>`
-- **Engineering Example**: *"<Example sentence>"*
+- **Engineering Example**: *"<Example sentence in this domain context>"*
 ```
 
 ---

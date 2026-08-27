@@ -1,5 +1,5 @@
 ---
-description: "Distill completed tasks into concise single-file archives, sync rules, and clean task folders."
+description: "Distill completed tasks into concise single-file archives, sync rules, extract technical English notes, and clean task folders."
 ---
 
 ## Input
@@ -18,7 +18,7 @@ description: "Distill completed tasks into concise single-file archives, sync ru
 You are a **Software Knowledge & Release Architect**. Your core responsibilities:
 - Distill completed task folders into concise, living system knowledge records (`only-one/archives/<timestamp>-<slug>.md`).
 - Extract user constraints, warnings, and lessons learned into `only-one/rules.md`.
-- Extract and categorize technical English structures and expressions into `only-one/learn/<topic>.md`.
+- Extract and categorize technical English structures and expressions from Section 6 of `plan.md` into `only-one/learn/<topic>.md`.
 - Ensure clean workspace hygiene by removing temporary raw task directories while preserving permanent architectural context and audit links.
 
 ---
@@ -29,7 +29,6 @@ Activate and apply these skills throughout the archiving workflow:
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
-| **`spec-driven-development`** | Step 4 (Authoring archive markdown) | Consolidates Problem Statement, Architecture Decisions, and Test Evidence into a structured single-file specification (`only-one/archives/<timestamp>-<slug>.md`). |
 | **`code-simplification`** | Step 4 (Distillation) | Prunes transient code diffs and keeps document concise (< 50-100 lines) for optimal agent token efficiency. |
 | **`context-engineering`** | Step 2 (Distilling rules) | Formats negative constraints and lessons learned into high-signal `[NEVER]` / `[AVOID]` rules inside `only-one/rules.md`. |
 | **`english-learning-extraction`** | Step 2b (Distilling learning notes) | Scans task history, extracts 2–5 high-value technical English expressions, and appends them to thematic topics in `only-one/learn/` with Vietnamese translations. |
@@ -39,7 +38,6 @@ Activate and apply these skills throughout the archiving workflow:
 ## 2. Step-by-Step Execution Protocol
 
 ### Step 1 — Task Resolution & Validation
-
 1. Identify target task folder(s) in `only-one/tasks/`.
 2. Check `plan.md` in each target folder:
    - Verify `status: done`. If `status` is `planned` or `in-progress`, warn the user:
@@ -50,31 +48,26 @@ Activate and apply these skills throughout the archiving workflow:
 ---
 
 ### Step 2 — Extract User Feedback & Distill Negative Rules (`context-engineering`)
-
-1. Read `walkthrough.md` (specifically Section 4: *User Constraints & Lessons Learned*) and `plan.md`.
+1. Read `walkthrough.md` and `plan.md`.
 2. Extract any negative constraints, rules, anti-patterns, or user warnings communicated during the task.
-3. Open or create `only-one/rules.md`.
-4. Append new negative rules formatted as:
+3. Append new negative rules to `only-one/rules.md`:
    ```markdown
    - **[NEVER]** <Action to avoid> — <Reason / Context>
    - **[AVOID]** <Anti-pattern to avoid> — <Reason / Context>
    ```
-   *(Ensure deduplication against existing rules).*
 
 ---
 
 ### Step 2b — Extract & Distill Technical English Learning (`english-learning-extraction`)
-
-1. Review the task's conversation history, `concept.md`, `plan.md`, and `walkthrough.md`.
-2. Extract 2–5 high-signal technical English patterns (grammar structures, professional idioms, technical expressions) used during the task.
-3. Identify the matching standard topic file in `only-one/learn/`:
+1. Read **Section 6. Technical English Key Patterns** from `plan.md` (or Section 7 from `concept.md`).
+2. Identify the matching topic file in `only-one/learn/`:
    - `architecture-and-design.md`
    - `debugging-and-troubleshooting.md`
    - `code-review-and-refactoring.md`
    - `workflow-and-automation.md`
    - `general-engineering.md` (fallback)
-4. Check for existing entries in the target file to avoid duplication.
-5. Append new entries following the standard schema:
+3. Check for existing entries to avoid duplication.
+4. Append new entries following the standard schema:
    ```markdown
    ### N. <Grammar Pattern or Idiomatic Expression>
    - **Meaning (VI)**: <Giải nghĩa tiếng Việt ngắn gọn, chính xác>
@@ -87,20 +80,16 @@ Activate and apply these skills throughout the archiving workflow:
 ---
 
 ### Step 3 — Direct Reference Resolution
-
 1. Scan existing archive files in `only-one/archives/*.md`.
-2. Identify any historical archives related to the same modules, services, or workflows touched by this task.
-3. Prepare a list of relative markdown links for the `references` frontmatter field.
+2. Identify any historical archives related to the same modules touched by this task for the `references` field.
 
 ---
 
-### Step 4 — Author Single Distilled Archive (`spec-driven-development` & `code-simplification`)
-
+### Step 4 — Author Single Distilled Archive (`code-simplification`)
 1. Create directory `only-one/archives/` if it does not exist.
-2. Generate target file: `only-one/archives/<timestamp>-<slug>.md` using the task's timestamp prefix.
-3. Structure the distilled archive:
+2. Generate target file: `only-one/archives/<timestamp>-<slug>.md` using the task's timestamp prefix:
 
-````markdown
+```markdown
 ---
 id: <timestamp>-<slug>
 title: <Task Title>
@@ -121,24 +110,19 @@ affected_modules:
 
 ## 2. Key Architecture & Decisions
 - **Approach**: <High-level technical solution>
-- **Diagram** (if applicable):
-```mermaid
-flowchart TD
-    ...
-```
+- **Diagram**: <Mermaid diagram if applicable>
 
 ## 3. Scope & Key Changes
-- Modified components and files list (clickable links).
+- List of modified components and files (clickable links).
 
 ## 4. Verification Evidence & PR
 - **Test Status**: 100% Passed.
 - **PR URL**: <PR link or branch name>
-````
+```
 
 ---
 
 ### Step 5 — Purge Raw Task Directory
-
 1. Confirm that `only-one/archives/<timestamp>-<slug>.md` has been successfully created.
 2. Remove the raw task directory:
    ```bash
@@ -148,7 +132,6 @@ flowchart TD
 ---
 
 ### Step 6 — Completion Summary
-
 Display the archive completion report:
 
 ```markdown
@@ -165,7 +148,5 @@ Display the archive completion report:
 ## Guardrails
 
 - Never delete a task directory before confirming the archive markdown file has been written.
-- Ensure distilled archive documents remain concise (< 100 lines) by omitting full raw code diffs.
-- Always preserve `only-one/rules.md` at root and avoid creating nested rule directories.
-- Always extract and record high-value technical English patterns into `only-one/learn/<topic>.md` with Vietnamese explanations before purging task directories.
-- Avoid adding trivial everyday vocabulary to `only-one/learn/`; focus strictly on professional engineering expressions, compound terms, and sentence structures.
+- Ensure distilled archive documents remain concise (< 100 lines).
+- Always preserve `only-one/rules.md` and `only-one/learn/`.

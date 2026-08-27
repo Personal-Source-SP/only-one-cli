@@ -1,5 +1,5 @@
 ---
-description: Perform comprehensive 5-axis code health, security, simplicity, and performance review on branch changes before opening a PR using isolated review perspectives.
+description: Perform comprehensive 5-axis code health, security, simplicity, and performance review on branch changes before opening a PR using dual-perspective audit.
 ---
 
 ## Input
@@ -21,8 +21,6 @@ Inspect all modified files on the current branch against production-grade qualit
 ---
 
 ## 1. Skills Catalog (Review — Quality gates before merge)
-
-Activate and apply these four core skills during the review process:
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
@@ -57,24 +55,23 @@ Produce a structured markdown review report:
 ```markdown
 # 5-Axis Pre-PR Review Report
 
-## Summary
+## 1. Summary
 - **Branch Inspected**: `<current-branch>` against `<base-branch>`
-- **Files Inspected**: `N` files changed (`+X / -Y` lines)
+- **Files Inspected**: `N` files (`+X / -Y` lines)
 - **Change Sizing**: `Optimal (<200 lines)` | `Oversized (Consider splitting)`
 - **Overall Verdict**: `READY TO MERGE` | `CHANGES REQUESTED` | `WARNINGS FOUND`
 
-## Findings
+## 2. Findings Matrix
 
 | Severity | Axis | File | Issue & Actionable Recommendation |
 | :--- | :--- | :--- | :--- |
-| 🔴 **BLOCKER** | Security (`security-and-hardening`) | `src/auth/guard.ts` | Missing authorization check for tenant ID (IDOR vulnerability). |
+| 🔴 **BLOCKER** | Security (`security-and-hardening`) | `src/auth/guard.ts` | Missing tenant ID authorization check (IDOR vulnerability). |
 | 🟡 **WARNING** | Performance (`performance-optimization`) | `src/users/users.service.ts` | Potential N+1 query when fetching user roles in loop. |
-| 🔵 **SUGGESTION** | Simplicity (`code-simplification`) | `src/common/utils.ts` | Simplify nested ternary operator with guard clauses. |
+| 🔵 **SUGGESTION** | Simplicity (`code-simplification`) | `src/common/utils.ts` | Flatten nested ternary operator with guard clauses. |
 | ⚪ **NIT** | Quality (`code-review-and-quality`) | `src/users/dto.ts` | Fix typo in property JSDoc comment. |
 
-## Next Steps
-- Address any 🔴 **BLOCKER** issues before opening PR.
-- Consider addressing 🟡 **WARNING** and 🔵 **SUGGESTION** items.
+## 3. Next Steps
+- Address all 🔴 **BLOCKER** items before opening PR.
 - Run `/only-one-pr-git` to create the GitHub Pull Request once verified.
 ```
 
@@ -83,5 +80,5 @@ Produce a structured markdown review report:
 ## Guardrails
 
 - Focus exclusively on the code diff between `base-branch` and the current branch (`git diff <base-branch>...HEAD`).
-- Categorize issues strictly by severity: `BLOCKER` (must fix before merge), `WARNING` (potential risk), `SUGGESTION` (cleanliness/maintainability), `NIT` (minor style detail).
+- Categorize issues strictly by severity: `BLOCKER`, `WARNING`, `SUGGESTION`, `NIT`.
 - Do not perform source code modifications during the review workflow.
