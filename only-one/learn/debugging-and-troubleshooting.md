@@ -32,3 +32,24 @@
   > *"Before writing the bug fix, establish a reliable red feedback loop that reliably fails on the reported issue."*
 - **Origin Task**: `20260827-142500-optimize-workflows-skills-catalog`
 
+### 5. Error masking
+- **Meaning (VI)**: Hiện tượng lỗi thứ cấp hoặc ngoại lệ phát sinh trong quá trình xử lý/cleanup làm che giấu mất nguyên nhân lỗi gốc ban đầu.
+- **Grammar / Usage**: `[Noun] masking` — Hiện tượng che giấu hoặc ghi đè lỗi.
+- **Engineering Example**:
+  > *"We must catch cleanup errors separately to prevent error masking from hiding the root installation failure."*
+- **Origin Task**: `20260828-201500-fix-vs-extensions-antigravity-spawn-enoent`
+
+### 6. Platform-agnostic process spawning
+- **Meaning (VI)**: Kỹ thuật khởi tạo tiến trình con độc lập với hệ điều hành, tự động thích ứng với cơ chế thực thi của Windows batch scripts (`.cmd`) và Unix binaries.
+- **Grammar / Usage**: `Enable platform-agnostic process spawning by + [gerund / noun phrase]`
+- **Engineering Example**:
+  > *"We enable platform-agnostic process spawning by conditionally toggling the shell execution option on Win32 hosts."*
+- **Origin Task**: `20260828-201500-fix-vs-extensions-antigravity-spawn-enoent`
+
+### 7. Resilient rollback
+- **Meaning (VI)**: Cơ chế hoàn tác có khả năng tự phục hồi, tiếp tục hoàn tất các hạng mục dọn dẹp còn lại ngay cả khi một vài thao tác thành phần gặp lỗi lành tính (như tài nguyên không tồn tại).
+- **Grammar / Usage**: `Implement a resilient rollback mechanism to + [verb phrase]`
+- **Engineering Example**:
+  > *"Transaction managers should implement a resilient rollback to ensure journals and temp files are cleared even if an individual uninstall fails."*
+- **Origin Task**: `20260828-201500-fix-vs-extensions-antigravity-spawn-enoent`
+

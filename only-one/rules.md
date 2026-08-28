@@ -13,5 +13,7 @@
 - **[ALWAYS]** Đảm bảo `assets/skills/index.ts`, `assets/workflows/index.ts` và `.agents/workflows/*.md` luôn đồng bộ 100% về danh mục kỹ năng (`SKILLS` và `requiredSkills`), tuyệt đối không để sót tham chiếu không tồn tại (dangling references).
 - **[ALWAYS]** Áp dụng nguyên tắc Reuse-First Invariant và quét các thư mục dùng chung (utils, helpers, hooks, common, components) trước khi viết code mới hoặc lập plan để ngăn chặn duplicate logic.
 - **[NEVER]** Không sửa source code hoặc thực thi thay đổi dự án trong lượt chạy của workflow `/only-one-idea`. Workflow này chỉ dừng lại ở việc tạo `concept.md` (Strict Lifecycle Isolation).
+- **[NEVER]** Không gọi `child_process.spawn` trên Windows (`win32`) với `{ shell: false }` khi thực thi các lệnh CLI hoặc wrapper dạng batch script (`.cmd`/`.bat`) như Antigravity IDE, VS Code, Cursor để tránh crash lỗi `ENOENT`.
+- **[NEVER]** Không để ngoại lệ thứ cấp trong quá trình `rollback()` làm ngắt quãng việc dọn dẹp journal/backup file hoặc che giấu lỗi gốc (*Error Masking*). Rollback phải có tính kiên cường (resilient) và bỏ qua các lỗi tài nguyên đã không còn tồn tại.
 
 
