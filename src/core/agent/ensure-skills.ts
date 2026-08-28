@@ -17,7 +17,8 @@ export type EnsureStructureAgentSkillsRequest = {
 };
 
 export type EnsureStructureAgentSkillsResult =
-    { ok: true; agentTools: string[]; setupRan: boolean } | { ok: false; exitCode: number; message: string };
+    | { ok: true; agentTools: string[]; setupRan: boolean }
+    | { ok: false; exitCode: number; message: string };
 
 export const ensureStructureAgentSkills = async (
     deps: ProgramDeps,

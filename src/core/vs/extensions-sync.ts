@@ -39,7 +39,9 @@ export const resolveVsEditorCommand = async (runner: VsProcessRunner, editor: Vs
             return candidate;
         }
     }
-    return editor.commandCandidates[0];
+    throw new Error(
+        `Executable for "${editor.name}" not found in PATH (${editor.commandCandidates.join(', ')}). Please verify that ${editor.name} is installed and available in PATH.`,
+    );
 };
 
 export const getVsInstalledExtensions = async (runner: VsProcessRunner, command: string): Promise<string[]> => {

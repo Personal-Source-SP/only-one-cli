@@ -20,13 +20,17 @@ export const nodeVsFileSystem: VsFileSystem = {
 export class NodeVsProcessRunner implements VsProcessRunner {
     public async run(command: string, args: string[]): Promise<VsProcessResult> {
         return new Promise((resolve) => {
-            const child = spawn(command, args, { shell: false });
+            const isWin = process.platform === 'win32';
+            const child = spawn(command, args, {
+                shell: isWin,
+                windowsHide: true,
+            });
             let stderr = '';
             let stdout = '';
-            child.stderr.on('data', (chunk: Buffer) => {
+            child.stderr?.on('data', (chunk: Buffer) => {
                 stderr += chunk.toString();
             });
-            child.stdout.on('data', (chunk: Buffer) => {
+            child.stdout?.on('data', (chunk: Buffer) => {
                 stdout += chunk.toString();
             });
             child.on('error', (error) => resolve({ code: 127, stderr: error.message, stdout }));

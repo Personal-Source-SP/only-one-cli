@@ -2,7 +2,7 @@ import { dirname, join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { VsEditorId, VsPlatform, mergeSettings, normalizeExtensionIds, parseVsEditorIds, vsEditors } from '@src/core/vs/index.js';
 import { PercentProgressReporter } from '@src/core/vs/progress.js';
-import { syncVsExtensions } from '@src/core/vs/extensions-sync.js';
+import { resolveVsEditorCommand, syncVsExtensions } from '@src/core/vs/extensions-sync.js';
 import { syncVsSettings } from '@src/core/vs/settings-sync.js';
 import { resolveVsJournalPath, VsSyncTransaction } from '@src/core/vs/transaction.js';
 import type { VsFileSystem, VsProcessResult, VsProcessRunner } from '@src/core/vs/types.js';
@@ -240,5 +240,25 @@ describe('VS core sync helpers', () => {
         expect(runner.calls).toContainEqual({ command: 'code', args: ['--install-extension', 'Missing.One'] });
         expect(runner.calls).toContainEqual({ command: 'code', args: ['--uninstall-extension', 'Missing.One'] });
         expect(runner.calls).not.toContainEqual({ command: 'code', args: ['--uninstall-extension', 'existing.keep'] });
+    });
+
+    it('throws an actionable error when no editor command candidates are executable', async () => {
+        const runner: VsProcessRunner = {
+            run: async () => ({ code: 127, stderr: 'not found', stdout: '' }),
+        };
+        const editor = vsEditors.find((e) => e.id === VsEditorId.Antigravity)!;
+        await expect(resolveVsEditorCommand(runner, editor)).rejects.toThrow(/Executable for "Antigravity" not found in PATH/);
+    });
+
+    it('resolves the first available candidate command for an editor', async () => {
+        const runner: VsProcessRunner = {
+            run: async (command) => {
+                if (command === 'antigravity') return { code: 0, stderr: '', stdout: '1.0.0' };
+                return { code: 127, stderr: 'not found', stdout: '' };
+            },
+        };
+        const editor = vsEditors.find((e) => e.id === VsEditorId.Antigravity)!;
+        const resolved = await resolveVsEditorCommand(runner, editor);
+        expect(resolved).toBe('antigravity');
     });
 });
