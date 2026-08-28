@@ -1,19 +1,18 @@
 # Next.js Runtime Dev Loop & Debugging
 
-## Quy trình Kiểm tra Runtime & Debug Frontend
+## Frontend Runtime Verification & Debugging Workflow
 
 ### 1. Preconditions & Fast Loop Setup
-- Xác nhận server `next dev` đang chạy và URL mục tiêu.
-- Kiểm tra phiên bản Next.js, bundler (Turbopack), công cụ browser và xác thực người dùng.
-- Giữ nguyên trạng thái đăng nhập của người dùng. Không bao giờ yêu cầu credentials trong chat.
+- Confirm the `next dev` development server is running along with the target URL.
+- Inspect Next.js version, bundler (e.g., Turbopack or Webpack), browser tools, and user authentication state.
+- Preserve existing user login sessions; never ask for credentials in chat transcripts.
 
 ### 2. Runtime Dev Loop Workflow
-- Thực hiện sửa đổi nhỏ có phạm vi cụ thể (smallest scoped edit).
-- Kiểm tra compile/runtime diagnostics qua công cụ Next.js / server log.
-- Kiểm tra trực tiếp trên trình duyệt: nội dung hiển thị, loading / error / empty states, console errors, failed network requests và kết quả tương tác.
-- Đối chiếu kết quả trình duyệt với server log, route diagnostics, RSC / server-action errors.
-- Lặp lại sau mỗi thay đổi hành vi có ý nghĩa. Typecheck/build đơn thuần không thay thế được bằng chứng runtime.
+- Execute changes in the smallest scoped vertical edit.
+- Monitor compile/runtime diagnostics in the terminal and Next.js overlay logs.
+- Perform direct browser verification: rendered DOM content, loading/error/empty states, browser console errors, failed network requests, and user interactions.
+- Correlate browser feedback with server logs, route diagnostics, and RSC / Server Action exceptions.
+- Re-verify runtime behavior iteratively. Typechecks and builds never substitute for live runtime verification.
 
-### 3. Debug & Inspecting Values
-- BẮT BUỘC lưu kết quả xử lý vào biến trung gian trước khi `return` (ví dụ: `const result = ...; return result;`) để hỗ trợ đặt breakpoint và inspect giá trị khi debug.
-
+### 3. Debug-Friendly Variable Binding
+- ALWAYS bind computed values or promise results to explicit intermediate variables prior to returning (`const result = ...; return result;`) to support breakpoint inspection during debug sessions.

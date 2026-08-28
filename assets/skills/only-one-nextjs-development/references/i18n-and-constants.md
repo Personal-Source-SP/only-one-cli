@@ -1,32 +1,31 @@
 # i18n & Constants Reference
 
-## Quy chuẩn Đa ngôn ngữ (i18n) & Hằng số
+## Internationalization (i18n) & Constants Standards
 
-### 1. Cấu trúc Key dịch theo Page / Module (`pages.<feature>.*`)
-Mỗi feature page BẮT BUỘC tổ chức các keys dịch trong i18n theo đúng cấu trúc tiêu chuẩn dưới tiền tố `pages.<feature>.*`:
+### 1. Translation Key Taxonomy (`pages.<feature>.*`)
+Every feature page MUST organize its i18n localization keys under the standardized `pages.<feature>.*` prefix:
 
-- **`actions`**: Các hành động/nút bấm trên trang (ví dụ: `pages.washModes.actions.create`).
-- **`columns`**: Tiêu đề các cột dữ liệu hiển thị trên bảng `ListTable` (ví dụ: `pages.washModes.columns.name`).
-- **`filters`**: Nhãn hoặc placeholders của các trường lọc/tìm kiếm trong `FilterPanel` (ví dụ: `pages.washModes.filters.searchPlaceholder`).
-- **`status`**: Định nghĩa nhãn cho các trạng thái dữ liệu để hiển thị trên Badge/Tag (ví dụ: `pages.washModes.status.active`).
-- **`content`**: Tiêu đề Drawer/Modal và các nội dung văn bản thông thường (ví dụ: `pages.washModes.content.createTitle`).
-- **`notifications`**: Chứa toàn bộ thông báo Toast/Notification:
-  - **`success`**: Thông báo thành công khi tạo mới, cập nhật, xóa (`pages.washModes.notifications.success.create`).
-  - **`error`**: Thông báo lỗi nghiệp vụ hoặc hệ thống (`pages.washModes.notifications.error.create`).
-- **`form`**: Tất cả tài nguyên ngôn ngữ của form nhập liệu, phân nhỏ thành:
-  - **`labels`**: Nhãn (Label) hiển thị của các Form Item (`pages.washModes.form.labels.name`).
-  - **`placeholders`**: Gợi ý nhập liệu (Placeholder) tương ứng (`pages.washModes.form.placeholders.name`).
-  - **`rules`**: Cảnh báo lỗi xác thực dữ liệu / Validation rules (`pages.washModes.form.rules.nameRequired`).
+- **`actions`**: Buttons and interactive triggers (e.g., `pages.washModes.actions.create`).
+- **`columns`**: Table header labels for `ListTable` (e.g., `pages.washModes.columns.name`).
+- **`filters`**: Labels and placeholders for search/filter fields (e.g., `pages.washModes.filters.searchPlaceholder`).
+- **`status`**: State representations rendered within Badges/Tags (e.g., `pages.washModes.status.active`).
+- **`content`**: Titles for Drawers/Modals and general prose (e.g., `pages.washModes.content.createTitle`).
+- **`notifications`**: Toast and modal alerts:
+  - **`success`**: Confirmations for creation, update, and deletion (`pages.washModes.notifications.success.create`).
+  - **`error`**: Business exception and system failure messages (`pages.washModes.notifications.error.create`).
+- **`form`**: Form field language resources partitioned into:
+  - **`labels`**: Form item label text (`pages.washModes.form.labels.name`).
+  - **`placeholders`**: Input field placeholders (`pages.washModes.form.placeholders.name`).
+  - **`rules`**: Validation feedback messages (`pages.washModes.form.rules.nameRequired`).
 
-### 2. Các Thành phần Tùy biến (Custom Keys)
-Đối với các tính năng hoặc thành phần giao diện đặc thù không thuộc Form hay Table chuẩn (ví dụ: Drawer hiển thị thông tin bảo mật, hướng dẫn từng bước):
-- **Vị trí**: Đặt các nhóm key này trực tiếp ở cấp đầu của trang `pages.<feature>.*` (cùng cấp với `actions`, `form`, `content`), ví dụ `pages.devices.credentialsDrawer` hoặc `pages.devices.connectionSteps`.
-- **Mục đích**: Giữ cấu trúc phẳng vừa phải, tránh lồng quá nhiều cấp độ sâu và tránh làm phình to các nhóm chuẩn.
+### 2. Custom Key Groupings
+For specialized components not fitting standard form/table groupings (e.g., step wizards, credentials drawers):
+- **Location**: Define top-level sibling groups under `pages.<feature>.*` (e.g., `pages.devices.credentialsDrawer`, `pages.devices.connectionSteps`).
+- **Purpose**: Maintain shallow nesting hierarchies and avoid bloating standard dictionary groups.
 
-### 3. Quy chuẩn tích hợp trong Code
+### 3. Code Integration Guidelines
 - ✅ **i18next Integration**:
-  - Sử dụng `const { t } = useTranslation()`.
-  - BẮT BUỘC sử dụng `useMemo` khi tạo danh sách `columns`, `filters`, `actions`, `options` có gọi hàm `t(...)` để tối ưu hiệu năng re-render.
+  - Access translations via `const { t } = useTranslation()`.
+  - ALWAYS wrap `columns`, `filters`, `actions`, and dropdown `options` invoking `t(...)` in `useMemo` to eliminate unnecessary re-render overhead.
 - ✅ **Constants**:
-  - Khai báo độ rộng cột (`MODE_COLUMN_WIDTH`), index keys (`MODE_COLUMN_INDEX`) và hằng số tĩnh trong file `constants.ts` của trang.
-
+  - Define static column widths (`MODE_COLUMN_WIDTH`), column index keys (`MODE_COLUMN_INDEX`), and fixed default values in the page's `constants.ts` file.

@@ -1,24 +1,24 @@
 # Component Architecture
 
-## Quy chuẩn Thiết Kế UI & Sub-components
+## UI Component & Sub-Component Design Standards
 
-- ✅ **Tái sử dụng Common Components (`src/components`)**:
-  - BẮT BUỘC ưu tiên khảo sát và tái sử dụng các common components có sẵn tại `@/components` (`ListWrapper`, `ListTable`, `FilterPanel`, `CardAction`, `CustomDrawerForm`, `CustomInputForm`, `CustomSelectInput`, `CustomModal`, `UploadImage`,...) thay vì tự code lại thủ công.
-- ✅ **Form Drawer Component Pattern (`<CustomDrawerForm>`)**:
-  - Nhận prop `drawerForm` (từ `useCustomDrawerForm`).
-  - Dùng `<CustomDrawerForm>` làm wrapper chính với `createInitialValues`.
-  - Dùng `<CustomInputForm>` (hỗ trợ `type="text" | "number" | "html" | ...`) cho các trường nhập liệu.
-  - Dùng `<CustomSelectInput>` cho các trường dropdown (kết hợp `selectProps={{ showSearch: true, options }}`).
-  - Quy định rules xác thực bằng `FormRuleType` enum từ `@/utilities` (ví dụ: `type: FormRuleType.Required`).
-- ✅ **Cấu trúc Component (Đơn giản vs Phức tạp)**:
-  - **Component Đơn giản**: Viết trong **1 file `.tsx` đơn lẻ** (ví dụ: `components/ModeFormDrawer.tsx`). Giới hạn tối đa **200 dòng/file**.
-  - **Component Phức tạp**: Tách thành **một thư mục riêng** (ví dụ: `components/ModeFormDrawer/`) chứa file chính `index.tsx` cùng với các sub-components con bên trong (`ModeFormBasic.tsx`, `ModeFormAdvanced.tsx`,...).
-  - Tất cả sub-components re-export tập trung qua `components/index.ts`.
-- ✅ **Semantic HTML & List Keys**:
-  - Sử dụng các thẻ HTML5 ngữ nghĩa (`<section>`, `<article>`, `<header>`), hạn chế lạm dụng thẻ `<div>`.
-  - BẮT BUỘC truyền thuộc tính `key` cho mọi phần tử lặp trong danh sách `.map()`.
+- ✅ **Leverage Common Components (`src/components`)**:
+  - MUST audit and reuse available common components in `@/components` (`ListWrapper`, `ListTable`, `FilterPanel`, `CardAction`, `CustomDrawerForm`, `CustomInputForm`, `CustomSelectInput`, `CustomModal`, `UploadImage`) rather than creating bespoke duplicates.
+- ✅ **Form Drawer Pattern (`<CustomDrawerForm>`)**:
+  - Receive the `drawerForm` prop (derived from `useCustomDrawerForm`).
+  - Use `<CustomDrawerForm>` as the root form container paired with `createInitialValues`.
+  - Use `<CustomInputForm>` (supporting `type="text" | "number" | "html" | ...`) for text and numerical inputs.
+  - Use `<CustomSelectInput>` for dropdown controls (configured with `selectProps={{ showSearch: true, options }}`).
+  - Specify validation rules using `FormRuleType` from `@/utilities` (e.g., `type: FormRuleType.Required`).
+- ✅ **Component Directory Layout (Simple vs Complex)**:
+  - **Simple Component**: Authored in a **single `.tsx` file** (e.g., `components/ModeFormDrawer.tsx`). Maintain a maximum limit of **200 lines per file**.
+  - **Complex Component**: Encapsulated in a **dedicated subdirectory** (e.g., `components/ModeFormDrawer/`) containing a main `index.tsx` and partitioned sub-components (`ModeFormBasic.tsx`, `ModeFormAdvanced.tsx`).
+  - Re-export all sub-components through `components/index.ts`.
+- ✅ **Semantic HTML & Stable List Keys**:
+  - Favor semantic HTML5 tags (`<section>`, `<article>`, `<header>`, `<nav>`) over excessive `<div>` wrapping.
+  - ALWAYS provide a unique, stable `key` prop for every element rendered within `.map()` loops.
 - ✅ **Design System & Styling**:
-  - Tái sử dụng Ant Design components (`Button`, `Tag`, `Typography`, `Card`, `Space`).
-  - Màu sắc status/boolean dùng constants chung (`ACTIVE_STATUS_COLORS`, `BOOLEAN_TAG_COLORS`).
-- ✅ **Return bằng biến cụ thể (Debug-friendly Return)**:
-  - BẮT BUỘC lưu các giá trị render (JSX / computed elements) vào biến rõ nghĩa trước khi `return`.
+  - Reuse Ant Design components (`Button`, `Tag`, `Typography`, `Card`, `Space`).
+  - Use centralized constant palettes for badge/status styling (`ACTIVE_STATUS_COLORS`, `BOOLEAN_TAG_COLORS`).
+- ✅ **Debug-Friendly Return-by-Variable**:
+  - ALWAYS bind computed JSX elements or data structures to descriptive variables prior to returning.

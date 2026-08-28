@@ -1,52 +1,178 @@
 # Page Feature Architecture
 
-## Cấu trúc chuẩn của một Feature Page
+## Standard Feature Page Directory Structure
 
-Mỗi Feature Page (ví dụ `src/pages/<feature>/`) bắt buộc tuân thủ cấu trúc thư mục tự đóng gói:
+Each Feature Page (e.g., `src/pages/<feature>/`) MUST adhere to a self-encapsulated modular directory structure:
 
 ```text
 src/pages/<feature>/
-├── index.tsx              # Main Page component (ListWrapper, ListTable, FormDrawers, TableProps, Filters)
-├── components/            # Sub-components dùng riêng cho page (FormDrawer, Modals, Details,...)
-│   └── index.ts           # Barrel export tất cả sub-components
-├── constants.ts           # Hằng số page (Column widths, index keys, default values, drawer titles)
+├── index.tsx              # Presentation Orchestrator (ListWrapper, ListTable, FilterPanel, Drawers)
+├── components/            # Page-specific UI sub-components (FormDrawer, Modals, Details)
+│   └── index.ts           # Barrel export for all sub-components
+├── hooks/                 # Headless API & Business Hooks (Data fetching, table, drawer forms, mutations)
+│   └── index.ts           # Barrel export for all page hooks
+├── constants.ts           # Page constants (Column widths, index keys, default values, drawer titles)
 ├── enums/                 # Feature enums
 │   └── index.ts           # Barrel export
-├── types/                 # Interface & Type definitions (Data model, FormValues, Params)
+├── types/                 # Interface & type definitions (Data models, FormValues, Params)
 │   └── index.ts           # Barrel export
 └── utils/                 # Pure helper functions (Converters, Formatters, Parsers)
     └── index.ts           # Barrel export
 ```
 
-## Quy chuẩn trong `index.tsx` (Main Page Component)
+---
 
-### 1. Thứ tự Imports
-Imports sắp xếp theo 3 nhóm rõ ràng (mỗi nhóm cách 1 dòng trống):
-1. Thư viện bên ngoài (React, Ant Design, Icons, i18next,...).
-2. Components/Hooks/Utils dùng chung dự án (`@/components`, `@/hooks`, `@/utilities`, `@/enums`, `@/config`).
-3. File cục bộ của trang (`./components`, `./constants`, `./enums`, `./types`, `./utils`).
+## Headless API Hook & UI Separation Architecture
 
-### 2. Thứ tự & Quy tắc Khai báo trong Component
-Tất cả khai báo trong `.tsx` BẮT BUỘC tuân theo thứ tự nhóm vai trò:
+To keep the Main Page (`index.tsx`) clean, declarative, and well below the **200 LOC ceiling**, encapsulate **all API fetching, mutations, and Refine hook wiring inside dedicated page hooks** (`src/pages/<feature>/hooks/`):
 
-$$\text{Constants} \rightarrow \text{State \& Hooks} \rightarrow \text{Memos (useMemo)} \rightarrow \text{Effects (useEffect)} \rightarrow \text{Callbacks (useCallback)} \rightarrow \text{JSX (Return)}$$
+### 1. Separation of Responsibilities
+- **Data & Logic Layer (`src/pages/<feature>/hooks/`)**:
+  - Encapsulates `useCustomTable`, `useCustomDrawerForm`, `useCustomSelect`, and ad-hoc mutations.
+  - Handles `initialValuesMapper`, `onFinish` payload transformation, `onMutationSuccess` table refetching, and search debouncing.
+  - Exposes clean, structured data objects and action callbacks to the UI.
+- **Presentation Layer (`src/pages/<feature>/index.tsx` & `components/`)**:
+  - Consumes the headless page hook(s).
+  - Prepares table columns via `useMemo`, filter controls, and action triggers.
+  - Renders `<ListWrapper>`, `<ListTable>`, and Form Drawers without embedding raw API logic.
 
-- **Quy tắc độ dài dòng code**: Trong từng nhóm vai trò, các dòng khai báo phải được **sắp xếp theo độ dài từ ngắn đến dài** (tính theo số ký tự trên dòng).
-- **Ngăn cách nhóm**: Ngăn cách giữa các nhóm bằng **đúng một dòng trống**.
-- **Kích thước file**: Mỗi file component tối đa **200 dòng**. Tách nhỏ sub-components khi vượt quá.
-- **Kiểm tra mảng rỗng**: Đồng bộ cách kiểm tra mảng rỗng bằng `!list?.length` trên toàn bộ dự án.
+### 2. Code Example: Headless Page Hook (`hooks/use-feature-page.ts`)
 
-### 3. Layout Pattern & Component Composition (Tùy chọn theo dự án)
+```tsx
+import { API_ENDPOINT } from "@/config";
+import { useCustomDrawerForm, useCustomSelect, useCustomTable } from "@/hooks";
+import type { Feature, FeatureFormValues, CategoryOption } from "../types";
 
-> [!NOTE]
-> Các pattern dưới đây áp dụng khi codebase có hỗ trợ **Refine Framework** và các Portal common components (`ListWrapper`, `ListTable`, `useCustomTable`, `useCustomDrawerForm`). Với các dự án Next.js / React khác không dùng Refine, linh hoạt áp dụng pattern data-fetching & layout sẵn có của dự án đó.
+export const useFeaturePage = () => {
+  // 1. Table Orchestration
+  const {
+    tableProps,
+    tableQuery,
+    debouncedSearch,
+    setFilters,
+  } = useCustomTable<Feature>({
+    resource: API_ENDPOINT.FEATURES.BASE,
+  });
 
-- ✅ **ListWrapper & ListTable Pattern (Khi codebase hỗ trợ)**:
-  - Quản lý danh sách sử dụng `<ListWrapper>` bọc layout (actions, filters, error, resource, isLoading, permissionGroup).
-  - Sử dụng `<ListTable>` hiển thị bảng với `columns`, `tableProps`, `tableQuery`, `permissionGroup`, `deleteResource`, `onEdit`.
-- ✅ **Refine Hooks Wiring (Khi codebase hỗ trợ)**:
-  - `useCustomTable`: Quản lý phân trang, bộ lọc API và debounce search.
-  - `useCustomDrawerForm`: Tách riêng 2 instance cho `createDrawerForm` (`action: "create"`) và `editDrawerForm` (`action: "edit"`). Đăng ký `onMutationSuccess` gọi `await tableQuery.refetch()`.
-- ✅ **Return bằng biến cụ thể (Debug-friendly Return)**:
-  - BẮT BUỘC lưu các cấu hình (`actions`, `filters`, `columns`) hoặc JSX element vào biến rõ nghĩa trước khi `return`.
-  - Return JSX bọc trong React Fragment `<> ... </>`.
+  // 2. Form Drawer Orchestration (Create & Edit)
+  const createDrawerForm = useCustomDrawerForm<Feature, FeatureFormValues, Feature>({
+    action: "create",
+    resource: API_ENDPOINT.FEATURES.BASE,
+    onMutationSuccess: async () => {
+      await tableQuery.refetch();
+    },
+  });
+
+  const editDrawerForm = useCustomDrawerForm<Feature, FeatureFormValues, Feature>({
+    action: "edit",
+    resource: API_ENDPOINT.FEATURES.BASE,
+    onMutationSuccess: async () => {
+      await tableQuery.refetch();
+    },
+  });
+
+  // 3. Dropdown Options Loader
+  const { options: categoryOptions } = useCustomSelect<CategoryOption>({
+    resource: API_ENDPOINT.CATEGORIES.BASE,
+    optionLabel: "name",
+    optionValue: "id",
+  });
+
+  return {
+    table: {
+      tableProps,
+      tableQuery,
+      debouncedSearch,
+      setFilters,
+    },
+    drawers: {
+      createDrawerForm,
+      editDrawerForm,
+    },
+    options: {
+      categoryOptions,
+    },
+  };
+};
+```
+
+### 3. Code Example: Main Page Orchestrator (`index.tsx`)
+
+```tsx
+import { useMemo } from "react";
+import { useTranslation } from "next-i18next";
+import { ListTable, ListWrapper } from "@/components";
+import { PermissionGroups } from "@/enums";
+import { FeatureFormDrawer } from "./components";
+import { useFeaturePage } from "./hooks";
+import type { ColumnsType } from "antd/es/table";
+import type { Feature } from "./types";
+
+const FeaturePage = () => {
+  const { t } = useTranslation();
+  const { table, drawers, options } = useFeaturePage();
+
+  const columns: ColumnsType<Feature> = useMemo(() => [
+    {
+      title: t("pages.features.columns.name"),
+      dataIndex: "name",
+      key: "name",
+    },
+  ], [t]);
+
+  const actions = useMemo(() => (
+    <Button type="primary" onClick={() => drawers.createDrawerForm.show()}>
+      {t("pages.features.actions.create")}
+    </Button>
+  ), [drawers.createDrawerForm, t]);
+
+  return (
+    <>
+      <ListWrapper
+        actions={actions}
+        isLoading={table.tableQuery.isLoading}
+        permissionGroup={PermissionGroups.FEATURE}
+      >
+        <ListTable
+          columns={columns}
+          tableProps={table.tableProps}
+          tableQuery={table.tableQuery}
+          onEdit={(record) => drawers.editDrawerForm.show(record.id)}
+        />
+      </ListWrapper>
+
+      <FeatureFormDrawer
+        drawerForm={drawers.createDrawerForm}
+        categoryOptions={options.categoryOptions}
+      />
+      <FeatureFormDrawer
+        drawerForm={drawers.editDrawerForm}
+        categoryOptions={options.categoryOptions}
+      />
+    </>
+  );
+};
+
+export default FeaturePage;
+```
+
+---
+
+## Conventions in `index.tsx` (Main Page Component)
+
+### 1. Import Statement Ordering
+Group imports into 3 distinct sections separated by a single blank line:
+1. Third-party dependencies (React, Ant Design, Icons, i18next).
+2. Shared project components, hooks, and utilities (`@/components`, `@/hooks`, `@/utilities`, `@/enums`, `@/config`).
+3. Local page files (`./components`, `./hooks`, `./constants`, `./enums`, `./types`, `./utils`).
+
+### 2. Component Declaration Order & Formatting
+Declarations inside `.tsx` components MUST follow the role-ordered pipeline:
+
+$$\text{Constants} \rightarrow \text{State \& Hooks} \rightarrow \text{Memos (useMemo)} \rightarrow \text{Effects (useEffect)} \rightarrow \text{Callbacks (useCallback)} \rightarrow \text{JSX Return}$$
+
+- **Line Length Sorting**: Within each role group, sort variable and hook declaration lines **from shortest to longest** (character count).
+- **Group Separation**: Separate distinct role groups by **exactly one blank line**.
+- **File Length Ceiling**: Keep each component file within **200 lines**. Move API logic and data fetching into `hooks/` and UI pieces into `components/`.
+- **Empty Array Check**: Standardize empty array checks using `!list?.length` across the project.
+- **Debug-Friendly Return**: ALWAYS assign configurations (`actions`, `filters`, `columns`) and computed JSX elements to descriptive variables before returning.

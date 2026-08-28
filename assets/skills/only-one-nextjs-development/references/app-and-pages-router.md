@@ -1,11 +1,11 @@
 # App Router vs Pages Router Reference
 
-## Quy chuẩn Router & Data Fetching trong Next.js
+## Next.js Routing & Data-Fetching Conventions
 
-### 1. Phân biệt App Router & Pages Router
-- **App Router (`src/app/`)**: Mặc định là React Server Components (RSC). Chỉ thêm `'use client'` cho các components có state (`useState`), hooks (`useEffect`, custom hooks), browser APIs hoặc event handlers (`onClick`).
-- **Pages Router (`src/pages/`)**: Sử dụng `getServerSideProps`, `getStaticProps`, hoặc client-side data fetching (như Refine Hooks / React Query).
+### 1. App Router vs Pages Router Architecture
+- **App Router (`src/app/`)**: Components default to React Server Components (RSC). Apply the `'use client'` directive only when components require local state (`useState`), lifecycle hooks (`useEffect`, custom hooks), browser APIs, or interactive event handlers (`onClick`, `onChange`).
+- **Pages Router (`src/pages/`)**: Use `getServerSideProps`, `getStaticProps`, or client-side data fetching frameworks (such as Refine Hooks / TanStack Query).
 
-### 2. Ranh giới Client & Server
-- **Không bao giờ** import code server-only hoặc expose API keys / credentials bí mật vào Client bundles.
-- Định nghĩa rõ ràng các trạng thái `Loading`, `Error`, `NotFound` và `Empty` theo chuẩn Next.js.
+### 2. Client and Server Boundary Isolation
+- **NEVER** import server-only logic, database connections, or secret API credentials into client components or client bundles.
+- Explicitly handle and isolate standard states: `Loading`, `Error`, `NotFound`, and `Empty` views.

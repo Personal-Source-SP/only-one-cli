@@ -1,14 +1,14 @@
 # Utils & Helpers Reference
 
-## Quy chuẩn viết Hàm Tiện ích (Pure Helpers)
+## Helper & Pure Utility Function Standards
 
-- ✅ **Ưu tiên Common Utilities (`@/utilities`)**:
-  - BẮT BUỘC ưu tiên khảo sát và tái sử dụng các hàm utility sẵn có tại `@/utilities` (như `currencyNumber`, `toEnumOptions`, `FormRuleType`, formatters, parsers,...) trước khi viết mới.
-  - CHỈ viết helper function cục bộ trong thư mục `src/pages/<feature>/utils/` khi logic đó thực sự mang tính chất đặc thù riêng cho trang đó (ví dụ: `convertMinutesToSeconds`, `parseBoolean`).
+- ✅ **Leverage Common Utilities (`@/utilities`)**:
+  - MUST audit and reuse available utility functions in `@/utilities` (`currencyNumber`, `toEnumOptions`, `FormRuleType`, formatters, parsers) prior to authoring new functions.
+  - ONLY write local helper functions within `src/pages/<feature>/utils/` when logic is strictly isolated to that specific page (e.g., `convertMinutesToSeconds`, `parseBoolean`).
 - ✅ **Pure Functions**:
-  - Các helper function phải là pure functions: có đầu vào/đầu ra rõ ràng, không có side-effects.
-- ✅ **Sử dụng Lodash & Dayjs**:
-  - Ưu tiên sử dụng `lodash` (`isEmpty`, `get`, `set`, `uniq`, `groupBy`,...) thay vì tự viết lại logic lặp code.
-  - Xử lý ngày giờ bằng `dayjs`. Khi thao tác với múi giờ (timezone), bắt buộc kiểm tra việc nạp `dayjs.extend(utc)` và `dayjs.extend(timezone)` để tính toán chính xác.
-- ✅ **Return bằng biến cụ thể (Debug-friendly Return)**:
-  - BẮT BUỘC lưu kết quả tính toán/chuyển đổi vào biến rõ nghĩa trước khi `return`.
+  - Helpers must be deterministic, pure functions with explicit inputs and outputs and zero external side effects.
+- ✅ **Leverage Lodash & Dayjs**:
+  - Prioritize `lodash` utilities (`isEmpty`, `get`, `set`, `uniq`, `groupBy`) rather than manual loops and mappings.
+  - Handle date/time parsing and comparison with `dayjs`. When manipulating timezones, ensure `dayjs.extend(utc)` and `dayjs.extend(timezone)` are properly loaded for accurate calculations.
+- ✅ **Debug-Friendly Return-by-Variable**:
+  - ALWAYS bind computed values and transformation results to descriptive variables before returning (`const result = ...; return result;`).
