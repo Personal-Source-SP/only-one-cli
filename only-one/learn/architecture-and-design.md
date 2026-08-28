@@ -53,4 +53,26 @@
   > *"Adopting a dual-layer architecture bridges human cognitive ergonomics and machine parsing efficiency."*
 - **Origin Task**: `20260827-144600-bilingual-hybrid-doc-mode-and-english-immersion`
 
+### 8. Reuse-first invariant
+- **Meaning (VI)**: Nguyên tắc bất biến ưu tiên tái sử dụng (không viết mới hay sinh mã nguồn dư thừa khi đã có sẵn).
+- **Grammar / Usage**: `[Noun]-first [Noun]` — Bất biến lấy việc tái sử dụng làm trọng tâm.
+- **Engineering Example**:
+  > *"The **reuse-first invariant** prevents engineers and agents from re-implementing existing utilities."*
+- **Origin Task**: `20260828-101523-codebase-structure-and-reuse-guardrails`
+
+### 9. Defense-in-depth architecture
+- **Meaning (VI)**: Kiến trúc phòng thủ theo chiều sâu; thiết lập nhiều lớp bảo vệ độc lập từ định hướng skill, lập kế hoạch đến thực thi.
+- **Grammar / Usage**: `Defense-in-depth [Noun]` — Mô hình phòng thủ đa tầng.
+- **Engineering Example**:
+  > *"By applying **defense-in-depth**, we catch redundant code at the planning, skill guidance, and application stages."*
+- **Origin Task**: `20260828-101523-codebase-structure-and-reuse-guardrails`
+
+### 10. Pre-implementation audit
+- **Meaning (VI)**: Bước kiểm toán / khảo sát mã nguồn có sẵn trước khi bắt tay vào triển khai thực tế.
+- **Grammar / Usage**: `Pre-[Noun] [Noun]` — Khảo sát tiền triển khai.
+- **Engineering Example**:
+  > *"Performing a **pre-implementation audit** prevents redundant utilities from being created."*
+- **Origin Task**: `20260828-101523-codebase-structure-and-reuse-guardrails`
+
+
 

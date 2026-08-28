@@ -11,4 +11,7 @@
 - **[NEVER]** Không đặt `useInput` toàn cục bắt phím `Enter` ở wrapper cha khi component con cũng có `useInput` mà không qua router/focus lock, để tránh lỗi race condition gây thoát view trước khi action kịp thực thi.
 - **[ALWAYS]** Khai báo Machine-Readable Task Matrix đầy đủ các cột (`Order`, `Status`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`) trong Section 3 của `plan.md`.
 - **[ALWAYS]** Đảm bảo `assets/skills/index.ts`, `assets/workflows/index.ts` và `.agents/workflows/*.md` luôn đồng bộ 100% về danh mục kỹ năng (`SKILLS` và `requiredSkills`), tuyệt đối không để sót tham chiếu không tồn tại (dangling references).
+- **[ALWAYS]** Áp dụng nguyên tắc Reuse-First Invariant và quét các thư mục dùng chung (utils, helpers, hooks, common, components) trước khi viết code mới hoặc lập plan để ngăn chặn duplicate logic.
+- **[NEVER]** Không sửa source code hoặc thực thi thay đổi dự án trong lượt chạy của workflow `/only-one-idea`. Workflow này chỉ dừng lại ở việc tạo `concept.md` (Strict Lifecycle Isolation).
+
 
