@@ -74,5 +74,16 @@
   > *"Performing a **pre-implementation audit** prevents redundant utilities from being created."*
 - **Origin Task**: `20260828-101523-codebase-structure-and-reuse-guardrails`
 
+### 11. Lazy-loading reference matrix
+- **Meaning (VI)**: Ma trận điều hướng nạp tài liệu tham khảo theo nhu cầu nhằm tối ưu hóa context token cho AI Agent.
+- **Grammar / Usage**: `Lazy-loading [Noun]` — Cơ chế nạp tài liệu tham chiếu chọn lọc.
+- **Engineering Example**:
+  > *"The **lazy-loading reference matrix** ensures agents inspect only relevant architecture references rather than polluting context."*
+- **Origin Task**: `20260828-102831-standardize-nestjs-nextjs-skills`
 
-
+### 12. Headless hook & UI separation
+- **Meaning (VI)**: Kiến trúc phân tách giữa tầng logic/API (Headless Hook) và tầng trình diễn giao diện (UI Orchestration).
+- **Grammar / Usage**: `Headless [Noun] & [Noun] separation` — Mô hình tách biệt logic và render.
+- **Engineering Example**:
+  > *"Adopting **headless hook & UI separation** keeps the main page component strictly focused on presentation layout below 200 lines."*
+- **Origin Task**: `20260828-102831-standardize-nestjs-nextjs-skills`
