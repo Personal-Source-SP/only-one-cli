@@ -72,9 +72,10 @@ If input does not describe the idea or problem, ask a focused question before pr
 
 ---
 
-### Step 3 — Author & Save Comprehensive `concept.md` (Bilingual Hybrid)
+### Step 3 — Author, Save `concept.md` & Hard Stop (Terminal Gate)
 
-Consolidate findings into `only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/concept.md` using the template below (**Vietnamese narrative with English technical terminology**):
+1. **Save `concept.md` Artifact**:
+   - Consolidate findings into `only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/concept.md` using the template below (**Vietnamese narrative with English technical terminology**).
 
 ```markdown
 # Concept: <Tên Ý tưởng / Bài toán Kỹ thuật>
@@ -143,13 +144,23 @@ Consolidate findings into `only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/co
 - **Engineering Example**: *"<Câu ví dụ thực tế trong ngữ cảnh kỹ thuật này>"*
 ```
 
+2. **Handoff & Hard Stop (🛑 Mandatory Terminal Gate)**:
+   - Print completion message pointing to the newly created `concept.md`.
+   - Recommend the next step to the user:
+     ```text
+     Tài liệu Concept đã hoàn tất tại: only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/concept.md
+     Để bắt đầu nghiên cứu mã nguồn và lập kế hoạch thực thi, hãy chạy:
+     /only-one-plan only-one/tasks/<YYYYMMDD-HHmmss>-<slug>
+     ```
+   - 🛑 **STOP IMMEDIATELY**: Do NOT modify any source code, tests, configs, skills, or other workflows in the project. Do NOT automatically trigger `/only-one-plan` or `/only-one-apply`. The turn strictly terminates here.
+
 ---
 
 ## Guardrails
 
+- **🛑 Strict Lifecycle Isolation (Zero Source Code Modifications)**: `/only-one-idea` is strictly a scoping and conceptual specification workflow. The agent MUST NEVER edit source code, tests, configs, or other workflows during `/only-one-idea`.
 - **Enforce Bilingual Hybrid Documentation**: Write narrative and descriptions in Vietnamese, preserving standard English technical terms.
 - **Do not skip Phase 1 discovery**: Clarify problem and scope boundaries thoroughly before proposing solution options.
 - **Always explore and present at least 2 solution options with trade-offs** before finalizing the chosen strategy.
 - **Always provide ASCII / Markdown UI mockups** when the task has frontend/UI components.
-- Do not jump straight to low-level source code changes, AST modifications, or line-by-line file edits in `/only-one-idea` (those strictly belong to `/only-one-plan`).
-- Always save `concept.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/concept.md`).
+- Always save `concept.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/concept.md`) and stop immediately.

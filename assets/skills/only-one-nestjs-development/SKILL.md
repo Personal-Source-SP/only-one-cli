@@ -5,6 +5,21 @@ description: MUST use when creating, modifying, reviewing, or refactoring NestJS
 
 # NestJS Development Skill
 
+## 0. Mandatory Reuse-First Invariant (Anti-Reinvention Rules)
+
+⚠️ **BẮT BUỘC TUÂN THỦ TRƯỚC KHI VIẾT CODE MỚI**:
+1. **Pre-Implementation Codebase Audit**:
+   - Trước khi tạo bất kỳ Helper, Utility, Custom Decorator, DTO, Mapper, Exception Class hay Service Method mới nào, Agent **BẮT BUỘC** phải tìm kiếm (`grep_search` hoặc `list_dir`) trong:
+     - `src/common/`, `src/shared/`, `src/utils/`, `src/helpers/`, `src/decorators/`
+     - Các module lân cận có nghiệp vụ tương tự.
+2. **Strict Anti-Reinvention**:
+   - ❌ **CẤM** tự viết lại các hàm xử lý chuỗi, định dạng ngày tháng, hash password, format tiền tệ, mapping object, hoặc parse query nếu trong project đã có utility tương đương.
+   - ❌ **CẤM** viết logic inline ad-hoc trong Service/Controller nếu đã có Base Service, Shared Helper hoặc ORM Repository method phục vụ mục đích đó.
+3. **Mở rộng thay vì Tạo mới (Open/Closed Principle)**:
+   - Nếu hàm/helper có sẵn chỉ thiếu 1 tùy chọn nhỏ, hãy mở rộng hàm đó (thêm optional parameter) thay vì tạo ra một hàm mới trùng lặp.
+
+---
+
 ## Directives for Context Efficiency (Lazy Loading Rules)
 
 ⚠️ **QUAN TRỌNG VỀ TIẾT KIỆM TOKEN**: Agent KHÔNG ĐỌC TOÀN BỘ CÁC FILE REFERENCE CÙNG LÚC.

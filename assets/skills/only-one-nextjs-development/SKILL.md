@@ -5,6 +5,22 @@ description: MUST use when creating, modifying, reviewing, or refactoring Fronte
 
 # Master Next.js / Frontend Development Skill (Central Coordinator)
 
+## 0. Mandatory Reuse-First Invariant (Anti-Reinvention Rules)
+
+⚠️ **BẮT BUỘC TUÂN THỦ TRƯỚC KHI VIẾT CODE FRONTEND MỚI**:
+1. **Pre-Implementation Codebase Audit**:
+   - Trước khi tạo bất kỳ Custom Hook, UI Component, Utility Function, Form Drawer, Modal, Date/Time Formatter, hoặc Type/Interface mới nào, Agent **BẮT BUỘC** phải tìm kiếm (`grep_search` hoặc `list_dir`) trong:
+     - `src/components/`, `src/hooks/`, `src/utils/`, `src/helpers/`, `src/common/`, `src/types/`
+     - Các feature folder tương tự (ví dụ: các module quản trị khác trong admin portal).
+2. **Strict Anti-Reinvention**:
+   - ❌ **CẤM** tự viết lại các hàm xử lý date/time (dayjs timezone, format timestamp), number/currency format, parse URL query, lodash helpers nếu trong `src/utils/` đã có.
+   - ❌ **CẤM** tự viết các hook CRUD table/form nếu dự án đang dùng chuẩn chung (ví dụ `useCustomTable`, `useCustomDrawerForm`, custom refine hooks).
+   - ❌ **CẤM** tạo duplicate component (ví dụ StatusBadge, ConfirmModal, FilterDropdown) khi trong `src/components/` đã có sẵn.
+3. **Mở rộng thay vì Tạo mới (Open/Closed Principle)**:
+   - Nếu component hoặc hook có sẵn cần thêm thuộc tính (props/options), hãy mở rộng props đó (với giá trị default an toàn) thay vì tạo component mới copy-paste.
+
+---
+
 ## Directives for Context Efficiency (Lazy Loading Rules)
 
 ⚠️ **QUAN TRỌNG VỀ TIẾT KIỆM TOKEN**: Agent KHÔNG ĐỌC TOÀN BỘ CÁC FILE REFERENCE CÙNG LÚC.
