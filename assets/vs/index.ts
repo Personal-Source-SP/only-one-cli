@@ -4,7 +4,6 @@ export const VS_LIBRARY: VsLibraryManifest = {
     extensions: [
         'aaron-bond.better-comments',
         'anthropic.claude-code',
-        'anysphere.cursorpyright',
         'anysphere.remote-ssh',
         'bierner.markdown-mermaid',
         'bierner.markdown-preview-github-styles',

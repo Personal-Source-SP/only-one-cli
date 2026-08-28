@@ -261,4 +261,40 @@ describe('VS core sync helpers', () => {
         const resolved = await resolveVsEditorCommand(runner, editor);
         expect(resolved).toBe('antigravity');
     });
+
+    it('preserves the original install error message even when rollback uninstall fails', async () => {
+        const fs = new MemoryFs();
+        seedLibrary(fs);
+        const runner: VsProcessRunner = {
+            run: async (_command, args) => {
+                if (args[0] === '--list-extensions') return { code: 0, stderr: '', stdout: '' };
+                if (args[0] === '--install-extension' && args[1] === 'fail.ext') {
+                    return {
+                        code: 1,
+                        stderr: '[createInstance] extensionManagementService depends on antigravityAnalytics which is NOT registered.\nExtension not found.',
+                        stdout: 'Failed Installing Extensions: fail.ext',
+                    };
+                }
+                if (args[0] === '--uninstall-extension') {
+                    return {
+                        code: 1,
+                        stderr: 'Cannot uninstall',
+                        stdout: '',
+                    };
+                }
+                return { code: 0, stderr: '', stdout: '' };
+            },
+        };
+
+        await expect(
+            syncVsExtensions({
+                cwd: '/repo',
+                editorIds: [VsEditorId.VSCode],
+                fs,
+                libraryDir: join('/library', 'vs'),
+                runner,
+                write: () => undefined,
+            }),
+        ).rejects.toThrow(/Extension not found/);
+    });
 });

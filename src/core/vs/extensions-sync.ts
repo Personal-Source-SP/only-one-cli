@@ -3,7 +3,7 @@ import { PercentProgressReporter } from './progress.js';
 import { nodeVsFileSystem, NodeVsProcessRunner } from './runtime.js';
 import { resolveVsJournalPath, VsSyncTransaction } from './transaction.js';
 import { findVsEditor } from './editors.js';
-import type { VsEditorDescriptor, VsEditorId, VsFileSystem, VsProcessRunner } from './types.js';
+import type { VsEditorDescriptor, VsEditorId, VsFileSystem, VsProcessResult, VsProcessRunner } from './types.js';
 
 export interface ExistingVsExtensionCheck {
     editorId: VsEditorId;
@@ -83,6 +83,15 @@ export const checkExistingVsExtensions = async (options: {
     return checks;
 };
 
+const extractProcessErrorMessage = (result: VsProcessResult, fallback: string): string => {
+    const raw = `${result.stderr}\n${result.stdout}`
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line && !line.includes('extensionManagementService depends on antigravityAnalytics'))
+        .join('\n');
+    return raw || fallback;
+};
+
 export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promise<VsExtensionsSyncResponse> => {
     const fs = request.fs ?? nodeVsFileSystem;
     const runner = request.runner ?? new NodeVsProcessRunner();
@@ -135,7 +144,9 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
             const installedExtensions: string[] = [];
             for (const extensionId of plan.extensionIds) {
                 const result = await runner.run(plan.command, ['--install-extension', extensionId]);
-                if (result.code !== 0) throw new Error(result.stderr || `Failed to install ${extensionId}`);
+                if (result.code !== 0) {
+                    throw new Error(extractProcessErrorMessage(result, `Failed to install ${extensionId}`));
+                }
                 await transaction.recordInstalledExtension(plan.command, extensionId);
                 installedCount += 1;
                 installedExtensions.push(extensionId);
@@ -154,7 +165,11 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
     } catch (error) {
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
-        await transaction.rollback();
+        try {
+            await transaction.rollback();
+        } catch {
+            // Preserve original install error as the primary thrown exception
+        }
         throw error;
     }
 };

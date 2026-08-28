@@ -89,16 +89,31 @@ export class VsSyncTransaction {
     }
 
     public async rollback(): Promise<void> {
+        let rollbackError: Error | undefined;
         for (const file of [...this.journal.files].reverse()) {
             this.progress.rollback(file.targetPath);
-            await this.fs.mkdir(dirname(file.targetPath));
-            await this.fs.copyFile(file.backupPath, file.targetPath);
+            try {
+                await this.fs.mkdir(dirname(file.targetPath));
+                await this.fs.copyFile(file.backupPath, file.targetPath);
+            } catch (error) {
+                rollbackError ??= error instanceof Error ? error : new Error(String(error));
+            }
         }
         for (const extension of [...this.journal.extensions].reverse()) {
             this.progress.rollback(extension.extensionId);
-            const result = await this.runner.run(extension.command, ['--uninstall-extension', extension.extensionId]);
-            if (result.code !== 0) throw new Error(result.stderr || `Failed to uninstall ${extension.extensionId}`);
+            try {
+                const result = await this.runner.run(extension.command, ['--uninstall-extension', extension.extensionId]);
+                const output = `${result.stderr}\n${result.stdout}`.toLowerCase();
+                const isAlreadyNotInstalled = output.includes('not installed') || output.includes('is not installed');
+                if (result.code !== 0 && !isAlreadyNotInstalled) {
+                    rollbackError ??= new Error(result.stderr || `Failed to uninstall ${extension.extensionId}`);
+                }
+            } catch (error) {
+                rollbackError ??= error instanceof Error ? error : new Error(String(error));
+            }
         }
+        if (rollbackError) throw rollbackError;
+
         await this.fs.rm(this.journalPath);
         for (const file of this.journal.files) await this.fs.rm(file.backupPath);
     }
