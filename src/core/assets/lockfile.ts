@@ -3,27 +3,15 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { AssetType, InstalledAssetRecord, OnlyOneInstalledState } from './types.js';
 
+export const ONLY_ONE_DIR_NAME = 'only-one';
 export const ONLY_ONE_LOCKFILE_NAME = 'installed.json';
 
 /**
  * Resolves the lockfile path within a target project.
- * Checks for existing files in priority:
- * 1. .only-one/installed.json
- * 2. only-one/installed.json
- * 3. Default to .only-one/installed.json
+ * Uses only-one/installed.json as the single source of truth.
  */
 export function resolveInstalledLockfilePath(projectDir: string): string {
-    const dotOnlyOne = join(projectDir, '.only-one', ONLY_ONE_LOCKFILE_NAME);
-    if (existsSync(dotOnlyOne)) {
-        return dotOnlyOne;
-    }
-
-    const onlyOneDir = join(projectDir, 'only-one', ONLY_ONE_LOCKFILE_NAME);
-    if (existsSync(onlyOneDir)) {
-        return onlyOneDir;
-    }
-
-    return dotOnlyOne;
+    return join(projectDir, ONLY_ONE_DIR_NAME, ONLY_ONE_LOCKFILE_NAME);
 }
 
 /**

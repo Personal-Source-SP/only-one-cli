@@ -12,9 +12,9 @@ import {
 } from '@/core/assets/lockfile.js';
 
 describe('Assets Lockfile Management', () => {
-    it('resolves default lockfile path to .only-one/installed.json', () => {
+    it('resolves default lockfile path to only-one/installed.json', () => {
         const dummyDir = '/tmp/test-project';
-        expect(resolveInstalledLockfilePath(dummyDir)).toBe(join(dummyDir, '.only-one', ONLY_ONE_LOCKFILE_NAME));
+        expect(resolveInstalledLockfilePath(dummyDir)).toBe(join(dummyDir, 'only-one', ONLY_ONE_LOCKFILE_NAME));
     });
 
     it('returns an empty state when lockfile does not exist', async () => {
@@ -28,7 +28,7 @@ describe('Assets Lockfile Management', () => {
         }
     });
 
-    it('records installed assets and updates lockfile atomically', async () => {
+    it('records installed assets and updates lockfile atomically in only-one/installed.json', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-'));
         try {
             await recordInstalledAssetsBatch(cwd, [
@@ -37,7 +37,9 @@ describe('Assets Lockfile Management', () => {
             ]);
 
             const lockPath = resolveInstalledLockfilePath(cwd);
+            expect(lockPath).toBe(join(cwd, 'only-one', ONLY_ONE_LOCKFILE_NAME));
             expect(existsSync(lockPath)).toBe(true);
+            expect(existsSync(join(cwd, '.only-one'))).toBe(false);
 
             const state = await readInstalledLockfile(cwd);
             expect(state.installed.workflows?.['only-one-idea']?.version).toBe('0.0.1');
