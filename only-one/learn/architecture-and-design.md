@@ -87,3 +87,39 @@
 - **Engineering Example**:
   > *"Adopting **headless hook & UI separation** keeps the main page component strictly focused on presentation layout below 200 lines."*
 - **Origin Task**: `20260828-102831-standardize-nestjs-nextjs-skills`
+
+### 13. Atomic Per-Component Versioning
+- **Meaning (VI)**: Cơ chế định phiên bản độc lập ở cấp độ từng thành phần nguyên tử, ngăn chặn việc tăng version dây chuyền không cần thiết.
+- **Grammar / Usage**: `Adjective phrase` bổ nghĩa cho danh từ kiến trúc.
+- **Engineering Example**:
+  > *"Atomic per-component versioning ensures that hotfixing a single workflow manifest will not inflate the version counters of unrelated rules or packages."*
+- **Origin Task**: `20260903-104500-asset-versioning-and-sync`
+
+### 14. Base-10 / Decimal Rollover
+- **Meaning (VI)**: Sự cuốn chiếu cơ số 10 (chạm ngưỡng 9 thì reset về 0 và tăng 1 đơn vị ở nấc cao hơn liền kề).
+- **Grammar / Usage**: `Subject + rolls over to + Target`.
+- **Engineering Example**:
+  > *"Once the patch identifier reaches nine, it rolls over to zero and increments the minor version accordingly."*
+- **Origin Task**: `20260903-104500-asset-versioning-and-sync`
+
+### 15. Deterministic Path Resolution
+- **Meaning (VI)**: Quá trình phân giải đường dẫn mang tính xác định tuyệt đối (không phụ thuộc vào fallback ngẫu nhiên hoặc các điều kiện phỏng đoán).
+- **Grammar / Usage**: `Noun phrase`.
+- **Engineering Example**:
+  > *"Deterministic path resolution guarantees that all asset installation operations resolve to the exact same 'only-one/installed.json' location."*
+- **Origin Task**: `20260903-105930-relocate-installed-lockfile-to-only-one`
+
+### 16. Unified Schema Consolidation
+- **Meaning (VI)**: Quá trình quy chuẩn hóa và hợp nhất các lược đồ dữ liệu phân mảnh vào một lược đồ duy nhất.
+- **Grammar / Usage**: `Noun phrase`.
+- **Engineering Example**:
+  > *"Unified schema consolidation avoids data drift by keeping version history and remote provenance within the same record."*
+- **Origin Task**: `20260903-110500-consolidate-skills-lock-into-installed-json`
+
+### 17. Backward-Compatible Adapter Layer
+- **Meaning (VI)**: Tầng chuyển đổi tương thích ngược giúp giữ nguyên API hiện tại cho các callers mà không phải sửa đổi mã nguồn ở nhiều nơi.
+- **Grammar / Usage**: `Adjective + Noun phrase`.
+- **Engineering Example**:
+  > *"The lockfile functions serve as a backward-compatible adapter layer, abstracting the underlying single lockfile format."*
+- **Origin Task**: `20260903-110500-consolidate-skills-lock-into-installed-json`
+

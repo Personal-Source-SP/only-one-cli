@@ -15,5 +15,7 @@
 - **[NEVER]** Không sửa source code hoặc thực thi thay đổi dự án trong lượt chạy của workflow `/only-one-idea`. Workflow này chỉ dừng lại ở việc tạo `concept.md` (Strict Lifecycle Isolation).
 - **[NEVER]** Không gọi `child_process.spawn` trên Windows (`win32`) với `{ shell: false }` khi thực thi các lệnh CLI hoặc wrapper dạng batch script (`.cmd`/`.bat`) như Antigravity IDE, VS Code, Cursor để tránh crash lỗi `ENOENT`.
 - **[NEVER]** Không để ngoại lệ thứ cấp trong quá trình `rollback()` làm ngắt quãng việc dọn dẹp journal/backup file hoặc che giấu lỗi gốc (*Error Masking*). Rollback phải có tính kiên cường (resilient) và bỏ qua các lỗi tài nguyên đã không còn tồn tại.
+- **[ALWAYS]** Khai báo và gán `version: string` tuân thủ cơ số 10 (`X.Y.Z`) cho 100% asset manifests trong `assets/` và cập nhật phiên bản khi thay đổi nội dung file template (bảo vệ CI version gate).
+- **[NEVER]** Không lưu trữ lockfile trong thư mục ẩn `.only-one/` hoặc phân mảnh ra các file phụ như `skills-lock.json`. Toàn bộ trạng thái phiên bản và remote metadata phải quy tụ duy nhất về `only-one/installed.json` (Single Source of Truth).
 
 

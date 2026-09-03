@@ -46,17 +46,17 @@ flowchart TD
 4. **Resilient Rollback & Error Preservation**: `VsSyncTransaction.rollback()` tự động bỏ qua các lỗi lành tính (như extension đã không còn tồn tại) để dọn dẹp triệt để journal/backup files, đồng thời bảo toàn exception nguyên bản của bước install.
 
 ## 3. Scope & Key Modules (Phạm vi & Các Module Chính)
-- **Asset Manifest**: [`assets/vs/index.ts`](file:///d:/Sources/Personal/only-one-cli/assets/vs/index.ts) (Cấu hình chuẩn 40 extensions và 41 settings keys).
+- **Asset Manifest**: [`assets/vs/index.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/vs/index.ts) (Cấu hình chuẩn 40 extensions và 41 settings keys).
 - **Core Sync Engines**:
-  - [`src/core/vs/extensions-sync.ts`](file:///d:/Sources/Personal/only-one-cli/src/core/vs/extensions-sync.ts) (Đồng bộ extensions, lọc cảnh báo stderr, xử lý giao dịch).
-  - [`src/core/vs/settings-sync.ts`](file:///d:/Sources/Personal/only-one-cli/src/core/vs/settings-sync.ts) (Merge settings sâu, atomic file write).
-- **Runtime & Process Runner**: [`src/core/vs/runtime.ts`](file:///d:/Sources/Personal/only-one-cli/src/core/vs/runtime.ts) (`NodeVsProcessRunner` & `nodeVsFileSystem`).
-- **Transaction Manager**: [`src/core/vs/transaction.ts`](file:///d:/Sources/Personal/only-one-cli/src/core/vs/transaction.ts) (`VsSyncTransaction` & journal crash recovery).
-- **Editors Registry**: [`src/core/vs/editors.ts`](file:///d:/Sources/Personal/only-one-cli/src/core/vs/editors.ts) (Hỗ trợ VS Code, Cursor, Antigravity).
+  - [`src/core/vs/extensions-sync.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/extensions-sync.ts) (Đồng bộ extensions, lọc cảnh báo stderr, xử lý giao dịch).
+  - [`src/core/vs/settings-sync.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/settings-sync.ts) (Merge settings sâu, atomic file write).
+- **Runtime & Process Runner**: [`src/core/vs/runtime.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/runtime.ts) (`NodeVsProcessRunner` & `nodeVsFileSystem`).
+- **Transaction Manager**: [`src/core/vs/transaction.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/transaction.ts) (`VsSyncTransaction` & journal crash recovery).
+- **Editors Registry**: [`src/core/vs/editors.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/editors.ts) (Hỗ trợ VS Code, Cursor, Antigravity).
 - **Unit & Integration Tests**:
-  - [`test/core/vs/vs-core.test.ts`](file:///d:/Sources/Personal/only-one-cli/test/core/vs/vs-core.test.ts) (13 tests giao dịch, merge settings, resolution và rollback).
-  - [`test/core/vs/vs-library.test.ts`](file:///d:/Sources/Personal/only-one-cli/test/core/vs/vs-library.test.ts) (Kiểm tra tính toàn vẹn, sắp xếp A-Z).
-  - [`test/commands/vs/vs-commands.test.ts`](file:///d:/Sources/Personal/only-one-cli/test/commands/vs/vs-commands.test.ts) (7 tests kiểm thử CLI command).
+  - [`test/core/vs/vs-core.test.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/core/vs/vs-core.test.ts) (13 tests giao dịch, merge settings, resolution và rollback).
+  - [`test/core/vs/vs-library.test.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/core/vs/vs-library.test.ts) (Kiểm tra tính toàn vẹn, sắp xếp A-Z).
+  - [`test/commands/vs/vs-commands.test.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/commands/vs/vs-commands.test.ts) (7 tests kiểm thử CLI command).
 
 ## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu & PR)
 - **Test Status**: 100% Passed (22/22 unit tests trong domain VS Sync).

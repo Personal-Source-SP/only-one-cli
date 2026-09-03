@@ -4,7 +4,7 @@ title: Modernizing Only-One CLI Terminal User Interface (TUI)
 archived_at: 2026-08-25
 status: active
 references:
-  - only-one/archives/20260827-161300-workflow-and-skill-systems.md
+  - only-one/archives/20260828-110000-workflow-and-skill-systems.md
 affected_modules:
   - src/tui
   - test/tui
@@ -17,9 +17,9 @@ affected_modules:
 - **Value**: Transformed the terminal interface into a modern 2-pane Master-Detail dashboard with categorized accordion menus, fuzzy searching, live task execution with streaming stdout logs, and deterministic focus routing.
 
 ## 2. Key Architecture & Decisions
-- **Router & Focus Machine**: Centralized [RouterContext.tsx](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/router/RouterContext.tsx) manages history stack and pane focus (`sidebar` vs `content` vs `search`), preventing input collisions.
-- **Master-Detail Layout**: [MasterDetailLayout.tsx](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/components/MasterDetailLayout.tsx) splits the screen (36% sidebar / 64% content) with responsive fallback.
-- **Live Task Runner**: [TaskRunnerView.tsx](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/components/TaskRunnerView.tsx) provides animated execution feedback with real-time log buffers.
+- **Router & Focus Machine**: Centralized [RouterContext.tsx](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/router/RouterContext.tsx) manages history stack and pane focus (`sidebar` vs `content` vs `search`), preventing input collisions.
+- **Master-Detail Layout**: [MasterDetailLayout.tsx](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/components/MasterDetailLayout.tsx) splits the screen (36% sidebar / 64% content) with responsive fallback.
+- **Live Task Runner**: [TaskRunnerView.tsx](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/components/TaskRunnerView.tsx) provides animated execution feedback with real-time log buffers.
 
 ```mermaid
 flowchart TD
@@ -30,9 +30,9 @@ flowchart TD
 ```
 
 ## 3. Scope & Key Changes
-- **New Core Components**: [RouterContext.tsx](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/router/RouterContext.tsx), [routes.ts](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/router/routes.ts), [MasterDetailLayout.tsx](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/components/MasterDetailLayout.tsx), [HomeDashboardView.tsx](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/views/HomeDashboardView.tsx), [fuzzy.ts](file:///Users/kiem/Sources/Personal/only-one-cli/src/tui/utils/fuzzy.ts).
+- **New Core Components**: [RouterContext.tsx](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/router/RouterContext.tsx), [routes.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/router/routes.ts), [MasterDetailLayout.tsx](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/components/MasterDetailLayout.tsx), [HomeDashboardView.tsx](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/views/HomeDashboardView.tsx), [fuzzy.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/tui/utils/fuzzy.ts).
 - **Refactored Views**: Re-wired all 11 subviews to real action runners.
-- **Unit Tests**: Added [test/tui/router.test.ts](file:///Users/kiem/Sources/Personal/only-one-cli/test/tui/router.test.ts), [test/tui/fuzzy.test.ts](file:///Users/kiem/Sources/Personal/only-one-cli/test/tui/fuzzy.test.ts).
+- **Unit Tests**: Added [test/tui/router.test.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/tui/router.test.ts), [test/tui/fuzzy.test.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/tui/fuzzy.test.ts).
 
 ## 4. Verification Evidence & PR
 - **Test Status**: 100% Passed (`npm test` and `npm run build`).

@@ -3,7 +3,8 @@ id: 20260819-150535-workflow-only-one-intranet
 title: Workflow and Skill only-one-intranet with zodinet-timesheet MCP
 archived_at: 2026-08-20
 status: active
-references: []
+references:
+  - only-one/archives/20260828-110000-workflow-and-skill-systems.md
 affected_modules:
   - assets/workflows
   - assets/skills
@@ -38,14 +39,14 @@ flowchart TD
 
 ## 3. Scope & Key Changes
 - **Workflow & Skill Assets**:
-  - [`assets/workflows/only-one-intranet.md`](file:///Users/kiem/Sources/Personal/only-one-cli/assets/workflows/only-one-intranet.md)
+  - [`assets/workflows/only-one-intranet.md`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-intranet.md)
   - `assets/skills/only-one-intranet-skill/` (`SKILL.md`, `references/task-format.md`, `references/validation-rules.md`)
 - **MCP & Combos Registry**:
-  - [`assets/mcps/index.ts`](file:///Users/kiem/Sources/Personal/only-one-cli/assets/mcps/index.ts) registered `zodinet-timesheet` MCP server (`mcp-remote`).
-  - [`assets/combos/index.ts`](file:///Users/kiem/Sources/Personal/only-one-cli/assets/combos/index.ts) added `git-intranet-flow`.
+  - [`assets/mcps/index.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/mcps/index.ts) registered `zodinet-timesheet` MCP server (`mcp-remote`).
+  - [`assets/combos/index.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/combos/index.ts) added `git-intranet-flow`.
 - **Core Templates & Command Generation**:
-  - [`src/core/templates/agent-workflows.ts`](file:///Users/kiem/Sources/Personal/only-one-cli/src/core/templates/agent-workflows.ts) added Intranet command builders.
-  - [`src/core/combo/index.ts`](file:///Users/kiem/Sources/Personal/only-one-cli/src/core/combo/index.ts) added MCP inference.
+  - [`src/core/templates/agent-workflows.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/templates/agent-workflows.ts) added Intranet command builders.
+  - [`src/core/combo/index.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/combo/index.ts) added MCP inference.
 
 ## 4. Verification Evidence
 - **Unit Tests**: 180 passing tests (`test/core/agent-workflows.test.ts`).

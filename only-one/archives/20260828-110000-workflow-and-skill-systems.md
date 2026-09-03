@@ -1,23 +1,20 @@
-# Archive: Unified Architecture of Workflows, Skills Catalog, Dual-Layer Blueprints, Reuse Guardrails & Full Stack Skill Suites
-
-- **Slug**: `20260828-110000-workflow-and-skill-systems`
-- **Domain**: `workflow-and-skills`
-- **Status**: `active`
-- **Archived At**: `2026-08-28`
-- **Affected Files**:
-  - `assets/skills/index.ts`
-  - `assets/skills/only-one-nestjs-development/SKILL.md`
-  - `assets/skills/only-one-nestjs-development/references/*.md` (13 files)
-  - `assets/skills/only-one-nextjs-development/SKILL.md`
-  - `assets/skills/only-one-nextjs-development/references/*.md` (12 files)
-  - `assets/workflows/*.md` (12 files)
-  - `.agents/workflows/*.md` (12 files)
-  - `.agents/skills/`
-  - `src/core/templates/agent-workflows.ts`
-  - `only-one/rules.md`
-  - `only-one/learn/*.md`
-
 ---
+id: 20260828-110000-workflow-and-skill-systems
+title: Unified Architecture of Workflows, Skills Catalog, Dual-Layer Blueprints, Reuse Guardrails & Full Stack Skill Suites
+archived_at: 2026-08-28
+status: active
+references: []
+affected_modules:
+  - assets/skills
+  - assets/workflows
+  - .agents/workflows
+  - .agents/skills
+  - src/core/templates
+  - only-one/rules.md
+  - only-one/learn
+---
+
+# Archive: Unified Architecture of Workflows, Skills Catalog, Dual-Layer Blueprints, Reuse Guardrails & Full Stack Skill Suites
 
 ## 1. Problem Statement & Core Value
 

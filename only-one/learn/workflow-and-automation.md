@@ -137,6 +137,21 @@
   > *"We must reconcile workflow manifest definitions against the skill registry to prevent dangling references and ensure lossless resumption."*
 - **Origin Task**: `20260827-152000-refine-workflows-and-manifest-alignment`
 
+### 20. State Reconciliation
+- **Meaning (VI)**: Quá trình đối chiếu và cân bằng giữa trạng thái mong muốn (desired state) và trạng thái thực tế đã cài đặt (actual installed state).
+- **Grammar / Usage**: `Reconcile [Source State] with [Target State]`.
+- **Engineering Example**:
+  > *"During the update lifecycle, the CLI reconciles the project's lockfile entries with the latest upstream asset definitions to detect outdated artifacts."*
+- **Origin Task**: `20260903-104500-asset-versioning-and-sync`
+
+### 21. Zero-Bypass Quality Gate
+- **Meaning (VI)**: Cổng kiểm soát chất lượng không thể lách qua, bắt buộc 100% tuân thủ trước khi code được merge.
+- **Grammar / Usage**: `Noun phrase` chỉ chốt chặn kiểm thử trong CI/CD pipeline.
+- **Engineering Example**:
+  > *"The pre-commit test serves as a zero-bypass quality gate that automatically rejects any asset modifications lacking a corresponding version bump."*
+- **Origin Task**: `20260903-104500-asset-versioning-and-sync`
+
+
 
 
 

@@ -24,3 +24,11 @@
 - **Engineering Example**:
   > *"All entity definitions strictly adhere to our project naming conventions."*
 - **Origin Task**: Initial Seed
+
+### 4. Elimination of Dead Code Paths
+- **Meaning (VI)**: Loại bỏ các nhánh mã nguồn không còn dùng hoặc gây phân tán logic.
+- **Grammar / Usage**: `Eliminate [Condition] code paths`.
+- **Engineering Example**:
+  > *"By enforcing a hard cutover, we eliminate obsolete fallback code paths and reduce cognitive load across the module."*
+- **Origin Task**: `20260903-105930-relocate-installed-lockfile-to-only-one`
+
