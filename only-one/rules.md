@@ -17,5 +17,4 @@
 - **[NEVER]** Không để ngoại lệ thứ cấp trong quá trình `rollback()` làm ngắt quãng việc dọn dẹp journal/backup file hoặc che giấu lỗi gốc (*Error Masking*). Rollback phải có tính kiên cường (resilient) và bỏ qua các lỗi tài nguyên đã không còn tồn tại.
 - **[ALWAYS]** Khai báo và gán `version: string` tuân thủ cơ số 10 (`X.Y.Z`) cho 100% asset manifests trong `assets/` và cập nhật phiên bản khi thay đổi nội dung file template (bảo vệ CI version gate).
 - **[NEVER]** Không lưu trữ lockfile trong thư mục ẩn `.only-one/` hoặc phân mảnh ra các file phụ như `skills-lock.json`. Toàn bộ trạng thái phiên bản và remote metadata phải quy tụ duy nhất về `only-one/installed.json` (Single Source of Truth).
-
-
+- **[AVOID]** Không khởi chạy browser MCP tự động mà không chỉ định thư mục profile cô lập (`--user-data-dir`) nhằm ngăn chặn xung đột khóa tiến trình SingletonLock với trình duyệt cá nhân của developer.

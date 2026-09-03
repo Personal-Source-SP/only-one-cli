@@ -123,3 +123,23 @@
   > *"The lockfile functions serve as a backward-compatible adapter layer, abstracting the underlying single lockfile format."*
 - **Origin Task**: `20260903-110500-consolidate-skills-lock-into-installed-json`
 
+### 18. Invariant Preservation Pattern
+- **Meaning (VI)**: Diễn tả việc duy trì các bất biến cấu trúc và nguyên tắc kiểm định để tránh suy thoái mã nguồn.
+- **Grammar / Usage**: `Ensure that [new addition] strictly adheres to [invariant/rule] without violating [existing constraints].`
+- **Engineering Example**:
+  > *"Ensure that the newly registered MCP manifest strictly adheres to the semantic decimal versioning invariant without violating asset version gate checks."*
+- **Origin Task**: `20260903-113200-add-playwright-browser-mcp`
+
+### 19. Isolated Runtime Context Pattern
+- **Meaning (VI)**: Phân bổ không gian dữ liệu hoặc tiến trình độc lập để phòng tránh xung đột tài nguyên dùng chung.
+- **Grammar / Usage**: `Direct [tool/runtime] to [isolated directory] to avoid [concurrency issue/lock collision].`
+- **Engineering Example**:
+  > *"Direct the browser process to a dedicated user data directory to avoid profile singleton lock collisions with the developer's primary browser instance."*
+- **Origin Task**: `20260903-113200-add-playwright-browser-mcp`
+
+### 20. Registry Seam Integration Pattern
+- **Meaning (VI)**: Tích hợp thành phần mới vào điểm mở rộng (seam) của hệ thống registry mà không phải sửa đổi tầng logic xử lý nghiệp vụ.
+- **Grammar / Usage**: `Register [component] via the existing [registry seam] to achieve seamless discovery across [subsystems].`
+- **Engineering Example**:
+  > *"Register playwright-browser via the existing manifest array to achieve seamless discovery and configuration distribution across all supported IDE adapters."*
+- **Origin Task**: `20260903-113200-add-playwright-browser-mcp`

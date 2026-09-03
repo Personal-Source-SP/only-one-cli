@@ -4,7 +4,7 @@ title: Architecture of Independent Asset Versioning, Decimal Rollover, Unified L
 archived_at: 2026-09-03
 status: active
 references:
-  - only-one/archives/20260828-110000-workflow-and-skill-systems.md
+  - only-one/archives/20260903-114000-workflow-and-skill-systems.md
 affected_modules:
   - assets/types.ts
   - assets/rules
