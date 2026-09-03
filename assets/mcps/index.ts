@@ -40,6 +40,18 @@ export const MCPS: McpManifest[] = [
         },
     },
     {
+        id: 'playwright-browser',
+        version: '0.0.1',
+        server: {
+            command: 'npx',
+            args: [
+                '-y',
+                '@playwright/mcp',
+                '--user-data-dir=/Users/Tester/Library/Application Support/Google/Chrome/Default',
+            ],
+        },
+    },
+    {
         id: 'postgres',
         version: '0.0.1',
         server: {
