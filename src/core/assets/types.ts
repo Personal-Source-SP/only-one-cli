@@ -1,10 +1,20 @@
 export type AssetType = 'workflows' | 'skills' | 'rules' | 'mcps' | 'packages' | 'configs' | 'combos' | 'git' | 'vs';
 
+export interface RemoteSkillLockMeta {
+    source: string;
+    sourceType: 'github';
+    branch?: string;
+    skillPath: string;
+    computedHash: string;
+    updatedAt?: string;
+}
+
 export interface InstalledAssetRecord {
     version: string;
     installedAt: string;
     updatedAt?: string;
     files?: string[];
+    remote?: RemoteSkillLockMeta;
 }
 
 export interface OnlyOneInstalledState {

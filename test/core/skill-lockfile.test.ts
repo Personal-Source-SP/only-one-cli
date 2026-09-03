@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
-import { mkdtemp, rm, mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -12,9 +12,10 @@ import {
     ONLY_ONE_DIR_NAME,
     SKILLS_LOCKFILE_NAME,
 } from '@/core/skill/remote/lockfile.js';
+import { readInstalledLockfile } from '@/core/assets/lockfile.js';
 
-describe('skills lockfile resolution and management', () => {
-    it('resolves default lockfile path to only-one/skills-lock.json', () => {
+describe('skills lockfile resolution and management (Unified in installed.json)', () => {
+    it('resolves default lockfile path to only-one/installed.json', () => {
         const projectDir = '/tmp/dummy-project';
         expect(resolveSkillsLockfilePath(projectDir)).toBe(join(projectDir, ONLY_ONE_DIR_NAME, SKILLS_LOCKFILE_NAME));
     });
@@ -29,7 +30,7 @@ describe('skills lockfile resolution and management', () => {
         }
     });
 
-    it('saves skill to only-one/skills-lock.json and creates folder if missing', async () => {
+    it('saves remote skill into only-one/installed.json and preserves single file footprint', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'lockfile-test-'));
         try {
             await saveSkillToLockfile(cwd, 'test-skill', {
@@ -41,9 +42,16 @@ describe('skills lockfile resolution and management', () => {
                 computedHash: 'abc123hash',
             });
 
-            const lockPath = join(cwd, 'only-one', 'skills-lock.json');
-            expect(existsSync(lockPath)).toBe(true);
+            const unifiedLockPath = join(cwd, 'only-one', 'installed.json');
+            expect(existsSync(unifiedLockPath)).toBe(true);
+            expect(existsSync(join(cwd, 'only-one', 'skills-lock.json'))).toBe(false);
 
+            // Verify via unified installed lockfile
+            const installedState = await readInstalledLockfile(cwd);
+            expect(installedState.installed.skills?.['test-skill']).toBeDefined();
+            expect(installedState.installed.skills?.['test-skill']?.remote?.computedHash).toBe('abc123hash');
+
+            // Verify via adapter readSkillsLockfile
             const lock = await readSkillsLockfile(cwd);
             expect(lock.skills['test-skill']).toBeDefined();
             expect(lock.skills['test-skill'].name).toBe('test-skill');
@@ -55,76 +63,23 @@ describe('skills lockfile resolution and management', () => {
         }
     });
 
-    it('falls back to .only-one/skills-lock.json or legacy root if only-one/ does not exist', async () => {
+    it('supports transparent fallback when only legacy skills-lock.json exists', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'lockfile-test-'));
         try {
-            // Case 1: legacy in root
-            const legacyRootPath = join(cwd, 'skills-lock.json');
-            await writeFile(
-                legacyRootPath,
-                JSON.stringify({
-                    version: 1,
-                    skills: {
-                        'root-skill': {
-                            name: 'root-skill',
-                            source: 'owner/repo',
-                            sourceType: 'github',
-                            skillPath: 'skills/root-skill',
-                            computedHash: 'root123',
-                            installedAt: '2026-01-01T00:00:00.000Z',
-                            updatedAt: '2026-01-01T00:00:00.000Z',
-                        },
-                    },
-                }),
-                'utf-8',
-            );
-
-            expect(resolveSkillsLockfilePathForProject(cwd)).toBe(legacyRootPath);
-            let lock = await readSkillsLockfile(cwd);
-            expect(lock.skills['root-skill']).toBeDefined();
-
-            // Case 2: .only-one folder
-            const dotOnlyOneDir = join(cwd, '.only-one');
-            await mkdir(dotOnlyOneDir, { recursive: true });
-            const dotOnlyOnePath = join(dotOnlyOneDir, 'skills-lock.json');
-            await writeFile(
-                dotOnlyOnePath,
-                JSON.stringify({
-                    version: 1,
-                    skills: {
-                        'dot-skill': {
-                            name: 'dot-skill',
-                            source: 'owner/repo',
-                            sourceType: 'github',
-                            skillPath: 'skills/dot-skill',
-                            computedHash: 'dot123',
-                            installedAt: '2026-01-01T00:00:00.000Z',
-                            updatedAt: '2026-01-01T00:00:00.000Z',
-                        },
-                    },
-                }),
-                'utf-8',
-            );
-
-            expect(resolveSkillsLockfilePathForProject(cwd)).toBe(dotOnlyOnePath);
-            lock = await readSkillsLockfile(cwd);
-            expect(lock.skills['dot-skill']).toBeDefined();
-
-            // Case 3: preferred only-one folder takes precedence
             const preferredDir = join(cwd, 'only-one');
             await mkdir(preferredDir, { recursive: true });
-            const preferredPath = join(preferredDir, 'skills-lock.json');
+            const legacyPath = join(preferredDir, 'skills-lock.json');
             await writeFile(
-                preferredPath,
+                legacyPath,
                 JSON.stringify({
                     version: 1,
                     skills: {
-                        'preferred-skill': {
-                            name: 'preferred-skill',
+                        'legacy-skill': {
+                            name: 'legacy-skill',
                             source: 'owner/repo',
                             sourceType: 'github',
-                            skillPath: 'skills/preferred-skill',
-                            computedHash: 'preferred123',
+                            skillPath: 'skills/legacy-skill',
+                            computedHash: 'legacy123',
                             installedAt: '2026-01-01T00:00:00.000Z',
                             updatedAt: '2026-01-01T00:00:00.000Z',
                         },
@@ -133,16 +88,15 @@ describe('skills lockfile resolution and management', () => {
                 'utf-8',
             );
 
-            expect(resolveSkillsLockfilePathForProject(cwd)).toBe(preferredPath);
-            lock = await readSkillsLockfile(cwd);
-            expect(lock.skills['preferred-skill']).toBeDefined();
-            expect(lock.skills['dot-skill']).toBeUndefined();
+            const lock = await readSkillsLockfile(cwd);
+            expect(lock.skills['legacy-skill']).toBeDefined();
+            expect(lock.skills['legacy-skill'].computedHash).toBe('legacy123');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
     });
 
-    it('removes skill from lockfile and saves to only-one/skills-lock.json', async () => {
+    it('removes skill from lockfile in only-one/installed.json', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'lockfile-test-'));
         try {
             await saveSkillToLockfile(cwd, 'skill-1', {
@@ -165,6 +119,10 @@ describe('skills lockfile resolution and management', () => {
             const lock = await readSkillsLockfile(cwd);
             expect(lock.skills['skill-1']).toBeUndefined();
             expect(lock.skills['skill-2']).toBeDefined();
+
+            const installed = await readInstalledLockfile(cwd);
+            expect(installed.installed.skills?.['skill-1']).toBeUndefined();
+            expect(installed.installed.skills?.['skill-2']).toBeDefined();
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
