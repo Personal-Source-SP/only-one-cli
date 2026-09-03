@@ -13,7 +13,7 @@ vi.mock('@src/core/vs/index.js', async (importOriginal) => {
                     editorId,
                     editorName: editorId === VsEditorId.Antigravity ? 'Antigravity' : 'Cursor',
                     extensionId: ext,
-                    exists: ext === 'johnpapa.vscode-peacock',
+                    exists: ext === 'esbenp.prettier-vscode',
                 })),
             );
         }),
@@ -153,8 +153,8 @@ describe('VS sync commands', () => {
     it('prompts extension selection and confirm overwrite in interactive mode', async () => {
         const checkbox = vi
             .fn()
-            .mockResolvedValueOnce(['johnpapa.vscode-peacock', 'steoates.autoimport'])
-            .mockResolvedValueOnce(['cursor:johnpapa.vscode-peacock']);
+            .mockResolvedValueOnce(['esbenp.prettier-vscode', 'steoates.autoimport'])
+            .mockResolvedValueOnce(['cursor:esbenp.prettier-vscode']);
 
         const program = createProgram({
             cwd: '/repo',
@@ -190,7 +190,7 @@ describe('VS sync commands', () => {
             expect.objectContaining({
                 editorIds: [VsEditorId.Cursor],
                 extensionIdsPerEditor: {
-                    [VsEditorId.Cursor]: ['johnpapa.vscode-peacock', 'steoates.autoimport'],
+                    [VsEditorId.Cursor]: ['esbenp.prettier-vscode', 'steoates.autoimport'],
                 },
             }),
         );

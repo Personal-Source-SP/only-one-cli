@@ -1,7 +1,7 @@
 import type { VsLibraryManifest } from '../types.js';
 
 export const VS_LIBRARY: VsLibraryManifest = {
-    version: '0.0.1',
+    version: '0.0.2',
     extensions: [
         'aaron-bond.better-comments',
         'anthropic.claude-code',
@@ -20,10 +20,6 @@ export const VS_LIBRARY: VsLibraryManifest = {
         'esbenp.prettier-vscode',
         'firsttris.vscode-jest-runner',
         'formulahendry.auto-rename-tag',
-        'golang.go',
-        'jdinhlife.gruvbox',
-        'johnpapa.vscode-peacock',
-        'llvm-vs-code-extensions.vscode-clangd',
         'meta.pyrefly',
         'mikestead.dotenv',
         'ms-python.debugpy',
@@ -34,7 +30,6 @@ export const VS_LIBRARY: VsLibraryManifest = {
         'orta.vscode-jest',
         'pflannery.vscode-versionlens',
         'pkief.material-icon-theme',
-        'shopify.ruby-lsp',
         'sibiraj-s.vscode-scss-formatter',
         'steoates.autoimport',
         'streetsidesoftware.code-spell-checker',
