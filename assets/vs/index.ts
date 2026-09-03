@@ -1,6 +1,7 @@
 import type { VsLibraryManifest } from '../types.js';
 
 export const VS_LIBRARY: VsLibraryManifest = {
+    version: '0.0.1',
     extensions: [
         'aaron-bond.better-comments',
         'anthropic.claude-code',

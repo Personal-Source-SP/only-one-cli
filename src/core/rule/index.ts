@@ -8,6 +8,7 @@ import { executePackageActions } from '@/core/init/package-installer.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { RULES } from '@assets/rules/index.js';
 import type { RuleManifest } from '@assets/types.js';
+import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import { validateRuleDependenciesPreflight, buildDeduplicatedDependencyPlan } from './dependencies.js';
 
 const rulesAssetsDir = join(resolvePackageRoot(import.meta.url), 'assets/rules');
@@ -156,6 +157,20 @@ export const installRules = async (
                 });
             }
         }
+    }
+
+    const successfulRules = results.filter((r) => r.status === 'success' || r.status === 'overwritten');
+    if (successfulRules.length > 0) {
+        const uniqueRuleIds = Array.from(new Set(successfulRules.map((r) => r.ruleId)));
+        const entries = uniqueRuleIds.map((rId) => {
+            const manifest = ruleManifests.find((m) => m.id === rId);
+            return {
+                type: 'rules' as const,
+                id: rId,
+                version: manifest?.version || '0.0.1',
+            };
+        });
+        await recordInstalledAssetsBatch(projectDir, entries);
     }
 
     return {

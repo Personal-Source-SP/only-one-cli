@@ -12,6 +12,7 @@ import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { fetchSkillContentFromGitHub } from './remote/github-fetcher.js';
 import { saveSkillToLockfile } from './remote/lockfile.js';
+import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 
 const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/skills');
 
@@ -162,6 +163,20 @@ export const installSkills = async (request: {
         } catch (error) {
             deps.stdout(`Warning: Failed to update .gitignore: ${error instanceof Error ? error.message : String(error)}`);
         }
+    }
+
+    const successfulSkills = results.filter((r) => r.status === 'success' || r.status === 'overwritten');
+    if (successfulSkills.length > 0) {
+        const uniqueSkillNames = Array.from(new Set(successfulSkills.map((s) => s.skillName)));
+        const entries = uniqueSkillNames.map((sName) => {
+            const manifest = SKILLS.find((m) => m.name === sName);
+            return {
+                type: 'skills' as const,
+                id: sName,
+                version: manifest?.version || '0.0.1',
+            };
+        });
+        await recordInstalledAssetsBatch(projectDir, entries);
     }
 
     return results;

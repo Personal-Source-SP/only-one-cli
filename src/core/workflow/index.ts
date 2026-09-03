@@ -6,6 +6,8 @@ import type { AgentToolOption } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
+import { WORKFLOWS } from '../../../assets/workflows/index.js';
 
 const workflowsDir = join(resolvePackageRoot(import.meta.url), 'assets/workflows');
 
@@ -108,6 +110,20 @@ export const installWorkflows = async (request: WorkflowInstallRequest): Promise
                 });
             }
         }
+    }
+
+    const successes = results.filter((r) => r.status === 'success');
+    if (successes.length > 0) {
+        const uniqueNames = Array.from(new Set(successes.map((s) => s.workflowName)));
+        const entries = uniqueNames.map((wfName) => {
+            const manifest = WORKFLOWS.find((w) => w.name === wfName);
+            return {
+                type: 'workflows' as const,
+                id: wfName,
+                version: manifest?.version || '0.0.1',
+            };
+        });
+        await recordInstalledAssetsBatch(projectDir, entries);
     }
 
     return results;

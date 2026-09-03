@@ -22,7 +22,8 @@
         "publish:npm": "npm run format && node scripts/publish.js",
         "publish:local": "npm run format && node scripts/publish.js --local",
         "format": "prettier --write \"src/**/*.{ts,tsx}\" \"test/**/*.ts\"",
-        "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"test/**/*.ts\""
+        "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"test/**/*.ts\"",
+        "asset:bump": "tsx scripts/bump-asset.ts"
     },
     "dependencies": {
         "@iarna/toml": "^2.2.5",

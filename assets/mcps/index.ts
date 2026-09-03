@@ -3,6 +3,7 @@ import type { McpManifest } from '../types.js';
 export const MCPS: McpManifest[] = [
     {
         id: 'clockify',
+        version: '0.0.1',
         server: {
             command: 'npx',
             args: ['-y', '@yikizi/clockify-mcp'],
@@ -13,6 +14,7 @@ export const MCPS: McpManifest[] = [
     },
     {
         id: 'fetch',
+        version: '0.0.1',
         server: {
             command: 'npx',
             args: ['-y', '@modelcontextprotocol/server-fetch'],
@@ -20,6 +22,7 @@ export const MCPS: McpManifest[] = [
     },
     {
         id: 'github',
+        version: '0.0.1',
         server: {
             command: 'npx',
             args: ['-y', '@modelcontextprotocol/server-github'],
@@ -30,6 +33,7 @@ export const MCPS: McpManifest[] = [
     },
     {
         id: 'memory',
+        version: '0.0.1',
         server: {
             command: 'npx',
             args: ['-y', '@modelcontextprotocol/server-memory'],
@@ -37,6 +41,7 @@ export const MCPS: McpManifest[] = [
     },
     {
         id: 'postgres',
+        version: '0.0.1',
         server: {
             command: 'npx',
             args: ['-y', '@modelcontextprotocol/server-postgres'],
@@ -47,6 +52,7 @@ export const MCPS: McpManifest[] = [
     },
     {
         id: 'tavily',
+        version: '0.0.1',
         server: {
             command: 'npx',
             args: ['-y', '@yikizi/tavily-mcp'],
@@ -57,6 +63,7 @@ export const MCPS: McpManifest[] = [
     },
     {
         id: 'zodinet-timesheet',
+        version: '0.0.1',
         server: {
             command: 'npx',
             args: [

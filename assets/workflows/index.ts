@@ -3,6 +3,7 @@ import type { WorkflowManifest } from '../types.js';
 export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-idea',
+        version: '0.0.1',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
@@ -18,6 +19,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-plan',
+        version: '0.0.1',
         description:
             'Research current code and create a focused 6-section implementation plan with Machine-Readable Task Matrix, deep module design, architecture, code examples, and test cases.',
         requiredSkills: [
@@ -36,6 +38,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
+        version: '0.0.1',
         description:
             'Implement tasks from an approved plan.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
         requiredSkills: [
@@ -48,6 +51,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
+        version: '0.0.1',
         description:
             'Perform systematic Root Cause Analysis (RCA) and deliver a minimal verified fix using disciplined red feedback loops.',
         requiredSkills: [
@@ -59,6 +63,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-review',
+        version: '0.0.1',
         description:
             'Perform comprehensive 5-axis code health, security, simplicity, and performance review using dual-perspective audit.',
         requiredSkills: [
@@ -70,24 +75,28 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-handoff',
+        version: '0.0.1',
         description:
             'Compact current conversation and task state into a seamless handoff document for agent switching or context refreshment.',
         requiredSkills: ['handoff'],
     },
     {
         name: 'only-one-conflict',
+        version: '0.0.1',
         description:
             'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
         requiredSkills: ['resolving-merge-conflicts'],
     },
     {
         name: 'only-one-clockify',
+        version: '0.0.1',
         description: 'Validate and log Clockify tasks using only-one-clockify-skill and Clockify MCP.',
         requiredSkills: ['only-one-clockify-skill'],
         requiredMcps: ['clockify'],
     },
     {
         name: 'only-one-intranet',
+        version: '0.0.1',
         description:
             'Validate, log Intranet timesheet entries, and output monthly summary using only-one-intranet-skill and zodinet-timesheet MCP.',
         requiredSkills: ['only-one-intranet-skill'],
@@ -95,6 +104,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-pr-git',
+        version: '0.0.1',
         description:
             'Create or update a GitHub PR from current branch with mandatory 5-axis pre-review quality gate using GitHub MCP.',
         requiredSkills: ['only-one-pr-git-skill'],
@@ -102,12 +112,14 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-archive',
+        version: '0.0.1',
         description:
             'Distill completed tasks into concise single-file archives, sync rules, extract technical English notes, and clean task folders.',
         requiredSkills: ['handoff', 'code-simplification', 'context-engineering', 'english-learning-extraction'],
     },
     {
         name: 'only-one-clean',
+        version: '0.0.1',
         description:
             'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
         requiredSkills: [

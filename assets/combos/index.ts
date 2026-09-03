@@ -3,6 +3,7 @@ import type { ComboManifest } from '../types.js';
 export const COMBOS: ComboManifest[] = [
     {
         id: 'frontend-flow',
+        version: '0.0.1',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
         packages: ['ui-ux-pro-max-cli'],
@@ -44,6 +45,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'backend-flow',
+        version: '0.0.1',
         name: 'Backend Flow Setup',
         description: 'NestJS backend development toolkit with architecture design, security audit, and API standards',
         skills: [
@@ -84,6 +86,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'full-sdlc-flow',
+        version: '0.0.1',
         name: 'Full SDLC Enterprise Flow Setup',
         description: 'Complete end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, webperf, and review',
         skills: [
@@ -139,12 +142,14 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'mcp-flow',
+        version: '0.0.1',
         name: 'MCP Flow Setup',
         description: 'Model Context Protocol (MCP) servers toolkit',
         mcps: ['fetch', 'tavily', 'github', 'clockify', 'zodinet-timesheet', 'postgres'],
     },
     {
         id: 'git-timesheet-flow',
+        version: '0.0.1',
         name: 'Git & Timesheet Flow Setup',
         description: 'GitHub PR, Clockify, and Intranet Timesheet logging integration toolkit',
         skills: ['only-one-clockify-skill', 'only-one-intranet-skill', 'only-one-pr-git-skill'],

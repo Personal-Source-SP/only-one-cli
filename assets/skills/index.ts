@@ -4,6 +4,7 @@ export const SKILLS: SkillManifest[] = [
     // --- 1. Define Phase: Discovery, Grilling & Domain Modeling ---
     {
         name: 'grill-with-docs',
+        version: '0.0.1',
         description: 'Conduct a grilling session that sharpens domain terminology and updates CONTEXT.md and ADRs inline.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -11,6 +12,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'grill-me',
+        version: '0.0.1',
         description: 'Interview the user relentlessly about a plan or design until reaching shared understanding (zero file footprint).',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -18,6 +20,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'interview-me',
+        version: '0.0.1',
         description: 'Conduct a one-question-at-a-time interview extracting root needs until ~95% confidence.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -25,6 +28,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'idea-refine',
+        version: '0.0.1',
         description: 'Refine rough ideas and establish strict In-Scope vs Explicit Out-of-Scope boundaries.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -32,6 +36,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'domain-modeling',
+        version: '0.0.1',
         description: 'Actively build and sharpen domain models, challenge glossary terms, and maintain CONTEXT.md.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -39,6 +44,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'wait-what',
+        version: '0.0.1',
         description: 'Re-pitch complex explanations in plain English using the project domain glossary.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -48,6 +54,7 @@ export const SKILLS: SkillManifest[] = [
     // --- 2. Plan Phase: Architecture, Contracts & Task Graph ---
     {
         name: 'to-tickets',
+        version: '0.0.1',
         description: 'Break plan into tracer-bullet tickets with explicit dependency blocking edges.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -55,6 +62,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'codebase-design',
+        version: '0.0.1',
         description: 'Design deep modules with small interfaces at clean seams, testable through that interface.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -62,13 +70,15 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'api-and-interface-design',
-        description: 'Contract-first design, Hyrum\'s Law, error semantics, and boundary validation.',
+        version: '0.0.1',
+        description: "Contract-first design, Hyrum's Law, error semantics, and boundary validation.",
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
         skillPath: 'skills/api-and-interface-design/SKILL.md',
     },
     {
         name: 'frontend-ui-engineering',
+        version: '0.0.1',
         description: 'Component architecture, design systems, 5-state matrix, and WCAG accessibility.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -76,6 +86,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'source-driven-development',
+        version: '0.0.1',
         description: 'Enforce source-verified APIs and grounded documentation.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -83,6 +94,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'doubt-driven-development',
+        version: '0.0.1',
         description: 'Stress-test high-stakes design choices via CLAIM -> DOUBT -> RECONCILE loops.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -90,11 +102,13 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'c4-diagrams',
+        version: '0.0.1',
         description: 'Architecture diagrams in C4/Mermaid.',
         sourceType: 'local',
     },
     {
         name: 'gherkin-authoring',
+        version: '0.0.1',
         description: 'Draft BDD Gherkin acceptance scenarios for success metrics verification.',
         sourceType: 'local',
     },
@@ -102,6 +116,7 @@ export const SKILLS: SkillManifest[] = [
     // --- 3. Build Phase: Incremental Implementation & Safety ---
     {
         name: 'incremental-implementation',
+        version: '0.0.1',
         description: 'Implement thin vertical slices with safe defaults and rollback-friendly commits.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -109,6 +124,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'test-driven-development',
+        version: '0.0.1',
         description: 'Beyoncé Rule, Red-Green-Refactor loop, DAMP tests, and regression guards.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -116,6 +132,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'context-engineering',
+        version: '0.0.1',
         description: 'Feed agents high-signal minimal context, negative rules, and tech skills.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -123,6 +140,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'prototype',
+        version: '0.0.1',
         description: 'Build a throwaway prototype to answer an uncertain design or UI question.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -130,6 +148,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'wizard',
+        version: '0.0.1',
         description: 'Generate interactive bash wizard for steps only humans can perform.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -139,6 +158,7 @@ export const SKILLS: SkillManifest[] = [
     // --- 4. Verify & Debug Phase: RCA & Recovery ---
     {
         name: 'diagnosing-bugs',
+        version: '0.0.1',
         description: 'Disciplined diagnosis loop: build red test loop -> minimize -> hypothesize -> fix.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -146,6 +166,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'resolving-merge-conflicts',
+        version: '0.0.1',
         description: 'Resolve git merge/rebase conflicts hunk by hunk based on intent.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -153,6 +174,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'handoff',
+        version: '0.0.1',
         description: 'Compact current conversation state into a seamless handoff document.',
         source: 'mattpocock/skills',
         sourceType: 'github',
@@ -162,6 +184,7 @@ export const SKILLS: SkillManifest[] = [
     // --- 5. Review & Quality Gates Phase ---
     {
         name: 'code-review-and-quality',
+        version: '0.0.1',
         description: '5-axis code review, change sizing (~100 lines), and PR quality gating.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -169,13 +192,15 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'code-simplification',
-        description: 'Chesterton\'s Fence, Rule of 500, eliminate dead code and speculative wrappers.',
+        version: '0.0.1',
+        description: "Chesterton's Fence, Rule of 500, eliminate dead code and speculative wrappers.",
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
         skillPath: 'skills/code-simplification/SKILL.md',
     },
     {
         name: 'security-and-hardening',
+        version: '0.0.1',
         description: 'OWASP Top 10 prevention, auth guards, secrets audit, and 3-tier boundary validation.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -183,6 +208,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'performance-optimization',
+        version: '0.0.1',
         description: 'Core Web Vitals, N+1 database queries, bundle budgets, and memoization.',
         source: 'addyosmani/agent-skills',
         sourceType: 'github',
@@ -192,41 +218,49 @@ export const SKILLS: SkillManifest[] = [
     // --- 6. Local Project Specific Skills ---
     {
         name: 'only-one-nestjs-development',
+        version: '0.0.1',
         description: 'Use for NestJS development with selectively loaded architecture references.',
         sourceType: 'local',
     },
     {
         name: 'only-one-nextjs-development',
+        version: '0.0.1',
         description: 'Use for Next.js and React development with selectively loaded references.',
         sourceType: 'local',
     },
     {
         name: 'only-one-clockify-skill',
+        version: '0.0.1',
         description: 'Validate and log Clockify time entries from task lines.',
         sourceType: 'local',
     },
     {
         name: 'only-one-intranet-skill',
+        version: '0.0.1',
         description: 'Validate and log Intranet timesheet entries from task lines using zodinet-timesheet MCP.',
         sourceType: 'local',
     },
     {
         name: 'only-one-pr-git-skill',
+        version: '0.0.1',
         description: 'Create or update a GitHub Pull Request from current branch.',
         sourceType: 'local',
     },
     {
         name: 'conversational-english-coaching',
+        version: '0.0.1',
         description: 'Rephrase user thoughts into natural, professional technical English during interactive turns.',
         sourceType: 'local',
     },
     {
         name: 'english-learning-extraction',
+        version: '0.0.1',
         description: 'Extract technical English patterns, grammar structures, and real-world examples into learn topics.',
         sourceType: 'local',
     },
     {
         name: 'task-lifecycle-resolution',
+        version: '0.0.1',
         description: 'Resolve and auto-archive completed tasks before running clean and maintenance workflows.',
         sourceType: 'local',
     },
