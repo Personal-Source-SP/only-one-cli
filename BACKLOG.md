@@ -43,7 +43,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 - [x] **MCP sync** — `mcp` và `init mcp` chọn MCP server và merge config vào Antigravity, Claude, Cursor, Codex.
 - [x] **Multi-format config** — Đọc/ghi JSON (Antigravity, Claude, Cursor) và TOML (Codex).
 - [x] **Pre-write validation** — Dừng trước khi ghi nếu file cấu hình hiện tại bị malformed/syntax error.
-- [x] **MCP registry** — Cung cấp sẵn manifests: `clockify`, `fetch`, `github`, `memory`, `postgres`, `tavily`, `zodinet-timesheet`.
+- [x] **MCP registry** — Cung cấp sẵn manifests: `clockify`, `fetch`, `github`, `postgres`, `tavily`, `zodinet-timesheet`.
 
 ## Đã có — Editor synchronization
 

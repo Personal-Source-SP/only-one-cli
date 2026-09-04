@@ -125,7 +125,7 @@ Merge global MCP server definitions into supported agent configurations.
 
 ```bash
 only-one mcp [names] --ide antigravity,claude,cursor,codex
-only-one mcp github,clockify,zodinet-timesheet,tavily,fetch,postgres,memory
+only-one mcp github,clockify,zodinet-timesheet,tavily,fetch,postgres
 ```
 
 MCP synchronization supports Antigravity, Claude, Cursor, and Codex JSON or TOML formats. Existing malformed configurations are checked before writes.

@@ -32,14 +32,6 @@ export const MCPS: McpManifest[] = [
         },
     },
     {
-        id: 'memory',
-        version: '0.0.1',
-        server: {
-            command: 'npx',
-            args: ['-y', '@modelcontextprotocol/server-memory'],
-        },
-    },
-    {
         id: 'playwright-browser',
         version: '0.0.1',
         server: {

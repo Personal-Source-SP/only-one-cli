@@ -22,4 +22,10 @@ describe('MCP Registry & Predefined Manifests', () => {
         expect(entry).toBeDefined();
         expect(entry?.version).toBe('0.0.1');
     });
+
+    it('ensures memory MCP is excluded from active manifests', async () => {
+        const { manifests } = await readMcpManifests();
+        const memoryMcp = manifests.find((m) => m.id === 'memory');
+        expect(memoryMcp).toBeUndefined();
+    });
 });
