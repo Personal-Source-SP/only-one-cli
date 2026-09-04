@@ -10,13 +10,16 @@ export function createUpdateCommand(deps: ProgramDeps): Command {
         .helpOption('-h, --help', 'display help for command')
         .argument('[path]', 'Target project directory path (default: current directory)')
         .option('--force', 'Overwrite agent skill and workflow files even if local and remote versions match')
+        .option('--prune', 'Remove orphaned skills, rules, and workflows no longer provided upstream')
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
                 `  ${COLORS.cli.command('$ only-one update')}\n` +
+                `  ${COLORS.cli.command('$ only-one update --prune')}\n` +
                 `  ${COLORS.cli.command('$ only-one update /path/to/project --force')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('Looks up installed agent tools in the project configurations and pulls the latest definitions from the source registry.')}\n` +
+                `  - ${COLORS.dim('Automatically restores missing files and flags or removes orphaned components with --prune.')}\n` +
                 `  - ${COLORS.dim('Useful when updating CLI versions or retrieving upstream template improvements.')}`,
         )
         .action(async (path: string | undefined, options: UpdateCommandOptions, command) => {

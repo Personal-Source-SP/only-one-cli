@@ -23,7 +23,7 @@ export interface OnlyOneInstalledState {
     installed: Partial<Record<AssetType, Record<string, InstalledAssetRecord>>>;
 }
 
-export type AssetUpdateStatus = 'up-to-date' | 'outdated' | 'untracked';
+export type AssetUpdateStatus = 'up-to-date' | 'outdated' | 'missing' | 'removed' | 'untracked';
 
 export interface AssetInspectionItem {
     type: AssetType;

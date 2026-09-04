@@ -21,10 +21,17 @@ export const UpdateView: FC<UpdateViewProps> = ({ deps, onBack }) => {
             icon: '🔄',
             description: 'Refresh installed agent skills, rules, and workspace templates',
         },
+        {
+            label: 'Prune Orphaned Assets',
+            value: 'prune-all',
+            icon: '🗑️',
+            description: 'Remove leftover skills, rules, and workflows no longer in catalog',
+        },
     ];
 
     const handleRunUpdate = async (log: (msg: string) => void) => {
-        log('Checking and refreshing workspace artifacts...');
+        const isPrune = selectedAction === 'prune-all';
+        log(isPrune ? 'Pruning orphaned workspace artifacts...' : 'Checking and refreshing workspace artifacts...');
         const runDeps: ProgramDeps = deps ?? {
             stdout: (msg: string) => log(msg),
             stderr: (msg: string) => log(`[stderr] ${msg}`),
@@ -39,16 +46,17 @@ export const UpdateView: FC<UpdateViewProps> = ({ deps, onBack }) => {
                 stdout: (msg) => log(msg),
             },
             process.cwd(),
-            { force: true },
+            isPrune ? { prune: true } : { force: true },
             false,
         );
-        log('Workspace artifacts refreshed successfully.');
+        log(isPrune ? 'Orphaned artifacts pruned successfully.' : 'Workspace artifacts refreshed successfully.');
     };
 
     if (selectedAction) {
+        const title = selectedAction === 'prune-all' ? 'Prune Orphaned Assets' : 'Refresh Skills & Templates';
         return (
             <Box flexDirection="column" paddingX={1}>
-                <TaskRunnerView title="Refresh Skills & Templates" runTask={handleRunUpdate} onDone={onBack} />
+                <TaskRunnerView title={title} runTask={handleRunUpdate} onDone={onBack} />
             </Box>
         );
     }

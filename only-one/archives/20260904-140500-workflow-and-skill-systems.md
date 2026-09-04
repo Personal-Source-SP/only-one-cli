@@ -18,7 +18,6 @@ affected_modules:
   - src/core/templates
   - src/core/combo
   - only-one/rules.md
-  - only-one/learn
 ---
 
 # Archive: Kiến Trúc Hợp Nhất của Hệ Thống Workflows, Skills Catalog, Lean Diff-Centric Planning & Chốt Chặn Tuân Thủ Quy Chuẩn
@@ -26,7 +25,7 @@ affected_modules:
 ## 1. Problem Statement & Core Value (Bài toán & Giá trị Cốt lõi)
 
 ### 1.1. Core Problems (Vấn đề Cốt lõi)
-1. **Bệnh béo phì tài liệu (Documentation Bloat)**: Các quy trình trước đây (`idea` -> `plan` -> `apply`) ép buộc sinh các bản kế hoạch 6 sections dài dòng, nhồi nhét lý thuyết sáo rỗng và ghi chú tiếng Anh vào file task khiến người dùng bỏ qua hơn 60% nội dung.
+1. **Bệnh béo phì tài liệu (Documentation Bloat)**: Các quy trình trước đây (`idea` -> `plan` -> `apply`) ép buộc sinh các bản kế hoạch dài dòng, nhồi nhét lý thuyết sáo rỗng vào file task khiến người dùng bỏ qua hơn 60% nội dung.
 2. **Thiếu góc nhìn Unified Diff**: Phần code changes trong plan trước đây dùng code snippet dài rời rạc kèm comment `// [TARGET SEAM]`, rất khó nhận diện dòng thêm (`+`), xoá (`-`), sửa (`~`).
 3. **Hiện tượng Agent Drift**: Khi thực thi apply code, AI agent có xu hướng tự ý viết code theo thói quen hoặc thiên kiến mặc định của LLM thay vì tuân thủ nghiêm ngặt các tiêu chuẩn kỹ thuật trong skills ngôn ngữ (`nestjs-development`, strict typing...) và `rules.md`.
 4. **Trùng lặp & Tái phát minh logic (Reinventing the wheel)**: AI thiếu cơ chế bắt buộc đối soát thư mục dùng chung (`src/utils`, `src/helpers`, `src/hooks`) trước khi code mới.
@@ -37,7 +36,7 @@ affected_modules:
    - Tinh giản `concept.md` còn 4 mục cốt lõi: Problem & Goal, Scope Boundaries, Proposed Solution & Flow, Critical Risks.
    - Chuẩn hóa `plan.md` thành 5 sections súc tích: Current State, Detailed Design, Task Matrix, Code Changes (Unified Diff), Test Cases & Verification.
    - Trực quan hóa 100% thay đổi code bằng block ` ```diff ` chuẩn Git (`-` và `+`), cho phép review trong 5 giây.
-   - Chuyển việc trích xuất học tiếng Anh ra footer tin nhắn chat (`conversational-english-coaching`), giữ tài liệu dự án sạch sẽ 100%.
+   - Giữ tài liệu dự án sạch sẽ 100%, loại bỏ hoàn toàn các flow học tiếng Anh không phục vụ trực tiếp cho tác vụ kỹ thuật.
 2. **Strict Language Skill & Rule Adherence Gate**:
    - Chốt chặn nghiêm ngặt ở Step 1b, Step 4a và Guardrails của `only-one-apply`: Code áp dụng bắt buộc phải tuân thủ 100% quy chuẩn trong skills ngôn ngữ và `rules.md`, triệt tiêu hoàn toàn agent drift.
 3. **Hệ thống Phòng vệ 3 Lớp Chống Trùng Lặp (Reuse-First Invariant)**:
@@ -90,7 +89,7 @@ flowchart TD
   - [assets/workflows/only-one-apply.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-apply.md) & [.agents/workflows/only-one-apply.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/.agents/workflows/only-one-apply.md)
   - [assets/workflows/only-one-intranet.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-intranet.md) & [assets/skills/only-one-intranet-skill](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/skills/only-one-intranet-skill)
 - **Skills Catalog**:
-  - [assets/skills/index.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/skills/index.ts): Khai báo 22 core & domain skills.
+  - [assets/skills/index.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/skills/index.ts): Khai báo 20 core & domain skills.
   - [assets/skills/only-one-nestjs-development](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nestjs-development) & [assets/skills/only-one-nextjs-development](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nextjs-development)
 - **Governance & Negative Rules**:
   - [only-one/rules.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/only-one/rules.md): Cập nhật negative rules về Anti-Agent-Drift và Lean Diff-Centric Planning.
