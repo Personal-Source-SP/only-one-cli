@@ -80,68 +80,21 @@ If input does not describe the idea or problem, ask a focused question before pr
 ```markdown
 # Concept: <Tên Ý tưởng / Bài toán Kỹ thuật>
 
-## 1. Problem Statement & Root Need (Bối cảnh & Vấn đề Cốt lõi)
-- **Core Business Problem**: <Mô tả chi tiết điểm nghẽn, lý do giải pháp hiện tại không đáp ứng được>.
-- **Target Audience & Core Value**: <Đối tượng hưởng lợi và giá trị thực tế mang lại>.
+## 1. Problem & Goal (Vấn đề & Mục tiêu)
+- **Problem**: <Mô tả ngắn gọn 1-2 câu về điểm nghẽn hoặc nhu cầu kỹ thuật thực tế>.
+- **Goal**: <Kết quả cốt lõi cần đạt được>.
 
 ## 2. Scope Boundaries (Ranh giới Phạm vi)
 - **In-Scope**: <Các tính năng, hành vi và module bắt buộc triển khai>.
 - **Explicit Out-of-Scope**: <Các hạng mục hoãn lại hoặc chủ đích không làm để tránh phình scope>.
 
-## 3. Success Metrics (Thước đo Thành công / Definition of Done)
-- <Các tiêu chí định lượng đo lường được để nghiệm thu: latency, throughput, error rate, UX threshold...>.
+## 3. Proposed Solution & Core Mechanism (Giải pháp Đề xuất & Cơ chế)
+- **Core Mechanism**: <Mô tả giải pháp cốt lõi và cơ chế vận hành bằng thuật ngữ dev>.
+- **Workflow / Logic Flow**: <Các bước luồng dữ liệu chính hoặc sơ đồ Mermaid ngắn gọn nếu cần>.
+- *(Tùy chọn)* **UI Wireframe**: <ASCII wireframe nếu tính năng có giao diện>.
 
-## 4. Proposed Solution & Core Mechanism (Phương pháp Giải quyết & Cơ chế Xử lý)
-
-### 4.1. Explored Options & Trade-off Analysis (Các Phương án Đã Cân Nhắc)
-| Option | Hướng tiếp cận | Ưu điểm (Pros) | Nhược điểm (Cons) | Độ phức tạp | Đánh giá |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Option 1** | <Mô tả phương án 1> | <Ưu điểm> | <Nhược điểm> | Low / Medium / High | <Lý do chọn / loại> |
-| **Option 2** | <Mô tả phương án 2> | <Ưu điểm> | <Nhược điểm> | Low / Medium / High | <Lý do chọn / loại> |
-| **Option 3** | <Mô tả phương án 3> | <Ưu điểm> | <Nhược điểm> | Low / Medium / High | <Lý do chọn / loại> |
-
-- **Chosen Strategy (Phương án Được Chọn)**: <Nêu rõ phương án được chọn và lý do quyết định của PM>.
-
-### 4.2. Core Processing Flow (Luồng Xử lý / Chuyển trạng thái Chính)
-- **Workflow / Logic Flow**:
-  1. **Input / Trigger**: <Nguồn kích hoạt hoặc dữ liệu đầu vào>.
-  2. **Processing & State Transition**: <Các bước xử lý logic, kiểm tra điều kiện, chuyển trạng thái>.
-  3. **Output & Side Effects**: <Dữ liệu trả về, cập nhật DB, bắn event, thông báo...>.
-- *(Tùy chọn)* **Flow Diagram**:
-  ```mermaid
-  sequenceDiagram / flowchart TD
-    <Sơ đồ Mermaid tóm lược luồng đi của dữ liệu / trạng thái>
-  ```
-
-### 4.3. UI Wireframe / Visual Mockup (Mẫu Phác thảo Giao diện) *(Bỏ qua nếu không có UI)*
-```text
-+-------------------------------------------------------------+
-| Header / Navigation                                         |
-+-------------------------------------------------------------+
-| [Search Input / Filter]                    [+ Action Button] |
-|                                                             |
-| +---------------------------------------------------------+ |
-| | Main Content / Card / Table Area                         | |
-| | - Item 1: Status Badge [Active]          [Edit] [Delete] | |
-| | - Item 2: Status Badge [Pending]         [Edit] [Delete] | |
-| +---------------------------------------------------------+ |
-| [Pagination: < 1 2 3 >]              Total: 25 items        |
-+-------------------------------------------------------------+
-```
-- **State Handling Matrix**:
-  - **Empty State**: <Giao diện khi chưa có dữ liệu>.
-  - **Loading State**: <Trạng thái hiển thị khi đang nạp dữ liệu (Skeleton / Spinner)>.
-  - **Error / Validation State**: <Cách hiển thị thông báo lỗi hoặc cảnh báo form>.
-
-### 4.4. Critical Edge Cases & Risk Handling (Kịch bản Biên & Xử lý Rủi ro)
-- **Edge Cases & Failure Modes**: <Xử lý mất mạng, duplicate submit, race condition, timeout...>.
-- **Rollback / Fallback Mechanism**: <Cơ chế phục hồi hoặc fallback khi xử lý thất bại>.
-
-## 5. Technical English Key Patterns
-### 1. <Grammar Pattern or Expression>
-- **Meaning (VI)**: <Giải nghĩa tiếng Việt ngắn gọn, chuẩn xác>
-- **Grammar / Usage**: `<Syntax breakdown>`
-- **Engineering Example**: *"<Câu ví dụ thực tế trong ngữ cảnh kỹ thuật này>"*
+## 4. Critical Risks & Edge Cases (Rủi ro & Kịch bản Biên)
+- <Các rủi ro kỹ thuật, race condition, lỗi timeout hoặc chiến lược rollback nếu có>.
 ```
 
 2. **Handoff & Hard Stop (🛑 Mandatory Terminal Gate)**:

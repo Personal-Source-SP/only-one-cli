@@ -18,3 +18,5 @@
 - **[ALWAYS]** Khai báo và gán `version: string` tuân thủ cơ số 10 (`X.Y.Z`) cho 100% asset manifests trong `assets/` và cập nhật phiên bản khi thay đổi nội dung file template (bảo vệ CI version gate).
 - **[NEVER]** Không lưu trữ lockfile trong thư mục ẩn `.only-one/` hoặc phân mảnh ra các file phụ như `skills-lock.json`. Toàn bộ trạng thái phiên bản và remote metadata phải quy tụ duy nhất về `only-one/installed.json` (Single Source of Truth).
 - **[AVOID]** Không khởi chạy browser MCP tự động mà không chỉ định thư mục profile cô lập (`--user-data-dir`) nhằm ngăn chặn xung đột khóa tiến trình SingletonLock với trình duyệt cá nhân của developer.
+- **[NEVER]** Không tự ý viết code theo thiên kiến hoặc thói quen mặc định của LLM khi thực thi workflow `/only-one-apply`. Luôn đối chiếu và tuân thủ 100% các quy chuẩn, tiêu chuẩn code trong skills ngôn ngữ và `rules.md`.
+- **[AVOID]** Tránh sinh tài liệu task (`concept.md`, `plan.md`) dài dòng với văn mẫu sáo rỗng hoặc chèn phần học tiếng Anh vào file markdown làm loãng nội dung kỹ thuật. Luôn trình bày code changes dưới dạng Unified Diff (`-` và `+`).

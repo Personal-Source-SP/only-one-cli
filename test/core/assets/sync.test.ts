@@ -4,14 +4,19 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import { inspectAssetUpdates, applyAssetUpdates } from '@/core/assets/sync.js';
+import { WORKFLOWS } from '@assets/workflows/index.js';
+import { SKILLS } from '@assets/skills/index.js';
 
 describe('Asset Synchronization & Reconciliation', () => {
     it('identifies up-to-date and outdated assets in target project', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'sync-test-'));
+        const ideaVersion = WORKFLOWS.find((w) => w.name === 'only-one-idea')?.version ?? '0.0.1';
+        const skillVersion = SKILLS.find((s) => s.name === 'c4-diagrams')?.version ?? '0.0.1';
+
         try {
             await recordInstalledAssetsBatch(cwd, [
-                { type: 'workflows', id: 'only-one-idea', version: '0.0.1' },
-                { type: 'skills', id: 'c4-diagrams', version: '0.0.1' },
+                { type: 'workflows', id: 'only-one-idea', version: ideaVersion },
+                { type: 'skills', id: 'c4-diagrams', version: skillVersion },
             ]);
 
             const result = await inspectAssetUpdates(cwd);

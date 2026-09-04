@@ -5,7 +5,7 @@ archived_at: 2026-08-28
 status: active
 references:
   - only-one/archives/20260824-103830-tui-modernization.md
-  - only-one/archives/20260903-114000-workflow-and-skill-systems.md
+  - only-one/archives/20260904-140500-workflow-and-skill-systems.md
 affected_modules:
   - src/core/vs
   - assets/vs

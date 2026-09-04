@@ -91,16 +91,11 @@ describe('Workflow Command Unit & Integration Tests', () => {
         await rmP(testProjectDir, { recursive: true, force: true });
     });
 
-    it('ensures only-one-idea and only-one-plan contain English learning specifications', async () => {
+    it('ensures only-one-idea and only-one-plan retain conversational english coaching', async () => {
         const ideaContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-idea.md'), 'utf-8');
         const planContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-plan.md'), 'utf-8');
 
         expect(ideaContent).toContain('conversational-english-coaching');
-        expect(ideaContent).toContain('english-learning-extraction');
-        expect(ideaContent).toContain('## 5. Technical English Key Patterns');
-
         expect(planContent).toContain('conversational-english-coaching');
-        expect(planContent).toContain('english-learning-extraction');
-        expect(planContent).toContain('Section 6. Technical English Key Patterns');
     });
 });

@@ -4,7 +4,7 @@ title: Modernizing Only-One CLI Terminal User Interface (TUI)
 archived_at: 2026-08-25
 status: active
 references:
-  - only-one/archives/20260828-110000-workflow-and-skill-systems.md
+  - only-one/archives/20260904-140500-workflow-and-skill-systems.md
 affected_modules:
   - src/tui
   - test/tui
