@@ -91,11 +91,12 @@ describe('Workflow Command Unit & Integration Tests', () => {
         await rmP(testProjectDir, { recursive: true, force: true });
     });
 
-    it('ensures only-one-idea and only-one-plan retain conversational english coaching', async () => {
+    it('ensures only-one-idea and only-one-plan do not retain conversational english coaching or english learning extraction', async () => {
         const ideaContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-idea.md'), 'utf-8');
         const planContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-plan.md'), 'utf-8');
 
-        expect(ideaContent).toContain('conversational-english-coaching');
-        expect(planContent).toContain('conversational-english-coaching');
+        expect(ideaContent).not.toContain('conversational-english-coaching');
+        expect(ideaContent).not.toContain('english-learning-extraction');
+        expect(planContent).not.toContain('conversational-english-coaching');
     });
 });

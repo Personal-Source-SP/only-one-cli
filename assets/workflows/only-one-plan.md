@@ -26,7 +26,6 @@ You are a **Senior Software Architect** specializing in codebase analysis and im
     - Section 3 must use the structured **Task Matrix & Dependency Graph** with standardized table columns: `Order`, `Status`, `Action`, `File Path`, `Target Symbols / AST Seams`, `Depends On`, `Fast Test Command`.
     - Section 4 must provide Git-standard **Unified Diff (` ```diff `)** blocks with context lines, deleted lines (`-`), and added lines (`+`).
     - Variable names, classes, interfaces, methods, SQL queries, CLI commands, file paths must be 100% English.
-- Foster continuous technical English learning by rephrasing user inputs and breaking down response idioms during interactive turns (`conversational-english-coaching`) in the chat footer—do NOT pollute `plan.md` files with English extraction sections.
 - Produce a single reviewable `plan.md` artifact at the designated independent task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md`). Do not implement anything or modify project source code during this workflow.
 
 ## Purpose
@@ -74,7 +73,6 @@ Activate these skills during research or planning when their trigger conditions 
 | **`c4-diagrams`** | Section 2 architecture involves multiple components, modules, or complex data flows | Produce clean Mermaid or ASCII C4 / Sequence diagrams directly inside Section 2. |
 | **`frontend-ui-engineering`** | Building or modifying user-facing frontend components | Design component architecture, state management, 5-state matrix, and accessibility in Section 2. |
 | **`source-driven-development`** | Introducing new library APIs or framework methods | Ground all code signatures in verified official documentation in Section 4 to prevent API hallucination. |
-| **`conversational-english-coaching`** | Conversational planning turns and proposal reviews | Rephrase user design feedback into natural technical English in chat responses. |
 
 ---
 
@@ -149,10 +147,9 @@ Mô tả từng file trong Section 3 theo thứ tự thực thi bằng block dif
 ## 4. Review Gate & Next Steps
 
 1. Create artifact with `RequestFeedback: true` and `UserFacing: true`.
-2. **Activate `conversational-english-coaching`**: At the footer of the review presentation, provide `💬 English Expression Coaching`.
-3. Stop after presenting the plan.
-4. Do not implement project changes before explicit user approval.
-5. Once approved, the user proceeds to `/only-one-apply <task-folder>/plan.md` to execute the plan.
+2. Stop after presenting the plan.
+3. Do not implement project changes before explicit user approval.
+4. Once approved, the user proceeds to `/only-one-apply <task-folder>/plan.md` to execute the plan.
 
 ---
 
@@ -161,5 +158,4 @@ Mô tả từng file trong Section 3 theo thứ tự thực thi bằng block dif
 - **Enforce Dev-First & Diff-Centric Architecture**: Author narrative in Section 1 and 2 with punchy dev technical terms; present Section 4 in Git-standard Unified Diff (` ```diff `) format.
 - **Enforce Reuse-First Invariant**: Always identify and declare reused existing utilities/helpers in Section 3 & 4; never propose reinventing existing functions.
 - Always include `Fast Test Command` per file in the Task Matrix to shorten verification feedback loops.
-- Do NOT include English learning extraction sections in `plan.md` (keep coaching strictly in chat response footer).
 - Save `plan.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md`).

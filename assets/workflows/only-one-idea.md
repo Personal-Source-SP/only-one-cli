@@ -22,7 +22,6 @@ If input does not describe the idea or problem, ask a focused question before pr
   - Author `concept.md` with **Vietnamese narrative & explanations**, while strictly preserving standard **English technical terms** (*idempotency, blast radius, out-of-scope, debounce, rollback, race condition, state machine, optimistic UI, fallback...*).
 - Activate and follow the Define skills (`grill-with-docs`, `grill-me`, `domain-modeling`, `interview-me`, `idea-refine`, `wait-what`).
 - Maintain the project's Living Domain Glossary (`CONTEXT.md`) and record Architecture Decision Records (`only-one/adrs/`) for hard-to-reverse decisions.
-- Foster continuous technical English learning by rephrasing user inputs and breaking down response idioms during interactive turns (`conversational-english-coaching`).
 - **Do not perform deep codebase tracing, line-by-line file inspections, or low-level implementation code** (those strictly belong to `/only-one-plan`).
 
 ---
@@ -37,8 +36,6 @@ If input does not describe the idea or problem, ask a focused question before pr
 | **`grill-with-docs`** | User wants an intensive design grilling session with permanent docs | Conduct an interview that sharpens domain terminology and records `CONTEXT.md` and ADRs inline. |
 | **`grill-me`** | User requests fast brainstorming without creating files on disk | Conduct a relentless interview to uncover hidden assumptions with zero file footprint. |
 | **`wait-what`** | Agent explanation is unclear or drifting | Stop immediately and re-pitch the explanation in plain, concise English using domain vocabulary. |
-| **`conversational-english-coaching`** | Interactive Q&A turns and discussions | Rephrase user thoughts into natural, professional technical English. |
-| **`english-learning-extraction`** | Authoring `concept.md` | Extract 2–4 architectural, scoping, or trade-off English patterns into Section 5 of `concept.md`. |
 
 ---
 
@@ -68,7 +65,6 @@ If input does not describe the idea or problem, ask a focused question before pr
    - Key failure modes, concurrency, timeouts, and rollback/fallback strategies.
 4. **Decision Alignment with User (Role: User as PM)**:
    - Present the options and mockups to the user (as PM) for review, discussion, and selection of the final approach.
-5. **English Expression Coaching (`conversational-english-coaching`)**: Include `💬 English Expression Coaching` at the footer of each turn.
 
 ---
 

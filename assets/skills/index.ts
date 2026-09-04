@@ -247,18 +247,6 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
     },
     {
-        name: 'conversational-english-coaching',
-        version: '0.0.1',
-        description: 'Rephrase user thoughts into natural, professional technical English during interactive turns.',
-        sourceType: 'local',
-    },
-    {
-        name: 'english-learning-extraction',
-        version: '0.0.1',
-        description: 'Extract technical English patterns, grammar structures, and real-world examples into learn topics.',
-        sourceType: 'local',
-    },
-    {
         name: 'task-lifecycle-resolution',
         version: '0.0.1',
         description: 'Resolve and auto-archive completed tasks before running clean and maintenance workflows.',

@@ -174,6 +174,8 @@ describe('prebuilt combo completeness', () => {
         expect(referencedIds).not.toContain('nextjs-development');
         expect(referencedIds).not.toContain('nestjs-development');
         expect(referencedIds).not.toContain('architecture-stack');
+        expect(referencedIds).not.toContain('conversational-english-coaching');
+        expect(referencedIds).not.toContain('english-learning-extraction');
     });
 });
 
