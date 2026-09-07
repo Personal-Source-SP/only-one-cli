@@ -65,7 +65,7 @@ describe('Workflow Command Unit & Integration Tests', () => {
         await rmP(testProjectDir, { recursive: true, force: true });
     });
 
-    it('installs only-one-archive and only-one-clean workflows properly', async () => {
+    it('installs only-one-clean workflow properly', async () => {
         const deps: Partial<ProgramDeps> = {
             stdout: () => {},
             prompts: {
@@ -80,12 +80,10 @@ describe('Workflow Command Unit & Integration Tests', () => {
         await mkdirP(testProjectDir, { recursive: true });
 
         const cmd = createWorkflowCommand(deps as ProgramDeps);
-        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-archive,only-one-clean']);
+        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-clean']);
 
-        const archiveDest = join(testProjectDir, '.agents/workflows/only-one-archive.md');
         const cleanDest = join(testProjectDir, '.agents/workflows/only-one-clean.md');
 
-        expect(existsSync(archiveDest)).toBe(true);
         expect(existsSync(cleanDest)).toBe(true);
 
         await rmP(testProjectDir, { recursive: true, force: true });

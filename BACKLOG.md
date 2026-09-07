@@ -23,9 +23,8 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
   - *Review & Quality*: `code-review-and-quality`, `code-simplification`, `security-and-hardening`, `performance-optimization`.
   - *Local Custom*: `only-one-nestjs-development`, `only-one-nextjs-development`, `only-one-clockify-skill`, `only-one-intranet-skill`, `only-one-pr-git-skill`.
 - [x] **Task lifecycle management**:
-  - `only-one-archive`: chưng cất task đã hoàn thành thành single-file archive markdown (`only-one/archives/YYYYMMDD-HHMMSS-<name>.md`) kèm YAML frontmatter, cập nhật rules và dọn dẹp task folders.
-  - `only-one-clean`: tổng hợp archive liên quan, đối chiếu logic sâu với codebase thực tế, và dọn dẹp tài liệu cũ/stale.
-- [x] **Standardized SDLC workflows (10 workflows)**:
+  - `only-one-clean`: tự động lưu trữ task đã hoàn thành (`status: done`), chưng cất rules, tổng hợp archive cùng miền, và đối chiếu logic sâu với codebase thực tế.
+- [x] **Standardized SDLC workflows (9 workflows)**:
   - `only-one-idea`: làm rõ và thẩm định ý tưởng ban đầu trước khi lập kế hoạch.
   - `only-one-plan`: nghiên cứu codebase và tạo kế hoạch 5 phần (User Review, Open Questions, Proposed Changes, Verification Plan, Automated Tests).
   - `only-one-apply`: triển khai từng file theo plan đã duyệt, TDD, tự động tạo walkthrough documentation.
@@ -34,7 +33,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
   - `only-one-clockify`: xác thực task time entry GMT+7 và log vào Clockify qua MCP.
   - `only-one-intranet`: xác thực và log timesheet Intranet, xuất báo cáo tháng qua `zodinet-timesheet` MCP.
   - `only-one-pr-git`: tạo/cập nhật GitHub Pull Request với pre-review quality gates.
-  - `only-one-archive` & `only-one-clean`: quản lý vòng đời task và lưu trữ tri thức.
+  - `only-one-clean`: quản lý toàn diện vòng đời task, lưu trữ và thanh lọc tri thức hệ thống.
 - [x] **Full TUI command parity** — `only-one tui` giao diện terminal tương tác 1-1 với toàn bộ 13 subcommands thông qua Ink components (`ComboView`, `WorkflowView`, `RuleView`, `StructureView`, `UpdateView`, `DoctorView`, `McpView`, `SkillView`, `InitView`, `GitView`, `SettingsView`).
 - [x] **Rule management** — Cài persistent agent rules: `next-architecture-stack`, `nest-architecture-stack`, `context-and-tools`.
 

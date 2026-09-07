@@ -3,7 +3,7 @@ import type { ComboManifest } from '../types.js';
 export const COMBOS: ComboManifest[] = [
     {
         id: 'frontend-flow',
-        version: '0.0.2',
+        version: '0.0.3',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
         packages: ['ui-ux-pro-max-cli'],
@@ -37,13 +37,12 @@ export const COMBOS: ComboManifest[] = [
             'only-one-review',
             'only-one-handoff',
             'only-one-conflict',
-            'only-one-archive',
             'only-one-clean',
         ],
     },
     {
         id: 'backend-flow',
-        version: '0.0.2',
+        version: '0.0.3',
         name: 'Backend Flow Setup',
         description: 'NestJS backend development toolkit with architecture design, security audit, and API standards',
         skills: [
@@ -76,13 +75,12 @@ export const COMBOS: ComboManifest[] = [
             'only-one-review',
             'only-one-handoff',
             'only-one-conflict',
-            'only-one-archive',
             'only-one-clean',
         ],
     },
     {
         id: 'full-sdlc-flow',
-        version: '0.0.2',
+        version: '0.0.3',
         name: 'Full SDLC Enterprise Flow Setup',
         description: 'Complete end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, webperf, and review',
         skills: [
@@ -127,7 +125,6 @@ export const COMBOS: ComboManifest[] = [
             'only-one-review',
             'only-one-handoff',
             'only-one-conflict',
-            'only-one-archive',
             'only-one-clean',
             'only-one-clockify',
             'only-one-intranet',

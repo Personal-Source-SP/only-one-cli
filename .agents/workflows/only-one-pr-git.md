@@ -109,7 +109,7 @@ Activate and apply these skills throughout the PR workflow:
 - **Quality Gate**: `Passed` (or `Bypassed by user`)
 
 ### Next Steps:
-- After merging this Pull Request, run `/only-one-archive` to distill the completed task into `only-one/archives/` and clean up the working task directory.
+- After merging this Pull Request, run `/only-one-clean` to archive the completed task, update rules, and audit the repository.
 ```
 
 ---

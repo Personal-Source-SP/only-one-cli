@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Changed
+- **Task Lifecycle Workflow Consolidation**: Merged `only-one-archive` into `only-one-clean`. Task auto-archiving, rule distillation, and raw directory purging now execute seamlessly inside Step 0 of `/only-one-clean`.
+
 ## 1.0.3 (2026-08-27)
 
 ### Improvements

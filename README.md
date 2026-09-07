@@ -99,7 +99,6 @@ Standardized workflows include:
 - `only-one-apply`: Implement tasks from an approved plan with TDD and automated walkthrough creation.
 - `only-one-debug`: Systematic 5-step Root Cause Analysis (RCA) and minimal verified bug fixes.
 - `only-one-review`: 5-axis code health, security, simplicity, and performance review.
-- `only-one-archive`: Distill completed tasks into concise single-file archives (`only-one/archives/`).
 - `only-one-clean`: Consolidate related archives and purge stale task files.
 - `only-one-clockify`: Validate task time entries and log to Clockify.
 - `only-one-intranet`: Validate and log Intranet timesheet entries with monthly summary output.
@@ -220,9 +219,9 @@ Initialization can merge bundled Git, Docker, and npm ignore templates. Git igno
 
 `only-one-intranet` requires its bundled skill, `zodinet-timesheet` remote MCP server, and `TIMESHEET_PAT`.
 
-### Task Lifecycle (Archive & Clean)
+### Task Lifecycle (Clean)
 
-`only-one-archive` and `only-one-clean` manage historical task documentation in `only-one/archives/` using frontmatter metadata.
+`only-one-clean` automatically archives completed tasks (`status: done`), extracts negative rules into `only-one/rules.md`, consolidates domain archives, and audits documentation against active code.
 
 ## Compatibility
 
