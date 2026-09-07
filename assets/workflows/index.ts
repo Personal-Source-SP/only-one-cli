@@ -3,7 +3,7 @@ import type { WorkflowManifest } from '../types.js';
 export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-idea',
-        version: '0.0.3',
+        version: '0.0.4',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
@@ -17,7 +17,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-plan',
-        version: '0.0.3',
+        version: '0.0.4',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Current State, Detailed Design, Task Matrix, Unified Diffs, and Verification.',
         requiredSkills: [
@@ -33,7 +33,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.2',
+        version: '0.0.3',
         description:
             'Implement tasks from an approved plan.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
         requiredSkills: [

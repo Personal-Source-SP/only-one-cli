@@ -44,18 +44,27 @@ Read `concept.md` from the target task folder (`only-one/tasks/*-<slug>/concept.
 4. **Key Failure Modes & Security Boundaries**: Edge cases and risks.
 5. **Affected Modules / Services**: Modules, packages, or services to be modified.
 
-### 1b. Research Current Code & Reuse-First Audit
-1. Start with files, symbols, errors, and requirements from `concept.md` or user input.
-2. Read direct callers, dependencies, entities, DTOs, contracts, and tests in the codebase to verify exact current behavior.
-3. **Mandatory Reuse-First Audit**:
-   - Actively search (`grep_search` / `list_dir`) in `src/utils/`, `src/helpers/`, `src/hooks/`, `src/common/`, `src/components/`, `src/shared/` to identify existing utilities, helper functions, base classes, and custom hooks before designing new logic.
-   - ❌ **Strict Anti-Reinvention**: Do not propose new utility functions or duplicate components if existing ones can be reused or extended.
-4. Read `only-one/rules.md` to strictly observe mandatory negative rules and past lessons learned.
-5. Check `only-one/CONTEXT.md` for domain terminology and `only-one/archives/*.md` for past architecture decisions.
-6. Check `only-one/skills/` (and `.agents/skills/`) for relevant technology skills. Read their `SKILL.md` before analyzing affected code.
-7. Check existing repository patterns before proposing a new abstraction.
-8. Keep research bounded to the requested change; do not scan unrelated repository areas.
-9. Do not modify source code, dependencies, configuration, database state, or Git state.
+### 1b. File-Centric Research & Target-Driven Knowledge Ingestion Flow
+Do NOT bulk-load all rules, skills, and archives blindly (avoids context pollution and token waste). Follow the disciplined **File-Centric 2-Step Ingestion Flow**:
+
+1. **Step 1 — Identify Target Files & Impact Scope**:
+   - From `concept.md` and codebase analysis, assemble the preliminary list of affected files with their action tags: `[NEW]`, `[MODIFY]`, `[DELETE]`, `[RENAME]`.
+   - Read direct callers, dependencies, entities, DTOs, contracts, and tests to verify exact current behavior.
+   - **Mandatory Reuse-First Audit**: Actively search (`grep_search` / `list_dir`) in shared directories (`src/utils/`, `src/helpers/`, `src/hooks/`, `src/common/`, `src/components/`, `src/shared/`) to identify existing utilities, helper functions, and custom hooks. ❌ **Strict Anti-Reinvention**: Do not propose duplicate logic if existing helpers can be reused or extended.
+
+2. **Step 2 — Target-Driven Rules & Skills Lookup**:
+   - **IDE Framework Skills & Rules**:
+     - Match each target file against its framework and technology stack (e.g. `src/modules/*/*.service.ts` $\rightarrow$ `nestjs-development`; `src/components/*/*.tsx` $\rightarrow$ frontend UI/React skills; `*.dto.ts` $\rightarrow$ class-validator).
+     - Read `.agents/rules/`, `.cursorrules`, and the `SKILL.md` of ONLY the matched framework skills. ❌ **Strict No-Bulk-Loading**: Do NOT load unrelated tech skills into working memory.
+     - Extract exact naming conventions, DTO decorators, typing rules, and architectural constraints.
+   - **Only-One Governance & Targeted Archives**:
+     - Read `only-one/rules.md` to strictly enforce mandatory negative rules (`[NEVER]`, `[ALWAYS]`, `[AVOID]`).
+     - Search and read ONLY the relevant `only-one/archives/*.md` files matching the domain/module of the target files to understand past architectural decisions, rationale, and invariants.
+     - Check `only-one/CONTEXT.md` for domain terminology.
+
+3. **Step 3 — Mandatory Pre-Diff Blueprint Compliance Gate**:
+   - Before authoring Section 4 (Code Changes Unified Diff), cross-check every planned modification against the rules and framework skills loaded in Step 2.
+   - 🛑 **Zero-Tolerance Anti-Agent-Drift**: All proposed code changes in `plan.md` must be 100% compliant with the project's loaded skills and repository negative rules.
 
 ---
 
@@ -113,7 +122,21 @@ branch: ~
 - Thay đổi về giao tiếp module, xử lý dữ liệu và state transitions.
 - *(Tùy chọn)* Sơ đồ Mermaid sequence hoặc flowchart TD nếu luồng tương tác phức tạp.
 
-## Section 3. Task Matrix & Dependency Graph
+## Section 3. Directory Structure & Task Matrix
+
+### 3.1 Directory Structure Changes (Cấu trúc Thư mục & Tệp Thay đổi)
+Sơ đồ cây ASCII trực quan thể hiện tất cả các tệp sẽ được thêm mới, sửa đổi hoặc xóa kèm nhãn tag chuẩn:
+
+```text
+src/modules/order/
+├── [MODIFY] order.service.ts         # Xử lý cascading filter và reset ward state
+├── [NEW]    dto/order-filter.dto.ts  # DTO validate query parameters
+├── [DELETE] legacy-filter.helper.ts  # Xóa helper cũ đã deprecated
+└── components/
+    └── [MODIFY] StationsPage.tsx     # Controlled Select components & event handlers
+```
+
+### 3.2 Task Matrix & Dependency Graph
 
 | Order | Status | Action | File Path | Target Symbols / AST Seams | Reused Existing Utilities / Helpers | Depends On | Fast Test Command |
 | :---: | :---: | :---: | :--- | :--- | :--- | :--- | :--- |
@@ -146,7 +169,9 @@ Mô tả từng file trong Section 3 theo thứ tự thực thi bằng block dif
 
 ## 4. Review Gate & Next Steps
 
-1. Create artifact with `RequestFeedback: true` and `UserFacing: true`.
+1. **Single Plan Document Authority (Zero IDE Artifact Duplication)**:
+   - Save ONLY to `only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/plan.md`.
+   - ❌ **Strict No-Duplicate Artifacts**: Do NOT create secondary IDE-specific planning artifacts (such as `implementation_plan.md` in IDE brain/artifact directories). Present `plan.md` directly to the user.
 2. Stop after presenting the plan.
 3. Do not implement project changes before explicit user approval.
 4. Once approved, the user proceeds to `/only-one-apply <task-folder>/plan.md` to execute the plan.
@@ -156,6 +181,8 @@ Mô tả từng file trong Section 3 theo thứ tự thực thi bằng block dif
 ## Guardrails
 
 - **Enforce Dev-First & Diff-Centric Architecture**: Author narrative in Section 1 and 2 with punchy dev technical terms; present Section 4 in Git-standard Unified Diff (` ```diff `) format.
+- **🛑 Mandatory File-Centric Research & Compliance Gate**: Always identify target files first, then selectively load matching IDE framework skills and `only-one` rules/archives. Proposed diffs must comply 100% with loaded skills and rules.
+- **🛑 Strict Single-Document Invariant (Zero IDE Plan Artifacts)**: Only produce the canonical `only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md`. Never generate duplicate IDE internal plan files (e.g. `implementation_plan.md`).
 - **Enforce Reuse-First Invariant**: Always identify and declare reused existing utilities/helpers in Section 3 & 4; never propose reinventing existing functions.
 - Always include `Fast Test Command` per file in the Task Matrix to shorten verification feedback loops.
 - Save `plan.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md`).

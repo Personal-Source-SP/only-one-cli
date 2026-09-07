@@ -76,11 +76,13 @@ Check the frontmatter `status` field:
 
 ---
 
-### Step 3 — Parse Task Matrix & Dependency Graph
+### Step 3 — Ingest Directory Structure & Parse Task Matrix
 
-1. Jump directly to **Section 3. Task Matrix & Dependency Graph** in `plan.md`.
-2. Extract the ordered sequence: `Order`, `Status`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`.
-3. Skip rows already marked `[x]` (Done), identify the first pending row `[ ]` or in-progress row `[/]`.
+1. **Review Section 3.1 Directory Structure Changes**: Ingest the ASCII directory tree to establish an immediate mental model of all touched files (`[NEW]`, `[MODIFY]`, `[DELETE]`, `[RENAME]`).
+2. **Parse Section 3.2 Task Matrix & Dependency Graph**:
+   - Jump to **Section 3.2 Task Matrix & Dependency Graph** in `plan.md`.
+   - Extract the ordered sequence: `Order`, `Status`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`.
+   - Skip rows already marked `[x]` (Done), identify the first pending row `[ ]` or in-progress row `[/]`.
 
 ---
 
