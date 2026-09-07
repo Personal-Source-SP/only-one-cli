@@ -41,12 +41,12 @@ Activate and apply these skills throughout the archiving workflow:
    - Verify `status: done`. If `status` is `planned` or `in-progress`, warn the user:
      > *"⚠️ Task `<slug>` is not marked done. Do you want to force archive?"*
      Proceed only upon explicit user confirmation.
-3. Verify that `walkthrough.md` exists in the task folder.
+3. Verify that `plan.md` is marked `status: done` with completed verification in Section 5 (or legacy `walkthrough.md` if present).
 
 ---
 
 ### Step 2 — Extract User Feedback & Distill Negative Rules (`context-engineering`)
-1. Read `walkthrough.md` and `plan.md`.
+1. Read `plan.md` (and `concept.md` / legacy `walkthrough.md` if present).
 2. Extract any negative constraints, rules, anti-patterns, or user warnings communicated during the task.
 3. Append new negative rules to `only-one/rules.md`:
    ```markdown

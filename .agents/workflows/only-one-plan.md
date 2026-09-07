@@ -117,10 +117,11 @@ branch: ~
 - Danh sách Invariants bắt buộc giữ nguyên để tránh regression.
 - Dùng tên file ngắn gọn (basename như `auth.service.ts`), tuyệt đối không lặp lại đường dẫn dài lê thê.
 
-## Section 2. Detailed Design (Thiết kế Kỹ thuật Chi tiết)
-- Cơ chế vận hành mới và quyết định kiến trúc, dùng thuật ngữ chuyên môn trực diện (*seams, contracts, DTOs*).
-- Thay đổi về giao tiếp module, xử lý dữ liệu và state transitions.
-- *(Tùy chọn)* Sơ đồ Mermaid sequence hoặc flowchart TD nếu luồng tương tác phức tạp.
+## Section 2. Technical Contracts & AST Seams (Hợp Đồng Mã Nguồn & Điểm Neo)
+*(Kế thừa 100% cơ chế vận hành từ concept.md; tuyệt đối không mô tả lại giải pháp tổng quan)*
+
+- **Type Signatures & Code Contracts**: Khai báo các interface, DTO fields/decorators, function signatures mới hoặc sửa đổi. Nếu không phát sinh type mới, ghi rõ: `Kế thừa 100% cơ chế tại concept.md; không phát sinh Type Contract mới.`
+- **AST Seams & Callers**: Vị trí exact hàm, hook state, event handlers, dependency arrays, callers/callees bị ảnh hưởng trong codebase.
 
 ## Section 3. Directory Structure & Task Matrix
 
@@ -138,10 +139,10 @@ src/modules/order/
 
 ### 3.2 Task Matrix & Dependency Graph
 
-| Order | Status | Action | File Path | Target Symbols / AST Seams | Reused Existing Utilities / Helpers | Depends On | Fast Test Command |
-| :---: | :---: | :---: | :--- | :--- | :--- | :--- | :--- |
-| **1** | `[ ]` | `[NEW]` | `path/to/file.ts` | `Class.methodName` | `src/utils/date.ts (formatUtc)` | `None` | `npm test path/to/file.test.ts` |
-| **2** | `[ ]` | `[MODIFY]` | `path/to/caller.ts` | `Caller.handler` | `src/hooks/useCustomTable.ts` | `Order 1` | `npm test path/to/caller.test.ts` |
+| Order | Status | Action | File Path | Target Symbols / AST Seams | Depends On | Fast Test Command |
+| :---: | :---: | :---: | :--- | :--- | :--- | :--- |
+| **1** | `[ ]` | `[NEW]` | `path/to/file.ts` | `Class.methodName` | `None` | `npm test path/to/file.test.ts` |
+| **2** | `[ ]` | `[MODIFY]` | `path/to/caller.ts` | `Caller.handler` | `Order 1` | `npm test path/to/caller.test.ts` |
 
 ## Section 4. Code Changes (Unified Diff)
 Mô tả từng file trong Section 3 theo thứ tự thực thi bằng block diff chuẩn Git:
@@ -181,6 +182,7 @@ Mô tả từng file trong Section 3 theo thứ tự thực thi bằng block dif
 ## Guardrails
 
 - **Enforce Dev-First & Diff-Centric Architecture**: Author narrative in Section 1 and 2 with punchy dev technical terms; present Section 4 in Git-standard Unified Diff (` ```diff `) format.
+- **🛑 Anti-Concept-Duplication**: Never re-explain or summarize the high-level mechanism in Section 2. `concept.md` is the authoritative Single Source of Truth for the solution mechanism; Section 2 strictly defines code-level contracts, type signatures, and AST seams.
 - **🛑 Mandatory File-Centric Research & Compliance Gate**: Always identify target files first, then selectively load matching IDE framework skills and `only-one` rules/archives. Proposed diffs must comply 100% with loaded skills and rules.
 - **🛑 Strict Single-Document Invariant (Zero IDE Plan Artifacts)**: Only produce the canonical `only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md`. Never generate duplicate IDE internal plan files (e.g. `implementation_plan.md`).
 - **Enforce Reuse-First Invariant**: Always identify and declare reused existing utilities/helpers in Section 3 & 4; never propose reinventing existing functions.

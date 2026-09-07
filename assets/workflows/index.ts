@@ -17,7 +17,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-plan',
-        version: '0.0.4',
+        version: '0.0.5',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Current State, Detailed Design, Task Matrix, Unified Diffs, and Verification.',
         requiredSkills: [
@@ -33,7 +33,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.3',
+        version: '0.0.4',
         description:
             'Implement tasks from an approved plan.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
         requiredSkills: [
@@ -107,7 +107,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-archive',
-        version: '0.0.2',
+        version: '0.0.3',
         description:
             'Distill completed tasks into concise single-file archives, sync rules, and clean task folders.',
         requiredSkills: ['handoff', 'code-simplification', 'context-engineering'],
