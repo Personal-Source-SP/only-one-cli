@@ -69,13 +69,6 @@ export const WORKFLOWS: WorkflowManifest[] = [
         ],
     },
     {
-        name: 'only-one-handoff',
-        version: '0.0.1',
-        description:
-            'Compact current conversation and task state into a seamless handoff document for agent switching or context refreshment.',
-        requiredSkills: ['handoff'],
-    },
-    {
         name: 'only-one-conflict',
         version: '0.0.1',
         description:

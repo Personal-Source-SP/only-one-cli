@@ -172,14 +172,6 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'github',
         skillPath: 'skills/engineering/resolving-merge-conflicts/SKILL.md',
     },
-    {
-        name: 'handoff',
-        version: '0.0.1',
-        description: 'Compact current conversation state into a seamless handoff document.',
-        source: 'mattpocock/skills',
-        sourceType: 'github',
-        skillPath: 'skills/productivity/handoff/SKILL.md',
-    },
 
     // --- 5. Review & Quality Gates Phase ---
     {
