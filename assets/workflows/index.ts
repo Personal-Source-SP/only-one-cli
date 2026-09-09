@@ -100,7 +100,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-clean',
-        version: '0.0.3',
+        version: '0.0.4',
         description:
             'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
         requiredSkills: [

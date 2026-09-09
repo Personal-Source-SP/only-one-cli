@@ -240,7 +240,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'task-lifecycle-resolution',
-        version: '0.0.1',
+        version: '0.0.2',
         description: 'Resolve and auto-archive completed tasks before running clean and maintenance workflows.',
         sourceType: 'local',
     },
