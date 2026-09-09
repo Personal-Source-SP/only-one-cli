@@ -87,12 +87,4 @@ export const GIT_SNIPPETS: GitSnippet[] = [
         file: 'snippets/antigravity.sh',
         defaultSelected: true,
     },
-    {
-        id: 'k8s-dev-forward',
-        version: '0.0.1',
-        name: 'K8s Dev Forwarding Helper',
-        description: 'f-all() function to port-forward Postgres, Redis, EMQX in dev cluster',
-        file: 'snippets/k8s-dev-forward.sh',
-        defaultSelected: false,
-    },
 ];
