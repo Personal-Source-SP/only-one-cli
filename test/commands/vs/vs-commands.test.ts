@@ -29,9 +29,11 @@ vi.mock('@src/core/vs/index.js', async (importOriginal) => {
                 },
             ]);
         }),
-        syncVsExtensions: vi
-            .fn()
-            .mockResolvedValue({ installed: 2, results: [{ editorName: 'VSCode', installedExtensions: ['ext1', 'ext2'] }] }),
+        syncVsExtensions: vi.fn().mockResolvedValue({
+            installed: 2,
+            pruned: 1,
+            results: [{ editorName: 'VSCode', installedExtensions: ['ext1', 'ext2'], prunedExtensions: ['pruned1'] }],
+        }),
         syncVsSettings: vi.fn().mockResolvedValue({
             changed: 2,
             results: [{ editorName: 'VSCode', newKeys: { 'some.new': true }, changedKeys: { 'some.changed': { old: 1, new: 2 } } }],
@@ -148,6 +150,19 @@ describe('VS sync commands', () => {
 
         expect(syncVsExtensions).toHaveBeenCalledWith(expect.objectContaining({ cwd: '/repo', editorIds: [VsEditorId.Cursor] }));
         expect(writes.map((w) => w.replace(/\u001b\[\d+m/g, ''))).toContain('\nSync Summary:');
+    });
+
+    it('passes prune option to syncVsExtensions when --prune is specified', async () => {
+        const program = createProgram({
+            cwd: '/repo',
+            env: {},
+            fetcher: (() => Promise.resolve({})) as typeof fetch,
+            stdout: () => undefined,
+        });
+
+        await program.parseAsync(['extensions-vs', '--editors', 'cursor', '--prune'], { from: 'user' });
+
+        expect(syncVsExtensions).toHaveBeenCalledWith(expect.objectContaining({ prune: true }));
     });
 
     it('prompts extension selection and confirm overwrite in interactive mode', async () => {

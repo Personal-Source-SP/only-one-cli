@@ -18,6 +18,7 @@ export function createExtensionsVsCommand(deps: ProgramDeps): Command {
         .option('--editors <ids>', 'Comma-separated list of editor identifiers to sync (choices: antigravity, cursor)')
         .option('--extensions <ids>', 'Comma-separated list of extension IDs to install')
         .option('--force', 'Force install all extensions, bypassing merge', false)
+        .option('--prune', 'Remove extensions installed on the editor that are not in the library manifest', false)
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +

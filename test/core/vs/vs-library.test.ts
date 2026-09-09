@@ -18,8 +18,10 @@ describe('VS_LIBRARY manifest', () => {
         const lib = await loadVsLibraryManifest();
         expect(lib.extensions).toContain('bierner.markdown-mermaid');
         expect(lib.extensions).toContain('bierner.markdown-preview-github-styles');
+        expect(lib.extensions).toContain('anysphere.cursorpyright');
         expect(lib.extensions).not.toContain('shd101wyy.markdown-preview-enhanced');
         expect(lib.settings['git.autofetch']).toBe(true);
+        expect(lib.settings['python.languageServer']).toBe('Default');
         expect(lib.settings['workbench.editorAssociations']).toEqual({ '*.md': 'vscode.markdown.preview.editor' });
     });
 });

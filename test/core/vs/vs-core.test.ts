@@ -58,11 +58,14 @@ class MemoryFs implements VsFileSystem {
 class MemoryRunner implements VsProcessRunner {
     public readonly calls: Array<{ command: string; args: string[] }> = [];
 
-    public constructor(private readonly failInstallId?: string) {}
+    public constructor(
+        private readonly failInstallId?: string,
+        private readonly listStdout = 'existing.keep\n',
+    ) {}
 
     public async run(command: string, args: string[]): Promise<VsProcessResult> {
         this.calls.push({ args, command });
-        if (args[0] === '--list-extensions') return { code: 0, stderr: '', stdout: 'existing.keep\n' };
+        if (args[0] === '--list-extensions') return { code: 0, stderr: '', stdout: this.listStdout };
         if ((args[0] === '--install-extension' || args[0] === '--uninstall-extension') && args[1] === this.failInstallId) {
             return { code: 1, stderr: 'install failed', stdout: '' };
         }
@@ -240,6 +243,27 @@ describe('VS core sync helpers', () => {
         expect(runner.calls).toContainEqual({ command: 'code', args: ['--install-extension', 'Missing.One'] });
         expect(runner.calls).toContainEqual({ command: 'code', args: ['--uninstall-extension', 'Missing.One'] });
         expect(runner.calls).not.toContainEqual({ command: 'code', args: ['--uninstall-extension', 'existing.keep'] });
+    });
+
+    it('prunes unlisted extensions when prune option is enabled', async () => {
+        const fs = new MemoryFs();
+        seedLibrary(fs);
+        const runner = new MemoryRunner(undefined, 'existing.keep\norphaned.ext\n');
+
+        const result = await syncVsExtensions({
+            cwd: '/repo',
+            editorIds: [VsEditorId.VSCode],
+            fs,
+            libraryDir: join('/library', 'vs'),
+            prune: true,
+            runner,
+            write: () => undefined,
+        });
+
+        expect(runner.calls).toContainEqual({ command: 'code', args: ['--uninstall-extension', 'orphaned.ext'] });
+        expect(runner.calls).not.toContainEqual({ command: 'code', args: ['--uninstall-extension', 'existing.keep'] });
+        expect(result.results[0]?.prunedExtensions).toEqual(['orphaned.ext']);
+        expect(result.pruned).toBe(1);
     });
 
     it('throws an actionable error when no editor command candidates are executable', async () => {

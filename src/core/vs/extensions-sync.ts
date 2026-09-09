@@ -17,18 +17,22 @@ export interface VsExtensionsSyncRequest {
     editorIds: VsEditorId[];
     write: (line: string) => void;
     force?: boolean;
+    prune?: boolean;
     fs?: VsFileSystem;
     libraryDir?: string;
     runner?: VsProcessRunner;
     extensionIds?: string[];
     extensionIdsPerEditor?: Record<VsEditorId, string[]>;
+    pruneExtensionIdsPerEditor?: Record<VsEditorId, string[]>;
 }
 
 export interface VsExtensionsSyncResponse {
     installed: number;
+    pruned: number;
     results: Array<{
         editorName: string;
         installedExtensions: string[];
+        prunedExtensions: string[];
     }>;
 }
 
@@ -102,31 +106,38 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
     const editors = request.editorIds.map((id) => findVsEditor(id));
     if (editors.some((editor) => !editor)) throw new Error('Unsupported editor selected');
 
-    const plans: Array<{ command: string; editorName: string; extensionIds: string[] }> = [];
+    const plans: Array<{ command: string; editorName: string; extensionIds: string[]; pruneExtensionIds: string[] }> = [];
     for (const editor of editors) {
         if (!editor) continue;
         const command = await resolveVsEditorCommand(runner, editor);
         const targetExtensions = request.extensionIdsPerEditor?.[editor.id] ?? request.extensionIds ?? manifest.extensions;
+        const targetSet = new Set(targetExtensions.map((id) => id.toLowerCase()));
+        const installedList = await getVsInstalledExtensions(runner, command).catch(() => []);
+        const installed = new Set(installedList.map((id) => id.toLowerCase()));
 
         const isExplicitSelection = Boolean(request.extensionIdsPerEditor || request.extensionIds);
+        const pruneExtensionIds = request.prune
+            ? (request.pruneExtensionIdsPerEditor?.[editor.id] ?? installedList.filter((id) => !targetSet.has(id.toLowerCase())))
+            : [];
 
         if (request.force || isExplicitSelection) {
             plans.push({
                 command,
                 editorName: editor.name,
                 extensionIds: targetExtensions,
+                pruneExtensionIds,
             });
         } else {
-            const installed = new Set((await getVsInstalledExtensions(runner, command)).map((id) => id.toLowerCase()));
             plans.push({
                 command,
                 editorName: editor.name,
                 extensionIds: targetExtensions.filter((id) => !installed.has(id.toLowerCase())),
+                pruneExtensionIds,
             });
         }
     }
 
-    const total = plans.reduce((sum, plan) => sum + plan.extensionIds.length, 0) + 2;
+    const total = plans.reduce((sum, plan) => sum + plan.extensionIds.length + plan.pruneExtensionIds.length, 0) + 2;
     progress.start(total, 'validate extensions sync');
     await transaction.begin();
     const handleSignal = async (): Promise<void> => {
@@ -137,11 +148,13 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
     process.once('SIGTERM', handleSignal);
     progress.step('backup ready');
     let installedCount = 0;
+    let prunedCount = 0;
     const results: VsExtensionsSyncResponse['results'] = [];
 
     try {
         for (const plan of plans) {
             const installedExtensions: string[] = [];
+            const prunedExtensions: string[] = [];
             for (const extensionId of plan.extensionIds) {
                 const result = await runner.run(plan.command, ['--install-extension', extensionId]);
                 if (result.code !== 0) {
@@ -152,16 +165,26 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
                 installedExtensions.push(extensionId);
                 progress.step(`${plan.editorName}: ${extensionId}`);
             }
+            for (const extensionId of plan.pruneExtensionIds) {
+                const result = await runner.run(plan.command, ['--uninstall-extension', extensionId]);
+                if (result.code !== 0) {
+                    throw new Error(extractProcessErrorMessage(result, `Failed to uninstall ${extensionId}`));
+                }
+                prunedCount += 1;
+                prunedExtensions.push(extensionId);
+                progress.step(`${plan.editorName} (pruned): ${extensionId}`);
+            }
             results.push({
                 editorName: plan.editorName,
                 installedExtensions,
+                prunedExtensions,
             });
         }
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
         await transaction.commit();
         progress.step('extensions committed');
-        return { installed: installedCount, results };
+        return { installed: installedCount, pruned: prunedCount, results };
     } catch (error) {
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);

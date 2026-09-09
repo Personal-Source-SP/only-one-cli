@@ -1,10 +1,11 @@
 import type { VsLibraryManifest } from '../types.js';
 
 export const VS_LIBRARY: VsLibraryManifest = {
-    version: '0.0.2',
+    version: '0.0.3',
     extensions: [
         'aaron-bond.better-comments',
         'anthropic.claude-code',
+        'anysphere.cursorpyright',
         'anysphere.remote-ssh',
         'bierner.markdown-mermaid',
         'bierner.markdown-preview-github-styles',
@@ -84,7 +85,7 @@ export const VS_LIBRARY: VsLibraryManifest = {
         'workbench.activityBar.iconClickBehavior': 'toggle',
         'terminal.integrated.defaultProfile.windows': 'PowerShell',
         'jest.enable': false,
-        'cSpell.userWords': ['automapper', 'dtos', 'ILIKE', 'Redlock', 'refinedev', 'Serper'],
+        'cSpell.userWords': ['automapper', 'dtos', 'ILIKE', 'Paygate', 'Redlock', 'refinedev', 'Serper'],
         'editor.unicodeHighlight.ambiguousCharacters': false,
         'terminal.integrated.defaultProfile.osx': 'zsh',
         'git.confirmSync': false,
@@ -123,7 +124,7 @@ export const VS_LIBRARY: VsLibraryManifest = {
         'workbench.editorAssociations': {
             '*.md': 'vscode.markdown.preview.editor',
         },
-        'python.languageServer': 'None',
+        'python.languageServer': 'Default',
         'git.autofetch': true,
         'explorer.confirmDelete': false,
         'workbench.sideBar.location': 'right',
