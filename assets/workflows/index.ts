@@ -46,9 +46,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
-        version: '0.0.1',
+        version: '0.0.2',
         description:
-            'Perform systematic Root Cause Analysis (RCA) and deliver a minimal verified fix using disciplined red feedback loops.',
+            'Perform systematic Root Cause Analysis (RCA) with a mandatory Review Gate, document debug.md, and deliver a minimal verified fix.',
         requiredSkills: [
             'diagnosing-bugs',
             'doubt-driven-development',
