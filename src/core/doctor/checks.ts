@@ -14,17 +14,8 @@ import {
 } from '@/core/config/index.js';
 import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint } from '@/core/runtime/credentials.js';
 import { resolveLocalConfigPathForProject } from '@/core/prebuilt/index-output.js';
-import type { DoctorMode } from '@/core/indexing/tools.js';
-import { resolveCocoindexImage, resolveCocoindexScript } from '@/core/indexing/tools.js';
-import {
-    COCOINDEX_CONTAINER_NAME,
-    ensureCocoindexContainerRunning,
-    getContainerState,
-    getDockerServerVersion,
-    hasDockerImage,
-    isDockerDaemonRunning,
-    verifyCocoindexInContainer,
-} from '@/core/indexing/docker-runtime.js';
+import type { DoctorMode } from './types.js';
+import { getDockerServerVersion, isDockerDaemonRunning } from '@/core/indexing/docker-runtime.js';
 
 export interface RunIndexingChecksOptions {
     autoStartContainers?: boolean;
@@ -253,112 +244,8 @@ export async function checkDocker(mode: DoctorMode): Promise<CheckResult> {
     };
 }
 
-export async function checkCocoindex(mode: DoctorMode, options: RunIndexingChecksOptions = {}): Promise<CheckResult> {
-    if (mode === 'docker') {
-        return checkCocoindexDocker(options);
-    }
-    return checkCocoindexLocal();
-}
-
-async function checkCocoindexLocal(): Promise<CheckResult> {
-    const script = resolveCocoindexScript();
-
-    try {
-        const python = process.env.COCOINDEX_BINARY ?? 'python3';
-        if (!(await fileExists(script))) {
-            return {
-                name: 'cocoindex',
-                ok: false,
-                detail: 'index script not found',
-                required: true,
-                remediation: 'Reinstall only-one (includes scripts/cocoindex_documents.py) or set COCOINDEX_SCRIPT to the script path',
-            };
-        }
-
-        const version = execFileSync(python, ['--version'], {
-            encoding: 'utf-8',
-            stdio: 'pipe',
-        }).trim();
-        return {
-            name: 'cocoindex',
-            ok: true,
-            detail: `${version}; script ready`,
-            required: true,
-        };
-    } catch {
-        return {
-            name: 'cocoindex',
-            ok: false,
-            detail: 'python3 not found',
-            required: true,
-            remediation: 'Install Python 3.11+ and pip3 install cocoindex',
-        };
-    }
-}
-
-async function checkCocoindexDocker(options: RunIndexingChecksOptions): Promise<CheckResult> {
-    const image = resolveCocoindexImage();
-    if (!hasDockerImage(image)) {
-        return {
-            name: 'cocoindex',
-            ok: false,
-            detail: `image not found (${image})`,
-            required: true,
-            remediation: `Pull CocoIndex image: docker pull ${image} (or only-one doctor --install-missing)`,
-        };
-    }
-
-    const containerState = getContainerState(COCOINDEX_CONTAINER_NAME);
-    if (containerState !== 'running') {
-        if (options.autoStartContainers !== false) {
-            try {
-                ensureCocoindexContainerRunning(image);
-            } catch (err: unknown) {
-                const message = err instanceof Error ? err.message : 'failed to start container';
-                return {
-                    name: 'cocoindex',
-                    ok: false,
-                    detail: `container ${COCOINDEX_CONTAINER_NAME} failed to start (${message})`,
-                    required: true,
-                    remediation: `Start CocoIndex container: docker start ${COCOINDEX_CONTAINER_NAME}`,
-                };
-            }
-        } else {
-            return {
-                name: 'cocoindex',
-                ok: false,
-                detail:
-                    containerState === 'stopped'
-                        ? `container ${COCOINDEX_CONTAINER_NAME} stopped`
-                        : `container ${COCOINDEX_CONTAINER_NAME} missing`,
-                required: true,
-                remediation: `Run only-one doctor to start ${COCOINDEX_CONTAINER_NAME}`,
-            };
-        }
-    }
-
-    try {
-        verifyCocoindexInContainer();
-        return {
-            name: 'cocoindex',
-            ok: true,
-            detail: `CLI ready (${COCOINDEX_CONTAINER_NAME} running)`,
-            required: true,
-        };
-    } catch {
-        return {
-            name: 'cocoindex',
-            ok: false,
-            detail: `container ${COCOINDEX_CONTAINER_NAME} unhealthy`,
-            required: true,
-            remediation: `Recreate container: docker rm -f ${COCOINDEX_CONTAINER_NAME} && only-one doctor --install-missing`,
-        };
-    }
-}
-
-export async function runIndexingChecks(mode: DoctorMode, options: RunIndexingChecksOptions = {}): Promise<CheckResult[]> {
-    const checksOptions = { autoStartContainers: options.autoStartContainers ?? true };
-    return Promise.all([checkDocker(mode), checkCocoindex(mode, checksOptions)]);
+export async function runIndexingChecks(mode: DoctorMode, _options: RunIndexingChecksOptions = {}): Promise<CheckResult[]> {
+    return Promise.all([checkDocker(mode)]);
 }
 
 export async function assertIndexingReadiness(cwd: string, modeOverride?: string): Promise<DoctorReport> {
@@ -433,7 +320,7 @@ export function buildSampleCommands(status: ReadinessStatus, _config: SampleComm
         return [
             {
                 command: 'only-one doctor --install-missing',
-                description: 'Install missing CocoIndex dependencies',
+                description: 'Install missing dependencies',
             },
             {
                 command: 'only-one doctor --print-install-script',

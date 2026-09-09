@@ -1,7 +1,4 @@
 import { execFileSync } from 'node:child_process';
-import { resolveCocoindexImage } from '@/core/indexing/tools.js';
-
-export const COCOINDEX_CONTAINER_NAME = 'only-one-cocoindex';
 
 const DOCKER = 'docker';
 
@@ -54,14 +51,6 @@ export function getContainerState(name: string): DockerContainerState {
     }
 }
 
-export function cocoindexContainerRunArgs(image: string): string[] {
-    return ['run', '-d', '--name', COCOINDEX_CONTAINER_NAME, '--restart', 'unless-stopped', '--entrypoint', 'sleep', image, 'infinity'];
-}
-
-export function ensureCocoindexContainerRunning(image = resolveCocoindexImage()): void {
-    ensureContainerRunning(COCOINDEX_CONTAINER_NAME, cocoindexContainerRunArgs(image));
-}
-
 export function ensureContainerRunning(name: string, runArgs: string[]): void {
     const state = getContainerState(name);
     if (state === 'running') {
@@ -72,16 +61,4 @@ export function ensureContainerRunning(name: string, runArgs: string[]): void {
         return;
     }
     execFileSync(DOCKER, runArgs, { encoding: 'utf-8', stdio: 'pipe' });
-}
-
-export function verifyCocoindexInContainer(): void {
-    const state = getContainerState(COCOINDEX_CONTAINER_NAME);
-    if (state !== 'running') {
-        throw new Error(`container ${COCOINDEX_CONTAINER_NAME} is not running`);
-    }
-    execFileSync(DOCKER, ['exec', COCOINDEX_CONTAINER_NAME, 'ccc', '--help'], {
-        encoding: 'utf-8',
-        stdio: 'pipe',
-        timeout: 120_000,
-    });
 }

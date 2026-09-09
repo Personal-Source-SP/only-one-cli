@@ -4,15 +4,12 @@ import { existsSync } from 'node:fs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { promisify } from 'node:util';
-import type { IndexMode } from '@/core/config/index.js';
-import { resolveCocoindexImage, resolveCocoindexScript } from '@/core/indexing/tools.js';
 import { listStructureRelativePaths } from '@/core/structure/paths.js';
 
 const execFileAsync = promisify(execFile);
 
 export interface ManifestData {
     artifactChecksum: string;
-    cocoindexVersion: string;
     commitSha: string;
     createdAt: string;
     fileCount: number;
@@ -22,7 +19,7 @@ export interface ManifestData {
     structuralFiles?: string[];
 }
 
-const ARTIFACT_DIRS = ['.cocoindex'] as const;
+const ARTIFACT_DIRS = [] as const;
 
 export async function countFiles(dir: string): Promise<number> {
     if (!existsSync(dir)) return 0;
@@ -41,22 +38,6 @@ export async function getCommitSha(dir: string): Promise<string> {
             timeout: 5000,
         });
         return stdout.trim();
-    } catch {
-        return 'unknown';
-    }
-}
-
-export async function detectCocoindexVersion(mode: IndexMode): Promise<string> {
-    if (mode === 'docker') {
-        return resolveCocoindexImage();
-    }
-
-    const python = process.env.COCOINDEX_BINARY ?? 'python3';
-    try {
-        const { stdout } = await execFileAsync(python, ['--version'], { timeout: 10_000 });
-        const py = stdout.trim();
-        const script = resolveCocoindexScript();
-        return existsSync(script) ? `${py}; ${script}` : py;
     } catch {
         return 'unknown';
     }
@@ -101,27 +82,16 @@ export async function computeArtifactChecksum(outputDir: string): Promise<string
     return hash.digest('hex');
 }
 
-export async function buildManifestData(
-    projectDir: string,
-    outputDir: string,
-    projectName: string,
-    mode: IndexMode,
-): Promise<ManifestData> {
-    const [commitSha, cocoindexVersion, fileCount, artifactChecksum] = await Promise.all([
-        getCommitSha(projectDir),
-        detectCocoindexVersion(mode),
-        countFiles(join(outputDir, '.cocoindex')),
-        computeArtifactChecksum(outputDir),
-    ]);
+export async function buildManifestData(projectDir: string, outputDir: string, projectName: string): Promise<ManifestData> {
+    const [commitSha, artifactChecksum] = await Promise.all([getCommitSha(projectDir), computeArtifactChecksum(outputDir)]);
 
     const structuralFiles = listStructureRelativePaths(outputDir);
 
     return {
         artifactChecksum,
-        cocoindexVersion,
         commitSha,
         createdAt: new Date().toISOString(),
-        fileCount,
+        fileCount: structuralFiles.length,
         projectName,
         schemaVersion: '1.0',
         ...(structuralFiles.length ? { structuralFiles } : {}),

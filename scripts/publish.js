@@ -110,12 +110,6 @@ info('Copying files for packaging...');
 copyRecursive(path.join(ROOT, 'dist'), path.join(packRoot, 'dist'));
 fs.copyFileSync(path.join(ROOT, 'package.json'), path.join(packRoot, 'package.json'));
 
-const scriptsDir = path.join(packRoot, 'scripts');
-fs.mkdirSync(scriptsDir, { recursive: true });
-const docScript = path.join(ROOT, 'scripts', 'cocoindex_documents.py');
-if (fs.existsSync(docScript)) {
-  fs.copyFileSync(docScript, path.join(scriptsDir, 'cocoindex_documents.py'));
-}
 
 for (const file of ['README.md', 'LICENSE']) {
   const filePath = path.join(ROOT, file);

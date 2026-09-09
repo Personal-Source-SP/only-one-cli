@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { listStructureRelativePaths } from '@/core/structure/paths.js';
 
-const CORE_BUNDLE_ENTRIES = ['.cocoindex', 'manifest.json'] as const;
+const CORE_BUNDLE_ENTRIES = ['manifest.json'] as const;
 
 export function listBundleEntries(indexOutputDir: string): string[] {
     const entries: string[] = [];

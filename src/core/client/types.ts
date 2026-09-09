@@ -138,7 +138,6 @@ export interface UploadPrebuiltIndexResponse {
 
 export interface IndexVersionMetadata {
     artifactChecksum?: string;
-    cocoindexVersion?: string;
     commitSha?: string;
     createdAt?: string;
     createdBy?: string;
@@ -158,7 +157,6 @@ export interface ListIndexesOptions {
 
 export interface LatestIndexMetadata {
     artifactChecksum?: string;
-    cocoindexVersion?: string;
     commitSha?: string;
     createdAt?: string;
     indexVersionId?: string;

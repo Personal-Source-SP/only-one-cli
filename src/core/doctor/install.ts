@@ -1,12 +1,8 @@
 import filter from 'lodash/filter.js';
 import isEmpty from 'lodash/isEmpty.js';
 import map from 'lodash/map.js';
-import { execFileSync } from 'node:child_process';
-import type { DoctorMode } from '@/core/indexing/tools.js';
-import { resolveCocoindexImage } from '@/core/indexing/tools.js';
 import type { CheckResult } from './checks.js';
-import { COCOINDEX_CONTAINER_NAME, ensureCocoindexContainerRunning } from '@/core/indexing/docker-runtime.js';
-import type { DoctorBuildInstallScriptRequest, DoctorInstallDependenciesRequest, InstallResult } from './types.js';
+import type { DoctorBuildInstallScriptRequest, DoctorInstallDependenciesRequest, DoctorMode, InstallResult } from './types.js';
 
 export function missingIndexingDependencies(checks: CheckResult[]): string[] {
     return map(
@@ -16,7 +12,7 @@ export function missingIndexingDependencies(checks: CheckResult[]): string[] {
 }
 
 export function buildInstallScript(request: DoctorBuildInstallScriptRequest): string {
-    const { mode, missing } = request;
+    const { missing } = request;
     const lines = ['#!/usr/bin/env bash', 'set -euo pipefail', ''];
 
     if (missing.includes('docker')) {
@@ -25,30 +21,10 @@ export function buildInstallScript(request: DoctorBuildInstallScriptRequest): st
         lines.push('');
     }
 
-    if (mode === 'docker') {
-        if (missing.includes('cocoindex')) {
-            const image = resolveCocoindexImage();
-            lines.push(`docker pull ${image}`);
-            lines.push(`docker run -d --name ${COCOINDEX_CONTAINER_NAME} --restart unless-stopped --entrypoint sleep ${image} infinity`);
-            lines.push('');
-        }
-        return lines.join('\n').trimEnd();
-    }
-
-    if (missing.includes('cocoindex')) {
-        lines.push('# Requires Python 3.11+');
-        lines.push('pip3 install cocoindex');
-        lines.push('');
-    }
-
     return lines.join('\n').trimEnd();
 }
 
-async function pullDockerImage(image: string): Promise<void> {
-    execFileSync('docker', ['pull', image], { encoding: 'utf-8', stdio: 'pipe' });
-}
-
-export async function runMissingInstalls(mode: DoctorMode, missing: string[]): Promise<InstallResult[]> {
+export async function runMissingInstalls(_mode: DoctorMode, missing: string[]): Promise<InstallResult[]> {
     const results: InstallResult[] = [];
 
     if (missing.includes('docker')) {
@@ -57,49 +33,6 @@ export async function runMissingInstalls(mode: DoctorMode, missing: string[]): P
             dependency: 'docker',
             detail: 'manual install required — see https://docs.docker.com/get-docker/',
         });
-    }
-
-    if (mode === 'docker') {
-        if (missing.includes('cocoindex')) {
-            try {
-                const image = resolveCocoindexImage();
-                await pullDockerImage(image);
-                ensureCocoindexContainerRunning(image);
-                results.push({
-                    ok: true,
-                    dependency: 'cocoindex',
-                    detail: `CocoIndex image pulled; container ${COCOINDEX_CONTAINER_NAME} running`,
-                });
-            } catch (err: any) {
-                results.push({
-                    ok: false,
-                    dependency: 'cocoindex',
-                    detail: err?.message ? String(err.message) : 'docker pull failed',
-                });
-            }
-        }
-
-        return results;
-    }
-
-    if (missing.includes('cocoindex')) {
-        try {
-            execFileSync('pip3', ['install', 'cocoindex'], {
-                stdio: 'pipe',
-                encoding: 'utf-8',
-            });
-            results.push({
-                ok: true,
-                dependency: 'cocoindex',
-                detail: 'installed via pip3',
-            });
-        } catch (err: any) {
-            results.push({
-                ok: false,
-                dependency: 'cocoindex',
-                detail: err?.message ? String(err.message) : 'pip3 install failed',
-            });
-        }
     }
 
     return results;

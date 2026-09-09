@@ -1,6 +1,6 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { CheckResult, DoctorReport, SampleCommand } from './checks.js';
-import type { DoctorMode } from '@/core/indexing/tools.js';
+export type DoctorMode = 'docker' | 'local';
 
 export type DoctorCategory = 'environment' | 'libraries' | 'ide_settings' | 'mcp' | 'agent_assets' | 'ignore_files' | 'extensions';
 
