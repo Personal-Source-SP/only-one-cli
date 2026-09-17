@@ -5,11 +5,10 @@ archived_at: 2026-09-17
 status: active
 references:
   - only-one/archives/20260824-103830-tui-modernization.md
-  - only-one/archives/20260828-203000-vs-environment-and-sync-systems.md
-  - only-one/archives/20260903-111050-asset-versioning-and-unified-lockfile.md
+  - only-one/archives/20260917-101800-refactor-dev-skills-standards.md
+  - only-one/archives/20260917-105100-asset-versioning-and-sync-systems.md
   - only-one/archives/20260904-140500-mcp-registry-and-servers.md
   - only-one/archives/20260909-100058-cli-tooling-and-cocoindex-purge.md
-  - only-one/archives/20260917-101800-refactor-dev-skills-standards.md
 affected_modules:
   - assets/skills
   - assets/workflows

@@ -4,7 +4,7 @@ title: Kiến Trúc MCP Registry, Tích Hợp Playwright Browser & Chuẩn Hóa 
 archived_at: 2026-09-04
 status: active
 references:
-  - only-one/archives/20260903-111050-asset-versioning-and-unified-lockfile.md
+  - only-one/archives/20260917-105100-asset-versioning-and-sync-systems.md
 affected_modules:
   - assets/mcps/index.ts
   - src/core/mcp
