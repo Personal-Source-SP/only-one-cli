@@ -33,9 +33,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.4',
+        version: '0.0.5',
         description:
-            'Implement tasks from an approved plan.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
+            'Implement tasks from an approved plan.md or debug.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
         requiredSkills: [
             'context-engineering',
             'incremental-implementation',
@@ -46,9 +46,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
-        version: '0.0.2',
+        version: '0.0.3',
         description:
-            'Perform systematic Root Cause Analysis (RCA) with a mandatory Review Gate, document debug.md, and deliver a minimal verified fix.',
+            'Perform systematic Root Cause Analysis (RCA), document findings in debug.md, and deliver an end-to-end minimal verified fix using disciplined red feedback loops.',
         requiredSkills: [
             'diagnosing-bugs',
             'doubt-driven-development',
