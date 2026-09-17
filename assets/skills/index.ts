@@ -210,13 +210,13 @@ export const SKILLS: SkillManifest[] = [
     // --- 6. Local Project Specific Skills ---
     {
         name: 'only-one-nestjs-development',
-        version: '0.0.1',
+        version: '0.0.2',
         description: 'Use for NestJS development with selectively loaded architecture references.',
         sourceType: 'local',
     },
     {
         name: 'only-one-nextjs-development',
-        version: '0.0.1',
+        version: '0.0.2',
         description: 'Use for Next.js and React development with selectively loaded references.',
         sourceType: 'local',
     },

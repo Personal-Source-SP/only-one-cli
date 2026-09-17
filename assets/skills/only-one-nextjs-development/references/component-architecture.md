@@ -2,6 +2,32 @@
 
 ## UI Component & Sub-Component Design Standards
 
+- ✅ **Component Props Type Standard**:
+  - ALWAYS define Component Props using a dedicated `type` alias with the `Props` suffix (e.g., `type OrderDetailDrawerProps = { ... }`).
+  - ❌ **NEVER** use `interface` for Component Props.
+  - ❌ **NEVER** use inline destructured type definitions in parameters (e.g., `({ isOpen }: { isOpen: boolean })`).
+  - Place the `type <ComponentName>Props` declaration immediately above the component function definition.
+  - Property ordering: Declare all required props first, followed by optional props (`?`) separated by a single blank line, sorted from shortest to longest line length.
+
+  ```typescript
+  type OrderDetailDrawerProps = {
+    isOpen: boolean;
+    isLoading: boolean;
+    onClose: () => void;
+
+    order?: Order | null;
+  };
+
+  export const OrderDetailDrawer = ({
+    isOpen,
+    isLoading,
+    onClose,
+    order,
+  }: OrderDetailDrawerProps) => {
+    // ...
+  };
+  ```
+
 - ✅ **Leverage Common Components (`src/components`)**:
   - MUST audit and reuse available common components in `@/components` (`ListWrapper`, `ListTable`, `FilterPanel`, `CardAction`, `CustomDrawerForm`, `CustomInputForm`, `CustomSelectInput`, `CustomModal`, `UploadImage`) rather than creating bespoke duplicates.
 - ✅ **Form Drawer Pattern (`<CustomDrawerForm>`)**:

@@ -6,6 +6,50 @@
   - Encapsulate type definitions inside the `types/` folder of the feature and re-export via `types/index.ts`.
   - All supporting subdirectories (`types/`, `enums/`, `components/`, `utils/`) MUST provide an `index.ts` barrel.
   - Consumers import directly from directory barrels: `import type { WashMode, WashModeFormValues } from "./types"`.
+  - ❌ **NEVER** declare domain/entity/form `type` or `interface` definitions directly inside `index.tsx`, `components/`, or `hooks/` files (only `type <ComponentName>Props` is allowed directly inside component files).
+
+- 🛑 **Zero Anonymous Inline Types Invariant (Anti-Inline-Object)**:
+  - ❌ **NEVER** define nested anonymous object shapes `{}` directly within parent types or interfaces.
+  - Every nested property representing a structured object MUST be extracted into a dedicated **Named Type / Interface** inside `types/<name>.type.ts` and re-exported via `types/index.ts`.
+
+  ```typescript
+  // ❌ ANTI-PATTERN (DON'T): Anonymous inline object shape
+  // File: src/pages/product/types/product.type.ts
+  export type ProductDetail = AbstractRecord & {
+    name: string;
+    pricing: {
+      basePrice: number;
+      discountPercent?: number;
+    };
+  };
+  ```
+
+  ```typescript
+  // ✅ STANDARD MULTI-FILE PATTERN (DO):
+
+  // File: src/pages/product/types/product-pricing.type.ts
+  export type ProductPricingConfig = {
+    basePrice: number;
+    discountPercent?: number;
+  };
+
+  // File: src/pages/product/types/product-detail.type.ts
+  import type { AbstractRecord } from "@/common";
+  import type { ProductPricingConfig } from "./product-pricing.type";
+
+  export type ProductDetail = AbstractRecord & {
+    name: string;
+    pricing: ProductPricingConfig;
+  };
+
+  // File: src/pages/product/types/index.ts
+  export * from "./product-pricing.type";
+  export * from "./product-detail.type";
+  ```
+
+- ✅ **Component Props Typing Convention**:
+  - Component Props MUST always be typed using `type <ComponentName>Props = { ... }`. Never use `interface` for component props.
+
 - ✅ **Property Ordering & Formatting Rules**:
   - Declare all **Required properties** first.
   - Declare all **Optional properties (`?`)** after required properties (separated by a blank line).

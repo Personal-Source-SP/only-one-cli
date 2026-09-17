@@ -11,7 +11,11 @@ src/pages/<feature>/
 │   └── index.ts           # Barrel export for all sub-components
 ├── hooks/                 # Headless API & Business Hooks (Data fetching, table, drawer forms, mutations)
 │   └── index.ts           # Barrel export for all page hooks
-├── constants.ts           # Page constants (Column widths, index keys, default values, drawer titles)
+├── constants/             # Page constants modular directory (Columns, filters, form configs, table limits)
+│   ├── columns.constant.ts # Table columns configuration & custom cell rendering helpers
+│   ├── filter.constant.ts  # Default filter values & static select options
+│   ├── form.constant.ts    # Drawer/modal form initial values & validation rules
+│   └── index.ts            # Barrel export for all page constants
 ├── enums/                 # Feature enums
 │   └── index.ts           # Barrel export
 ├── types/                 # Interface & type definitions (Data models, FormValues, Params)

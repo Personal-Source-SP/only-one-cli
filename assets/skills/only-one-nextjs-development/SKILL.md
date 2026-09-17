@@ -8,6 +8,10 @@ description: MUST use when creating, modifying, reviewing, or refactoring Fronte
 ## 0. Mandatory Reuse-First Invariant (Anti-Reinvention Rules)
 
 > [!IMPORTANT]
+> **MANDATORY SKILL READING & COMPLIANCE GATE**:
+> Before writing, generating, or modifying any Next.js / React frontend code, the Agent MUST inspect this skill file and selectively read (`view_file`) the dedicated reference doc (`references/*.md`) corresponding to the active task. Writing frontend code without checking the matching architectural reference is STRICTLY PROHIBITED.
+
+> [!IMPORTANT]
 > **MANDATORY AUDIT BEFORE WRITING NEW FRONTEND CODE**:
 > 1. **Pre-Implementation Codebase Audit**:
 >    - Before creating any Custom Hook, UI Component, Utility Function, Form Drawer, Modal, Date/Time Formatter, or Type/Interface, the Agent MUST audit (`grep_search` or `list_dir`):
