@@ -46,9 +46,9 @@ affected_modules:
      + `/only-one-apply`: Thực thi từng file theo dependency order và test verification.
      + **Strict Two-File Task Invariant**: Mỗi thư mục task chỉ duy trì duy nhất `concept.md` và `plan.md`. Triệt tiêu hoàn toàn `walkthrough.md` trên đĩa.
    - **Fast-Track Lane (`/only-one-flash` cho Quick Tasks & Hotfixes)**:
-     + Thực thi trọn gói trong 1 turn duy nhất (Autonomous One-Shot Execution).
-     + **Zero Disk Plan Footprint**: Không sinh thư mục `only-one/tasks/` hay tệp markdown trên đĩa.
+     + Thực thi tác vụ nhỏ, hotfixes với **Zero Disk Plan Footprint** (không sinh thư mục `only-one/tasks/` hay tệp markdown trên đĩa).
      + **Ultra-Clean In-Chat Plan**: Chỉ hiển thị 3 trường cốt lõi (**Mô tả**, **Target** cấu trúc source kèm mô tả vai trò từng file, và **Verification** lệnh test/build).
+     + **Mandatory Confirmation Review Gate**: Bắt buộc tạm dừng tại Step 2 để người dùng xem xét, trao đổi và xác nhận trước khi thực hiện Step 3 (Direct Strict Apply).
 2. **Quy trình Debug 2 Pha Chuẩn Mực & Strict Lifecycle Isolation**:
    - **Pha 1 (`/only-one-debug`)**: Dựng Red feedback loop (test tái hiện lỗi), phân tích Mechanical Root Cause & Violated Invariants, phác thảo Target Source Structure, thiết lập Task Matrix và Unified Diff chi tiết trong `debug.md`, sau đó **DỪNG LẠI TẠI REVIEW GATE (Zero Direct Code Modifications)**.
    - **Pha 2 (`/only-one-apply`)**: Tiếp nhận `debug.md`, áp dụng diffs theo thứ tự phụ thuộc, chạy test chống hồi quy (chuyển Red $\rightarrow$ Green), cập nhật Section 5 và đánh dấu `status: fixed`.
@@ -72,7 +72,7 @@ affected_modules:
 | **`/only-one-idea`** | Khảo sát nhu cầu, mô hình hóa domain, chốt phạm vi | `only-one/tasks/<slug>/concept.md` | Non-code (Review Gate) |
 | **`/only-one-plan`** | Thiết kế kỹ thuật, Task Matrix, Unified Diff | `only-one/tasks/<slug>/plan.md` | Non-code (Review Gate) |
 | **`/only-one-apply`** | Áp dụng plan/debug theo Task Matrix | Cập nhật Section 5 `plan.md` / `debug.md` | Fast Test Command từng file |
-| **`/only-one-flash`** | Sửa đổi nhỏ, hotfix nhanh trong 1 turn | In-Chat Plan (Zero Disk Doc) | Fast Test / Build Command |
+| **`/only-one-flash`** | Sửa đổi nhỏ, hotfix nhanh kèm Review Gate | In-Chat Plan (Zero Disk Doc) | Fast Test / Build Command |
 | **`/only-one-debug`** | Điều tra, RCA, dựng Red loop & lập patch plan | `only-one/tasks/<slug>/debug.md` | Red Test Loop (Review Gate) |
 | **`/only-one-clean`** | Auto-archive task, đối soát codebase, dọn dẹp | `only-one/archives/<domain>.md` | Source-Driven Audit |
 
@@ -83,7 +83,8 @@ flowchart TD
     subgraph FastTrack["⚡ Fast-Track Lane (Micro-changes & Hotfixes)"]
         F1["/only-one-flash"] --> F2["Rapid Ingestion & Reuse-First Audit"]
         F2 --> F3["In-Chat Plan (Mô tả, Target, Verification)"]
-        F3 --> F4["Direct Apply & Fast Verification"]
+        F3 --> F4["🛑 Confirmation Review Gate (Pause)"]
+        F4 -->|Confirmed| F5["Direct Apply & Fast Verification"]
     end
 
     subgraph StandardSDLC["🏗️ Standard SDLC Lane (Features & Refactors)"]
@@ -105,12 +106,12 @@ flowchart TD
 
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
 
-- [assets/workflows/index.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/index.ts): Đăng ký đầy đủ 11 workflows chuẩn (`only-one-idea`, `only-one-plan`, `only-one-apply`, `only-one-flash`, `only-one-debug` v0.0.4, `only-one-review`, `only-one-conflict`, `only-one-clockify`, `only-one-intranet`, `only-one-pr-git`, `only-one-clean`).
+- [assets/workflows/index.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/index.ts): Đăng ký đầy đủ 11 workflows chuẩn (`only-one-idea`, `only-one-plan`, `only-one-apply`, `only-one-flash` v0.0.2, `only-one-debug` v0.0.4, `only-one-review`, `only-one-conflict`, `only-one-clockify`, `only-one-intranet`, `only-one-pr-git`, `only-one-clean`).
 - [assets/combos/index.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/combos/index.ts): Tích hợp `only-one-flash` vào toàn bộ các combo `frontend-flow`, `backend-flow`, `full-sdlc-flow`.
-- [assets/workflows/only-one-flash.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-flash.md) & [.agents/workflows/only-one-flash.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/.agents/workflows/only-one-flash.md): Định nghĩa workflow fast-track.
+- [assets/workflows/only-one-flash.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-flash.md) & [.agents/workflows/only-one-flash.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/.agents/workflows/only-one-flash.md): Định nghĩa workflow fast-track kèm Confirmation Review Gate tại Step 2.
 - [assets/workflows/only-one-debug.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-debug.md) & [.agents/workflows/only-one-debug.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/.agents/workflows/only-one-debug.md): Quy trình RCA khép kín, cô lập vòng đời và dừng tại Review Gate.
 - [assets/workflows/only-one-apply.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-apply.md): Hỗ trợ thực thi đa tài liệu (`plan.md` và `debug.md`).
-- [only-one/rules.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/only-one/rules.md): Cập nhật negative rules cho `only-one-flash`, anti-concept-duplication, và `only-one-debug` lifecycle isolation.
+- [only-one/rules.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/only-one/rules.md): Cập nhật negative rules cho `only-one-flash` (Zero Disk Plan Footprint + Confirmation Review Gate), anti-concept-duplication, và `only-one-debug` lifecycle isolation.
 
 ---
 

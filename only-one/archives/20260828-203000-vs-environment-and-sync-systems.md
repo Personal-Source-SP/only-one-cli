@@ -5,7 +5,7 @@ archived_at: 2026-09-09
 status: active
 references:
   - only-one/archives/20260824-103830-tui-modernization.md
-  - only-one/archives/20260917-104100-workflow-and-sdlc-systems.md
+  - only-one/archives/20260917-113200-workflow-and-sdlc-systems.md
 affected_modules:
   - src/core/vs
   - src/commands/extensions-vs

@@ -4,7 +4,7 @@ title: Nâng Cấp & Chuẩn Hóa Toàn Diện Bộ Skills Frontend (Next.js) & 
 archived_at: 2026-09-17
 status: active
 references:
-  - only-one/archives/20260917-104100-workflow-and-sdlc-systems.md
+  - only-one/archives/20260917-113200-workflow-and-sdlc-systems.md
 affected_modules:
   - assets/skills/only-one-nextjs-development
   - assets/skills/only-one-nestjs-development

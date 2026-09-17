@@ -4,7 +4,7 @@ title: Architecture of Independent Asset Versioning, Unified Lockfile, Auto-Rest
 archived_at: 2026-09-17
 status: active
 references:
-  - only-one/archives/20260917-104100-workflow-and-sdlc-systems.md
+  - only-one/archives/20260917-113200-workflow-and-sdlc-systems.md
 affected_modules:
   - assets/types.ts
   - assets/rules

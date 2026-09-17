@@ -27,5 +27,6 @@
 - **[NEVER]** Không trả về anonymous inline object types (ví dụ: `Promise<{ order: OrderEntity; payment: PaymentTransactionEntity } | null>`) trên bất kỳ phương thức nào của Service hoặc sử dụng anonymous inline `{}` lồng trong interface cha ở Frontend.
 - **[NEVER]** Không viết thẻ HTML thô (`<div>`, `<button>`, `<span>`) nối chuỗi TailwindCSS để tái tạo lại các thành phần giao diện đã được hỗ trợ bởi Ant Design (`Card`, `Flex`, `Space`, `Typography`, `Button`, `Tag`) hoặc `@/components`.
 - **[NEVER]** Không tự ý tạo thư mục task hoặc sinh các tài liệu markdown trên đĩa khi chạy workflow `/only-one-flash`. Toàn bộ plan phải được in ra chat cực ngắn gọn (gồm Mô tả, Target cấu trúc source, và Verification) để duy trì tốc độ và Zero Disk Footprint.
+- **[ALWAYS]** Bắt buộc phải tạm dừng và chờ người dùng xác nhận kế hoạch (Review Gate) sau khi xuất Flash Plan ở Step 2 của workflow `/only-one-flash` trước khi thực hiện bất kỳ chỉnh sửa mã nguồn nào ở Step 3.
 - **[NEVER]** Không tự ý sửa đổi mã nguồn sản phẩm hoặc thực thi bản vá trong lượt chạy của workflow `/only-one-debug`. Workflow này chỉ chẩn đoán lỗi, dựng Red feedback loop, phân tích RCA và lập kế hoạch vá trong `debug.md` trước khi bàn giao cho `/only-one-apply` (Strict Lifecycle Isolation).
 
