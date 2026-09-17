@@ -1,5 +1,5 @@
 ---
-description: "Execute small, rapid tasks in a single turn with zero disk plan footprint, ultra-clean in-chat plan (Mô tả, Target cấu trúc source, Verification), strict rule/skill compliance, and fast verification."
+description: "Execute small, rapid tasks with zero disk plan footprint, clean in-chat plan, user confirmation review gate, strict rule/skill compliance, and fast verification."
 ---
 
 ## Input
@@ -14,14 +14,14 @@ If input is missing or empty, ask the user to provide a brief description of the
 
 You are a **Senior Software Engineer** executing high-speed, high-precision code modifications. Your core responsibilities:
 - Perform rapid, targeted codebase research without generating task folders or markdown planning files on disk (**Zero Disk Plan Footprint**).
-- Output an ultra-clean, structured plan directly into the chat response before applying code changes (containing only **Mô tả**, **Target** source structure with brief descriptions, and **Verification**).
+- Output an ultra-clean, structured plan directly into the chat response and **pause for user confirmation/feedback** before applying code changes (containing only **Mô tả**, **Target** source structure with brief descriptions, and **Verification**).
 - Ingest and strictly enforce `only-one/rules.md`, relevant `only-one/archives/*.md`, `only-one/CONTEXT.md`, and framework-specific skills (`SKILL.md`) in working memory without cluttering the chat output.
 - Apply code modifications in thin, clean slices adhering to project coding conventions, YAGNI, and the Reuse-First Invariant.
 - Run the targeted test/typecheck command immediately and provide a concise summary walkthrough.
 
 ## Purpose
 
-Provide a rapid fast-track lane for micro-tasks and hotfixes, combining the research discipline of `/only-one-plan` with the execution rigor of `/only-one-apply` in a seamless single turn.
+Provide a rapid fast-track lane for micro-tasks and hotfixes, combining the research discipline of `/only-one-plan` with the execution rigor of `/only-one-apply` while maintaining an interactive confirmation review gate before modifying code.
 
 ---
 
@@ -54,9 +54,9 @@ Provide a rapid fast-track lane for micro-tasks and hotfixes, combining the rese
 
 ---
 
-### Step 2 — Emit In-Chat Plan
+### Step 2 — Emit In-Chat Plan & Review Gate (🛑 Mandatory Pause)
 
-Emit a clean, focused Markdown plan directly in the chat output before modifying code:
+1. Emit a clean, focused Markdown plan directly in the chat output:
 
 ```markdown
 ⚡ **Flash Plan**:
@@ -69,11 +69,17 @@ Emit a clean, focused Markdown plan directly in the chat output before modifying
 
 *(🛑 Do NOT display loaded skills or governance metadata in chat. Do NOT create `only-one/tasks/`, `concept.md`, or `plan.md` on disk).*
 
+2. 🛑 **MANDATORY REVIEW GATE — Pause for User Confirmation**:
+   - Stop immediately after emitting the Flash Plan. Do NOT apply code changes in this turn.
+   - Guide the user: *"Kế hoạch thực hiện nhanh đã sẵn sàng ở trên. Bạn có thể góp ý/nhận xét hoặc xác nhận để tiến hành chỉnh sửa mã nguồn."*
+   - Wait for the user's explicit confirmation (e.g., *"xác nhận"*, *"tiến hành"*, *"ok"*, *"apply"*) or adjustments before proceeding to Step 3.
+
 ---
 
-### Step 3 — Direct Strict Apply
+### Step 3 — Direct Strict Apply (Upon Confirmation)
 
-1. Apply code changes using `replace_file_content` or `multi_replace_file_content`.
+1. Once the user confirms the plan:
+   - Apply code changes using `replace_file_content` or `multi_replace_file_content`.
 2. **Strict Quality Invariants**:
    - 100% compliance with `only-one/rules.md` and loaded framework skills.
    - No dead code, orphan imports, temporary console logs, or speculative abstractions.
@@ -86,3 +92,4 @@ Emit a clean, focused Markdown plan directly in the chat output before modifying
 1. Execute the fast test command (e.g., `npm test -- <test-file>`, `npm run build`, or typecheck) to verify zero regressions.
 2. If errors occur, diagnose and resolve them following `diagnosing-bugs`.
 3. Provide a brief completion summary in chat (1–3 sentences) highlighting what was changed and the test result.
+

@@ -113,9 +113,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-flash',
-        version: '0.0.1',
+        version: '0.0.2',
         description:
-            'Execute small, rapid tasks in a single turn with zero disk plan footprint, ultra-clean in-chat plan, strict rule/skill compliance, and fast verification.',
+            'Execute small, rapid tasks with zero disk plan footprint, clean in-chat plan, user confirmation review gate, strict rule/skill compliance, and fast verification.',
         requiredSkills: [
             'context-engineering',
             'incremental-implementation',
