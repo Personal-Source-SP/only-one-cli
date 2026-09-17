@@ -4,10 +4,11 @@ import { existsSync } from 'node:fs';
 import { WORKFLOWS } from '../../../assets/workflows/index.js';
 import { SKILLS } from '../../../assets/skills/index.js';
 import { RULES } from '../../../assets/rules/index.js';
+import { COMBOS } from '../../../assets/combos/index.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { compareDecimalVersions } from './version.js';
 import { readInstalledLockfile, recordInstalledAssetsBatch, removeInstalledAsset } from './lockfile.js';
-import type { AssetInspectionItem, AssetType } from './types.js';
+import type { AssetInspectionItem, AssetType, InspectAssetOptions } from './types.js';
 
 export interface AssetSyncResult {
     inspected: AssetInspectionItem[];
@@ -15,11 +16,13 @@ export interface AssetSyncResult {
     upToDate: AssetInspectionItem[];
     missing: AssetInspectionItem[];
     removed: AssetInspectionItem[];
+    added: AssetInspectionItem[];
 }
 
 export interface AppliedAssetUpdateResult {
     updated: Array<{ type: AssetType; id: string; fromVersion: string; toVersion: string }>;
     restored: Array<{ type: AssetType; id: string; version: string }>;
+    added: Array<{ type: AssetType; id: string; version: string }>;
     failed: Array<{ type: AssetType; id: string; error: string }>;
 }
 
@@ -54,7 +57,7 @@ function checkRuleExists(projectDir: string, sourceFile: string): boolean {
 /**
  * Inspects all installed assets in the target project and compares them with latest versions.
  */
-export async function inspectAssetUpdates(projectDir: string): Promise<AssetSyncResult> {
+export async function inspectAssetUpdates(projectDir: string, options?: InspectAssetOptions): Promise<AssetSyncResult> {
     const lockfile = await readInstalledLockfile(projectDir);
     const inspected: AssetInspectionItem[] = [];
 
@@ -145,10 +148,76 @@ export async function inspectAssetUpdates(projectDir: string): Promise<AssetSync
         });
     }
 
+    // If prune is requested, reconcile installed combos to pull in any newly added combo assets
+    if (options?.prune) {
+        const installedCombos = lockfile.installed.combos || {};
+        for (const [comboId] of Object.entries(installedCombos)) {
+            const comboManifest = COMBOS.find(
+                (c) => c.id.toLowerCase() === comboId.toLowerCase() || c.name.toLowerCase() === comboId.toLowerCase(),
+            );
+            if (!comboManifest) continue;
+
+            // Check combo workflows
+            if (comboManifest.workflows?.length) {
+                for (const wfName of comboManifest.workflows) {
+                    if (!installedWorkflows[wfName]) {
+                        const wfManifest = WORKFLOWS.find((w) => w.name === wfName);
+                        if (wfManifest && !inspected.some((i) => i.type === 'workflows' && i.id === wfName)) {
+                            inspected.push({
+                                type: 'workflows',
+                                id: wfName,
+                                name: wfName,
+                                latestVersion: wfManifest.version,
+                                status: 'added',
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Check combo skills
+            if (comboManifest.skills?.length) {
+                for (const skillName of comboManifest.skills) {
+                    if (!installedSkills[skillName]) {
+                        const skillManifest = SKILLS.find((s) => s.name === skillName);
+                        if (skillManifest && !inspected.some((i) => i.type === 'skills' && i.id === skillName)) {
+                            inspected.push({
+                                type: 'skills',
+                                id: skillName,
+                                name: skillName,
+                                latestVersion: skillManifest.version,
+                                status: 'added',
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Check combo rules
+            if (comboManifest.rules?.length) {
+                for (const ruleId of comboManifest.rules) {
+                    if (!installedRules[ruleId]) {
+                        const ruleManifest = RULES.find((r) => r.id === ruleId);
+                        if (ruleManifest && !inspected.some((i) => i.type === 'rules' && i.id === ruleId)) {
+                            inspected.push({
+                                type: 'rules',
+                                id: ruleId,
+                                name: ruleId,
+                                latestVersion: ruleManifest.version,
+                                status: 'added',
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     const outdated = inspected.filter((i) => i.status === 'outdated');
     const upToDate = inspected.filter((i) => i.status === 'up-to-date');
     const missing = inspected.filter((i) => i.status === 'missing');
     const removed = inspected.filter((i) => i.status === 'removed');
+    const added = inspected.filter((i) => i.status === 'added');
 
     return {
         inspected,
@@ -156,6 +225,7 @@ export async function inspectAssetUpdates(projectDir: string): Promise<AssetSync
         upToDate,
         missing,
         removed,
+        added,
     };
 }
 
@@ -165,6 +235,7 @@ export async function inspectAssetUpdates(projectDir: string): Promise<AssetSync
 export async function applyAssetUpdates(projectDir: string, itemsToUpdate: AssetInspectionItem[]): Promise<AppliedAssetUpdateResult> {
     const updated: AppliedAssetUpdateResult['updated'] = [];
     const restored: AppliedAssetUpdateResult['restored'] = [];
+    const added: AppliedAssetUpdateResult['added'] = [];
     const failed: AppliedAssetUpdateResult['failed'] = [];
     const batchToRecord: Array<{ type: AssetType; id: string; version: string }> = [];
     const agentDirs = getTargetAgentDirs(projectDir);
@@ -215,6 +286,12 @@ export async function applyAssetUpdates(projectDir: string, itemsToUpdate: Asset
                     id: item.id,
                     version: item.latestVersion,
                 });
+            } else if (item.status === 'added') {
+                added.push({
+                    type: item.type,
+                    id: item.id,
+                    version: item.latestVersion,
+                });
             } else {
                 updated.push({
                     type: item.type,
@@ -236,7 +313,7 @@ export async function applyAssetUpdates(projectDir: string, itemsToUpdate: Asset
         await recordInstalledAssetsBatch(projectDir, batchToRecord);
     }
 
-    return { updated, restored, failed };
+    return { updated, restored, added, failed };
 }
 
 /**

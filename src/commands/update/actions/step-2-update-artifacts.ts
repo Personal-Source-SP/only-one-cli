@@ -12,12 +12,12 @@ export const updateArtifactsStep = async (
     isJsonOutput: boolean,
 ): Promise<void> => {
     const result = await updateAgentArtifacts({ force: options.force, projectDir });
-    const assetSync = await inspectAssetUpdates(projectDir);
+    const assetSync = await inspectAssetUpdates(projectDir, { prune: options.prune });
 
     let assetUpdateResult = null;
     const itemsToUpdate = options.force
         ? assetSync.inspected.filter((i) => i.status !== 'removed')
-        : [...assetSync.outdated, ...assetSync.missing];
+        : [...assetSync.outdated, ...assetSync.missing, ...assetSync.added];
 
     if (itemsToUpdate.length > 0) {
         assetUpdateResult = await applyAssetUpdates(projectDir, itemsToUpdate);
@@ -56,6 +56,8 @@ export const updateArtifactsStep = async (
                 statusBadge = COLORS.warning(`▲ Missing (${item.installedVersion} -> Restoring...)`);
             } else if (item.status === 'removed') {
                 statusBadge = COLORS.error(`✕ Removed upstream (Orphaned)`);
+            } else if (item.status === 'added') {
+                statusBadge = COLORS.primary(`✚ New combo asset (Installing...)`);
             } else {
                 statusBadge = COLORS.success(`✓ Up to date (${item.latestVersion})`);
             }
@@ -76,6 +78,13 @@ export const updateArtifactsStep = async (
             }
         }
 
+        if (assetUpdateResult && assetUpdateResult.added && assetUpdateResult.added.length > 0) {
+            deps.stdout(`\n${COLORS.success('✨ Added New Combo Assets:')}`);
+            for (const a of assetUpdateResult.added) {
+                deps.stdout(`  - [${a.type}] ${COLORS.secondary(a.id)}: Installed template (${COLORS.primary(a.version)})`);
+            }
+        }
+
         if (assetPruneResult && assetPruneResult.pruned.length > 0) {
             deps.stdout(`\n${COLORS.success('🗑️ Pruned Orphaned Assets:')}`);
             for (const p of assetPruneResult.pruned) {
@@ -87,7 +96,12 @@ export const updateArtifactsStep = async (
                 deps.stdout(`  - [${r.type}] ${COLORS.secondary(r.id)}`);
             }
             deps.stdout(COLORS.dim('  Run "only-one update --prune" to remove leftover files and clean lockfile.'));
-        } else if (assetSync.outdated.length === 0 && assetSync.missing.length === 0 && assetSync.removed.length === 0) {
+        } else if (
+            assetSync.outdated.length === 0 &&
+            assetSync.missing.length === 0 &&
+            assetSync.removed.length === 0 &&
+            assetSync.added.length === 0
+        ) {
             deps.stdout(COLORS.dim('  All tracked assets are already up to date.'));
         }
     }
