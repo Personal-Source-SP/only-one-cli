@@ -4,7 +4,7 @@ title: Dọn dẹp Tooling Scripts và Loại bỏ Triệt để Tính năng Leg
 archived_at: 2026-09-09
 status: active
 references:
-  - only-one/archives/20260907-103000-workflow-and-skill-systems.md
+  - only-one/archives/20260917-104100-workflow-and-sdlc-systems.md
 affected_modules:
   - scripts
   - package.json

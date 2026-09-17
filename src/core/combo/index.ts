@@ -27,7 +27,6 @@ import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { WORKFLOWS } from '@assets/workflows/index.js';
 import { MCPS } from '@assets/mcps/index.js';
-import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -653,14 +652,6 @@ export const installCombo = async (params: {
             }
         }
     }
-
-    await recordInstalledAssetsBatch(projectDir, [
-        {
-            type: 'combos',
-            id: combo.id,
-            version: combo.version || '1.0.0',
-        },
-    ]);
 
     return results;
 };

@@ -109,29 +109,4 @@ describe('Update Command Integration Tests', () => {
         expect(parsed.assets.removed[0].id).toBe('obsolete-workflow');
         expect(parsed.assets.pruned.pruned.length).toBe(1);
     });
-
-    it('automatically syncs newly added combo assets when --prune is provided', async () => {
-        const stdoutLines: string[] = [];
-        const deps: Partial<ProgramDeps> = {
-            stdout: (msg: string) => stdoutLines.push(msg),
-            stderr: () => {},
-            cwd: testProjectDir,
-        };
-
-        // Record full-sdlc-flow combo in lockfile with only 1 workflow
-        await recordInstalledAssetsBatch(testProjectDir, [
-            { type: 'combos', id: 'full-sdlc-flow', version: '1.0.0' },
-            { type: 'workflows', id: 'only-one-clockify', version: '1.0.0' },
-        ]);
-
-        const cmd = createUpdateCommand(deps as ProgramDeps);
-        await cmd.parseAsync(['node', 'test', testProjectDir, '--prune']);
-
-        const output = stdoutLines.join('\n');
-        expect(output).toContain('Added New Combo Assets');
-
-        const lockfile = await readInstalledLockfile(testProjectDir);
-        expect(lockfile.installed.workflows).toBeDefined();
-        expect(lockfile.installed.workflows?.['only-one-idea']).toBeDefined();
-    });
 });
