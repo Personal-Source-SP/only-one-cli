@@ -26,4 +26,6 @@
 - **[NEVER]** Không định nghĩa `interface` hoặc `type` trực tiếp trong tệp `.service.ts` hoặc các component `.tsx` (ngoại trừ `type Props` của chính component đó). Toàn bộ domain type contract phải được định nghĩa trong thư mục `types/` của feature và re-export qua `types/index.ts`.
 - **[NEVER]** Không trả về anonymous inline object types (ví dụ: `Promise<{ order: OrderEntity; payment: PaymentTransactionEntity } | null>`) trên bất kỳ phương thức nào của Service hoặc sử dụng anonymous inline `{}` lồng trong interface cha ở Frontend.
 - **[NEVER]** Không viết thẻ HTML thô (`<div>`, `<button>`, `<span>`) nối chuỗi TailwindCSS để tái tạo lại các thành phần giao diện đã được hỗ trợ bởi Ant Design (`Card`, `Flex`, `Space`, `Typography`, `Button`, `Tag`) hoặc `@/components`.
+- **[NEVER]** Không tự ý tạo thư mục task hoặc sinh các tài liệu markdown trên đĩa khi chạy workflow `/only-one-flash`. Toàn bộ plan phải được in ra chat cực ngắn gọn (gồm Mô tả, Target cấu trúc source, và Verification) để duy trì tốc độ và Zero Disk Footprint.
+
 
