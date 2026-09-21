@@ -68,12 +68,21 @@ Do NOT bulk-load all rules, skills, and archives blindly (avoids context polluti
 
 ---
 
-## 2. Optional Skills Catalog
+## Mandatory Output Skill
 
-Activate these skills during research or planning when their trigger conditions are met. Read the skill's `SKILL.md` before invoking it:
+Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
+
+`i-have-adhd` is a presentation adapter, not an execution policy. Priority: safety → workflow lifecycle, gates, artifacts, and order → domain-skill completeness and evidence → ADHD-friendly formatting → generic style. Preserve domain-skill completeness, source evidence, all canonical `plan.md` sections, Task Matrix, Unified Diffs, and verification rigor. Structured tables, sources, and diffs are exempt from prose list limits.
+
+## 2. Skills Catalog
+
+### Mandatory
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
+| **`i-have-adhd`** | Every user-visible turn | Action-first progress output without changing planning logic or artifacts. |
+
+### Optional Skills Catalog
 | **`to-tickets`** | Decomposing the plan into orderly file changes with dependencies | Establish tracer bullets and explicit dependency blocking edges (`depends_on`) in Section 3. |
 | **`codebase-design`** | Designing new modules, refactoring core abstractions | Design deep modules with small interfaces at clean seams, testable through that interface. |
 | **`grill-me`** | User requests interactive stress-testing of the plan / design | Conduct a relentless interview to uncover hidden assumptions with zero file footprint. |

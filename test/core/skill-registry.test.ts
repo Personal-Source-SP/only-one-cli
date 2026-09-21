@@ -26,6 +26,18 @@ describe('skill registry integrity', () => {
         expect([...localSkills].sort()).toEqual(shippedLocalSkillNames);
     });
 
+    it('registers i-have-adhd from latest GitHub main without a local copy', () => {
+        const skill = SKILLS.find(({ name }) => name === 'i-have-adhd');
+
+        expect(skill).toMatchObject({
+            version: '0.0.1',
+            source: 'ayghri/i-have-adhd',
+            sourceType: 'github',
+            skillPath: 'skills/i-have-adhd/SKILL.md',
+        });
+        expect(existsSync(join(skillsDir, 'i-have-adhd'))).toBe(false);
+    });
+
     it('requires local SKILL.md with frontmatter name matching each local manifest', () => {
         for (const skill of SKILLS) {
             if (skill.sourceType === 'github') {

@@ -21,6 +21,15 @@ If input does not describe the idea or problem, ask a focused question before pr
   - Conduct interactive Q&A, solution sparring, and interview turns in Vietnamese (or user's preferred language).
   - Author `concept.md` with **Vietnamese narrative & explanations**, while strictly preserving standard **English technical terms** (*idempotency, blast radius, out-of-scope, debounce, rollback, race condition, state machine, optimistic UI, fallback...*).
 - Activate and follow the Define skills (`grill-with-docs`, `grill-me`, `domain-modeling`, `interview-me`, `idea-refine`, `wait-what`).
+- Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
+
+## Output Skill Compatibility Contract
+
+`i-have-adhd` is a presentation adapter, not an execution policy.
+
+Priority: safety and destructive confirmations → workflow lifecycle, gates, artifacts, and order → domain-skill completeness and evidence → ADHD-friendly formatting → generic style.
+
+Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1 exit gate, and terminal handoff. Ask one question per turn, but keep full interview coverage. Structured tables, sources, and code blocks are exempt from prose list limits.
 - Maintain the project's Living Domain Glossary (`CONTEXT.md`) and record Architecture Decision Records (`only-one/adrs/`) for hard-to-reverse decisions.
 - **Do not perform deep codebase tracing, line-by-line file inspections, or low-level implementation code** (those strictly belong to `/only-one-plan`).
 
@@ -30,6 +39,7 @@ If input does not describe the idea or problem, ask a focused question before pr
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
+| **`i-have-adhd`** | Every user-visible turn | Action-first progress output without changing discovery gates or concept artifacts. |
 | **`interview-me`** | Requirements are underspecified or ambiguous | Conduct a disciplined **one-question-at-a-time interview** (as BA) extracting root needs vs prescribed solutions until **~95% problem confidence**. |
 | **`idea-refine`** | A rough concept needs scoping and stress-testing | Define measurable success metrics and establish strict `In-Scope` vs `Explicit Out-of-Scope` boundaries. |
 | **`domain-modeling`** | Ambiguous domain terms arise | Challenge fuzzy terms, maintain project glossary (`CONTEXT.md`), and record ADRs for hard-to-reverse decisions. |

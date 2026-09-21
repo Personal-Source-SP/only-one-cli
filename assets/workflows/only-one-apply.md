@@ -33,10 +33,17 @@ Execute an approved plan or debug document with maximum machine efficiency and h
 
 ---
 
+## Mandatory Output Skill
+
+Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
+
+`i-have-adhd` is a presentation adapter, not an execution policy. Priority: safety → workflow lifecycle, gates, artifacts, and order → domain-skill completeness and evidence → ADHD-friendly formatting → generic style. Preserve domain-skill completeness, Task Matrix order, Depends On transitions, Fast Test Commands, final verification, and evidence. Structured tables, code blocks, and diffs are exempt from prose list limits.
+
 ## 1. Skills Catalog (Build & Execution Disciplines)
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
+| **`i-have-adhd`** | Every user-visible turn | Action-first progress output without changing Task Matrix execution or test evidence. |
 | **`context-engineering`** | Step 1b (Loading rules and skills) | Feed only the necessary, high-signal context into working memory (Negative Rules in `rules.md` and Tech Skills) before modifying code. |
 | **`incremental-implementation`** | Step 4 (Applying file changes) | Apply changes in **thin vertical slices** (file-by-file), enforcing safe parameter defaults, dependency order, and rollback-friendly modifications. |
 | **`code-simplification`** | Step 4 (Quality Gate) | Audit new/modified code against YAGNI: eliminate dead code, remove orphan imports, avoid speculative wrappers, and keep cognitive load low. |

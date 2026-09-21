@@ -1,6 +1,16 @@
 import type { SkillManifest } from '../types.js';
 
 export const SKILLS: SkillManifest[] = [
+    // --- 0. Cross-Cutting Output Discipline ---
+    {
+        name: 'i-have-adhd',
+        version: '0.0.1',
+        description: 'Shape agent output into action-first, bounded, progress-visible responses for readers with ADHD.',
+        source: 'ayghri/i-have-adhd',
+        sourceType: 'github',
+        skillPath: 'skills/i-have-adhd/SKILL.md',
+    },
+
     // --- 1. Define Phase: Discovery, Grilling & Domain Modeling ---
     {
         name: 'grill-with-docs',

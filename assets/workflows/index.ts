@@ -3,10 +3,11 @@ import type { WorkflowManifest } from '../types.js';
 export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-idea',
-        version: '0.0.4',
+        version: '0.0.5',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
+            'i-have-adhd',
             'grill-with-docs',
             'grill-me',
             'domain-modeling',
@@ -17,10 +18,11 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-plan',
-        version: '0.0.5',
+        version: '0.0.6',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Current State, Detailed Design, Task Matrix, Unified Diffs, and Verification.',
         requiredSkills: [
+            'i-have-adhd',
             'to-tickets',
             'codebase-design',
             'grill-me',
@@ -33,10 +35,11 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.5',
+        version: '0.0.6',
         description:
             'Implement tasks from an approved plan.md or debug.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
         requiredSkills: [
+            'i-have-adhd',
             'context-engineering',
             'incremental-implementation',
             'code-simplification',
@@ -46,10 +49,11 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
-        version: '0.0.4',
+        version: '0.0.5',
         description:
             'Perform systematic Root Cause Analysis (RCA), document findings in debug.md, and formulate an executable diff-centric patch blueprint with a red feedback loop.',
         requiredSkills: [
+            'i-have-adhd',
             'diagnosing-bugs',
             'doubt-driven-development',
             'test-driven-development',
@@ -113,10 +117,11 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-flash',
-        version: '0.0.3',
+        version: '0.0.4',
         description:
             'Execute small, rapid tasks with zero disk plan footprint, clean in-chat plan, user confirmation review gate, strict rule/skill compliance, and fast verification.',
         requiredSkills: [
+            'i-have-adhd',
             'context-engineering',
             'incremental-implementation',
             'code-simplification',

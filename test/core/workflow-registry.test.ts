@@ -26,4 +26,34 @@ describe('workflow registry integrity', () => {
     it('registers only-one-flash', () => {
         expect(WORKFLOWS.filter(({ name }) => name === 'only-one-flash')).toHaveLength(1);
     });
+
+    it('requires and activates i-have-adhd in the five core workflows', () => {
+        const expected = ['only-one-idea', 'only-one-plan', 'only-one-apply', 'only-one-flash', 'only-one-debug'];
+
+        for (const name of expected) {
+            const workflow = WORKFLOWS.find((item) => item.name === name);
+            const content = readFileSync(join(workflowsDir, `${name}.md`), 'utf8');
+
+            expect(workflow?.requiredSkills).toContain('i-have-adhd');
+            expect(content).toContain('i-have-adhd');
+            expect(content).toContain('presentation adapter, not an execution policy');
+            expect(content).toContain('domain-skill completeness');
+            expect(content).toMatch(/Mandatory Output Skill|Every user-visible turn/);
+        }
+    });
+
+    it('preserves workflow-specific domain invariants over output formatting', () => {
+        const contracts = {
+            'only-one-idea': ['one question', 'discovery'],
+            'only-one-plan': ['Task Matrix', 'Unified Diff'],
+            'only-one-apply': ['Depends On', 'Fast Test'],
+            'only-one-flash': ['Review Gate', 'Zero Disk'],
+            'only-one-debug': ['evidence', 'three failed patch attempts'],
+        };
+
+        for (const [name, requiredTerms] of Object.entries(contracts)) {
+            const content = readFileSync(join(workflowsDir, `${name}.md`), 'utf8');
+            for (const term of requiredTerms) expect(content.toLowerCase()).toContain(term.toLowerCase());
+        }
+    });
 });
