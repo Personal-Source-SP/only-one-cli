@@ -3,11 +3,12 @@ import type { ComboManifest } from '../types.js';
 export const COMBOS: ComboManifest[] = [
     {
         id: 'frontend-flow',
-        version: '0.0.5',
+        version: '0.0.6',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
         packages: ['ui-ux-pro-max-cli'],
         skills: [
+            'i-have-adhd',
             'grill-with-docs',
             'grill-me',
             'interview-me',
@@ -41,10 +42,11 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'backend-flow',
-        version: '0.0.5',
+        version: '0.0.6',
         name: 'Backend Flow Setup',
         description: 'NestJS backend development toolkit with architecture design, security audit, and API standards',
         skills: [
+            'i-have-adhd',
             'grill-with-docs',
             'grill-me',
             'interview-me',
@@ -78,10 +80,11 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'full-sdlc-flow',
-        version: '0.0.5',
+        version: '0.0.6',
         name: 'Full SDLC Enterprise Flow Setup',
         description: 'Complete end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, webperf, and review',
         skills: [
+            'i-have-adhd',
             'grill-with-docs',
             'grill-me',
             'interview-me',

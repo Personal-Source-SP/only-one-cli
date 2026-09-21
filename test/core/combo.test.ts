@@ -108,6 +108,11 @@ describe('prebuilt combo completeness', () => {
         expect(() => validateComboManifestReferences(COMBOS, productionRegistries)).not.toThrow();
     });
 
+    it.each(['frontend-flow', 'backend-flow', 'full-sdlc-flow'])('includes i-have-adhd in %s', (comboId) => {
+        const combo = COMBOS.find(({ id }) => id === comboId);
+        expect(combo?.skills).toContain('i-have-adhd');
+    });
+
     it.each([
         {
             comboId: 'frontend-flow',
