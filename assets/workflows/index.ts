@@ -3,7 +3,7 @@ import type { WorkflowManifest } from '../types.js';
 export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-idea',
-        version: '0.0.5',
+        version: '0.0.6',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
@@ -14,11 +14,12 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'interview-me',
             'idea-refine',
             'wait-what',
+            'ponytail',
         ],
     },
     {
         name: 'only-one-plan',
-        version: '0.0.6',
+        version: '0.0.7',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Current State, Detailed Design, Task Matrix, Unified Diffs, and Verification.',
         requiredSkills: [
@@ -31,11 +32,12 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'frontend-ui-engineering',
             'source-driven-development',
             'doubt-driven-development',
+            'ponytail',
         ],
     },
     {
         name: 'only-one-apply',
-        version: '0.0.6',
+        version: '0.0.7',
         description:
             'Implement tasks from an approved plan.md or debug.md by parsing the Machine-Readable Task Matrix and applying changes in dependency order.',
         requiredSkills: [
@@ -45,11 +47,12 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'code-simplification',
             'test-driven-development',
             'diagnosing-bugs',
+            'ponytail',
         ],
     },
     {
         name: 'only-one-debug',
-        version: '0.0.5',
+        version: '0.0.6',
         description:
             'Perform systematic Root Cause Analysis (RCA), document findings in debug.md, and formulate an executable diff-centric patch blueprint with a red feedback loop.',
         requiredSkills: [
@@ -58,6 +61,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'doubt-driven-development',
             'test-driven-development',
             'code-simplification',
+            'ponytail',
         ],
     },
     {
@@ -117,7 +121,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-flash',
-        version: '0.0.4',
+        version: '0.0.5',
         description:
             'Execute small, rapid tasks with zero disk plan footprint, clean in-chat plan, user confirmation review gate, strict rule/skill compliance, and fast verification.',
         requiredSkills: [
@@ -127,6 +131,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'code-simplification',
             'test-driven-development',
             'diagnosing-bugs',
+            'ponytail',
         ],
     },
 ];

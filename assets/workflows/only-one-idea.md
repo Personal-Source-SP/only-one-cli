@@ -46,6 +46,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 | **`grill-with-docs`** | User wants an intensive design grilling session with permanent docs | Conduct an interview that sharpens domain terminology and records `CONTEXT.md` and ADRs inline. |
 | **`grill-me`** | User requests fast brainstorming without creating files on disk | Conduct a relentless interview to uncover hidden assumptions with zero file footprint. |
 | **`wait-what`** | Agent explanation is unclear or drifting | Stop immediately and re-pitch the explanation in plain, concise English using domain vocabulary. |
+| **`ponytail`** | After Phase 1 problem clarity | Remove unnecessary scope without shortening discovery or introducing code-level design. |
 
 ---
 
@@ -60,6 +61,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
    - Define **Measurable Success Metrics / Definition of Done** (e.g., latency < 200ms, zero data loss, 100% test pass).
    - Capture domain terminology into `only-one/CONTEXT.md` (`domain-modeling`).
 2. **Exit Gate Phase 1**: Do NOT propose solutions prematurely until problem context and scope boundaries reach **~95% clarity**.
+3. **Ponytail Scope Gate**: After clarity, remove unnecessary scope. Do not use minimization to shorten discovery or acceptance criteria.
 
 ---
 
@@ -71,10 +73,11 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 2. **Draft UI Wireframes & State Mockups (For UI/UX features)**:
    - Provide clear **ASCII / Markdown Wireframes** showing layout hierarchy, components, and user actions.
    - Specify the **UI State Handling Matrix**: Empty State, Loading State, Error/Validation State, Populated State.
-3. **Analyze Edge Cases & Core Data/Logic Flow**:
-   - Step-by-step processing flow (Input $\rightarrow$ State Transition $\rightarrow$ Output/Side Effects).
+4. **Analyze Edge Cases & Core Domain Flow**:
+   - Describe business/domain flow and state transitions conceptually.
    - Key failure modes, concurrency, timeouts, and rollback/fallback strategies.
-4. **Decision Alignment with User (Role: User as PM)**:
+5. **Concept Boundary**: Keep all options, models, and flows conceptual. Do not emit source code, pseudocode, unified diffs, symbol signatures, file paths, or file-level implementation instructions.
+6. **Decision Alignment with User (Role: User as PM)**:
    - Present the options and mockups to the user (as PM) for review, discussion, and selection of the final approach.
 
 ---
@@ -107,8 +110,8 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 - **Explicit Out-of-Scope**: <Các hạng mục hoãn lại hoặc chủ đích không làm để tránh phình scope>.
 
 ## 3. Proposed Solution & Core Mechanism (Giải pháp Đề xuất & Cơ chế)
-- **Core Mechanism**: <Mô tả giải pháp cốt lõi và cơ chế vận hành bằng thuật ngữ dev>.
-- **Workflow / Logic Flow**: <Các bước luồng dữ liệu chính hoặc sơ đồ Mermaid ngắn gọn nếu cần>.
+- **Core Mechanism**: <Conceptual solution and operating model; no source code, pseudocode, symbol signatures, file paths, or file-level implementation instructions>.
+- **Conceptual Flow / Domain Model**: <Business/domain flow and state transitions conceptually; no code-level implementation details>.
 - *(Tùy chọn)* **UI Wireframe**: <ASCII wireframe nếu tính năng có giao diện>.
 
 ## 4. Critical Risks & Edge Cases (Rủi ro & Kịch bản Biên)
@@ -133,5 +136,5 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 - **Enforce Bilingual Hybrid Documentation**: Write narrative and descriptions in Vietnamese, preserving standard English technical terms.
 - **Do not skip Phase 1 discovery**: Clarify problem and scope boundaries thoroughly before proposing solution options.
 - **Always explore and present at least 2 solution options with trade-offs** before finalizing the chosen strategy.
-- **Always provide ASCII / Markdown UI mockups** when the task has frontend/UI components.
-- Always save `concept.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/concept.md`) and stop immediately.
+- **Strict Concept Boundary**: Never include source code, pseudocode, unified diffs, symbol signatures, file paths, or file-level implementation instructions.
+- Always save `concept.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/concept.md`) and stop immediately.

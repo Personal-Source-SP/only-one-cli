@@ -49,6 +49,7 @@ Activate and apply these skills throughout the debugging lifecycle:
 | **`doubt-driven-development`** | Step 3 (Root cause hypothesis) | Challenge implicit assumptions in code (e.g., nullability, race conditions, async timing, third-party availability). |
 | **`test-driven-development`** | Step 1 & Step 5 (Reproduction & Regression) | Enforce the **Beyoncé Rule**: write a failing reproduction test before patching, and verify it turns green after the fix. |
 | **`code-simplification`** | Step 4 & Step 5 (Deliver Minimal Fix) | Keep fixes strictly focused as a **Surgical Minimal Patch**, rejecting premature abstractions or unrelated refactoring. |
+| **`ponytail`** | After root cause is proven | Select smallest root-cause fix and record per-file reuse/new-code evidence without weakening reproduction. |
 
 ---
 
@@ -208,4 +209,3 @@ Display a concise markdown summary in Vietnamese narrative with English technica
 - Never perform unrelated refactoring during a bug fix.
 - Always include an automated regression test.
 - Keep the fix minimal, surgical, and scoped directly to the defect.
-

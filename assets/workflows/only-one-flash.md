@@ -41,6 +41,7 @@ Before emitting the Flash Plan, read and activate `i-have-adhd`; keep it active 
 | **`code-simplification`** | Step 3 (Quality Gate) | Eliminate dead code, unused imports, speculative abstractions, and keep cognitive complexity low (YAGNI). |
 | **`test-driven-development`** | Step 4 (Verification) | Enforce the Beyoncé Rule (*"If you changed behavior, you must verify it with a test"*), running fast targeted test commands. |
 | **`diagnosing-bugs`** | When any test or compiler error occurs | Execute disciplined Red Feedback Loops (Reproduce $\rightarrow$ Localize $\rightarrow$ Hypothesize $\rightarrow$ Fix) without guessing. |
+| **`ponytail`** | Step 1 research and before approved edits | Make concise per-file reuse/new-code decisions and revalidate them before editing. |
 
 ---
 

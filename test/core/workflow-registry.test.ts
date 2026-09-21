@@ -42,6 +42,25 @@ describe('workflow registry integrity', () => {
         }
     });
 
+    it('requires ponytail in each Skills Catalog with stage-specific wording', () => {
+        const contracts = {
+            'only-one-idea': ['| **`ponytail`** | After Phase 1 problem clarity |', 'without shortening discovery'],
+            'only-one-plan': ['| **`ponytail`** | Before each file-level design or unified diff |', 'first sufficient solution rung'],
+            'only-one-debug': ['| **`ponytail`** | After root cause is proven |', 'smallest root-cause fix'],
+            'only-one-apply': ['| **`ponytail`** | Preflight and before each edit |', 'material plan conflict'],
+            'only-one-flash': ['| **`ponytail`** | Step 1 research and before approved edits |', 'concise per-file'],
+        };
+
+        for (const [name, terms] of Object.entries(contracts)) {
+            const workflow = WORKFLOWS.find((item) => item.name === name);
+            const content = readFileSync(join(workflowsDir, `${name}.md`), 'utf8');
+
+            expect(workflow?.requiredSkills).toContain('ponytail');
+            expect(content).toContain('## 1. Skills Catalog');
+            for (const term of terms) expect(content).toContain(term);
+        }
+    });
+
     it('preserves workflow-specific domain invariants over output formatting', () => {
         const contracts = {
             'only-one-idea': ['one question', 'discovery'],
