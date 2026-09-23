@@ -3,7 +3,7 @@ import type { ComboManifest } from '../types.js';
 export const COMBOS: ComboManifest[] = [
     {
         id: 'frontend-flow',
-        version: '0.0.7',
+        version: '0.0.8',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
         packages: ['ui-ux-pro-max-cli'],
@@ -29,7 +29,7 @@ export const COMBOS: ComboManifest[] = [
             'source-driven-development',
             'resolving-merge-conflicts',
         ],
-        rules: ['next-architecture-stack', 'context-and-tools'],
+        rules: ['next-architecture-stack', 'context-and-tools', 'execution-terminal'],
         workflows: [
             'only-one-idea',
             'only-one-plan',
@@ -43,7 +43,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'backend-flow',
-        version: '0.0.7',
+        version: '0.0.8',
         name: 'Backend Flow Setup',
         description: 'NestJS backend development toolkit with architecture design, security audit, and API standards',
         skills: [
@@ -68,7 +68,7 @@ export const COMBOS: ComboManifest[] = [
             'source-driven-development',
             'resolving-merge-conflicts',
         ],
-        rules: ['nest-architecture-stack', 'context-and-tools'],
+        rules: ['nest-architecture-stack', 'context-and-tools', 'execution-terminal'],
         workflows: [
             'only-one-idea',
             'only-one-plan',
@@ -82,7 +82,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'full-sdlc-flow',
-        version: '0.0.7',
+        version: '0.0.8',
         name: 'Full SDLC Enterprise Flow Setup',
         description: 'Complete end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, webperf, and review',
         skills: [
@@ -119,7 +119,7 @@ export const COMBOS: ComboManifest[] = [
             'only-one-intranet-skill',
             'only-one-pr-git-skill',
         ],
-        rules: ['nest-architecture-stack', 'next-architecture-stack', 'context-and-tools'],
+        rules: ['nest-architecture-stack', 'next-architecture-stack', 'context-and-tools', 'execution-terminal'],
         workflows: [
             'only-one-idea',
             'only-one-plan',

@@ -25,4 +25,11 @@ export const RULES: RuleManifest[] = [
         sourceFile: '01-context-and-tools.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
     },
+    {
+        id: 'execution-terminal',
+        version: '0.0.1',
+        description: 'No-Sleep / No Busy-Wait — ban sleep commands and polling loops; enforce approved async alternatives',
+        sourceFile: '03-execution-terminal.md',
+        supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
+    },
 ];
