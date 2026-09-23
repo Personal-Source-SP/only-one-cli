@@ -1,5 +1,5 @@
 ---
-description: "Implement tasks from an approved plan.md or debug.md file by parsing the Machine-Readable Task Matrix in Section 3 and applying changes in dependency order."
+description: "Implement tasks from an approved plan.md or debug.md file by parsing machine-readable file task blocks and applying changes in dependency order."
 ---
 
 ## Input
@@ -21,11 +21,11 @@ description: "Implement tasks from an approved plan.md or debug.md file by parsi
 ## Role
 
 You are a **Senior Software Engineer**. Your core responsibilities:
-- Fast-path ingest the **Section 3 Machine-Readable Task Matrix** from `plan.md` or `debug.md` in sub-second time.
-- Implement the changes described in `plan.md` or `debug.md`, one file at a time, strictly following Section 4 blueprint guidance and respecting `Depends On` ordering.
+- Fast-path ingest ordered **Section 2 File Changes** task blocks from both `plan.md` and `debug.md`.
+- Implement changes one file at a time from each task block's unified diff, respecting `Depends On` ordering.
 - Apply execution and quality disciplines (`incremental-implementation`, `test-driven-development`, `code-simplification`, `diagnosing-bugs`).
 - Run the targeted `Fast Test Command` immediately after modifying each file to maintain rapid feedback loops.
-- Record verification evidence directly into Section 5 of `plan.md` or `debug.md` and report a concise walkthrough summary in the chat turn.
+- Record verification evidence directly into Section 3 of `plan.md` or the existing verification section of `debug.md`, then report a concise walkthrough summary in chat.
 
 ## Purpose
 
@@ -37,13 +37,13 @@ Execute an approved plan or debug document with maximum machine efficiency and h
 
 Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
 
-`i-have-adhd` is a presentation adapter, not an execution policy. Priority: safety → workflow lifecycle, gates, artifacts, and order → domain-skill completeness and evidence → ADHD-friendly formatting → generic style. Preserve domain-skill completeness, Task Matrix order, Depends On transitions, Fast Test Commands, final verification, and evidence. Structured tables, code blocks, and diffs are exempt from prose list limits.
+`i-have-adhd` is a presentation adapter, not an execution policy. Priority: safety → workflow lifecycle, gates, artifacts, and order → domain-skill completeness and evidence → ADHD-friendly formatting → generic style. Preserve domain-skill completeness, file task-block order, Depends On transitions, Fast Test Commands, final verification, and evidence. Structured tables, code blocks, and diffs are exempt from prose list limits.
 
 ## 1. Skills Catalog (Build & Execution Disciplines)
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
-| **`i-have-adhd`** | Every user-visible turn | Action-first progress output without changing Task Matrix execution or test evidence. |
+| **`i-have-adhd`** | Every user-visible turn | Action-first progress output without changing task-block execution or test evidence. |
 | **`context-engineering`** | Step 1b (Loading rules and skills) | Feed only the necessary, high-signal context into working memory (Negative Rules in `rules.md` and Tech Skills) before modifying code. |
 | **`incremental-implementation`** | Step 4 (Applying file changes) | Apply changes in **thin vertical slices** (file-by-file), enforcing safe parameter defaults, dependency order, and rollback-friendly modifications. |
 | **`code-simplification`** | Step 4 (Quality Gate) | Audit new/modified code against YAGNI: eliminate dead code, remove orphan imports, avoid speculative wrappers, and keep cognitive load low. |
@@ -100,21 +100,24 @@ Check the frontmatter `status` field:
 
 ---
 
-### Step 3 — Ingest Source Structure & Parse Task Matrix
+### Step 3 — Ingest Source Structure & Parse File Tasks
 
-1. **Review Source Structure Changes**: Ingest the ASCII directory tree (Section 3.1 in `plan.md` or Section 2.2 in `debug.md`) to establish an immediate mental model of all touched files (`[NEW]`, `[MODIFY]`, `[DELETE]`, `[RENAME]`).
-2. **Parse Section 3 Task Matrix & Dependency Graph**:
-   - Jump to **Section 3 Task Matrix & Dependency Graph** in `plan.md` or `debug.md`.
-   - Extract the ordered sequence: `Order`, `Status`, `Action`, `File Path`, `Target Symbols`, `Depends On`, `Fast Test Command`.
-   - Skip rows already marked `[x]` (Done), identify the first pending row `[ ]` or in-progress row `[/]`.
+1. **Review Source Structure Changes**:
+   - For `plan.md`, ingest Section 1 Directory Structure Changes.
+   - For `debug.md`, ingest Section 1 Diagnosis to understand the proven root cause and fix constraints.
+2. **Parse executable tasks**:
+   - For `plan.md` or `debug.md`, jump to **Section 2 File Changes** and read ordered headings `### <order>. [<ACTION>] <path>`.
+   - Require each task block to contain `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` before its checklist and unified diff.
+   - Treat heading order as execution order and `Depends On` as blocking edges.
+   - Skip tasks marked `[x]`; identify the first `[ ]` or `[/]` task.
 
 ---
 
 ### Step 4 — Apply File Changes Incrementally (`incremental-implementation`)
 
-For each pending row in the Task Matrix:
+For each pending file task block:
 1. Verify that all prerequisite files (`Depends On`) have been successfully applied and verified (`[x]`).
-2. Mark the row's `Status` as `[/]` (in-progress) in the active document (`plan.md` or `debug.md`).
+2. Mark the task's `Status` as `[/]` (in-progress) in the active document (`plan.md` or `debug.md`).
 3. **Step 4a — Pre-apply Context, Existing Imports & Language Skill Compliance Gate**:
    - Read the target file (`view_file`) to inspect its current imports, shared utilities, and surrounding code patterns.
    - Verify that existing project helpers/hooks are properly imported and utilized (Reuse-First Invariant).
@@ -126,11 +129,11 @@ For each pending row in the Task Matrix:
    - Re-run the checklist against the current file for stale-plan drift.
    - On material conflict, do not edit. Emit `Ponytail Plan Conflict`, report completed rows, and stop before edit.
 5. **Step 4c — Apply Code Modification (Diff Application)**:
-   - Locate the corresponding file in **Section 4. Code Changes (Unified Diff)**.
+   - Use the Unified Diff inside the current Section 2 task block.
    - Apply the modification precisely by replacing the deleted lines (`-`) with added lines (`+`).
 6. **Step 4d — Fast Test Command**:
-   - Run the row's **`Fast Test Command`** immediately:
-     - If test passes: mark row `Status` as `[x]` (done) in the document and proceed to next row.
+   - Run the task's **`Fast Test Command`** immediately:
+     - If test passes: mark task `Status` as `[x]` (done) in the document and proceed to next row.
      - If test fails: activate `diagnosing-bugs` (Red Feedback Loop $\rightarrow$ Instrument $\rightarrow$ Fix).
 
 ---
@@ -143,7 +146,7 @@ For each pending row in the Task Matrix:
    npm run lint
    ```
 2. **Update Document Verification Evidence & Completion**:
-   - Update Section 5 of `plan.md` or `debug.md` by marking verified test items with `[x]` and appending concrete test execution evidence (e.g., `PASS - X tests passed`).
+   - Update Section 3 Verification of `plan.md` or `debug.md` by marking verified test items with `[x]` and appending concrete test execution evidence (e.g., `PASS - X tests passed`).
    - Update document frontmatter:
    ```yaml
    status: done   # (hoặc status: fixed cho debug.md)
@@ -160,6 +163,6 @@ For each pending row in the Task Matrix:
 - **🛑 Strict Task Document Invariant (Zero walkthrough.md Creation)**: Each task folder must contain ONLY `concept.md` and `plan.md` (or `debug.md`). Never generate a separate `walkthrough.md` file on disk. Present walkthrough results directly in the conversation response.
 - **🛑 Strict Tech Skill & Rule Adherence**: Applied code must strictly adhere to active language/tech skills and repository rules. Agent MUST NOT write arbitrary code based on personal assumptions.
 - **Enforce Reuse-First Verification**: Always inspect target file imports and utilize project shared utilities; never duplicate existing code.
-- Prioritize parsing Section 3 Task Matrix for sub-second ingestion.
+- Prioritize parsing ordered Section 2 file task blocks identically for `plan.md` and `debug.md`.
 - Execute `Fast Test Command` per file before proceeding to the next.
 - Maintain Beyoncé Rule at all times.

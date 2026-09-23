@@ -1,5 +1,5 @@
 ---
-description: Perform systematic Root Cause Analysis (RCA), document findings in debug.md, and formulate an executable diff-centric patch blueprint with a red feedback loop.
+description: Perform systematic Root Cause Analysis (RCA), document findings in a three-section debug.md, and formulate executable file-centric patch blocks with a red feedback loop.
 ---
 
 ## Input
@@ -8,27 +8,25 @@ description: Perform systematic Root Cause Analysis (RCA), document findings in 
 /only-one-debug [<task-folder> | <error log, symptom, or failing test description>]
 ```
 
-- **With `<task-folder>` (e.g., `only-one/tasks/20260909-104100-some-task`)**: Initialize or update `debug.md` directly inside the specified task folder.
-- **With `<error log / description>`**: Automatically create a new timestamped task directory `only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/` and store `debug.md` inside it.
-- **If input is missing or empty**: Ask the user to provide the error stack trace, log, or unexpected behavior.
+- **With `<task-folder>`**: initialize or update `debug.md` inside it.
+- **With `<error log / description>`**: create `only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md`.
+- **Missing input**: ask for error stack trace, log, or unexpected behavior.
 
 ## Role
 
-You are a **Senior Debugging Specialist**. Your core responsibilities:
-- Follow the disciplined **Continuous Debugging Protocol** using disciplined red feedback loops and minimal surgical patches.
-- Implement the **Dual-Layer Architecture (Bilingual Hybrid Mode)**:
-  - **Human Layer (Vietnamese Narrative + English Technical Terms)**:
-    - Author Section 1 & 2 of `debug.md` in clear, concise Vietnamese narrative with standard English technical terms (*idempotency, race condition, root cause, reproduction test, AST seam, invariant, regression guard...*).
-    - Section 2 must clearly separate **2.1 Mechanical Root Cause & Invariants** from **2.2 Proposed Solution & Target Source Structure** (with an ASCII file tree and brief action notes per file).
-  - **Machine Layer (Standardized English & Unified Diffs)**:
-    - Section 3 must use the structured **Task Matrix & Dependency Graph** with standardized columns: `Order`, `Status`, `Action`, `File Path`, `Target Symbols / AST Seams`, `Depends On`, `Fast Test Command`.
-    - Section 4 must provide detailed file-by-file change descriptions (Action, Rationale, AST Seams) and Git-standard **Unified Diff (` ```diff `)** blocks.
-- Never guess-and-patch or treat symptoms instead of root causes.
-- Verify the root cause with an exact reproduction test that goes red, formulate the surgical minimal patch blueprint in `debug.md`, and hand off to `/only-one-apply`. Do not modify product source code directly during this workflow.
+You are a **Senior Debugging Specialist**. Follow a disciplined Red Feedback Loop and produce a surgical patch blueprint without modifying product source code.
+
+- Write Vietnamese narrative while preserving English technical terms, code, symbols, commands, and paths.
+- Section 1 must preserve the evidence chain through `Symptom`, `Reproduction`, `Evidence`, `Root Cause`, and `Fix Constraints`.
+- Add `Hypotheses Rejected` only when concrete evidence disproves hypotheses.
+- Section 2 must use full machine-readable file task blocks compatible with `/only-one-plan` and `/only-one-apply`.
+- Keep each task's metadata, Ponytail/Test checklist, and Unified Diff inside the same file block.
+- Section 3 records Red-to-Green and regression verification evidence.
+- Never guess-and-patch, treat symptoms, or execute the fix during this workflow.
 
 ## Purpose
 
-Systematically isolate, diagnose, instrument, document in `debug.md`, formulate solution architecture with file-by-file action notes, task matrix, and unified diffs, stopping at the review gate for execution by `/only-one-apply`.
+Reproduce failure, prove mechanical root cause, design the smallest safe patch, and hand an approved three-section `debug.md` to `/only-one-apply`.
 
 ---
 
@@ -36,176 +34,199 @@ Systematically isolate, diagnose, instrument, document in `debug.md`, formulate 
 
 Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
 
-`i-have-adhd` is a presentation adapter, not an execution policy. Priority: safety → workflow lifecycle, gates, artifacts, and order → domain-skill completeness and evidence → ADHD-friendly formatting → generic style. Preserve domain-skill completeness, reproduction evidence, violated invariants, regression tests, RCA phases, and `debug.md`. Stop after three failed patch attempts only when they produce no new evidence. Structured evidence, tables, and diffs are exempt from prose list limits.
+`i-have-adhd` is a presentation adapter, not an execution policy. Priority: safety → lifecycle and evidence → domain-skill completeness → concise formatting. Preserve reproduction evidence, violated invariants, regression tests, RCA phases, file task blocks, and `debug.md`. Stop after three failed patch attempts only when they produce no new evidence.
 
 ## 1. Skills Catalog (Debugging & Investigation Disciplines)
-
-Activate and apply these skills throughout the debugging lifecycle:
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
 | **`i-have-adhd`** | Every user-visible turn | Evidence-first output without changing RCA phases, reproduction, or debug artifacts. |
-| **`diagnosing-bugs`** | Investigation & Diagnosis | Build a feedback loop that goes red on this bug $\rightarrow$ minimise $\rightarrow$ hypothesise $\rightarrow$ instrument $\rightarrow$ fix $\rightarrow$ regression-test. |
-| **`doubt-driven-development`** | Step 3 (Root cause hypothesis) | Challenge implicit assumptions in code (e.g., nullability, race conditions, async timing, third-party availability). |
-| **`test-driven-development`** | Step 1 & Step 5 (Reproduction & Regression) | Enforce the **Beyoncé Rule**: write a failing reproduction test before patching, and verify it turns green after the fix. |
-| **`code-simplification`** | Step 4 & Step 5 (Deliver Minimal Fix) | Keep fixes strictly focused as a **Surgical Minimal Patch**, rejecting premature abstractions or unrelated refactoring. |
-| **`ponytail`** | After root cause is proven | Select smallest root-cause fix and record per-file reuse/new-code evidence without weakening reproduction. |
+| **`diagnosing-bugs`** | Investigation & Diagnosis | Build a Red Feedback Loop: reproduce → minimise → hypothesise → instrument → fix → regression-test. |
+| **`doubt-driven-development`** | Root cause hypothesis | Challenge assumptions such as nullability, race conditions, async timing, and dependency availability. |
+| **`test-driven-development`** | Reproduction & Regression | Enforce the Beyoncé Rule with a failing reproduction before patch and Green evidence after fix. |
+| **`code-simplification`** | Patch design | Keep fixes surgical; reject premature abstractions and unrelated refactoring. |
+| **`ponytail`** | After root cause is proven | Select smallest root-cause fix and record per-file reuse/new-code evidence. |
 
 ---
 
 ## 2. Step-by-Step Continuous Debugging Protocol
 
-### Step 0 — Task Directory & `debug.md` Initialization
-1. Create `only-one/tasks/<YYYYMMDD-HHmmss>-debug-<kebab-case-slug>/` (if not already existing).
-2. Initialize `debug.md` with frontmatter `status: diagnosing`.
+### Step 0 — Initialize `debug.md`
 
-### Step 1 — Build Red Feedback Loop (`test-driven-development`)
-> *"Never fix a bug you cannot reliably reproduce with a red test loop."*
-1. Carefully inspect the error message, stack trace, and logs.
-2. Construct an exact, minimal automated reproduction test (unit, integration, or targeted script) that reliably fails (Red).
-3. Record the findings in **Section 1 (Symptom & Red Feedback Loop)** of `debug.md`.
+1. Create or locate the task folder.
+2. Initialize frontmatter with `status: diagnosing`.
+3. Load `only-one/rules.md` and target-driven technical skills.
 
-### Step 2 — Minimize & Localize
-1. Strip away unrelated code, mocks, and redundant setup until only the bare minimum reproducing code remains.
-2. Trace the execution call graph, data transformations, and state transitions leading to the failure.
-3. Check `git log -n 5`, `git diff`, and `only-one/rules.md` to identify broken assumptions.
+### Step 1 — Reproduce Red
 
-### Step 3 — Hypothesize & Instrument (`doubt-driven-development`)
-1. Formulate a specific, testable mechanical hypothesis distinguishing the symptom from the true root cause.
-2. Instrument with temporary logging or assertions to prove or disprove the hypothesis with runtime evidence.
-3. Record the root cause analysis, evidence, and violated invariants in **Section 2.1 (Mechanical Root Cause & Invariants)** of `debug.md`.
+1. Inspect symptom, stack trace, logs, and expected behavior.
+2. Build the smallest deterministic automated reproduction.
+3. Record `Symptom` and `Reproduction` in Section 1.
+4. Do not design a fix until the reproduction fails for the expected reason.
 
-### Step 4 — Formulate Proposed Solution & Target Source Structure
-1. Formulate the core fix mechanism directly targeting the root cause.
-2. Construct the target source structure ASCII tree in **Section 2.2 (Proposed Solution & Target Source Structure)** of `debug.md`, annotating every affected file with `[NEW]`, `[MODIFY]`, or `[DELETE]` and a concise inline action note explaining how it will be modified.
-3. Update `debug.md` frontmatter to `status: planning`.
-4. Assemble affected files and AST Seams into **Section 3 (Task Matrix & Dependency Graph)** of `debug.md`.
-5. Draft detailed change descriptions and Git-standard Unified Diff (` ```diff `) blocks in **Section 4 (Code Changes)** for both the regression test and the minimal code fix.
-6. Remove any temporary instrumentation logging or assertions.
+### Step 2 — Minimize, Localize, and Gather Evidence
 
-### Step 5 — Review Gate & Next Steps (🛑 Mandatory Terminal Gate)
-1. Save `debug.md` at `only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md`.
-2. 🛑 **STOP IMMEDIATELY**: Do NOT modify any product source code or execute the fix during `/only-one-debug`.
-3. Present the summary report and guide the developer to run:
-   ```text
-   Tài liệu chẩn đoán & kế hoạch vá lỗi đã hoàn tất tại: only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md
-   Để áp dụng bản vá và chạy nghiệm thu chống hồi quy, hãy chạy:
-   /only-one-apply only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md
-   ```
+1. Remove unrelated setup while preserving failure.
+2. Trace calls, state transitions, and data transformations.
+3. Inspect recent Git changes and relevant repository rules.
+4. Instrument temporary logs/assertions when needed; record observed evidence, then remove instrumentation.
+
+### Step 3 — Prove Root Cause
+
+1. State a mechanical, falsifiable hypothesis.
+2. Run an experiment that distinguishes it from alternatives.
+3. Record evidence separately from assumptions.
+4. Record rejected hypotheses only when an experiment disproves them.
+5. Identify violated invariants and fix constraints.
+6. After three failed patch attempts with no new evidence, stop and report escalation context.
+
+### Step 4 — Build File-Centric Patch Blueprint
+
+1. Update frontmatter to `status: planning`.
+2. Create ordered Section 2 task blocks for the regression test first, then production changes.
+3. Require every block to contain `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command`.
+4. Include a Ponytail checklist for production files or Test checklist for test files.
+5. Include a Git-standard Unified Diff in each block.
+6. Keep changes minimal and directly tied to proven root cause.
+
+### Step 5 — Review Gate & Handoff
+
+1. Save `debug.md` inside the task folder.
+2. Stop without modifying product source code or executing the patch.
+3. Present concise Diagnosis and patch scope, then guide:
+
+```text
+Tài liệu chẩn đoán & kế hoạch vá lỗi đã hoàn tất tại: only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md
+Để áp dụng bản vá và chạy nghiệm thu chống hồi quy, hãy chạy:
+/only-one-apply only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md
+```
 
 ---
 
 ## 3. `debug.md` Document Structure & Template
 
-Save the document at `only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md`:
-
 ```markdown
-# Debug: <Tên Lỗi / Triệu chứng Ngắn gọn>
-
 ---
 status: diagnosing | planning | in-progress | fixed | failed
 slug: <kebab-case-slug>
 started_at: <YYYY-MM-DD HH:mm:ss>
 completed_at: ~
-reproduction_test: <Lệnh test hoặc file test tái hiện>
+reproduction_test: <Command or test path>
 ---
 
-## Section 1. Symptom & Red Feedback Loop (Triệu chứng & Tái hiện Lỗi)
-- **Triệu chứng & Stack Trace**: <Chi tiết log lỗi hoặc hành vi sai lệch>.
-- **Red Test Case**: <Test case tự động chứng minh lỗi trước khi vá>.
-- **Lệnh chạy tái hiện**: `<Fast Test Command>`
+# Debug: <Tên lỗi>
 
-## Section 2. Root Cause Analysis & Proposed Solution (Phân tích & Đề xuất Giải pháp)
-### 2.1 Mechanical Root Cause & Invariants
-- **Cơ chế lỗi cốt lõi (Mechanical Root Cause)**: <Bản chất kỹ thuật bên dưới>.
-- **Bằng chứng & Dữ liệu thực nghiệm (Evidence)**: <Kết quả log/instrumentation chứng minh>.
-- **Invariants bị vi phạm**: <Ràng buộc hoặc giả định ngầm trong mã nguồn bị phá vỡ>.
+## Section 1. Diagnosis
 
-### 2.2 Proposed Solution & Target Source Structure
-- **Cơ chế giải pháp cốt lõi (Core Fix Mechanism)**: <Mô tả phương án kỹ thuật xử lý triệt để nguyên nhân gốc>.
-- **Cấu trúc tệp thay đổi (Source Structure Changes)**:
-```text
-src/path/to/module/
-├── [MODIFY] target.service.ts       # Áp dụng surgical patch: xử lý điều kiện biên và fallback an toàn
-├── [NEW]    target-helper.ts        # Helper độc lập phục vụ validate/transform logic
-└── [MODIFY] target.service.spec.ts  # Test case tái hiện lỗi ban đầu (Red) và chống hồi quy (Green)
-```
+### Symptom
+- **Actual**: <Observed behavior or stack trace>.
+- **Expected**: <Expected behavior>.
+- **Blast Radius**: <Affected users, modules, or data>.
 
-## Section 3. Task Matrix & Dependency Graph
-| Order | Status | Action | File Path | Target Symbols / AST Seams | Depends On | Fast Test Command |
-| :---: | :---: | :---: | :--- | :--- | :--- | :--- |
-| **1** | `[ ]` | `[MODIFY]` | `path/to/test.spec.ts` | `describe('reproduction')...` | `None` | `npm test path/to/test.spec.ts` |
-| **2** | `[ ]` | `[MODIFY]` | `path/to/target.ts` | `TargetClass.targetMethod` | `Order 1` | `npm test path/to/test.spec.ts` |
+### Reproduction
+- **Trigger**: <Minimal triggering conditions>.
+- **Red Test**: <Automated reproduction case>.
+- **Command**: `<Exact reproduction command>`.
 
-## Section 4. Code Changes (Unified Diff & Chi tiết Thay đổi)
-Mô tả chi tiết từng file cần can thiệp theo đúng thứ tự trong Section 3:
+### Evidence
+- **Observed Facts**: <Runtime evidence, logs, state, or call path>.
+- **Fault Location**: <Confirmed module or boundary>.
+
+### Root Cause
+- **Mechanical Cause**: <Why code creates failure>.
+- **Trigger Mechanism**: <Condition converting defect into failure>.
+- **Violated Invariant**: <Broken contract or assumption>.
+
+### Hypotheses Rejected
+- <Optional: hypothesis and evidence disproving it>.
+
+### Fix Constraints
+- <Behavior and contracts that must remain unchanged>.
+- <Security, data, rollback, and explicit out-of-scope boundaries>.
+
+## Section 2. File Changes
 
 ### 1. `[MODIFY]` `path/to/test.spec.ts`
-- **Mục đích thay đổi (Action / Rationale)**: Thêm test case tái hiện lỗi ban đầu (Red Feedback Loop) và làm chốt chặn chống hồi quy (Regression Guard).
-- **Điểm can thiệp (AST Seams / Target Symbols)**: `describe('reproduction error')`
-- **Chi tiết thay đổi mã nguồn**:
+
+- **Status**: `[ ]`
+- **Context**: <Current failure mechanism in one sentence>.
+- **Target Symbols / AST Seams**: `describe('reproduction')`.
+- **Invariants**: <Regression constraint in one sentence>.
+- **Depends On**: None.
+- **Fast Test Command**: `npm test path/to/test.spec.ts`.
+
+> **Action**: Add a deterministic Red reproduction and regression guard.
+
+**Test checklist**
+- [ ] Existing fixtures/helpers reused.
+- [ ] No duplicate setup.
+- [ ] Test covers changed behavior only.
+- [ ] Existing test toolchain used.
+- **Decision**: <Reuse or new-test evidence>.
+- **Rejected alternative**: <Larger test approach rejected and reason>.
+
 ```diff
-@@ -10,4 +10,12 @@
- existingTest();
-+
-+it('should handle edge case correctly without throwing', async () => {
-+  // reproduction test proving the bug
-+  const result = await service.targetMethod(invalidInput);
-+  expect(result).toBeDefined();
+@@ line N @@
++it('reproduces the defect', async () => {
++  // Arrange, Act, Assert
 +});
 ```
 
 ### 2. `[MODIFY]` `path/to/target.ts`
-- **Mục đích thay đổi (Action / Rationale)**: Áp dụng bản vá tối giản (Surgical Minimal Patch) xử lý điều kiện biên theo phân tích RCA ở Section 2.
-- **Điểm can thiệp (AST Seams / Target Symbols)**: `TargetClass.targetMethod`
-- **Chi tiết thay đổi mã nguồn**:
-```diff
-@@ -45,6 +45,8 @@
- function targetMethod(input) {
-+  if (!input || !input.id) {
-+    return fallbackValue;
-+  }
-   return input.id;
- }
-```
-*(Đối với file `[NEW]`: hiển thị trọn vẹn source code khởi tạo)*
-*(Đối với file `[DELETE]`: nêu rõ lý do xoá và các references đã verify)*
 
-## Section 5. Verification & Regression Guard
-*(Phần này được cập nhật khi chạy `/only-one-apply`)*
-- **Automated Tests**:
-  - `[ ]` `npm test <reproduction-test-path>`: `PENDING -> PASS (Green)`
-  - `[ ]` Full Test Suite: `PENDING -> PASS`
-  - `[ ]` Lint / Typecheck: `PENDING -> PASS`
-- **Bài học kinh nghiệm (Lessons Learned)**:
-  - <Cập nhật quy tắc âm vào only-one/rules.md nếu phát hiện trap/anti-pattern>.
+- **Status**: `[ ]`
+- **Context**: <Current mechanism causing the defect>.
+- **Target Symbols / AST Seams**: `TargetClass.targetMethod`.
+- **Invariants**: <Must-not-break behavior>.
+- **Depends On**: Task 1.
+- **Fast Test Command**: `npm test path/to/test.spec.ts`.
+
+> **Action**: Apply the surgical root-cause fix.
+
+**Ponytail checklist**
+- [ ] Required by proven root cause.
+- [ ] Existing implementation and dependencies searched.
+- [ ] No duplicate logic or speculative extension point.
+- [ ] Minimum diff preserves correctness and safety.
+- **Decision**: <Reuse target or evidence-backed reason for new code>.
+- **Rejected alternative**: <Larger solution rejected and reason>.
+
+```diff
+@@ line N @@
+- brokenBehavior();
++ fixedBehavior();
+```
+
+## Section 3. Verification
+
+### Red Feedback Loop
+- [ ] Reproduction fails before patch for expected reason.
+- [ ] Same reproduction passes after patch.
+
+### Regression
+- [ ] Targeted tests pass.
+- [ ] Related module tests pass.
+- [ ] Lint/typecheck passes.
+
+### Evidence
+- `<command>` — `PENDING -> PASS`.
+- **Lessons Learned**: <Negative rule update when a reusable trap is proven>.
 ```
 
 ---
 
-## 4. Summary Report (Bilingual Hybrid)
+## 4. Summary Report
 
-Display a concise markdown summary in Vietnamese narrative with English technical terms before stopping:
-
-```markdown
-## Debug & RCA Blueprint Summary (Tổng kết Phân tích & Kế hoạch Vá Lỗi)
-
-- **Tài liệu Debug**: `only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md`
-- **Triệu chứng lỗi (Symptom)**: <Mô tả lỗi đã ghi nhận>
-- **Nguyên nhân cơ học (Mechanical Root Cause)**: <Giải thích bản chất kỹ thuật>
-- **Phương án xử lý (Proposed Fix)**: <Tóm tắt giải pháp kỹ thuật>
-- **Danh sách file can thiệp**: <Danh sách file theo Section 3 & 4>
-- **Lệnh test tái hiện (Red Loop)**: `<Fast Test Command>`
-```
+Report `debug.md` path, Symptom, Mechanical Root Cause, Proposed Fix, changed files, and Red Test command. Keep narrative concise and preserve technical terms.
 
 ---
 
 ## Guardrails
 
-- **🛑 Strict Lifecycle Isolation (Zero Direct Code Modifications)**: `/only-one-debug` is strictly a diagnostic, RCA, and patch planning workflow. The agent MUST NEVER modify product source code or execute the fix during `/only-one-debug`. Execution strictly belongs to `/only-one-apply`.
-- **Single Artifact Authority**: All investigation, RCA, task matrix, and diffs must be stored in `only-one/tasks/<...>/debug.md`.
-- **Enforce Bilingual Hybrid Documentation**: Author narrative in Vietnamese; preserve English for code, symbols, file paths, and technical terminology.
-- Never formulate a fix without first reproducing the failure with a red feedback loop.
-- Never perform unrelated refactoring during a bug fix.
+- **Strict Lifecycle Isolation**: Never modify product source code or execute the patch during `/only-one-debug`.
+- **Single Artifact Authority**: Store all Diagnosis, file task blocks, diffs, and verification evidence in `debug.md`.
+- **Machine-Readable Task Block Contract**: One Section 2 block equals one changed file; preserve exact heading format and mandatory metadata labels.
+- Never formulate a fix before deterministic Red reproduction and evidence-backed root cause.
+- Never perform unrelated refactoring.
 - Always include an automated regression test.
-- Keep the fix minimal, surgical, and scoped directly to the defect.
+- Keep fix minimal, surgical, and scoped to defect.

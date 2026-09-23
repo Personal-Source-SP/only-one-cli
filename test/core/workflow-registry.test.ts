@@ -64,10 +64,10 @@ describe('workflow registry integrity', () => {
     it('preserves workflow-specific domain invariants over output formatting', () => {
         const contracts = {
             'only-one-idea': ['one question', 'discovery'],
-            'only-one-plan': ['Task Matrix', 'Unified Diff'],
+            'only-one-plan': ['machine-readable task block', 'Unified Diff'],
             'only-one-apply': ['Depends On', 'Fast Test'],
-            'only-one-flash': ['Review Gate', 'Zero Disk'],
-            'only-one-debug': ['evidence', 'three failed patch attempts'],
+            'only-one-flash': ['Review Gate', 'Zero Disk', 'File Changes', '**Target**', '**Preserve**'],
+            'only-one-debug': ['Diagnosis', 'machine-readable file task blocks', 'Hypotheses Rejected'],
         };
 
         for (const [name, requiredTerms] of Object.entries(contracts)) {
