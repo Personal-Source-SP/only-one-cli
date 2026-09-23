@@ -37,9 +37,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.9',
+        version: '0.0.10',
         description:
-            'Implement tasks from an approved plan.md or debug.md by parsing machine-readable file task blocks and applying changes in dependency order.',
+            'Implement tasks from an approved plan.md, debug.md, or selected findings in review.md with dependency-ordered verification.',
         requiredSkills: [
             'i-have-adhd',
             'context-engineering',
@@ -66,15 +66,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-review',
-        version: '0.0.1',
-        description:
-            'Perform comprehensive 5-axis code health, security, simplicity, and performance review using dual-perspective audit.',
-        requiredSkills: [
-            'code-review-and-quality',
-            'code-simplification',
-            'security-and-hardening',
-            'performance-optimization',
-        ],
+        version: '0.0.2',
+        description: 'Run Open CodeReview and produce selectable debug-grade executable findings.',
+        requiredSkills: ['diagnosing-bugs', 'doubt-driven-development', 'test-driven-development', 'code-simplification', 'ponytail'],
     },
     {
         name: 'only-one-conflict',
@@ -100,9 +94,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-pr-git',
-        version: '0.0.1',
+        version: '0.0.2',
         description:
-            'Create or update a GitHub PR from current branch with mandatory 5-axis pre-review quality gate using GitHub MCP.',
+            'Create or update a GitHub PR from the current branch using validated Git state and GitHub MCP.',
         requiredSkills: ['only-one-pr-git-skill'],
         requiredMcps: ['github'],
     },

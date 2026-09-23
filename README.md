@@ -98,7 +98,7 @@ Standardized workflows include:
 - `only-one-plan`: Research codebase and create a focused 5-section implementation plan.
 - `only-one-apply`: Implement tasks from an approved plan with TDD and automated walkthrough creation.
 - `only-one-debug`: Systematic 5-step Root Cause Analysis (RCA) and minimal verified bug fixes.
-- `only-one-review`: 5-axis code health, security, simplicity, and performance review.
+- `only-one-review`: Open CodeReview for branch, uncommitted changes, or commit changes with selectable executable fixes via `only-one-apply`.
 - `only-one-clean`: Consolidate related archives and purge stale task files.
 - `only-one-clockify`: Validate task time entries and log to Clockify.
 - `only-one-intranet`: Validate and log Intranet timesheet entries with monthly summary output.

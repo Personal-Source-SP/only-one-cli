@@ -29,7 +29,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
   - `only-one-plan`: nghiên cứu codebase và tạo kế hoạch 5 phần (User Review, Open Questions, Proposed Changes, Verification Plan, Automated Tests).
   - `only-one-apply`: triển khai từng file theo plan đã duyệt, TDD, tự động tạo walkthrough documentation.
   - `only-one-debug`: phân tích RCA 5 bước và sửa lỗi tối giản kèm kiểm chứng.
-  - `only-one-review`: review toàn diện 5 trục (health, security, simplicity, performance, PR readiness).
+  - `only-one-review`: OCR review theo branch/changes/commit, tạo executable findings để người dùng chọn sửa qua `only-one-apply`.
   - `only-one-clockify`: xác thực task time entry GMT+7 và log vào Clockify qua MCP.
   - `only-one-intranet`: xác thực và log timesheet Intranet, xuất báo cáo tháng qua `zodinet-timesheet` MCP.
   - `only-one-pr-git`: tạo/cập nhật GitHub Pull Request với pre-review quality gates.

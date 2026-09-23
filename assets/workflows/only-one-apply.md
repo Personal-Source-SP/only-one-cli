@@ -1,27 +1,27 @@
 ---
-description: "Implement tasks from an approved plan.md or debug.md file by parsing machine-readable file task blocks and applying changes in dependency order."
+description: "Implement tasks from an approved plan.md, debug.md, or selected findings in review.md with dependency-ordered verification."
 ---
 
 ## Input
 
 ```text
-/only-one-apply [<task-folder> | <plan-path> | <debug-path>]
+/only-one-apply [<task-folder> | <plan-path> | <debug-path> | <review-path>]
 ```
 
-- **With `<task-folder>`, `<plan-path>`, or `<debug-path>`**: use the given plan/debug file (e.g., `only-one/tasks/20260819-142500-soft-delete/plan.md` or `only-one/tasks/20260917-100000-debug-bug/debug.md`) directly. If a task folder is given, locate `plan.md` or `debug.md` within it (prefer `in-progress` > `planned`/`planning`).
+- **With `<task-folder>`, `<plan-path>`, `<debug-path>`, or `<review-path>`**: use the given plan/debug/review file (e.g., `only-one/tasks/20260819-142500-soft-delete/plan.md` or `only-one/tasks/20260917-100000-debug-bug/debug.md`) directly. If a task folder is given, locate `plan.md`, `debug.md`, or `review.md` within it (prefer `in-progress` > `planned`/`planning`).
 - **Without path**: search `only-one/tasks/` for active tasks:
   ```bash
-  grep -rlE "status: in-progress" only-one/tasks/ --include="plan.md" --include="debug.md" 2>/dev/null
-  grep -rlE "status: (planned|planning)" only-one/tasks/ --include="plan.md" --include="debug.md" 2>/dev/null
+  grep -rlE "status: in-progress" only-one/tasks/ --include="plan.md" --include="debug.md" --include="review.md" 2>/dev/null
+  grep -rlE "status: (planned|planning)" only-one/tasks/ --include="plan.md" --include="debug.md" --include="review.md" 2>/dev/null
   ```
   - Prefer `in-progress` over `planned`/`planning`.
   - If multiple found, display the list and ask the user to select.
-  - If none found, report: "No active plan or debug task found in only-one/tasks/." and stop.
+  - If none found, report: "No active plan, debug, or review task found in only-one/tasks/." and stop.
 
 ## Role
 
 You are a **Senior Software Engineer**. Your core responsibilities:
-- Fast-path ingest ordered **Section 2 File Changes** task blocks from both `plan.md` and `debug.md`.
+- Fast-path ingest ordered **Section 2 File Changes** task blocks from `plan.md`, `debug.md`, and `review.md`.
 - Implement changes one file at a time from each task block's unified diff, respecting `Depends On` ordering.
 - Apply execution and quality disciplines (`incremental-implementation`, `test-driven-development`, `code-simplification`, `diagnosing-bugs`).
 - Run the targeted `Fast Test Command` immediately after modifying each file to maintain rapid feedback loops.
@@ -58,18 +58,18 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 ### Step 1 — Locate and read the plan or debug document
 
 **If a path or task folder is provided:**
-1. If target is a file path (`plan.md` or `debug.md`), read it directly.
-2. If target is a task folder, check for `plan.md` or `debug.md`. If both exist, prioritize `in-progress` $\rightarrow$ `planned`/`planning`.
+1. If target is a file path (`plan.md`, `debug.md`, or `review.md`), read it directly.
+2. If target is a task folder, check for `plan.md`, `debug.md`, or `review.md`. If both exist, prioritize `in-progress` $\rightarrow$ `planned`/`planning`.
 3. If neither exists, report error and stop.
 
 **If no path is provided:**
 ```bash
-grep -rlE "status: in-progress" only-one/tasks/ --include="plan.md" --include="debug.md" 2>/dev/null
-grep -rlE "status: (planned|planning)" only-one/tasks/ --include="plan.md" --include="debug.md" 2>/dev/null
+grep -rlE "status: in-progress" only-one/tasks/ --include="plan.md" --include="debug.md" --include="review.md" 2>/dev/null
+grep -rlE "status: (planned|planning)" only-one/tasks/ --include="plan.md" --include="debug.md" --include="review.md" 2>/dev/null
 ```
 - Prefer `in-progress` over `planned`/`planning`.
 - If multiple found, display the list and ask the user to select.
-- If none found, report: "No active plan or debug task found in only-one/tasks/." and stop.
+- If none found, report: "No active plan, debug, or review task found in only-one/tasks/." and stop.
 
 ---
 
@@ -100,24 +100,34 @@ Check the frontmatter `status` field:
 
 ---
 
+### Review Selection Gate
+
+For `review.md`:
+
+1. Require `document_type: review` and at least one executable finding in `OPEN`, `SELECTED`, `IN_PROGRESS`, or `FAILED`.
+2. Resume `SELECTED`, `IN_PROGRESS`, or `FAILED` findings only after explicit confirmation.
+3. Otherwise display interactive **multi-select** of `OPEN` findings, ordered by severity then stable ID. Show ID, severity, title, location, changed files, and Red Test summary.
+4. On cancel or empty selection, stop with zero source and status mutations.
+5. After confirmation, mark chosen findings `SELECTED`; leave every unselected finding `OPEN`. Never execute tasks from unselected findings.
+
 ### Step 3 — Ingest Source Structure & Parse File Tasks
 
 1. **Review Source Structure Changes**:
    - For `plan.md`, ingest Section 1 Directory Structure Changes.
-   - For `debug.md`, ingest Section 1 Diagnosis to understand the proven root cause and fix constraints.
+   - For `debug.md`, ingest Section 1 Diagnosis to understand the proven root cause and fix constraints. For `review.md`, ingest each selected finding Diagnosis and its finding-local File Changes.
 2. **Parse executable tasks**:
-   - For `plan.md` or `debug.md`, jump to **Section 2 File Changes** and read ordered headings `### <order>. [<ACTION>] <path>`.
+   - For `plan.md`, `debug.md`, or `review.md`, jump to **Section 2 File Changes** and read ordered headings `### <order>. [<ACTION>] <path>`.
    - Require each task block to contain `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` before its checklist and unified diff.
    - Treat heading order as execution order and `Depends On` as blocking edges.
-   - Skip tasks marked `[x]`; identify the first `[ ]` or `[/]` task.
+   - Skip tasks marked `[x]`; identify the first `[ ]` or `[/]` task. Cancelled or empty selection performs zero mutations; unselected findings remain `OPEN`.
 
 ---
 
-### Step 4 — Apply File Changes Incrementally (`incremental-implementation`)
+### Step 4 — Apply Selected File Changes Incrementally (`incremental-implementation`)
 
 For each pending file task block:
 1. Verify that all prerequisite files (`Depends On`) have been successfully applied and verified (`[x]`).
-2. Mark the task's `Status` as `[/]` (in-progress) in the active document (`plan.md` or `debug.md`).
+2. Mark the task's `Status` as `[/]` (in-progress) in the active document (`plan.md`, `debug.md`, or `review.md`).
 3. **Step 4a — Pre-apply Context, Existing Imports & Language Skill Compliance Gate**:
    - Read the target file (`view_file`) to inspect its current imports, shared utilities, and surrounding code patterns.
    - Verify that existing project helpers/hooks are properly imported and utilized (Reuse-First Invariant).
@@ -134,7 +144,7 @@ For each pending file task block:
 6. **Step 4d — Fast Test Command**:
    - Run the task's **`Fast Test Command`** immediately:
      - If test passes: mark task `Status` as `[x]` (done) in the document and proceed to next row.
-     - If test fails: activate `diagnosing-bugs` (Red Feedback Loop $\rightarrow$ Instrument $\rightarrow$ Fix).
+     - If test fails: mark the finding `FAILED`, record evidence, stop before next finding, and activate `diagnosing-bugs` (Red Feedback Loop $\rightarrow$ Instrument $\rightarrow$ Fix).
 
 ---
 
@@ -146,10 +156,10 @@ For each pending file task block:
    npm run lint
    ```
 2. **Update Document Verification Evidence & Completion**:
-   - Update Section 3 Verification of `plan.md` or `debug.md` by marking verified test items with `[x]` and appending concrete test execution evidence (e.g., `PASS - X tests passed`).
+   - Update Section 3 Verification of `plan.md`, `debug.md`, or `review.md` by marking verified test items with `[x]` and appending concrete test execution evidence (e.g., `PASS - X tests passed`).
    - Update document frontmatter:
    ```yaml
-   status: done   # (hoặc status: fixed cho debug.md)
+   status: done   # review.md only when no executable OPEN/SELECTED/IN_PROGRESS/FAILED findings remain; debug.md uses fixed
    completed_at: <YYYY-MM-DD>
    ```
 3. **In-Chat Walkthrough Presentation (Zero walkthrough.md File Creation)**:

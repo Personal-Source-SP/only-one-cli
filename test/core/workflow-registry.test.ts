@@ -61,6 +61,34 @@ describe('workflow registry integrity', () => {
         }
     });
 
+    it('defines OCR review modes and executable finding contracts', () => {
+        const review = readFileSync(join(workflowsDir, 'only-one-review.md'), 'utf8');
+        expect(review).toContain('ocr review --from <from> --to <to> --output');
+        expect(review).toContain('ocr review --commit HEAD --output');
+        expect(review).toContain('ocr review --commit <sha> --output');
+        expect(review).toContain('`changes`');
+        expect(review).toContain('#### Diagnosis');
+        expect(review).toContain('#### File Changes');
+        expect(review).toContain('#### Verification');
+        expect(review).toContain('NON_EXECUTABLE');
+    });
+
+    it('selects only chosen review findings for apply', () => {
+        const apply = readFileSync(join(workflowsDir, 'only-one-apply.md'), 'utf8');
+        expect(apply).toContain('<review-path>');
+        expect(apply).toContain('multi-select');
+        expect(apply).toContain('SELECTED');
+        expect(apply).toContain('leave every unselected finding `OPEN`');
+        expect(apply).toContain('Never execute tasks from unselected findings');
+    });
+
+    it('keeps PR creation independent from review', () => {
+        const pr = readFileSync(join(workflowsDir, 'only-one-pr-git.md'), 'utf8');
+        expect(pr).not.toContain('/only-one-review');
+        expect(pr).not.toContain('Quality Gate');
+        expect(pr).toContain('Git Preflight Checks');
+    });
+
     it('preserves workflow-specific domain invariants over output formatting', () => {
         const contracts = {
             'only-one-idea': ['one question', 'discovery'],
