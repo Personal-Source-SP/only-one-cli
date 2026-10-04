@@ -102,7 +102,7 @@ describe('workflow registry integrity', () => {
             'only-one-plan': ['machine-readable task block', 'Unified Diff'],
             'only-one-apply': ['Depends On', 'Fast Test'],
             'only-one-flash': ['Review Gate', 'Zero Disk', 'File Changes', '**Target**', '**Preserve**'],
-            'only-one-debug': ['Diagnosis', 'machine-readable file task blocks', 'Hypotheses Rejected'],
+            'only-one-debug': ['Diagnosis', 'Directory Structure', 'machine-readable file task blocks', 'Hypotheses Rejected'],
         };
 
         for (const [name, requiredTerms] of Object.entries(contracts)) {

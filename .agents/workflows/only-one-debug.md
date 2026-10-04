@@ -84,11 +84,12 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 ### Step 4 — Build File-Centric Patch Blueprint
 
 1. Update frontmatter to `status: planning`.
-2. Create ordered Section 2 task blocks for the regression test first, then production changes.
-3. Require every block to contain `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command`.
-4. Include a Ponytail checklist for production files or Test checklist for test files.
-5. Include a Git-standard Unified Diff in each block.
-6. Keep changes minimal and directly tied to proven root cause.
+2. Include an ASCII Directory Structure tree diagram at the top of Section 2 showing affected tests and source files with standard action tags (`[NEW]`, `[MODIFY]`, `[DELETE]`).
+3. Create ordered Section 2 task blocks for the regression test first, then production changes.
+4. Require every block to contain `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command`.
+5. Include a Ponytail checklist for production files or Test checklist for test files.
+6. Include a Git-standard Unified Diff in each block.
+7. Keep changes minimal and directly tied to proven root cause.
 
 ### Step 5 — Review Gate & Handoff
 
@@ -146,6 +147,15 @@ reproduction_test: <Command or test path>
 - <Security, data, rollback, and explicit out-of-scope boundaries>.
 
 ## Section 2. File Changes
+
+### Directory Structure Changes (Cấu trúc Thư mục & Tệp Thay đổi)
+Sơ đồ cây ASCII trực quan thể hiện các tệp kiểm thử hồi quy và mã nguồn cần chỉnh sửa:
+
+```text
+src/path/to/module/
+├── [NEW]    __tests__/defect-reproduction.test.ts # Red test tái hiện lỗi & chốt chặn hồi quy
+└── [MODIFY] target.service.ts                     # Bản vá sửa lỗi tận gốc
+```
 
 ### 1. `[MODIFY]` `path/to/test.spec.ts`
 
