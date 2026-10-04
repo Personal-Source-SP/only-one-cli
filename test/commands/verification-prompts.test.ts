@@ -23,7 +23,7 @@ describe('Existing-resource verification prompts & non-TTY skip (Tasks 4.2 & 4.3
         const cmd = createSkillCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-clockify-skill', '--tool', 'antigravity']);
 
-        const fullLog = stdoutLogs.join('\n');
+        const fullLog = stdoutLogs.join('\n').replace(/\u001b\[\d+m/g, '');
         expect(fullLog).toContain('Skipped (Kept Existing)');
         expect(fullLog).toContain('only-one-clockify-skill in Antigravity');
 
@@ -43,7 +43,7 @@ describe('Existing-resource verification prompts & non-TTY skip (Tasks 4.2 & 4.3
         const cmd = createRuleCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir, 'context-and-tools', '--tool', 'antigravity']);
 
-        const fullLog = stdoutLogs.join('\n');
+        const fullLog = stdoutLogs.join('\n').replace(/\u001b\[\d+m/g, '');
         expect(fullLog).toContain('Skipped:');
         expect(fullLog).toContain('context-and-tools in Antigravity');
 

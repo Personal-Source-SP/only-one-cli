@@ -227,6 +227,13 @@ export const SKILLS: SkillManifest[] = [
         skillPath: 'skills/ponytail/SKILL.md',
     },
     {
+        name: 'karpathy-ste100-discipline',
+        version: '0.0.1',
+        description:
+            "Enforce Andrej Karpathy's 4 Core Disciplines and 70% ASD-STE100 Aviation Technical Writing Specification for zero-slop Markdown.",
+        sourceType: 'local',
+    },
+    {
         name: 'only-one-nestjs-development',
         version: '0.0.2',
         description: 'Use for NestJS development with selectively loaded architecture references.',

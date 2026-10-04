@@ -30,4 +30,6 @@
 - **[ALWAYS]** Bắt buộc phải tạm dừng và chờ người dùng xác nhận kế hoạch (Review Gate) sau khi xuất Flash Plan ở Step 2 của workflow `/only-one-flash` trước khi thực hiện bất kỳ chỉnh sửa mã nguồn nào ở Step 3.
 - **[NEVER]** Không tự ý sửa đổi mã nguồn sản phẩm hoặc thực thi bản vá trong lượt chạy của workflow `/only-one-debug`. Workflow này chỉ chẩn đoán lỗi, dựng Red feedback loop, phân tích RCA và lập kế hoạch vá trong `debug.md` trước khi bàn giao cho `/only-one-apply` (Strict Lifecycle Isolation).
 - **[ALWAYS]** `debug.md` phải có đúng 3 section chính: `Diagnosis`, full machine-readable `File Changes`, và `Verification`; mỗi Debug file task block dùng cùng metadata contract với `plan.md`.
+- **[ALWAYS]** Tuân thủ 4 Kỷ luật Thực thi của Andrej Karpathy: Think Before Coding (nêu rõ giả định, không suy diễn ngầm), Simplicity First (chọn giải pháp tối giản nhất, cấm over-engineering), Surgical Changes (chỉ sửa đúng file/dòng trong scope), và Goal-Driven Execution (nghiệm thu bằng test/lệnh tự động).
+- **[ALWAYS]** Áp dụng quy chuẩn 70% ASD-STE100 khi sinh tài liệu Markdown (`concept.md`, `plan.md`, `debug.md`): câu chỉ dẫn <= 25 từ, câu mô tả <= 30 từ, cấu trúc 3 tầng Prerequisites -> Action -> Verification, triệt tiêu 100% văn phong rào đón xã giao (AI Slop).
 

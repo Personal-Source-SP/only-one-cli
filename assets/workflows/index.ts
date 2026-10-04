@@ -3,7 +3,7 @@ import type { WorkflowManifest } from '../types.js';
 export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one-idea',
-        version: '0.0.6',
+        version: '0.0.7',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
@@ -15,11 +15,12 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'idea-refine',
             'wait-what',
             'ponytail',
+            'karpathy-ste100-discipline',
         ],
     },
     {
         name: 'only-one-plan',
-        version: '0.0.9',
+        version: '0.0.10',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification.',
         requiredSkills: [
@@ -33,6 +34,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'source-driven-development',
             'doubt-driven-development',
             'ponytail',
+            'karpathy-ste100-discipline',
         ],
     },
     {
@@ -52,7 +54,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
-        version: '0.0.7',
+        version: '0.0.8',
         description:
             'Perform systematic RCA in a three-section debug.md and formulate executable file-centric patch blocks with a red feedback loop.',
         requiredSkills: [
@@ -62,6 +64,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'test-driven-development',
             'code-simplification',
             'ponytail',
+            'karpathy-ste100-discipline',
         ],
     },
     {
@@ -115,7 +118,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-flash',
-        version: '0.0.6',
+        version: '0.0.7',
         description:
             'Execute small, rapid tasks with zero disk plan footprint, compact in-chat File Changes, a user confirmation review gate, and fast verification.',
         requiredSkills: [
@@ -126,6 +129,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'test-driven-development',
             'diagnosing-bugs',
             'ponytail',
+            'karpathy-ste100-discipline',
         ],
     },
 ];

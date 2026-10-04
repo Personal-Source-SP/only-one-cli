@@ -46,6 +46,7 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 | **`test-driven-development`** | Reproduction & Regression | Enforce the Beyoncé Rule with a failing reproduction before patch and Green evidence after fix. |
 | **`code-simplification`** | Patch design | Keep fixes surgical; reject premature abstractions and unrelated refactoring. |
 | **`ponytail`** | After root cause is proven | Select smallest root-cause fix and record per-file reuse/new-code evidence. |
+| **`karpathy-ste100-discipline`** | Documenting RCA and patch blueprint | Enforce goal-driven verification and 70% ASD-STE100 concise root cause analysis. |
 
 ---
 
@@ -224,6 +225,7 @@ Report `debug.md` path, Symptom, Mechanical Root Cause, Proposed Fix, changed fi
 ## Guardrails
 
 - **Strict Lifecycle Isolation**: Never modify product source code or execute the patch during `/only-one-debug`.
+- **Enforce 70% ASD-STE100 Writing Specification**: Sentence length <= 25 words, eliminate AI slop, and structure fixes as Prerequisites -> Action -> Verification.
 - **Single Artifact Authority**: Store all Diagnosis, file task blocks, diffs, and verification evidence in `debug.md`.
 - **Machine-Readable Task Block Contract**: One Section 2 block equals one changed file; preserve exact heading format and mandatory metadata labels.
 - Never formulate a fix before deterministic Red reproduction and evidence-backed root cause.

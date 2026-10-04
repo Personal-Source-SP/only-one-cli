@@ -21,6 +21,7 @@ If input does not describe the idea or problem, ask a focused question before pr
   - Conduct interactive Q&A, solution sparring, and interview turns in Vietnamese (or user's preferred language).
   - Author `concept.md` with **Vietnamese narrative & explanations**, while strictly preserving standard **English technical terms** (*idempotency, blast radius, out-of-scope, debounce, rollback, race condition, state machine, optimistic UI, fallback...*).
 - Activate and follow the Define skills (`grill-with-docs`, `grill-me`, `domain-modeling`, `interview-me`, `idea-refine`, `wait-what`).
+- Activate and follow `karpathy-ste100-discipline` for zero-slop 70% ASD-STE100 specification writing.
 - Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
 
 ## Output Skill Compatibility Contract
@@ -47,6 +48,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 | **`grill-me`** | User requests fast brainstorming without creating files on disk | Conduct a relentless interview to uncover hidden assumptions with zero file footprint. |
 | **`wait-what`** | Agent explanation is unclear or drifting | Stop immediately and re-pitch the explanation in plain, concise English using domain vocabulary. |
 | **`ponytail`** | After Phase 1 problem clarity | Remove unnecessary scope without shortening discovery or introducing code-level design. |
+| **`karpathy-ste100-discipline`** | Writing concept.md specification | Enforce 70% ASD-STE100 concise prose (instructions <= 25 words, descriptions <= 30 words) and Karpathy disciplines. |
 
 ---
 
@@ -134,6 +136,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 
 - **🛑 Strict Lifecycle Isolation (Zero Source Code Modifications)**: `/only-one-idea` is strictly a scoping and conceptual specification workflow. The agent MUST NEVER edit source code, tests, configs, or other workflows during `/only-one-idea`.
 - **Enforce Bilingual Hybrid Documentation**: Write narrative and descriptions in Vietnamese, preserving standard English technical terms.
+- **Enforce 70% ASD-STE100 Writing Standard**: Eliminate AI slop, restrict sentence length, and structure actions using Prerequisites -> Action -> Verification.
 - **Do not skip Phase 1 discovery**: Clarify problem and scope boundaries thoroughly before proposing solution options.
 - **Always explore and present at least 2 solution options with trade-offs** before finalizing the chosen strategy.
 - **Strict Concept Boundary**: Never include source code, pseudocode, unified diffs, symbol signatures, file paths, or file-level implementation instructions.

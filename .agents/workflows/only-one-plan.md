@@ -94,6 +94,7 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 | **`c4-diagrams`** | Section 2 file changes involve multiple components, modules, or complex data flows | Produce clean Mermaid or ASCII C4 / Sequence diagrams inside Section 2 task blocks. |
 | **`frontend-ui-engineering`** | Building or modifying user-facing frontend components | Design component architecture, state management, 5-state matrix, and accessibility in Section 2 task blocks. |
 | **`source-driven-development`** | Introducing new library APIs or framework methods | Ground all code signatures in verified official documentation in Section 2 to prevent API hallucination. |
+| **`karpathy-ste100-discipline`** | Writing Section 2 task blocks and diff boundaries | Enforce surgical changes, simplicity first, and 70% ASD-STE100 tri-part action verification. |
 
 ---
 
@@ -193,6 +194,7 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 ## Guardrails
 
 - **Enforce File-Centric & Diff-Centric Architecture**: Present every Section 2 task block with fixed metadata labels and a Git-standard Unified Diff (` ```diff `).
+- **Enforce 70% ASD-STE100 & Karpathy Surgical Discipline**: Restrict task block instructions to <= 25 words, eliminate prose filler, and ensure strict surgical code changes.
 - **🛑 Anti-Current-State-Duplication**: Never recreate Current State or high-level solution narratives in `plan.md`; `concept.md` is their authoritative Single Source of Truth when present.
 - **🛑 Machine-Readable Task Block Contract**: One Section 2 block equals one changed file. Preserve exact heading format and mandatory metadata labels.
 - **🛑 Mandatory File-Centric Research & Compliance Gate**: Always identify target files first, then selectively load matching IDE framework skills and `only-one` rules/archives. Proposed diffs must comply 100% with loaded skills and rules.
