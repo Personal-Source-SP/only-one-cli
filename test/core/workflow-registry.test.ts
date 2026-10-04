@@ -27,6 +27,13 @@ describe('workflow registry integrity', () => {
         expect(WORKFLOWS.filter(({ name }) => name === 'only-one-flash')).toHaveLength(1);
     });
 
+    it('registers only-one gateway router', () => {
+        const workflow = WORKFLOWS.find(({ name }) => name === 'only-one');
+        expect(workflow).toBeDefined();
+        expect(workflow?.requiredSkills).toContain('i-have-adhd');
+        expect(workflow?.requiredSkills).toContain('karpathy-ste100-discipline');
+    });
+
     it('requires and activates i-have-adhd in the five core workflows', () => {
         const expected = ['only-one-idea', 'only-one-plan', 'only-one-apply', 'only-one-flash', 'only-one-debug'];
 

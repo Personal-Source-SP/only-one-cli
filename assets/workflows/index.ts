@@ -2,6 +2,18 @@ import type { WorkflowManifest } from '../types.js';
 
 export const WORKFLOWS: WorkflowManifest[] = [
     {
+        name: 'only-one',
+        version: '0.0.1',
+        description:
+            'Triage user intent, inspect workspace state, and route to the matching specialized workflow.',
+        requiredSkills: [
+            'i-have-adhd',
+            'karpathy-ste100-discipline',
+            'ponytail',
+            'doubt-driven-development',
+        ],
+    },
+    {
         name: 'only-one-idea',
         version: '0.0.7',
         description:
