@@ -53,7 +53,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.10',
+        version: '0.0.11',
         description:
             'Implement tasks from an approved plan.md, debug.md, or selected findings in review.md with dependency-ordered verification.',
         requiredSkills: [

@@ -120,31 +120,40 @@ For `review.md`:
    - Require each task block to contain `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` before its checklist and unified diff.
    - Treat heading order as execution order and `Depends On` as blocking edges.
    - Skip tasks marked `[x]`; identify the first `[ ]` or `[/]` task. Cancelled or empty selection performs zero mutations; unselected findings remain `OPEN`.
+3. **Build Execution Waves (DAG Partitioning)**:
+   - Group remaining `[ ]` tasks into sequential **Execution Waves** based on `Depends On`:
+     - **Wave 0**: All tasks with no dependencies (`Depends On: None`) or whose prerequisites are already `[x]`.
+     - **Disjoint File Invariant**: Tasks in the same wave MUST target distinct files. If two independent tasks modify the same file, assign them to sequential sub-waves.
+     - **Concurrency Cap**: Limit concurrent Sub-agents to a maximum of 3-4 workers per wave.
 
 ---
 
-### Step 4 — Apply Selected File Changes Incrementally (`incremental-implementation`)
+### Step 4 — Apply Selected File Changes via Parallel Waves & Sub-agents (`incremental-implementation`)
 
-For each pending file task block:
-1. Verify that all prerequisite files (`Depends On`) have been successfully applied and verified (`[x]`).
-2. Mark the task's `Status` as `[/]` (in-progress) in the active document (`plan.md`, `debug.md`, or `review.md`).
-3. **Step 4a — Pre-apply Context, Existing Imports & Language Skill Compliance Gate**:
-   - Read the target file (`view_file`) to inspect its current imports, shared utilities, and surrounding code patterns.
-   - Verify that existing project helpers/hooks are properly imported and utilized (Reuse-First Invariant).
-   - ❌ **Strict Anti-Reinvention Check**: Do NOT write inline helper logic or duplicate functions if a shared project utility already exists.
-   - 🛑 **Strict Language Skill & Rule Adherence Gate**:
-     - Code modification MUST strictly follow conventions defined in active language/tech skills (Step 1b) and `only-one/rules.md`.
-     - ❌ **Anti-Agent-Drift**: DO NOT code arbitrarily based on agent habits or unverified training defaults. Adhere 100% to project typing, naming, and error handling standards.
-4. **Step 4b — Ponytail Revalidation Before Edit**:
-   - Re-run the checklist against the current file for stale-plan drift.
-   - On material conflict, do not edit. Emit `Ponytail Plan Conflict`, report completed rows, and stop before edit.
-5. **Step 4c — Apply Code Modification (Diff Application)**:
-   - Use the Unified Diff inside the current Section 2 task block.
-   - Apply the modification precisely by replacing the deleted lines (`-`) with added lines (`+`).
-6. **Step 4d — Fast Test Command**:
-   - Run the task's **`Fast Test Command`** immediately:
-     - If test passes: mark task `Status` as `[x]` (done) in the document and proceed to next row.
-     - If test fails: mark the finding `FAILED`, record evidence, stop before next finding, and activate `diagnosing-bugs` (Red Feedback Loop $\rightarrow$ Instrument $\rightarrow$ Fix).
+Execute wave-by-wave until all tasks are marked `[x]`:
+
+1. **Wave Dispatch Strategy**:
+   - **Single-Task Wave**: Main Agent applies the change directly (no Sub-agent overhead).
+   - **Multi-Task Wave (Independent Slices)**: Main Agent acts as Orchestrator and delegates each task in the wave to an isolated Sub-agent:
+     - Spawn concurrent Sub-agents (1 worker per independent task block).
+     - Provide each Sub-agent with its dedicated task context, file diff, and Fast Test Command.
+
+2. **Per-Task Execution Protocol (Main Agent or Worker Sub-agent)**:
+   - Mark task `Status` as `[/]` (in-progress) in `plan.md` or `debug.md`.
+   - **Step 4a — Pre-apply Context, Existing Imports & Language Skill Compliance Gate**:
+     - Read target file (`view_file`), verify imports and enforce Reuse-First Invariant.
+     - Adhere 100% to active language/tech skills and `only-one/rules.md`.
+   - **Step 4b — Ponytail Revalidation Before Edit**: Re-verify checklist for plan drift.
+   - **Step 4c — Apply Code Modification (Diff Application)**: Precisely replace deleted lines (`-`) with added lines (`+`).
+   - **Step 4d — Fast Test Command**:
+     - Run targeted `Fast Test Command` immediately.
+     - If test passes: Report `SUCCESS` and mark task `Status` as `[x]`.
+     - If test fails: Report `FAILED`, halt dependent waves, and activate `diagnosing-bugs`.
+
+3. **Barrier Synchronization Gate**:
+   - Main Agent waits for all workers in the active wave to finish.
+   - Aggregate test outputs and update `plan.md` statuses to `[x]`.
+   - Only advance to the next wave when 100% of tasks in the current wave pass verification.
 
 ---
 
