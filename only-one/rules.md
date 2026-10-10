@@ -33,4 +33,6 @@
 - **[ALWAYS]** Tuân thủ 4 Kỷ luật Thực thi của Andrej Karpathy: Think Before Coding (nêu rõ giả định, không suy diễn ngầm), Simplicity First (chọn giải pháp tối giản nhất, cấm over-engineering), Surgical Changes (chỉ sửa đúng file/dòng trong scope), và Goal-Driven Execution (nghiệm thu bằng test/lệnh tự động).
 - **[ALWAYS]** Áp dụng quy chuẩn 70% ASD-STE100 khi sinh tài liệu Markdown (`concept.md`, `plan.md`, `debug.md`): câu chỉ dẫn <= 25 từ, câu mô tả <= 30 từ, cấu trúc 3 tầng Prerequisites -> Action -> Verification, triệt tiêu 100% văn phong rào đón xã giao (AI Slop).
 - **[ALWAYS]** Trình bày sơ đồ cây ASCII Directory Structure Changes ở đầu Section 2 của `debug.md` và `plan.md` để hiển thị trực quan toàn bộ các tệp kiểm thử và mã nguồn bị can thiệp kèm nhãn tag chuẩn (`[NEW]`, `[MODIFY]`, `[DELETE]`).
+- **[NEVER]** Không để Agent đồng thuận mù quáng hoặc dùng các câu mào đầu khen ngợi sáo rỗng (Sycophantic Fillers). Luôn bóc tách rủi ro theo 5 trục kỹ thuật (Boundary conditions, Simplicity, Blast radius, Concurrency, Security) trước khi đồng thuận.
+- **[NEVER]** Không cho phép 2 Sub-agents chỉnh sửa cùng một file cùng lúc (Disjoint File Invariant) trong quá trình thực thi song song của `/only-one-apply` để tránh race condition và mất mát dữ liệu.
 
