@@ -69,6 +69,7 @@ Do NOT bulk-load all rules, skills, and archives blindly (avoids context polluti
    - Before authoring Section 2 (File Changes), cross-check every planned modification against the rules and framework skills loaded in Step 2.
    - Run `ponytail` for every target file after reading current flow and shared helpers.
    - Record the first sufficient decision rung, reuse target, or evidence-backed reason for new code.
+   - **Activate `sparring-partner`**: Challenge proposed file diffs for unnecessary complexity, speculative abstraction, or unhandled failure modes.
    - Safety and acceptance criteria override minimization.
    - 🛑 **Zero-Tolerance Anti-Agent-Drift**: All proposed code changes in `plan.md` must be 100% compliant with the project's loaded skills and repository negative rules.
 
@@ -88,6 +89,7 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 | **`to-tickets`** | Decomposing the plan into orderly file changes with dependencies | Establish tracer bullets and explicit dependency blocking edges (`Depends On`) in Section 2 task blocks. |
 | **`codebase-design`** | Designing new modules, refactoring core abstractions | Design deep modules with small interfaces at clean seams, testable through that interface. |
 | **`grill-me`** | User requests interactive stress-testing of the plan / design | Conduct a relentless interview to uncover hidden assumptions with zero file footprint. |
+| **`sparring-partner`** | Designing file task blocks and architectural seams | Eliminate sycophancy, challenge over-engineering or speculative patterns, and ensure strict 5-vector resilience. |
 | **`doubt-driven-development`** | High-stakes architectural decisions, critical transactional flows, or unfamiliar complex code | Perform an adversarial Red-Team sanity check (`CLAIM` $\rightarrow$ `DOUBT` $\rightarrow$ `RECONCILE`) on critical design points in Section 2. |
 | **`ponytail`** | Before each file-level design or unified diff | Select first sufficient solution rung and record reuse/new-code evidence beside each file. |
 | **`api-and-interface-design`** | Designing or modifying REST/GraphQL APIs, DTOs, or module boundaries | Enforce Contract-first design, Hyrum's Law (hide internal details), error semantics, and boundary validation in Section 2. |

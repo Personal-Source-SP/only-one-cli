@@ -15,13 +15,14 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-idea',
-        version: '0.0.7',
+        version: '0.0.8',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
             'i-have-adhd',
             'grill-with-docs',
             'grill-me',
+            'sparring-partner',
             'domain-modeling',
             'interview-me',
             'idea-refine',
@@ -32,7 +33,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-plan',
-        version: '0.0.10',
+        version: '0.0.11',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification.',
         requiredSkills: [
@@ -40,6 +41,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'to-tickets',
             'codebase-design',
             'grill-me',
+            'sparring-partner',
             'c4-diagrams',
             'api-and-interface-design',
             'frontend-ui-engineering',
@@ -81,9 +83,9 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-review',
-        version: '0.0.2',
+        version: '0.0.3',
         description: 'Run Open CodeReview and produce selectable debug-grade executable findings.',
-        requiredSkills: ['diagnosing-bugs', 'doubt-driven-development', 'test-driven-development', 'code-simplification', 'ponytail'],
+        requiredSkills: ['sparring-partner', 'diagnosing-bugs', 'doubt-driven-development', 'test-driven-development', 'code-simplification', 'ponytail'],
     },
     {
         name: 'only-one-conflict',

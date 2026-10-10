@@ -29,6 +29,12 @@ export const SKILLS: SkillManifest[] = [
         skillPath: 'skills/productivity/grill-me/SKILL.md',
     },
     {
+        name: 'sparring-partner',
+        version: '0.0.1',
+        description: 'Challenge user assumptions, enforce anti-sycophancy, evaluate solutions across 5 technical vectors, and propose robust alternatives before concurring.',
+        sourceType: 'local',
+    },
+    {
         name: 'interview-me',
         version: '0.0.1',
         description: 'Conduct a one-question-at-a-time interview extracting root needs until ~95% confidence.',

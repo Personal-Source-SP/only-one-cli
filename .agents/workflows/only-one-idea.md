@@ -20,7 +20,7 @@ If input does not describe the idea or problem, ask a focused question before pr
 - **Enforce Bilingual Hybrid Documentation**:
   - Conduct interactive Q&A, solution sparring, and interview turns in Vietnamese (or user's preferred language).
   - Author `concept.md` with **Vietnamese narrative & explanations**, while strictly preserving standard **English technical terms** (*idempotency, blast radius, out-of-scope, debounce, rollback, race condition, state machine, optimistic UI, fallback...*).
-- Activate and follow the Define skills (`grill-with-docs`, `grill-me`, `domain-modeling`, `interview-me`, `idea-refine`, `wait-what`).
+- Activate and follow the Define skills (`grill-with-docs`, `grill-me`, `sparring-partner`, `domain-modeling`, `interview-me`, `idea-refine`, `wait-what`).
 - Activate and follow `karpathy-ste100-discipline` for zero-slop 70% ASD-STE100 specification writing.
 - Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
 
@@ -46,6 +46,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 | **`domain-modeling`** | Ambiguous domain terms arise | Challenge fuzzy terms, maintain project glossary (`CONTEXT.md`), and record ADRs for hard-to-reverse decisions. |
 | **`grill-with-docs`** | User wants an intensive design grilling session with permanent docs | Conduct an interview that sharpens domain terminology and records `CONTEXT.md` and ADRs inline. |
 | **`grill-me`** | User requests fast brainstorming without creating files on disk | Conduct a relentless interview to uncover hidden assumptions with zero file footprint. |
+| **`sparring-partner`** | User proposes architecture or solution options | Pressure-test solution options against 5 technical vectors and surface hidden risks before concurring. |
 | **`wait-what`** | Agent explanation is unclear or drifting | Stop immediately and re-pitch the explanation in plain, concise English using domain vocabulary. |
 | **`ponytail`** | After Phase 1 problem clarity | Remove unnecessary scope without shortening discovery or introducing code-level design. |
 | **`karpathy-ste100-discipline`** | Writing concept.md specification | Enforce 70% ASD-STE100 concise prose (instructions <= 25 words, descriptions <= 30 words) and Karpathy disciplines. |
@@ -70,6 +71,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 ### Step 2 — Solution Architecture, UI Mockup & Trade-offs (Role: Technical Lead)
 
 1. **Proactively Brainstorm & Propose 2–3 Solution Options**:
+   - **Apply `sparring-partner` anti-sycophancy discipline**: Ruthlessly pressure-test each proposed option against the 5 technical vectors (boundary conditions, simplicity, blast radius, concurrency, scalability/security) before asking PM for the final decision.
    - Present **2–3 architectural/implementation approaches** (e.g., Option 1: Lightweight/Direct, Option 2: Robust/Standard, Option 3: Event-Driven/Scalable).
    - Compare each option via structured matrix: **Pros**, **Cons**, **Implementation Complexity**, and **Trade-offs**.
 2. **Draft UI Wireframes & State Mockups (For UI/UX features)**:

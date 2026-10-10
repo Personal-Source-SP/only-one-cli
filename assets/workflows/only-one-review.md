@@ -33,6 +33,7 @@ Run one requested OCR mode, preserve every OCR finding, investigate each claim, 
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
+| **`sparring-partner`** | Evaluating review findings and designing fixes | Challenge superficial fixes, enforce anti-sycophancy, and verify 5 technical vectors. |
 | **`diagnosing-bugs`** | Reproducing or localizing an OCR finding | Prove symptom, root cause, and red feedback loop before proposing a fix. |
 | **`doubt-driven-development`** | Validating each OCR claim | Challenge assumptions and reject unproven claims without inventing findings. |
 | **`test-driven-development`** | Designing executable finding fixes | Require red reproduction, regression coverage, and fast verification. |
