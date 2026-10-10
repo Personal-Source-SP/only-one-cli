@@ -4,7 +4,7 @@ title: Dọn dẹp Tooling Scripts và Loại bỏ Triệt để Tính năng Leg
 archived_at: 2026-09-09
 status: active
 references:
-  - only-one/archives/20260917-113200-workflow-and-sdlc-systems.md
+  - only-one/archives/20261010-224000-workflow-and-sdlc-systems.md
 affected_modules:
   - scripts
   - package.json
@@ -29,9 +29,9 @@ affected_modules:
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
 - **Surgical Purge & Clean Seams**:
   - Xóa bỏ hoàn toàn `scripts/cocoindex_documents.py`, `src/core/indexing/tools.ts` và test `tools.test.ts`.
-  - Tách định nghĩa `DoctorMode = 'docker' | 'local'` vào trực tiếp [src/core/doctor/types.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/doctor/types.ts).
-  - Bảo toàn các generic Docker helpers hữu ích trong [src/core/indexing/docker-runtime.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/indexing/docker-runtime.ts) (`isDockerDaemonRunning`, `getDockerServerVersion`, `hasDockerImage`, `getContainerState`, `ensureContainerRunning`).
-  - Làm sạch [src/core/prebuilt/manifest.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/prebuilt/manifest.ts) và [bundle.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/prebuilt/bundle.ts) không còn `.cocoindex` hay `cocoindexVersion`.
+  - Tách định nghĩa `DoctorMode = 'docker' | 'local'` vào trực tiếp [src/core/doctor/types.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/doctor/types.ts).
+  - Bảo toàn các generic Docker helpers hữu ích trong [src/core/indexing/docker-runtime.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/indexing/docker-runtime.ts) (`isDockerDaemonRunning`, `getDockerServerVersion`, `hasDockerImage`, `getContainerState`, `ensureContainerRunning`).
+  - Làm sạch [src/core/prebuilt/manifest.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/prebuilt/manifest.ts) và [bundle.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/prebuilt/bundle.ts) không còn `.cocoindex` hay `cocoindexVersion`.
 
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
 - **Xoá tệp rác & legacy**:

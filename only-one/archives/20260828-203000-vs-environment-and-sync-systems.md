@@ -5,7 +5,7 @@ archived_at: 2026-09-09
 status: active
 references:
   - only-one/archives/20260824-103830-tui-modernization.md
-  - only-one/archives/20260917-113200-workflow-and-sdlc-systems.md
+  - only-one/archives/20261010-224000-workflow-and-sdlc-systems.md
 affected_modules:
   - src/core/vs
   - src/commands/extensions-vs
@@ -51,20 +51,20 @@ flowchart TD
 5. **Resilient Rollback & Error Preservation**: `VsSyncTransaction.rollback()` tự động bỏ qua các lỗi lành tính (như extension đã không còn tồn tại) để dọn dẹp triệt để journal/backup files, đồng thời bảo toàn exception nguyên bản của bước install.
 
 ## 3. Scope & Key Modules (Phạm vi & Các Module Chính)
-- **Asset Manifest**: [`assets/vs/index.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/vs/index.ts) (Cấu hình chuẩn 36 extensions và 41 settings keys, version `0.0.3`).
+- **Asset Manifest**: [`assets/vs/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/vs/index.ts) (Cấu hình chuẩn 36 extensions và 41 settings keys, version `0.0.3`).
 - **CLI Commands & Step Actions**:
-  - [`src/commands/extensions-vs/command.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/commands/extensions-vs/command.ts) (Đăng ký option `--prune`).
-  - [`src/commands/extensions-vs/actions/step-5-execute-and-report.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/commands/extensions-vs/actions/step-5-execute-and-report.ts) (Báo cáo tóm tắt cả installed và pruned extensions).
+  - [`src/commands/extensions-vs/command.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/commands/extensions-vs/command.ts) (Đăng ký option `--prune`).
+  - [`src/commands/extensions-vs/actions/step-5-execute-and-report.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/commands/extensions-vs/actions/step-5-execute-and-report.ts) (Báo cáo tóm tắt cả installed và pruned extensions).
 - **Core Sync Engines**:
-  - [`src/core/vs/extensions-sync.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/extensions-sync.ts) (Đồng bộ extensions, diffing orphan extensions, gọi uninstall, lọc cảnh báo stderr, xử lý giao dịch).
-  - [`src/core/vs/settings-sync.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/settings-sync.ts) (Merge settings sâu, atomic file write).
-- **Runtime & Process Runner**: [`src/core/vs/runtime.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/runtime.ts) (`NodeVsProcessRunner` & `nodeVsFileSystem`).
-- **Transaction Manager**: [`src/core/vs/transaction.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/transaction.ts) (`VsSyncTransaction` & journal crash recovery).
-- **Editors Registry**: [`src/core/vs/editors.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/src/core/vs/editors.ts) (Hỗ trợ VS Code, Cursor, Antigravity).
+  - [`src/core/vs/extensions-sync.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/vs/extensions-sync.ts) (Đồng bộ extensions, diffing orphan extensions, gọi uninstall, lọc cảnh báo stderr, xử lý giao dịch).
+  - [`src/core/vs/settings-sync.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/vs/settings-sync.ts) (Merge settings sâu, atomic file write).
+- **Runtime & Process Runner**: [`src/core/vs/runtime.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/vs/runtime.ts) (`NodeVsProcessRunner` & `nodeVsFileSystem`).
+- **Transaction Manager**: [`src/core/vs/transaction.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/vs/transaction.ts) (`VsSyncTransaction` & journal crash recovery).
+- **Editors Registry**: [`src/core/vs/editors.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/vs/editors.ts) (Hỗ trợ VS Code, Cursor, Antigravity).
 - **Unit & Integration Tests**:
-  - [`test/core/vs/vs-core.test.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/core/vs/vs-core.test.ts) (14 tests giao dịch, merge settings, prune logic, resolution và rollback).
-  - [`test/core/vs/vs-library.test.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/core/vs/vs-library.test.ts) (Kiểm tra tính toàn vẹn, sắp xếp A-Z).
-  - [`test/commands/vs/vs-commands.test.ts`](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/commands/vs/vs-commands.test.ts) (8 tests kiểm thử CLI command).
+  - [`test/core/vs/vs-core.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/core/vs/vs-core.test.ts) (14 tests giao dịch, merge settings, prune logic, resolution và rollback).
+  - [`test/core/vs/vs-library.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/core/vs/vs-library.test.ts) (Kiểm tra tính toàn vẹn, sắp xếp A-Z).
+  - [`test/commands/vs/vs-commands.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/commands/vs/vs-commands.test.ts) (8 tests kiểm thử CLI command).
 
 ## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu & PR)
 - **Test Status**: 100% Passed (24/24 unit tests trong domain VS Sync, 230/230 toàn bộ repository).

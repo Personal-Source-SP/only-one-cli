@@ -28,7 +28,7 @@ affected_modules:
 - **Cấu hình Độc Lập cho Browser Profile**:
   - Manifest `playwright-browser` sử dụng `--user-data-dir=/Users/Tester/Library/Application Support/Google/Chrome/Default` (hoặc tương đương) đảm bảo phiên duyệt web chạy trong môi trường hoàn toàn cô lập.
 - **Single Source of Truth**:
-  - Toàn bộ danh mục MCP được khai báo duy nhất tại [assets/mcps/index.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/mcps/index.ts).
+  - Toàn bộ danh mục MCP được khai báo duy nhất tại [assets/mcps/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/mcps/index.ts).
   - Tự động đồng bộ sang cấu hình các IDE thông qua `syncMcpGlobalConfig()` (hỗ trợ Antigravity IDE, Claude Desktop, Cursor, Codex).
 - **Luồng Đồng Bộ & Kiểm Soát Phiên Bản**:
 ```mermaid
@@ -40,13 +40,13 @@ flowchart LR
 ```
 
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
-- [assets/mcps/index.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/assets/mcps/index.ts):
+- [assets/mcps/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/mcps/index.ts):
   - Thêm entry `playwright-browser` (`@playwright/mcp`) với cờ `--user-data-dir`.
   - Xoá bỏ hoàn toàn entry `memory`.
-- [test/core/mcp/registry.test.ts](file:///Users/kiem/Sources/PERSONAL/only-one-cli/test/core/mcp/registry.test.ts):
+- [test/core/mcp/registry.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/core/mcp/registry.test.ts):
   - Unit test khẳng định `playwright-browser` tồn tại với đúng lệnh và cờ argument.
   - Unit test khẳng định `memory` không còn nằm trong active manifests.
-- [README.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/README.md) & [BACKLOG.md](file:///Users/kiem/Sources/PERSONAL/only-one-cli/BACKLOG.md): Cập nhật danh mục MCP chính thức.
+- [README.md](file:///d:/Sources/PERSONAL/only-one-cli/README.md) & [BACKLOG.md](file:///d:/Sources/PERSONAL/only-one-cli/BACKLOG.md): Cập nhật danh mục MCP chính thức.
 
 ## 4. Verification Evidence (Bằng chứng Nghiệm thu)
 - `npm test test/core/mcp/registry.test.ts`: 3/3 tests passed.
