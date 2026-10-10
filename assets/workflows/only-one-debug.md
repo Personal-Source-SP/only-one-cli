@@ -46,7 +46,8 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 | **`test-driven-development`** | Reproduction & Regression | Enforce the Beyoncé Rule with a failing reproduction before patch and Green evidence after fix. |
 | **`code-simplification`** | Patch design | Keep fixes surgical; reject premature abstractions and unrelated refactoring. |
 | **`ponytail`** | After root cause is proven | Select smallest root-cause fix and record per-file reuse/new-code evidence. |
-| **`karpathy-ste100-discipline`** | Documenting RCA and patch blueprint | Enforce goal-driven verification and 70% ASD-STE100 concise root cause analysis. |
+| **`c4-diagrams`** | Visualizing defect reproduction, broken call traces, or state divergence | Produce Mermaid sequence or state diagrams in Diagnosis to pinpoint broken contracts visually. |
+| **`karpathy-ste100-discipline`** | Documenting RCA and patch blueprint | Enforce goal-driven verification and 80% ASD-STE100 concise root cause analysis (<= 20 words instructions, <= 25 words context, active voice). |
 
 ---
 
@@ -79,7 +80,8 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 3. Record evidence separately from assumptions.
 4. Record rejected hypotheses only when an experiment disproves them.
 5. Identify violated invariants and fix constraints.
-6. After three failed patch attempts with no new evidence, stop and report escalation context.
+6. Create a **Mermaid Failure Trace Diagram** (`sequenceDiagram` or `stateDiagram`) in Section 1 illustrating the exact sequence where actual state diverged from expected contract.
+7. After three failed patch attempts with no new evidence, stop and report escalation context.
 
 ### Step 4 — Build File-Centric Patch Blueprint
 
@@ -145,6 +147,13 @@ reproduction_test: <Command or test path>
 ### Fix Constraints
 - <Behavior and contracts that must remain unchanged>.
 - <Security, data, rollback, and explicit out-of-scope boundaries>.
+
+### Defect Call Trace / State Divergence Flow
+```mermaid
+sequenceDiagram
+    Caller->>TargetModule: Invokes method with trigger payload
+    TargetModule--xBrokenBoundary: Contract violated / unexpected failure state
+```
 
 ## Section 2. File Changes
 
@@ -235,7 +244,8 @@ Report `debug.md` path, Symptom, Mechanical Root Cause, Proposed Fix, changed fi
 ## Guardrails
 
 - **Strict Lifecycle Isolation**: Never modify product source code or execute the patch during `/only-one-debug`.
-- **Enforce 70% ASD-STE100 Writing Specification**: Sentence length <= 25 words, eliminate AI slop, and structure fixes as Prerequisites -> Action -> Verification.
+- **Enforce 80% ASD-STE100 Writing Specification**: Sentence length <= 20 words for instructions, <= 25 words for context, eliminate passive voice, and structure fixes as Prerequisites -> Action -> Verification.
+- **Enforce Mandatory Failure Trace Diagram**: Always include a Mermaid sequence or divergence diagram in Section 1 Diagnosis to prove the broken mechanical boundary visually.
 - **Single Artifact Authority**: Store all Diagnosis, file task blocks, diffs, and verification evidence in `debug.md`.
 - **Machine-Readable Task Block Contract**: One Section 2 block equals one changed file; preserve exact heading format and mandatory metadata labels.
 - Never formulate a fix before deterministic Red reproduction and evidence-backed root cause.

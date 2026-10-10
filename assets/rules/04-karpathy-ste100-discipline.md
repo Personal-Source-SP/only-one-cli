@@ -2,7 +2,7 @@
 alwaysApply: true
 ---
 
-# RULE 4: KARPATHY DISCIPLINES & 70% ASD-STE100 WRITING SPECIFICATION
+# RULE 4: KARPATHY DISCIPLINES & 80% ASD-STE100 WRITING SPECIFICATION
 
 ## 1. Andrej Karpathy 4 Golden Disciplines
 
@@ -27,14 +27,15 @@ alwaysApply: true
 
 ---
 
-## 2. 70% ASD-STE100 Aviation Technical Writing Specification
+## 2. 80% ASD-STE100 Aviation Technical Writing Specification
 
 Enforce controlled technical language adapted from aerospace maintenance manuals to prevent AI slop and ambiguity:
 
 1. **Sentence Length Limits**:
-   - **Instruction Sentences**: Maximum 25 words.
-   - **Description / Context Sentences**: Maximum 30 words.
+   - **Instruction Sentences**: Maximum 20 words.
+   - **Description / Context Sentences**: Maximum 25 words.
    - Avoid compound multi-clause sentences; break complex logic into bullet points.
+   - Prohibit passive voice; enforce direct active voice.
 
 2. **Aviation Tri-Part Action Architecture**:
    - `[Prerequisites]`: Required pre-conditions, setup, or baseline assets.

@@ -93,10 +93,10 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 | **`doubt-driven-development`** | High-stakes architectural decisions, critical transactional flows, or unfamiliar complex code | Perform an adversarial Red-Team sanity check (`CLAIM` $\rightarrow$ `DOUBT` $\rightarrow$ `RECONCILE`) on critical design points in Section 2. |
 | **`ponytail`** | Before each file-level design or unified diff | Select first sufficient solution rung and record reuse/new-code evidence beside each file. |
 | **`api-and-interface-design`** | Designing or modifying REST/GraphQL APIs, DTOs, or module boundaries | Enforce Contract-first design, Hyrum's Law (hide internal details), error semantics, and boundary validation in Section 2. |
-| **`c4-diagrams`** | Section 2 file changes involve multiple components, modules, or complex data flows | Produce clean Mermaid or ASCII C4 / Sequence diagrams inside Section 2 task blocks. |
+| **`c4-diagrams`** | Multi-module file changes (>= 2 modules), complex call chains, or async workflows | Produce mandatory Mermaid or ASCII C4 Component or Sequence diagrams at the top of Section 2. |
 | **`frontend-ui-engineering`** | Building or modifying user-facing frontend components | Design component architecture, state management, 5-state matrix, and accessibility in Section 2 task blocks. |
 | **`source-driven-development`** | Introducing new library APIs or framework methods | Ground all code signatures in verified official documentation in Section 2 to prevent API hallucination. |
-| **`karpathy-ste100-discipline`** | Writing Section 2 task blocks and diff boundaries | Enforce surgical changes, simplicity first, and 70% ASD-STE100 tri-part action verification. |
+| **`karpathy-ste100-discipline`** | Writing Section 2 task blocks and diff boundaries | Enforce surgical changes, simplicity first, and 80% ASD-STE100 tri-part action verification (<= 20 words for instructions, <= 25 words for context, active voice). |
 
 ---
 
@@ -140,6 +140,9 @@ src/modules/order/
 ```
 
 ## Section 2. File Changes
+
+### Architectural Interaction Diagram (Bắt buộc khi có >= 2 modules hoặc luồng async)
+Khi kế hoạch thay đổi tác động $\ge 2$ modules hoặc có luồng bất đồng bộ, cung cấp sơ đồ Mermaid hoặc ASCII C4/Sequence diagram trực quan hóa luồng gọi và ranh giới trước danh sách task blocks.
 
 Mỗi file là một machine-readable task block. Giữ nguyên heading và thứ tự metadata dưới đây:
 
@@ -196,7 +199,8 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 ## Guardrails
 
 - **Enforce File-Centric & Diff-Centric Architecture**: Present every Section 2 task block with fixed metadata labels and a Git-standard Unified Diff (` ```diff `).
-- **Enforce 70% ASD-STE100 & Karpathy Surgical Discipline**: Restrict task block instructions to <= 25 words, eliminate prose filler, and ensure strict surgical code changes.
+- **Enforce 80% ASD-STE100 & Karpathy Surgical Discipline**: Restrict task block instructions to <= 20 words, context to <= 25 words, prohibit passive voice, eliminate prose filler, and ensure strict surgical code changes.
+- **Enforce Mandatory Multi-Module Visual Diagrams**: When changes touch >= 2 modules or async pipelines, provide a Mermaid/ASCII interaction diagram at the top of Section 2 before file blocks.
 - **🛑 Anti-Current-State-Duplication**: Never recreate Current State or high-level solution narratives in `plan.md`; `concept.md` is their authoritative Single Source of Truth when present.
 - **🛑 Machine-Readable Task Block Contract**: One Section 2 block equals one changed file. Preserve exact heading format and mandatory metadata labels.
 - **🛑 Mandatory File-Centric Research & Compliance Gate**: Always identify target files first, then selectively load matching IDE framework skills and `only-one` rules/archives. Proposed diffs must comply 100% with loaded skills and rules.

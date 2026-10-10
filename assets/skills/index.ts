@@ -234,9 +234,9 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'karpathy-ste100-discipline',
-        version: '0.0.1',
+        version: '0.0.2',
         description:
-            "Enforce Andrej Karpathy's 4 Core Disciplines and 70% ASD-STE100 Aviation Technical Writing Specification for zero-slop Markdown.",
+            "Enforce Andrej Karpathy's 4 Core Disciplines and 80% ASD-STE100 Aviation Technical Writing Specification for zero-slop Markdown.",
         sourceType: 'local',
     },
     {

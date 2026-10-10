@@ -15,7 +15,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-idea',
-        version: '0.0.8',
+        version: '0.0.9',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
@@ -27,13 +27,14 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'interview-me',
             'idea-refine',
             'wait-what',
+            'c4-diagrams',
             'ponytail',
             'karpathy-ste100-discipline',
         ],
     },
     {
         name: 'only-one-plan',
-        version: '0.0.11',
+        version: '0.0.12',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification.',
         requiredSkills: [
@@ -68,7 +69,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
-        version: '0.0.9',
+        version: '0.0.10',
         description:
             'Perform systematic RCA in a three-section debug.md and formulate executable file-centric patch blocks with a red feedback loop.',
         requiredSkills: [
@@ -77,6 +78,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
             'doubt-driven-development',
             'test-driven-development',
             'code-simplification',
+            'c4-diagrams',
             'ponytail',
             'karpathy-ste100-discipline',
         ],

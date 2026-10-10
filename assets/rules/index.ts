@@ -34,8 +34,8 @@ export const RULES: RuleManifest[] = [
     },
     {
         id: 'karpathy-ste100-discipline',
-        version: '0.0.1',
-        description: "Andrej Karpathy's 4 Core Disciplines and 70% ASD-STE100 Aviation Technical Writing Specification",
+        version: '0.0.2',
+        description: "Andrej Karpathy's 4 Core Disciplines and 80% ASD-STE100 Aviation Technical Writing Specification",
         sourceFile: '04-karpathy-ste100-discipline.md',
         supportedTargets: [AllowedToolId.Antigravity, AllowedToolId.Claude, AllowedToolId.Cursor],
         requiredSkills: ['karpathy-ste100-discipline'],
