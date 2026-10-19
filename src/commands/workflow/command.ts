@@ -28,10 +28,11 @@ export function createWorkflowCommand(deps: ProgramDeps): Command {
             }
 
             const { targetTool, targetTools } = await selectWorkflowTargetStep(deps, options);
+            const workflowNamesArg = options.global && pathArg && !namesArg ? pathArg : namesArg;
             const { selectedWorkflows, allExistingWorkflows } = await selectWorkflowsStep(
                 deps,
                 projectDir,
-                namesArg,
+                workflowNamesArg,
                 availableWorkflows,
                 targetTool,
                 targetTools,
@@ -43,7 +44,7 @@ export function createWorkflowCommand(deps: ProgramDeps): Command {
                 return;
             }
 
-            const ignoreTargets = await selectIgnoreTargets(deps);
+            const ignoreTargets = options.global || options.ignore === false ? [] : await selectIgnoreTargets(deps);
 
             const overwriteList = await confirmWorkflowOverwriteStep(deps, selectedWorkflows, allExistingWorkflows);
             await executeAndReportWorkflowsStep(deps, projectDir, targetTools, selectedWorkflows, overwriteList, options, ignoreTargets);

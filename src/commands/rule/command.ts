@@ -27,13 +27,14 @@ export function createRuleCommand(deps: ProgramDeps): Command {
                 return;
             }
 
-            const explicitRuleIds = parseCsv(idsArg);
+            const ruleIdsArg = options.global && pathArg && !idsArg ? pathArg : idsArg;
+            const explicitRuleIds = parseCsv(ruleIdsArg);
             const { targetTools, agentName } = await selectRuleTargetStep(deps, options, explicitRuleIds);
 
             const { selectedRuleIds, allExistingRules } = await selectRulesStep(
                 deps,
                 projectDir,
-                idsArg,
+                ruleIdsArg,
                 options,
                 targetTools,
                 agentName,
@@ -45,7 +46,7 @@ export function createRuleCommand(deps: ProgramDeps): Command {
                 return;
             }
 
-            const ignoreTargets = await selectIgnoreTargets(deps);
+            const ignoreTargets = options.global ? [] : await selectIgnoreTargets(deps);
 
             const overwriteList = await confirmRuleOverwriteStep(deps, selectedRuleIds, allExistingRules);
             await executeAndReportRulesStep(

@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
-import type { AgentToolOption } from '@/core/agent/tools.js';
+import { resolveToolDestinationPaths, type AgentToolOption } from '@/core/agent/tools.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -18,8 +18,22 @@ export const SKILLS_CLI_TARGETS: Record<string, string> = {
     windsurf: 'windsurf',
 };
 
-export const getExternalSkillPath = (projectDir: string, tool: AgentToolOption, skillName: string): string | undefined =>
-    tool.skillsDir ? join(projectDir, tool.skillsDir, 'skills', skillName, 'SKILL.md') : undefined;
+export const getExternalSkillPath = (
+    projectDir: string,
+    tool: AgentToolOption,
+    skillName: string,
+    isGlobal = false,
+): string | undefined => {
+    if (isGlobal) {
+        const globalPath = resolveToolDestinationPaths(tool, 'skills', projectDir, true);
+        const skillMd = join(globalPath, skillName, 'SKILL.md');
+        if (existsSync(skillMd)) return skillMd;
+        const fallbackPath = join(projectDir, '.agents', 'skills', skillName, 'SKILL.md');
+        if (existsSync(fallbackPath)) return fallbackPath;
+        return skillMd;
+    }
+    return tool.skillsDir ? join(projectDir, tool.skillsDir, 'skills', skillName, 'SKILL.md') : undefined;
+};
 
 export async function installSkillViaSkillsCli(params: {
     projectDir: string;
@@ -27,24 +41,31 @@ export async function installSkillViaSkillsCli(params: {
     skillName: string;
     selectedTools: AgentToolOption[];
     cliVersion?: string;
+    isGlobal?: boolean;
 }): Promise<void> {
-    const { projectDir, source, skillName, selectedTools, cliVersion = '^1.0.0' } = params;
+    const { projectDir, source, skillName, selectedTools, cliVersion = '^1.0.0', isGlobal = false } = params;
     const unsupported = selectedTools.filter((tool) => !SKILLS_CLI_TARGETS[tool.value]);
     if (unsupported.length > 0) {
         throw new Error(`skills CLI does not support target(s): ${unsupported.map((tool) => tool.value).join(', ')}`);
     }
 
     const agents = selectedTools.map((tool) => SKILLS_CLI_TARGETS[tool.value]);
-    const packageSpec = cliVersion ? `skills@${cliVersion}` : 'skills';
+    const cleanVersion = cliVersion && !cliVersion.startsWith('^') && cliVersion !== '1.0.0' ? cliVersion : undefined;
+    const packageSpec = cleanVersion ? `skills@${cleanVersion}` : 'skills';
 
-    await execFileAsync('npx', ['-y', packageSpec, 'add', source, '--skill', skillName, '--agent', ...agents, '--yes', '--copy'], {
+    const args = ['-y', packageSpec, 'add', source, '--skill', skillName, '--agent', ...agents, '--yes', '--copy'];
+    if (isGlobal) {
+        args.push('-g');
+    }
+
+    await execFileAsync('npx', args, {
         cwd: projectDir,
         timeout: 120000,
         shell: process.platform === 'win32',
     });
 
     const missing = selectedTools.filter((tool) => {
-        const path = getExternalSkillPath(projectDir, tool, skillName);
+        const path = getExternalSkillPath(projectDir, tool, skillName, isGlobal);
         return !path || !existsSync(path);
     });
     if (missing.length > 0) {

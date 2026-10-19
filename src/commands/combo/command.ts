@@ -29,10 +29,11 @@ export function createComboCommand(deps: ProgramDeps): Command {
             }
 
             const { targetTool, targetTools } = await selectComboTargetStep(deps, options);
+            const comboNamesArg = options.global && pathArg && !namesArg ? pathArg : namesArg;
             const selectedComboNames = await selectCombosStep(
                 deps,
                 projectDir,
-                namesArg,
+                comboNamesArg,
                 availableCombos,
                 targetTool,
                 targetTools,
@@ -44,7 +45,7 @@ export function createComboCommand(deps: ProgramDeps): Command {
                 return;
             }
 
-            const ignoreTargets = await selectIgnoreTargets(deps);
+            const ignoreTargets = options.global || options.ignore === false ? [] : await selectIgnoreTargets(deps);
 
             for (const comboName of selectedComboNames) {
                 const combo = availableCombos.find(

@@ -234,6 +234,7 @@ export const installExternalSkill = async (
     installer: Extract<PackageManifest['installer'], { kind: 'skills' }>,
     selectedTools: AgentToolOption[],
     projectDir: string,
+    isGlobal = false,
 ): Promise<void> => {
     await installSkillViaSkillsCli({
         projectDir,
@@ -241,6 +242,7 @@ export const installExternalSkill = async (
         skillName: installer.skillName,
         selectedTools,
         cliVersion: installer.cliVersion,
+        isGlobal,
     });
 };
 
@@ -271,7 +273,7 @@ export const checkExistingComboComponents = async (params: {
                 exists =
                     selectedTools.length > 0 &&
                     selectedTools.every((tool) => {
-                        const path = externalSkillPath(projectDir, tool, skillName);
+                        const path = externalSkillPath(projectDir, tool, skillName, isGlobal);
                         return Boolean(path && existsSync(path));
                     });
             } else {
@@ -452,7 +454,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
                 if (pkg.installer.kind === 'npm') {
                     await npmInstall(pkg.installer.packageName, pkg.installer.scope ?? 'global', projectDir);
                 } else {
-                    await installExternalSkill(pkg.installer, selectedTools, projectDir);
+                    await installExternalSkill(pkg.installer, selectedTools, projectDir, isGlobal);
                 }
                 results.packages.push({ name: pkgName, status: 'success' });
             } catch (err: any) {

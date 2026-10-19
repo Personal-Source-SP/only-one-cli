@@ -42,10 +42,11 @@ export function createSkillCommand(deps: ProgramDeps): Command {
                 }
 
                 const { targetTool, targetTools } = await selectSkillTargetStep(deps, options);
+                const skillNamesArg = options.global && pathArg && !namesArg ? pathArg : namesArg;
                 const { selectedSkills, allExistingSkills } = await selectSkillsStep(
                     deps,
                     projectDir,
-                    namesArg,
+                    skillNamesArg,
                     availableSkills,
                     targetTool,
                     targetTools,
@@ -57,7 +58,7 @@ export function createSkillCommand(deps: ProgramDeps): Command {
                     return;
                 }
 
-                const ignoreTargets = await selectIgnoreTargets(deps);
+                const ignoreTargets = options.global || options.ignore === false ? [] : await selectIgnoreTargets(deps);
 
                 const overwriteList = await confirmSkillOverwriteStep(deps, selectedSkills, allExistingSkills);
                 await executeAndReportSkillsStep(deps, projectDir, targetTools, selectedSkills, overwriteList, options, ignoreTargets);
