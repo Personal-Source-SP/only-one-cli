@@ -6,7 +6,7 @@ triggers:
   - "assets/**"
   - "src/core/assets/**"
   - "src/commands/update/**"
-archived_at: 2026-09-17T10:51:00+07:00
+archived_at: 2026-10-19T19:18:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -41,6 +41,8 @@ affected_modules:
     - Đối soát version đã cài với upstream và cập nhật asset outdated.
     - Phát hiện file vật lý bị mất (`status: 'missing'`) và tự động khôi phục từ template gốc.
     - Khi dùng cờ `--prune`: dọn sạch file mồ côi (`status: 'removed'`) trên đĩa và trong lockfile.
+  - **Global Assets Architecture (`~/.only-one`)**: Hỗ trợ phân định phạm vi tài nguyên `scope: 'global' | 'project'`, cho phép cài đặt skills, workflows và rules dùng chung cho toàn bộ máy tính của nhà phát triển, đồng bộ qua CLI mà không làm ô nhiễm thư mục repo cục bộ.
+  - **Combo Scope & Agent Compatibility Matrix**: Phân loại các bộ Combos theo phạm vi (`global` vs `project`) và độ tương thích với target agents (`antigravity`, `cursor`, `copilot`), kiểm soát qua schema validation nghiêm ngặt.
   - **Developer Tooling & Zero-Bypass CI Gate**: Cung cấp `scripts/bump-asset.ts` (`pnpm asset:bump <type> <id>`) và bài test `test/core/assets/version-gate.test.ts` chặn commit vi phạm.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)

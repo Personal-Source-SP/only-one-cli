@@ -28,3 +28,9 @@ triggers:
 - **MUST_DO**: Check shared directories (`src/utils/`, `src/helpers/`, `src/common/`) before writing new helpers.
 - **NEVER_DO**: Re-implement existing utility functions or duplicate existing regex/parsing logic.
 - **RATIONALE**: Keeps code footprint minimal and leverages tested repository primitives.
+
+### CLI-005: Skills Installation via skills.sh CLI Registry
+- **MUST_DO**: Install remote skills using `npx -y skills add <skill-name>` through the official skills.sh CLI runner.
+- **NEVER_DO**: Fall back to manual git repository cloning into skill folders.
+- **RATIONALE**: Ensures upstream schema conformity, automatic updates, and standard lockfile registration.
+

@@ -5,7 +5,7 @@ domain: skills
 triggers:
   - "assets/skills/**"
   - "only-one/rules/**"
-archived_at: 2026-09-17T10:18:00+07:00
+archived_at: 2026-10-19T19:18:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -35,6 +35,7 @@ affected_modules:
 - **Service Return Contracts**: Cấm tuyệt đối anonymous return types; cấm định nghĩa `type`/`interface` trong `.service.ts`.
 - **Thứ bậc UI Components**: Ưu tiên 1 (`@/components`), Ưu tiên 2 (Ant Design UI Kit compound primitives), Ưu tiên 3 (TailwindCSS cho layout spacing/gap). Cấm viết raw HTML thay thế Ant Design/Shared components.
 - **Mandatory Skill Reading Gate**: Agent bắt buộc đọc `SKILL.md` và `references/*.md` trước khi code.
+- **Tích hợp Registry `skills.sh`**: Chuyển đổi cơ chế cài đặt kỹ năng từ git clone trực tiếp sang CLI chuẩn `skills.sh` (`npx -y skills add <skill>`), đảm bảo tuân thủ cấu trúc kỹ năng Antigravity/Agent chuẩn và tích hợp metadata mượt mà vào `installed.json`.
 
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
 - [page-architecture.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nextjs-development/references/page-architecture.md): Cập nhật cây thư mục và quy tắc `constants/`.

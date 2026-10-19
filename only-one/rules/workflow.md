@@ -38,3 +38,9 @@ triggers:
 - **MUST_DO**: Assign parallel subagents to completely distinct target files during `/only-one-apply`.
 - **NEVER_DO**: Allow two concurrent subagents to edit the same file simultaneously.
 - **RATIONALE**: Prevents file write race conditions and git conflict corruption.
+
+### WF-007: In-Workflow Persona & Authority Over Separate Agent Folders
+- **MUST_DO**: Declare agent personas, authorities, and role boundaries directly inside each workflow under `## Role & Collaboration Model` -> `### Assigned Persona & Authority`.
+- **NEVER_DO**: Create unstandardized subdirectories (such as `.agents/agents/` or `assets/agents/`) outside standard Antigravity customization roots (`workflows`, `skills`, `rules`, `plugins`).
+- **RATIONALE**: Antigravity does not recognize `.agents/agents/`, risking discovery failure and maintenance fragmentation.
+

@@ -6,7 +6,7 @@ triggers:
   - ".agents/workflows/**"
   - "assets/workflows/**"
   - ".agents/skills/**"
-archived_at: 2026-10-10T22:40:00+07:00
+archived_at: 2026-10-19T19:18:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -37,8 +37,11 @@ affected_modules:
 6. **Vi phạm ranh giới vòng đời (Lifecycle Drift)**: Debug tự ý sửa code sản phẩm; review không có định dạng thực thi chuẩn.
 
 ### 1.2. Core Value & Solutions
-1. **Gateway Router ([`/only-one`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one.md))**: Triage ý đồ người dùng, quét trạng thái workspace và điều hướng sang workflow chuyên biệt tối ưu.
-2. **Phân cấp 3 Làn Thực Thi SDLC**:
+1. **Direct Specialized Workflow Invocation**: Loại bỏ gateway router trung gian, cho phép kích hoạt trực tiếp các workflows chuyên biệt (`/only-one-idea`, `/only-one-plan`, `/only-one-apply`, `/only-one-flash`, `/only-one-debug`, `/only-one-review`, `/only-one-conflict`, `/only-one-clean`, `/only-one-pr-git`).
+2. **Dedicated Persona & Authority Invariant**: Mỗi workflow tự định danh rõ Persona, Mindset, Allowed Actions và Forbidden Actions ngay trong phần `Role & Collaboration Model` (không tạo thư mục `.agents/agents/` ngoài luồng).
+3. **Chuẩn hóa 100% Tiếng Anh Kỹ thuật**: Toàn bộ hướng dẫn, khuôn mẫu và chốt chặn trong workflow sử dụng 100% tiếng Anh chuẩn quốc tế.
+4. **Kiến Trúc Bộ Nhớ Phân Tầng (Tiered Context System)**: Quản trị tri thức tinh gọn qua `only-one/INDEX.md`, `only-one/rules/<domain>.md` và `only-one/archives/`.
+5. **Phân cấp 3 Làn Thực Thi SDLC**:
    - **Standard Lane (`/only-one-idea` $\rightarrow$ `/only-one-plan` $\rightarrow$ `/only-one-apply` $\rightarrow$ `/only-one-clean`)**:
      - Chuẩn hóa **3 Sections Tinh gọn** cho [`plan.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-plan.md) & [`debug.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-debug.md):
        + *Section 1*: Directory Structure Changes (Sơ đồ cây ASCII kèm Action Tags `[NEW]`, `[MODIFY]`, `[DELETE]`).
@@ -97,9 +100,16 @@ flowchart TD
         end
     end
 
-    Router --> Idea
-    Router --> Flash
-    Router --> Debug
+        subgraph GIT_LANE ["Git & Release Lane"]
+            PRGit["/only-one-pr-git\n(GitHub PR Creation via MCP)"]
+            Conflict["/only-one-conflict\n(Hunk-by-hunk Conflict Resolution)"]
+        end
+    end
+
+    User["User Intent"] --> StandardLane
+    User --> FastLane
+    User --> RCA_LANE
+    User --> GIT_LANE
     Idea --> Plan --> Apply --> Clean
     Debug -.->|Approved Patch Plan| Apply
     STE100 -.-> StandardLane
@@ -111,15 +121,15 @@ flowchart TD
 
 | Workflow | Vai trò & Trọng trách Cốt lõi | Input & Artifacts | Sơ đồ Trực quan Bắt buộc |
 | :--- | :--- | :--- | :--- |
-| **[`/only-one`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one.md)** | Gateway router, triage ý đồ & điều hướng | Input tự do $\rightarrow$ gợi ý workflow | Không |
-| **[`/only-one-idea`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-idea.md)** | Khám phá bài toán & kiến trúc giải pháp | `concept.md` (SSOT cho What & Why) | Flowchart / State Diagram |
-| **[`/only-one-plan`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-plan.md)** | Lập kế hoạch 3 sections diff-centric | Ingest `concept.md` $\rightarrow$ `plan.md` | C4 Component / Sequence ($\ge 2$ modules) |
-| **[`/only-one-apply`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-apply.md)** | Thực thi DAG waves song song với Sub-agents | Ingest `plan.md`/`debug.md` $\rightarrow$ Code | Execution Wave Graph |
+| **[`/only-one-idea`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-idea.md)** | Khám phá bài toán & kiến trúc giải pháp (BA & Architect) | `concept.md` (SSOT cho What & Why) | Flowchart / State Diagram |
+| **[`/only-one-plan`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-plan.md)** | Lập kế hoạch 3 sections diff-centric (Architect & Planner) | Ingest `concept.md` $\rightarrow$ `plan.md` | C4 Component / Sequence ($\ge 2$ modules) |
+| **[`/only-one-apply`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-apply.md)** | Thực thi DAG waves song song với Sub-agents (Dev & Lead) | Ingest `plan.md`/`debug.md` $\rightarrow$ Code | Execution Wave Graph |
 | **[`/only-one-flash`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-flash.md)** | Fast-track hotfix & quick tasks với Review Gate | Zero Disk Plan (In-chat plan & apply) | ASCII Target Structure |
-| **[`/only-one-debug`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-debug.md)** | RCA cơ học, Red feedback loop, plan vá | `debug.md` (Strict Lifecycle Isolation) | Mermaid Failure Call Trace |
-| **[`/only-one-review`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-review.md)** | Chuẩn hóa kết quả Open CodeReview (OCR) | `review.md` $\rightarrow$ multi-select apply | Không |
-| **[`/only-one-conflict`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-conflict.md)** | Giải quyết xung đột git merge/rebase an toàn | Conflict hunks $\rightarrow$ clean resolution | Không |
-| **[`/only-one-clean`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-clean.md)** | Tự động archive task, đối soát & thanh lọc | Purge task folder $\rightarrow$ Living Archives | Không |
+| **[`/only-one-debug`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-debug.md)** | RCA cơ học, Red feedback loop, plan vá (Investigator) | `debug.md` (Strict Lifecycle Isolation) | Mermaid Failure Call Trace |
+| **[`/only-one-review`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-review.md)** | Chuẩn hóa kết quả Open CodeReview (OCR Reviewer) | `review.md` $\rightarrow$ multi-select apply | Không |
+| **[`/only-one-conflict`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-conflict.md)** | Giải quyết xung đột git merge/rebase an toàn (Conflict Specialist) | Conflict hunks $\rightarrow$ clean resolution | Không |
+| **[`/only-one-clean`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-clean.md)** | Tự động archive task, đối soát & thanh lọc (Archivist & Auditor) | Purge task folder $\rightarrow$ Living Archives | Không |
+| **[`/only-one-pr-git`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-pr-git.md)** | Tạo GitHub PR từ Git state qua GitHub MCP (Release Engineer) | Git preflight $\rightarrow$ GitHub PR | Không |
 
 ---
 

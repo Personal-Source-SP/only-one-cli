@@ -7,7 +7,7 @@ triggers:
   - "package.json"
   - "src/core/doctor/**"
   - "src/core/indexing/**"
-archived_at: 2026-09-09T10:00:58+07:00
+archived_at: 2026-10-19T19:18:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -31,6 +31,7 @@ affected_modules:
   - Tinh gọn thư mục `scripts/` chỉ phục vụ dev tooling (`publish.js`, `bump-asset.ts`, `postbuild-paths.cjs`).
   - Thu gọn danh sách đóng gói npm package về đúng 2 thư mục cần thiết: `["dist", "assets"]`.
   - Phẫu thuật loại bỏ triệt để (Surgical Purge) 100% mã nguồn, doctor checks, container runners và metadata liên quan đến CocoIndex, giúp lệnh `doctor` chạy nhanh, nhẹ và triệt tiêu phụ thuộc ngoài.
+  - **Purge Triệt để Hệ Sinh thái Chấm công (Timesheet Ecosystem Purge)**: Xóa bỏ 100% các workflows, skills, MCP adapters và template manifests liên quan đến hệ thống chấm công không còn sử dụng (`only-one-timesheet.md`, timesheet MCPs), giảm thiểu hoàn toàn gánh nặng bảo trì và loại bỏ code rác.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
 - **Surgical Purge & Clean Seams**:
