@@ -10,8 +10,9 @@ export const selectWorkflowsStep = async (
     availableWorkflows: string[],
     targetTool: AgentToolOption,
     targetTools: AgentToolOption[],
+    isGlobal = false,
 ): Promise<{ selectedWorkflows: string[]; allExistingWorkflows: Awaited<ReturnType<typeof checkExistingWorkflows>> }> => {
-    const allExistingWorkflows = await checkExistingWorkflows(projectDir, targetTools, availableWorkflows);
+    const allExistingWorkflows = await checkExistingWorkflows(projectDir, targetTools, availableWorkflows, isGlobal);
     let selectedWorkflows = parseCsv(namesArg);
 
     if (!selectedWorkflows?.length) {

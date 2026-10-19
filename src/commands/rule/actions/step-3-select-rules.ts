@@ -12,6 +12,7 @@ export const selectRulesStep = async (
     options: RuleCommandOptions,
     targetTools: AllowedTarget[],
     agentName: string,
+    isGlobal = false,
 ): Promise<{ selectedRuleIds: string[]; allExistingRules: Awaited<ReturnType<typeof checkExistingRules>> }> => {
     const explicitRuleIds = parseCsv(idsArg);
     if (options.tool && explicitRuleIds.length === 0 && !deps.prompts?.checkbox) {
@@ -19,7 +20,7 @@ export const selectRulesStep = async (
     }
 
     const allAvailableRuleIds = RULES.map((r) => r.id);
-    const allExistingRules = await checkExistingRules(projectDir, targetTools, allAvailableRuleIds);
+    const allExistingRules = await checkExistingRules(projectDir, targetTools, allAvailableRuleIds, RULES, isGlobal);
 
     let selectedRuleIds = parseCsv(idsArg);
     if (!selectedRuleIds?.length) {

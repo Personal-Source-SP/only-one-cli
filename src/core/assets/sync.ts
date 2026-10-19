@@ -31,31 +31,34 @@ export interface AppliedAssetPruneResult {
 const packageRoot = resolvePackageRoot(import.meta.url);
 const AGENT_DIRS = ['.agents', '.cursor', '.claude'];
 
-function getTargetAgentDirs(projectDir: string): string[] {
+function getTargetAgentDirs(projectDir: string, isGlobal = false): string[] {
+    if (isGlobal) {
+        return ['.gemini/config', '.claude', '.cursor', '.codex'];
+    }
     const existing = AGENT_DIRS.filter((ad) => existsSync(join(projectDir, ad)));
     return existing.length > 0 ? existing : ['.agents'];
 }
 
-function checkWorkflowExists(projectDir: string, id: string): boolean {
-    const dirs = getTargetAgentDirs(projectDir);
+function checkWorkflowExists(projectDir: string, id: string, isGlobal = false): boolean {
+    const dirs = getTargetAgentDirs(projectDir, isGlobal);
     return dirs.some((ad) => existsSync(join(projectDir, ad, 'workflows', `${id}.md`)));
 }
 
-function checkSkillExists(projectDir: string, id: string): boolean {
-    const dirs = getTargetAgentDirs(projectDir);
+function checkSkillExists(projectDir: string, id: string, isGlobal = false): boolean {
+    const dirs = getTargetAgentDirs(projectDir, isGlobal);
     return dirs.some((ad) => existsSync(join(projectDir, ad, 'skills', id, 'SKILL.md')));
 }
 
-function checkRuleExists(projectDir: string, sourceFile: string): boolean {
-    const dirs = getTargetAgentDirs(projectDir);
+function checkRuleExists(projectDir: string, sourceFile: string, isGlobal = false): boolean {
+    const dirs = getTargetAgentDirs(projectDir, isGlobal);
     return dirs.some((ad) => existsSync(join(projectDir, ad, 'rules', sourceFile)));
 }
 
 /**
  * Inspects all installed assets in the target project and compares them with latest versions.
  */
-export async function inspectAssetUpdates(projectDir: string): Promise<AssetSyncResult> {
-    const lockfile = await readInstalledLockfile(projectDir);
+export async function inspectAssetUpdates(projectDir: string, isGlobal = false): Promise<AssetSyncResult> {
+    const lockfile = await readInstalledLockfile(projectDir, isGlobal);
     const inspected: AssetInspectionItem[] = [];
 
     // Inspect Workflows
@@ -74,7 +77,7 @@ export async function inspectAssetUpdates(projectDir: string): Promise<AssetSync
             continue;
         }
 
-        const existsOnDisk = checkWorkflowExists(projectDir, wfName);
+        const existsOnDisk = checkWorkflowExists(projectDir, wfName, isGlobal);
         const latestVersion = manifest.version;
         const cmp = compareDecimalVersions(record.version, latestVersion);
         inspected.push({
@@ -103,7 +106,7 @@ export async function inspectAssetUpdates(projectDir: string): Promise<AssetSync
             continue;
         }
 
-        const existsOnDisk = checkSkillExists(projectDir, skillName);
+        const existsOnDisk = checkSkillExists(projectDir, skillName, isGlobal);
         const latestVersion = manifest.version;
         const cmp = compareDecimalVersions(record.version, latestVersion);
         inspected.push({
@@ -132,7 +135,7 @@ export async function inspectAssetUpdates(projectDir: string): Promise<AssetSync
             continue;
         }
 
-        const existsOnDisk = checkRuleExists(projectDir, manifest.sourceFile);
+        const existsOnDisk = checkRuleExists(projectDir, manifest.sourceFile, isGlobal);
         const latestVersion = manifest.version;
         const cmp = compareDecimalVersions(record.version, latestVersion);
         inspected.push({
@@ -162,12 +165,16 @@ export async function inspectAssetUpdates(projectDir: string): Promise<AssetSync
 /**
  * Updates selected or all outdated assets in the target project.
  */
-export async function applyAssetUpdates(projectDir: string, itemsToUpdate: AssetInspectionItem[]): Promise<AppliedAssetUpdateResult> {
+export async function applyAssetUpdates(
+    projectDir: string,
+    itemsToUpdate: AssetInspectionItem[],
+    isGlobal = false,
+): Promise<AppliedAssetUpdateResult> {
     const updated: AppliedAssetUpdateResult['updated'] = [];
     const restored: AppliedAssetUpdateResult['restored'] = [];
     const failed: AppliedAssetUpdateResult['failed'] = [];
     const batchToRecord: Array<{ type: AssetType; id: string; version: string }> = [];
-    const agentDirs = getTargetAgentDirs(projectDir);
+    const agentDirs = getTargetAgentDirs(projectDir, isGlobal);
 
     for (const item of itemsToUpdate) {
         try {
@@ -233,7 +240,7 @@ export async function applyAssetUpdates(projectDir: string, itemsToUpdate: Asset
     }
 
     if (batchToRecord.length > 0) {
-        await recordInstalledAssetsBatch(projectDir, batchToRecord);
+        await recordInstalledAssetsBatch(projectDir, batchToRecord, isGlobal);
     }
 
     return { updated, restored, failed };
@@ -242,10 +249,14 @@ export async function applyAssetUpdates(projectDir: string, itemsToUpdate: Asset
 /**
  * Prunes orphaned assets (removed upstream) from project agent directories and lockfile.
  */
-export async function pruneAssetUpdates(projectDir: string, itemsToPrune: AssetInspectionItem[]): Promise<AppliedAssetPruneResult> {
+export async function pruneAssetUpdates(
+    projectDir: string,
+    itemsToPrune: AssetInspectionItem[],
+    isGlobal = false,
+): Promise<AppliedAssetPruneResult> {
     const pruned: AppliedAssetPruneResult['pruned'] = [];
     const failed: AppliedAssetPruneResult['failed'] = [];
-    const agentDirs = AGENT_DIRS;
+    const agentDirs = getTargetAgentDirs(projectDir, isGlobal);
 
     for (const item of itemsToPrune) {
         try {
@@ -272,7 +283,7 @@ export async function pruneAssetUpdates(projectDir: string, itemsToPrune: AssetI
                 }
             }
 
-            await removeInstalledAsset(projectDir, item.type, item.id);
+            await removeInstalledAsset(projectDir, item.type, item.id, isGlobal);
             pruned.push({
                 type: item.type,
                 id: item.id,

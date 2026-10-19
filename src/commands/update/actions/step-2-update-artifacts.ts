@@ -11,8 +11,9 @@ export const updateArtifactsStep = async (
     options: UpdateCommandOptions,
     isJsonOutput: boolean,
 ): Promise<void> => {
+    const isGlobal = Boolean(options.global);
     const result = await updateAgentArtifacts({ force: options.force, projectDir });
-    const assetSync = await inspectAssetUpdates(projectDir);
+    const assetSync = await inspectAssetUpdates(projectDir, isGlobal);
 
     let assetUpdateResult = null;
     const itemsToUpdate = options.force
@@ -20,12 +21,12 @@ export const updateArtifactsStep = async (
         : [...assetSync.outdated, ...assetSync.missing];
 
     if (itemsToUpdate.length > 0) {
-        assetUpdateResult = await applyAssetUpdates(projectDir, itemsToUpdate);
+        assetUpdateResult = await applyAssetUpdates(projectDir, itemsToUpdate, isGlobal);
     }
 
     let assetPruneResult = null;
     if (options.prune && assetSync.removed.length > 0) {
-        assetPruneResult = await pruneAssetUpdates(projectDir, assetSync.removed);
+        assetPruneResult = await pruneAssetUpdates(projectDir, assetSync.removed, isGlobal);
     }
 
     if (isJsonOutput) {

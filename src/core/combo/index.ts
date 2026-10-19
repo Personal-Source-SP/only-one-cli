@@ -8,6 +8,7 @@ import type { AgentToolOption } from '@/core/agent/tools.js';
 import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
 import { checkExistingWorkflows, installWorkflows, type WorkflowInstallResult } from '@/core/workflow/index.js';
 import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
+import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import type {
     ComboManifest,
@@ -249,8 +250,9 @@ export const checkExistingComboComponents = async (params: {
     platform: NodeJS.Platform;
     selectedTools: AgentToolOption[];
     combo: ExtendedComboManifest;
+    isGlobal?: boolean;
 }): Promise<ExistingComboComponent[]> => {
-    const { projectDir, homeDir, platform, selectedTools, combo } = params;
+    const { projectDir, homeDir, platform, selectedTools, combo, isGlobal = false } = params;
     const results: ExistingComboComponent[] = [];
 
     const plan = buildComboDependencyPlan(combo, comboRegistries());
@@ -305,7 +307,7 @@ export const checkExistingComboComponents = async (params: {
     }
 
     if (plan.skills.length > 0 && selectedTools.length > 0) {
-        const skillChecks = await checkExistingSkills(projectDir, selectedTools, plan.skills);
+        const skillChecks = await checkExistingSkills(projectDir, selectedTools, plan.skills, isGlobal);
         for (const check of skillChecks) {
             results.push({
                 type: 'skill',
@@ -325,7 +327,7 @@ export const checkExistingComboComponents = async (params: {
         const ruleTargets = selectedTools
             .map((tool) => ALLOWED_TARGETS.find((target) => target.id === tool.value))
             .filter((target): target is (typeof ALLOWED_TARGETS)[number] => Boolean(target?.agent?.rulesDir));
-        const ruleChecks = await checkExistingRules(projectDir, ruleTargets, combo.rules);
+        const ruleChecks = await checkExistingRules(projectDir, ruleTargets, combo.rules, RULES, isGlobal);
         for (const check of ruleChecks) {
             results.push({
                 type: 'rule',
@@ -342,7 +344,7 @@ export const checkExistingComboComponents = async (params: {
 
     // 5. Workflows
     if (combo.workflows?.length) {
-        const workflowChecks = await checkExistingWorkflows(projectDir, selectedTools, combo.workflows);
+        const workflowChecks = await checkExistingWorkflows(projectDir, selectedTools, combo.workflows, isGlobal);
         for (const check of workflowChecks) {
             results.push({
                 type: 'workflow',
@@ -400,7 +402,7 @@ export const checkExistingComboComponents = async (params: {
     return results;
 };
 
-export const installCombo = async (params: {
+export interface InstallComboRequest {
     deps: ProgramDeps;
     projectDir: string;
     homeDir: string;
@@ -409,8 +411,11 @@ export const installCombo = async (params: {
     combo: ExtendedComboManifest;
     overwriteList?: string[]; // list of existing component ids that user confirmed to overwrite
     noIgnore?: boolean;
-}): Promise<ComboInstallResult> => {
-    const { deps, projectDir, homeDir, platform, selectedTools, combo, overwriteList = [], noIgnore = false } = params;
+    isGlobal?: boolean;
+}
+
+export const installCombo = async (params: InstallComboRequest): Promise<ComboInstallResult> => {
+    const { deps, projectDir, homeDir, platform, selectedTools, combo, overwriteList = [], noIgnore = false, isGlobal = false } = params;
     const results: ComboInstallResult = {
         packages: [],
         configs: [],
@@ -422,7 +427,7 @@ export const installCombo = async (params: {
     const plan = buildComboDependencyPlan(combo, comboRegistries());
 
     // Get existing component info
-    const checks = await checkExistingComboComponents({ projectDir, homeDir, platform, selectedTools, combo });
+    const checks = await checkExistingComboComponents({ projectDir, homeDir, platform, selectedTools, combo, isGlobal });
 
     // 1. Packages
     if (plan.packages.length) {
@@ -495,6 +500,7 @@ export const installCombo = async (params: {
                 selectedTargets: ruleTargets,
                 ruleIds: plan.rules,
                 overwriteList: overwriteList.filter((item) => item.startsWith('rule:')).map((item) => item.substring(5)),
+                isGlobal,
             });
             results.rules = ruleResult.results;
         }
@@ -511,7 +517,8 @@ export const installCombo = async (params: {
             selectedTools,
             skillNames: plan.skills,
             overwriteList: skillOverwrites,
-            noIgnore,
+            noIgnore: noIgnore || isGlobal,
+            isGlobal,
         });
         results.skills = skillResults;
     }
@@ -564,7 +571,8 @@ export const installCombo = async (params: {
             selectedTools,
             workflowNames: plan.workflows,
             overwriteList: overwriteList.filter((item) => item.startsWith('workflow:')).map((item) => item.substring(9)),
-            noIgnore,
+            noIgnore: noIgnore || isGlobal,
+            isGlobal,
         });
     }
 
@@ -617,6 +625,9 @@ export const installCombo = async (params: {
             }
         }
     }
+
+    // Record combo metadata in lockfile
+    await recordInstalledAssetsBatch(projectDir, [{ type: 'combos' as const, id: combo.id, version: combo.version }], isGlobal);
 
     return results;
 };

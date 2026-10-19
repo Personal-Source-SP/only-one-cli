@@ -23,7 +23,8 @@ export const executeAndReportComboStep = async (
         selectedTools: targetTools,
         combo,
         overwriteList,
-        noIgnore: options.ignore === false,
+        noIgnore: options.ignore === false || Boolean(options.global),
+        isGlobal: Boolean(options.global),
     });
 
     deps.stdout('\n==================================================');
@@ -98,5 +99,7 @@ export const executeAndReportComboStep = async (
 
     deps.stdout('\n==================================================\n');
 
-    await writeIgnoreTemplates(projectDir, ignoreTargets);
+    if (!options.global) {
+        await writeIgnoreTemplates(projectDir, ignoreTargets);
+    }
 };

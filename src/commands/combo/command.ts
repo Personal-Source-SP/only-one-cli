@@ -1,3 +1,4 @@
+import { homedir } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { selectIgnoreTargets } from '@/core/ignore/index.js';
@@ -19,14 +20,24 @@ export function createComboCommand(deps: ProgramDeps): Command {
         .argument('[names]', 'Comma-separated list of combo names to apply')
         .option('--tool <tools>', 'Target IDE/tool ID')
         .option('--no-ignore', 'Skip updating the .gitignore file')
+        .option('-g, --global', 'Apply combo components globally to user IDE config directories (~/.only-one)')
         .action(async (pathArg: string | undefined, namesArg: string | undefined, options: ComboCommandOptions) => {
-            const { projectDir, availableCombos } = await loadComboManifestsStep(deps, pathArg);
+            const targetDir = options.global ? homedir() : pathArg;
+            const { projectDir, availableCombos } = await loadComboManifestsStep(deps, targetDir);
             if (!availableCombos?.length) {
                 return;
             }
 
             const { targetTool, targetTools } = await selectComboTargetStep(deps, options);
-            const selectedComboNames = await selectCombosStep(deps, projectDir, namesArg, availableCombos, targetTool, targetTools);
+            const selectedComboNames = await selectCombosStep(
+                deps,
+                projectDir,
+                namesArg,
+                availableCombos,
+                targetTool,
+                targetTools,
+                Boolean(options.global),
+            );
 
             if (!selectedComboNames?.length) {
                 deps.stdout('No combos selected. Exiting.');
@@ -45,7 +56,7 @@ export function createComboCommand(deps: ProgramDeps): Command {
 
                 deps.stdout(`\nProcessing combo: ${COLORS.primary(combo.name)}...`);
 
-                const overwriteList = await confirmComboOverwriteStep(deps, projectDir, combo, targetTools);
+                const overwriteList = await confirmComboOverwriteStep(deps, projectDir, combo, targetTools, Boolean(options.global));
                 await executeAndReportComboStep(deps, projectDir, combo, targetTools, overwriteList, options, ignoreTargets);
             }
         });

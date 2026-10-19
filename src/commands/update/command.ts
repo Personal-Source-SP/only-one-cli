@@ -1,3 +1,4 @@
+import { homedir } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
@@ -11,6 +12,7 @@ export function createUpdateCommand(deps: ProgramDeps): Command {
         .argument('[path]', 'Target project directory path (default: current directory)')
         .option('--force', 'Overwrite agent skill and workflow files even if local and remote versions match')
         .option('--prune', 'Remove orphaned skills, rules, and workflows no longer provided upstream')
+        .option('-g, --global', 'Refresh globally installed agent skills, workflows, rules, and combos (~/.only-one)')
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
@@ -23,7 +25,7 @@ export function createUpdateCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Useful when updating CLI versions or retrieving upstream template improvements.')}`,
         )
         .action(async (path: string | undefined, options: UpdateCommandOptions, command) => {
-            const projectDir = resolveProjectStep(deps, path);
+            const projectDir = options.global ? homedir() : resolveProjectStep(deps, path);
             const parent = command.parent?.opts() ?? {};
             await updateArtifactsStep(deps, projectDir, options, Boolean(parent.json));
         });

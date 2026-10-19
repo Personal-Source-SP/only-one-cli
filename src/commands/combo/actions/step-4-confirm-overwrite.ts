@@ -8,6 +8,7 @@ export const confirmComboOverwriteStep = async (
     projectDir: string,
     combo: ExtendedComboManifest,
     targetTools: AgentToolOption[],
+    isGlobal = false,
 ): Promise<string[]> => {
     const checks = await checkExistingComboComponents({
         projectDir,
@@ -15,6 +16,7 @@ export const confirmComboOverwriteStep = async (
         platform: process.platform,
         selectedTools: targetTools,
         combo,
+        isGlobal,
     });
 
     const alreadyExisting = checks.filter((c) => c.exists);

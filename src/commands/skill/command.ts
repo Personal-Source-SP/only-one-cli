@@ -1,3 +1,4 @@
+import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
@@ -25,16 +26,17 @@ export function createSkillCommand(deps: ProgramDeps): Command {
         .option('--tool <tools>', 'Comma-separated IDE/tool IDs to target')
         .option('--no-ignore', 'Skip updating the project .gitignore file')
         .option('--outdated', 'Check for outdated skills against upstream GitHub')
+        .option('-g, --global', 'Install skills globally to user IDE config directories (~/.only-one)')
         .action(
             async (pathArg: string | undefined, namesArg: string | undefined, options: SkillCommandOptions & { outdated?: boolean }) => {
-                const projectDir = resolve(pathArg || process.cwd());
+                const projectDir = options.global ? homedir() : resolve(pathArg || process.cwd());
 
                 if (options.outdated) {
                     await reportOutdatedSkillsStep(deps, projectDir);
                     return;
                 }
 
-                const { availableSkills } = loadSkillManifestsStep(deps, pathArg);
+                const { availableSkills } = loadSkillManifestsStep(deps, options.global ? homedir() : pathArg);
                 if (!availableSkills?.length) {
                     return;
                 }
@@ -47,6 +49,7 @@ export function createSkillCommand(deps: ProgramDeps): Command {
                     availableSkills,
                     targetTool,
                     targetTools,
+                    Boolean(options.global),
                 );
 
                 if (!selectedSkills?.length) {

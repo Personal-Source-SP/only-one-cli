@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, cp, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { AgentToolOption } from '@/core/agent/tools.js';
+import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { updateGitignore } from '@/core/init/gitignore.js';
 import { buildPrGitCommandContent } from '@/core/templates/agent-workflows.js';
@@ -37,14 +38,15 @@ export const checkExistingSkills = async (
     projectDir: string,
     selectedTools: AgentToolOption[],
     skillNames: string[],
+    isGlobal = false,
 ): Promise<ExistingSkill[]> => {
     const results: ExistingSkill[] = [];
     for (const tool of selectedTools) {
         if (!tool.skillsDir) continue;
         for (const skillName of skillNames) {
-            const destPath = join(tool.skillsDir, 'skills', skillName);
-            const absoluteDestPath = join(projectDir, destPath);
-            const exists = existsSync(join(absoluteDestPath, 'SKILL.md'));
+            const toolSkillsDir = resolveToolDestinationPaths(tool, 'skills', projectDir, isGlobal);
+            const destPath = join(toolSkillsDir, skillName);
+            const exists = existsSync(join(destPath, 'SKILL.md'));
             results.push({
                 toolId: tool.value,
                 toolName: tool.name,
@@ -64,11 +66,12 @@ export const installSkills = async (request: {
     skillNames: string[];
     overwriteList?: string[]; // array of "toolId:skillName"
     noIgnore?: boolean;
+    isGlobal?: boolean;
 }): Promise<SkillInstallResult[]> => {
-    const { deps, projectDir, selectedTools, skillNames, overwriteList = [], noIgnore = false } = request;
+    const { deps, projectDir, selectedTools, skillNames, overwriteList = [], noIgnore = false, isGlobal = false } = request;
     const results: SkillInstallResult[] = [];
 
-    const existingChecks = await checkExistingSkills(projectDir, selectedTools, skillNames);
+    const existingChecks = await checkExistingSkills(projectDir, selectedTools, skillNames, isGlobal);
 
     for (const tool of selectedTools) {
         if (!tool.skillsDir) continue;
@@ -90,7 +93,7 @@ export const installSkills = async (request: {
                 }
             }
 
-            const toolSkillsDir = join(projectDir, tool.skillsDir, 'skills');
+            const toolSkillsDir = resolveToolDestinationPaths(tool, 'skills', projectDir, isGlobal);
             const destPath = join(toolSkillsDir, skillName);
             const srcPath = join(skillsDir, skillName);
 
@@ -107,25 +110,35 @@ export const installSkills = async (request: {
                         skillName,
                         selectedTools: [tool],
                     });
-                    await saveSkillToLockfile(projectDir, skillName, {
-                        name: skillName,
-                        description: manifest.description,
-                        source: manifest.source,
-                        sourceType: 'skills.sh',
-                        computedHash: 'skills.sh-managed',
-                    });
+                    await saveSkillToLockfile(
+                        projectDir,
+                        skillName,
+                        {
+                            name: skillName,
+                            description: manifest.description,
+                            source: manifest.source,
+                            sourceType: 'skills.sh',
+                            computedHash: 'skills.sh-managed',
+                        },
+                        isGlobal,
+                    );
                 } else if (manifest?.sourceType === 'github' && manifest.source && manifest.skillPath) {
                     // Fetch remote skill from GitHub (legacy fallback)
                     const { content, hash } = await fetchSkillContentFromGitHub(manifest.source, manifest.skillPath);
                     await writeFile(join(destPath, 'SKILL.md'), content, 'utf-8');
-                    await saveSkillToLockfile(projectDir, skillName, {
-                        name: skillName,
-                        description: manifest.description,
-                        source: manifest.source,
-                        sourceType: 'github',
-                        skillPath: manifest.skillPath,
-                        computedHash: hash,
-                    });
+                    await saveSkillToLockfile(
+                        projectDir,
+                        skillName,
+                        {
+                            name: skillName,
+                            description: manifest.description,
+                            source: manifest.source,
+                            sourceType: 'github',
+                            skillPath: manifest.skillPath,
+                            computedHash: hash,
+                        },
+                        isGlobal,
+                    );
                 } else if (existsSync(srcPath)) {
                     // Copy local built-in skill
                     await cp(srcPath, destPath, { recursive: true, force: true });
@@ -169,7 +182,7 @@ export const installSkills = async (request: {
         }
     }
 
-    if (!noIgnore && selectedTools.length > 0) {
+    if (!noIgnore && !isGlobal && selectedTools.length > 0) {
         try {
             await updateGitignore(projectDir);
         } catch (error) {
@@ -188,7 +201,7 @@ export const installSkills = async (request: {
                 version: manifest?.version || '0.0.1',
             };
         });
-        await recordInstalledAssetsBatch(projectDir, entries);
+        await recordInstalledAssetsBatch(projectDir, entries, isGlobal);
     }
 
     return results;

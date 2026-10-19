@@ -17,6 +17,27 @@ describe('Assets Lockfile Management', () => {
         expect(resolveInstalledLockfilePath(dummyDir)).toBe(join(dummyDir, 'only-one', ONLY_ONE_LOCKFILE_NAME));
     });
 
+    it('resolves global lockfile path to .only-one/installed.json when isGlobal is true', () => {
+        const dummyHome = '/home/user';
+        expect(resolveInstalledLockfilePath(dummyHome, true)).toBe(join(dummyHome, '.only-one', ONLY_ONE_LOCKFILE_NAME));
+    });
+
+    it('records global assets into .only-one/installed.json without touching local only-one dir', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-global-'));
+        try {
+            await recordInstalledAssetsBatch(cwd, [{ type: 'skills', id: 'c4-diagrams', version: '0.0.1' }], true);
+
+            const globalLockPath = resolveInstalledLockfilePath(cwd, true);
+            expect(existsSync(globalLockPath)).toBe(true);
+            expect(existsSync(join(cwd, 'only-one'))).toBe(false);
+
+            const state = await readInstalledLockfile(cwd, true);
+            expect(state.installed.skills?.['c4-diagrams']?.version).toBe('0.0.1');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
+
     it('returns an empty state when lockfile does not exist', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-'));
         try {

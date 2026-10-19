@@ -11,6 +11,7 @@ export const executeAndReportRulesStep = async (
     selectedRuleIds: string[],
     overwriteList: string[],
     ignoreTargets: import('@/core/ignore/index.js').IgnoreTarget[] = [],
+    isGlobal = false,
 ): Promise<void> => {
     deps.stdout('\nSyncing rules...');
 
@@ -20,6 +21,7 @@ export const executeAndReportRulesStep = async (
         selectedTargets: targetTools,
         ruleIds: selectedRuleIds,
         overwriteList,
+        isGlobal,
     });
 
     deps.stdout('\n==================================================');
@@ -69,5 +71,7 @@ export const executeAndReportRulesStep = async (
 
     deps.stdout('\n==================================================\n');
 
-    await writeIgnoreTemplates(projectDir, ignoreTargets);
+    if (!isGlobal) {
+        await writeIgnoreTemplates(projectDir, ignoreTargets);
+    }
 };

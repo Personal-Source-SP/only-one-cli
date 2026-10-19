@@ -1,3 +1,4 @@
+import { homedir } from 'node:os';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { selectIgnoreTargets } from '@/core/ignore/index.js';
@@ -18,8 +19,10 @@ export function createWorkflowCommand(deps: ProgramDeps): Command {
         .argument('[names]', 'Comma-separated list of specific workflow names to sync')
         .option('--tool <tools>', 'Comma-separated IDE/tool IDs to target')
         .option('--no-ignore', 'Skip updating the project .gitignore file')
+        .option('-g, --global', 'Install workflows globally to user IDE config directories (~/.only-one)')
         .action(async (pathArg: string | undefined, namesArg: string | undefined, options: WorkflowCommandOptions) => {
-            const { projectDir, availableWorkflows } = loadWorkflowManifestsStep(deps, pathArg);
+            const targetDir = options.global ? homedir() : pathArg;
+            const { projectDir, availableWorkflows } = loadWorkflowManifestsStep(deps, targetDir);
             if (!availableWorkflows?.length) {
                 return;
             }
@@ -32,6 +35,7 @@ export function createWorkflowCommand(deps: ProgramDeps): Command {
                 availableWorkflows,
                 targetTool,
                 targetTools,
+                Boolean(options.global),
             );
 
             if (!selectedWorkflows?.length) {

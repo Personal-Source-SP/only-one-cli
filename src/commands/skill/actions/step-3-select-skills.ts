@@ -10,8 +10,9 @@ export const selectSkillsStep = async (
     availableSkills: string[],
     targetTool: AgentToolOption,
     targetTools: AgentToolOption[],
+    isGlobal = false,
 ): Promise<{ selectedSkills: string[]; allExistingSkills: Awaited<ReturnType<typeof checkExistingSkills>> }> => {
-    const allExistingSkills = await checkExistingSkills(projectDir, targetTools, availableSkills);
+    const allExistingSkills = await checkExistingSkills(projectDir, targetTools, availableSkills, isGlobal);
 
     let selectedSkills = parseCsv(namesArg);
     if (!selectedSkills?.length) {

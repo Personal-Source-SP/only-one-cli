@@ -14,6 +14,7 @@ export const selectCombosStep = async (
     availableCombos: ExtendedComboManifest[],
     targetTool: AgentToolOption,
     targetTools: AgentToolOption[],
+    isGlobal = false,
 ): Promise<string[]> => {
     const comboChecks = await Promise.all(
         availableCombos.map(async (combo) => {
@@ -23,6 +24,7 @@ export const selectCombosStep = async (
                 platform: process.platform,
                 selectedTools: targetTools,
                 combo,
+                isGlobal,
             });
             return { combo, checks, installationStatus: summarizeComboInstallation(checks) };
         }),

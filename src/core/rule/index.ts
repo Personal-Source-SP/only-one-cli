@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { AllowedToolId } from '@/constants/allowed-tools.js';
 import { type AllowedTarget } from '@/core/target-selection/catalog.js';
+import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import { executePackageActions } from '@/core/init/package-installer.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { RULES } from '@assets/rules/index.js';
@@ -35,6 +36,7 @@ export const checkExistingRules = async (
     selectedTargets: AllowedTarget[],
     ruleIds: string[],
     ruleManifests: RuleManifest[] = RULES,
+    isGlobal = false,
 ): Promise<ExistingRule[]> => {
     const results: ExistingRule[] = [];
     for (const target of selectedTargets) {
@@ -43,14 +45,14 @@ export const checkExistingRules = async (
             const manifest = ruleManifests.find((r) => r.id === ruleId);
             if (!manifest) continue;
             const filename = manifest.sourceFile;
-            const destPath = join(target.agent.rulesDir, filename);
-            const absoluteDestPath = join(projectDir, destPath);
+            const targetRulesDir = resolveToolDestinationPaths(target.agent, 'rules', projectDir, isGlobal);
+            const absoluteDestPath = join(targetRulesDir, filename);
             const exists = existsSync(absoluteDestPath);
             results.push({
                 toolId: target.id,
                 toolName: target.agent.name,
                 ruleId,
-                destPath,
+                destPath: absoluteDestPath,
                 exists,
             });
         }
@@ -66,6 +68,7 @@ export interface InstallRulesRequest {
     ruleManifests?: RuleManifest[];
     overwriteList?: string[]; // array of "toolId:ruleId"
     execFileAsync?: (file: string, args: string[], options: any) => Promise<{ stdout: string; stderr: string }>;
+    isGlobal?: boolean;
 }
 
 export const installRules = async (
@@ -76,7 +79,7 @@ export const installRules = async (
         packages: string[];
     };
 }> => {
-    const { deps, projectDir, selectedTargets, ruleIds, ruleManifests = RULES, overwriteList = [] } = request;
+    const { deps, projectDir, selectedTargets, ruleIds, ruleManifests = RULES, overwriteList = [], isGlobal = false } = request;
     const targetIds = selectedTargets.map((t) => t.id as AllowedToolId);
 
     // 1. Preflight validation
@@ -90,7 +93,7 @@ export const installRules = async (
 
     // 3. Execute package dependencies
     let installedPackages: string[] = [];
-    if (plan.packages.length > 0) {
+    if (plan.packages.length > 0 && !isGlobal) {
         deps.stdout('\nInstalling rule package dependencies...');
         const pkgResult = await executePackageActions({
             deps,
@@ -103,7 +106,7 @@ export const installRules = async (
     }
 
     // 4. Pre-check existing rules
-    const existingChecks = await checkExistingRules(projectDir, selectedTargets, ruleIds, ruleManifests);
+    const existingChecks = await checkExistingRules(projectDir, selectedTargets, ruleIds, ruleManifests, isGlobal);
 
     // 5. Install rule files per target
     const results: RuleInstallResult[] = [];
@@ -131,7 +134,7 @@ export const installRules = async (
                 }
             }
 
-            const targetRulesDir = join(projectDir, target.agent.rulesDir);
+            const targetRulesDir = resolveToolDestinationPaths(target.agent, 'rules', projectDir, isGlobal);
             const destPath = join(targetRulesDir, manifest.sourceFile);
             const srcPath = join(rulesAssetsDir, manifest.sourceFile);
 
@@ -170,7 +173,7 @@ export const installRules = async (
                 version: manifest?.version || '0.0.1',
             };
         });
-        await recordInstalledAssetsBatch(projectDir, entries);
+        await recordInstalledAssetsBatch(projectDir, entries, isGlobal);
     }
 
     return {

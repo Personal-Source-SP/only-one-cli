@@ -3,6 +3,7 @@ import { mkdir, cp } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AgentToolOption } from '@/core/agent/tools.js';
+import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
@@ -34,25 +35,27 @@ export interface WorkflowInstallRequest {
     workflowNames: string[];
     overwriteList?: string[];
     noIgnore?: boolean;
+    isGlobal?: boolean;
 }
 
 export const checkExistingWorkflows = async (
     projectDir: string,
     selectedTools: AgentToolOption[],
     workflowNames: string[],
+    isGlobal = false,
 ): Promise<ExistingWorkflow[]> => {
     const results: ExistingWorkflow[] = [];
     for (const tool of selectedTools) {
         if (!tool.skillsDir) continue;
         for (const wfName of workflowNames) {
-            const destPath = join(tool.skillsDir, 'workflows', `${wfName}.md`);
-            const absoluteDestPath = join(projectDir, destPath);
+            const toolWorkflowsDir = resolveToolDestinationPaths(tool, 'workflows', projectDir, isGlobal);
+            const absoluteDestPath = join(toolWorkflowsDir, `${wfName}.md`);
             const exists = existsSync(absoluteDestPath);
             results.push({
                 toolId: tool.value,
                 toolName: tool.name,
                 workflowName: wfName,
-                destPath,
+                destPath: absoluteDestPath,
                 exists,
             });
         }
@@ -61,10 +64,10 @@ export const checkExistingWorkflows = async (
 };
 
 export const installWorkflows = async (request: WorkflowInstallRequest): Promise<WorkflowInstallResult[]> => {
-    const { deps, projectDir, selectedTools, workflowNames, overwriteList = [] } = request;
+    const { deps, projectDir, selectedTools, workflowNames, overwriteList = [], isGlobal = false } = request;
     const results: WorkflowInstallResult[] = [];
 
-    const existingChecks = await checkExistingWorkflows(projectDir, selectedTools, workflowNames);
+    const existingChecks = await checkExistingWorkflows(projectDir, selectedTools, workflowNames, isGlobal);
 
     for (const tool of selectedTools) {
         if (!tool.skillsDir) continue;
@@ -86,7 +89,7 @@ export const installWorkflows = async (request: WorkflowInstallRequest): Promise
                 }
             }
 
-            const toolWorkflowsDir = join(projectDir, tool.skillsDir, 'workflows');
+            const toolWorkflowsDir = resolveToolDestinationPaths(tool, 'workflows', projectDir, isGlobal);
             const destPath = join(toolWorkflowsDir, `${wfName}.md`);
             const srcPath = join(workflowsDir, `${wfName}.md`);
 
@@ -123,7 +126,7 @@ export const installWorkflows = async (request: WorkflowInstallRequest): Promise
                 version: manifest?.version || '0.0.1',
             };
         });
-        await recordInstalledAssetsBatch(projectDir, entries);
+        await recordInstalledAssetsBatch(projectDir, entries, isGlobal);
     }
 
     return results;

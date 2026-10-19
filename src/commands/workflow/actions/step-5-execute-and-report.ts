@@ -24,7 +24,8 @@ export const executeAndReportWorkflowsStep = async (
         selectedTools: targetTools,
         workflowNames: selectedWorkflows,
         overwriteList,
-        noIgnore: options.ignore === false,
+        noIgnore: options.ignore === false || Boolean(options.global),
+        isGlobal: Boolean(options.global),
     });
 
     deps.stdout('\n==================================================');

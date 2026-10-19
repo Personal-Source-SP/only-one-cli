@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+
 /** Aligned with open-spec-source/src/core/config.ts */
 export type AgentToolOption = {
     available?: boolean;
@@ -8,6 +10,33 @@ export type AgentToolOption = {
     successLabel?: string;
     value: string;
 };
+
+export function resolveToolDestinationPaths(
+    tool: AgentToolOption,
+    assetType: 'skills' | 'workflows' | 'rules',
+    targetDir: string,
+    isGlobal = false,
+): string {
+    if (!isGlobal) {
+        if (assetType === 'skills') return join(targetDir, tool.skillsDir || '.agents', 'skills');
+        if (assetType === 'workflows') return join(targetDir, tool.skillsDir || '.agents', 'workflows');
+        return join(targetDir, tool.rulesDir || (tool.skillsDir ? join(tool.skillsDir, 'rules') : '.agents/rules'));
+    }
+
+    if (tool.value === 'antigravity') {
+        return join(targetDir, '.gemini/config', assetType);
+    }
+    if (tool.value === 'claude') {
+        return join(targetDir, '.claude', assetType);
+    }
+    if (tool.value === 'cursor') {
+        return join(targetDir, '.cursor', assetType);
+    }
+    if (tool.value === 'codex') {
+        return join(targetDir, '.codex', assetType);
+    }
+    return join(targetDir, tool.skillsDir || '.agents', assetType);
+}
 
 export const AI_TOOLS: AgentToolOption[] = [
     { available: true, name: 'Amazon Q Developer', skillsDir: '.amazonq', successLabel: 'Amazon Q Developer', value: 'amazon-q' },
