@@ -2,9 +2,9 @@ export type AssetType = 'workflows' | 'skills' | 'rules' | 'mcps' | 'packages' |
 
 export interface RemoteSkillLockMeta {
     source: string;
-    sourceType: 'github';
+    sourceType: 'github' | 'skills.sh';
     branch?: string;
-    skillPath: string;
+    skillPath?: string;
     computedHash: string;
     updatedAt?: string;
 }

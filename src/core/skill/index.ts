@@ -13,6 +13,7 @@ import { SKILLS } from '@assets/skills/index.js';
 import { fetchSkillContentFromGitHub } from './remote/github-fetcher.js';
 import { saveSkillToLockfile } from './remote/lockfile.js';
 import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
+import { installSkillViaSkillsCli } from './remote/skills-sh-installer.js';
 
 const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/skills');
 
@@ -99,8 +100,22 @@ export const installSkills = async (request: {
 
                 const manifest = SKILLS.find((s) => s.name === skillName);
 
-                if (manifest?.sourceType === 'github' && manifest.source && manifest.skillPath) {
-                    // Fetch remote skill from GitHub
+                if (manifest?.sourceType === 'skills.sh' && manifest.source) {
+                    await installSkillViaSkillsCli({
+                        projectDir,
+                        source: manifest.source,
+                        skillName,
+                        selectedTools: [tool],
+                    });
+                    await saveSkillToLockfile(projectDir, skillName, {
+                        name: skillName,
+                        description: manifest.description,
+                        source: manifest.source,
+                        sourceType: 'skills.sh',
+                        computedHash: 'skills.sh-managed',
+                    });
+                } else if (manifest?.sourceType === 'github' && manifest.source && manifest.skillPath) {
+                    // Fetch remote skill from GitHub (legacy fallback)
                     const { content, hash } = await fetchSkillContentFromGitHub(manifest.source, manifest.skillPath);
                     await writeFile(join(destPath, 'SKILL.md'), content, 'utf-8');
                     await saveSkillToLockfile(projectDir, skillName, {

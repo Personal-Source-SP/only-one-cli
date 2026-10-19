@@ -7,7 +7,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Shape agent output into action-first, bounded, progress-visible responses for readers with ADHD.',
         source: 'ayghri/i-have-adhd',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/i-have-adhd/SKILL.md',
     },
 
@@ -17,7 +17,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Conduct a grilling session that sharpens domain terminology and updates CONTEXT.md and ADRs inline.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/grill-with-docs/SKILL.md',
     },
     {
@@ -25,7 +25,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Interview the user relentlessly about a plan or design until reaching shared understanding (zero file footprint).',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/productivity/grill-me/SKILL.md',
     },
     {
@@ -39,7 +39,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Conduct a one-question-at-a-time interview extracting root needs until ~95% confidence.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/interview-me/SKILL.md',
     },
     {
@@ -47,7 +47,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Refine rough ideas and establish strict In-Scope vs Explicit Out-of-Scope boundaries.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/idea-refine/SKILL.md',
     },
     {
@@ -55,7 +55,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Actively build and sharpen domain models, challenge glossary terms, and maintain CONTEXT.md.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/domain-modeling/SKILL.md',
     },
     {
@@ -63,7 +63,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Re-pitch complex explanations in plain English using the project domain glossary.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/productivity/wait-what/SKILL.md',
     },
 
@@ -73,7 +73,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Break plan into tracer-bullet tickets with explicit dependency blocking edges.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/to-tickets/SKILL.md',
     },
     {
@@ -81,7 +81,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Design deep modules with small interfaces at clean seams, testable through that interface.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/codebase-design/SKILL.md',
     },
     {
@@ -89,7 +89,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: "Contract-first design, Hyrum's Law, error semantics, and boundary validation.",
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/api-and-interface-design/SKILL.md',
     },
     {
@@ -97,7 +97,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Component architecture, design systems, 5-state matrix, and WCAG accessibility.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/frontend-ui-engineering/SKILL.md',
     },
     {
@@ -105,7 +105,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Enforce source-verified APIs and grounded documentation.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/source-driven-development/SKILL.md',
     },
     {
@@ -113,7 +113,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Stress-test high-stakes design choices via CLAIM -> DOUBT -> RECONCILE loops.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/doubt-driven-development/SKILL.md',
     },
     {
@@ -135,7 +135,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Implement thin vertical slices with safe defaults and rollback-friendly commits.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/incremental-implementation/SKILL.md',
     },
     {
@@ -143,7 +143,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Beyoncé Rule, Red-Green-Refactor loop, DAMP tests, and regression guards.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/test-driven-development/SKILL.md',
     },
     {
@@ -151,7 +151,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Feed agents high-signal minimal context, negative rules, and tech skills.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/context-engineering/SKILL.md',
     },
     {
@@ -159,7 +159,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Build a throwaway prototype to answer an uncertain design or UI question.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/prototype/SKILL.md',
     },
     {
@@ -167,7 +167,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Generate interactive bash wizard for steps only humans can perform.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/wizard/SKILL.md',
     },
 
@@ -177,7 +177,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Disciplined diagnosis loop: build red test loop -> minimize -> hypothesize -> fix.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/diagnosing-bugs/SKILL.md',
     },
     {
@@ -185,7 +185,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Resolve git merge/rebase conflicts hunk by hunk based on intent.',
         source: 'mattpocock/skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/engineering/resolving-merge-conflicts/SKILL.md',
     },
 
@@ -195,7 +195,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: '5-axis code review, change sizing (~100 lines), and PR quality gating.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/code-review-and-quality/SKILL.md',
     },
     {
@@ -203,7 +203,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: "Chesterton's Fence, Rule of 500, eliminate dead code and speculative wrappers.",
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/code-simplification/SKILL.md',
     },
     {
@@ -211,7 +211,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'OWASP Top 10 prevention, auth guards, secrets audit, and 3-tier boundary validation.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/security-and-hardening/SKILL.md',
     },
     {
@@ -219,7 +219,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Core Web Vitals, N+1 database queries, bundle budgets, and memoization.',
         source: 'addyosmani/agent-skills',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/performance-optimization/SKILL.md',
     },
 
@@ -229,7 +229,7 @@ export const SKILLS: SkillManifest[] = [
         version: '0.0.1',
         description: 'Stop at the first sufficient solution rung while preserving safety.',
         source: 'DietrichGebert/ponytail',
-        sourceType: 'github',
+        sourceType: 'skills.sh',
         skillPath: 'skills/ponytail/SKILL.md',
     },
     {

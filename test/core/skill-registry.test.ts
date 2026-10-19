@@ -7,7 +7,7 @@ import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 const packageRoot = resolvePackageRoot(import.meta.url);
 const skillsDir = join(packageRoot, 'assets/skills');
 const shippedLocalSkillNames = readdirSync(skillsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+    .filter((entry) => entry.isDirectory() && existsSync(join(skillsDir, entry.name, 'SKILL.md')))
     .map((entry) => entry.name)
     .sort();
 
@@ -22,7 +22,7 @@ describe('skill registry integrity', () => {
         const manifestNames = SKILLS.map(({ name }) => name);
         expect(new Set(manifestNames).size).toBe(manifestNames.length);
 
-        const localSkills = SKILLS.filter((s) => s.sourceType !== 'github').map((s) => s.name);
+        const localSkills = SKILLS.filter((s) => s.sourceType === 'local').map((s) => s.name);
         expect([...localSkills].sort()).toEqual(shippedLocalSkillNames);
     });
 
@@ -32,17 +32,15 @@ describe('skill registry integrity', () => {
         expect(skill).toMatchObject({
             version: '0.0.1',
             source: 'ayghri/i-have-adhd',
-            sourceType: 'github',
-            skillPath: 'skills/i-have-adhd/SKILL.md',
+            sourceType: 'skills.sh',
         });
         expect(existsSync(join(skillsDir, 'i-have-adhd'))).toBe(false);
     });
 
     it('requires local SKILL.md with frontmatter name matching each local manifest', () => {
         for (const skill of SKILLS) {
-            if (skill.sourceType === 'github') {
+            if (skill.sourceType === 'skills.sh' || skill.sourceType === 'github') {
                 expect(skill.source).toBeDefined();
-                expect(skill.skillPath).toBeDefined();
             } else {
                 const skillPath = join(skillsDir, skill.name, 'SKILL.md');
                 expect(existsSync(skillPath), `${skill.name} must ship local SKILL.md`).toBe(true);
@@ -81,8 +79,7 @@ describe('skill registry integrity', () => {
         expect(mattSkillNames.sort()).toEqual(expectedNames.sort());
 
         for (const skill of mattSkills) {
-            expect(skill.sourceType).toBe('github');
-            expect(skill.skillPath).toMatch(/^skills\/(engineering|productivity)\/[a-z-]+\/SKILL\.md$/);
+            expect(skill.sourceType).toBe('skills.sh');
         }
     });
 

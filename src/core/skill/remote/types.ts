@@ -4,9 +4,9 @@ export interface RemoteSkillMeta {
     name: string;
     description?: string;
     source: string;
-    sourceType: 'github';
+    sourceType: 'github' | 'skills.sh';
     branch?: string;
-    skillPath: string;
+    skillPath?: string;
     computedHash: string;
     installedAt?: string;
     updatedAt?: string;

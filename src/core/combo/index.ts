@@ -27,6 +27,11 @@ import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { WORKFLOWS } from '@assets/workflows/index.js';
 import { MCPS } from '@assets/mcps/index.js';
+import {
+    SKILLS_CLI_TARGETS,
+    getExternalSkillPath as externalSkillPath,
+    installSkillViaSkillsCli,
+} from '@/core/skill/remote/skills-sh-installer.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -202,18 +207,6 @@ export const npmInstall = async (name: string, scope: 'global' | 'local', projec
     }
 };
 
-const SKILLS_CLI_TARGETS: Record<string, string> = {
-    antigravity: 'antigravity',
-    claude: 'claude-code',
-    cursor: 'cursor',
-    codex: 'codex',
-    cline: 'cline',
-    gemini: 'gemini',
-    'github-copilot': 'github-copilot',
-    opencode: 'opencode',
-    windsurf: 'windsurf',
-};
-
 export const UIPRO_AI_TARGETS: Record<string, string> = {
     antigravity: 'antigravity',
     cursor: 'cursor',
@@ -236,42 +229,18 @@ export const UIPRO_AI_TARGETS: Record<string, string> = {
     warp: 'warp',
 };
 
-const externalSkillPath = (projectDir: string, tool: AgentToolOption, skillName: string): string | undefined =>
-    tool.skillsDir ? join(projectDir, tool.skillsDir, 'skills', skillName, 'SKILL.md') : undefined;
-
 export const installExternalSkill = async (
     installer: Extract<PackageManifest['installer'], { kind: 'skills' }>,
     selectedTools: AgentToolOption[],
     projectDir: string,
 ): Promise<void> => {
-    const unsupported = selectedTools.filter((tool) => !SKILLS_CLI_TARGETS[tool.value]);
-    if (unsupported.length > 0)
-        throw new Error(`Skills CLI does not support target(s): ${unsupported.map((tool) => tool.value).join(', ')}`);
-    const agents = selectedTools.map((tool) => SKILLS_CLI_TARGETS[tool.value]);
-    await execFileAsync(
-        'npx',
-        [
-            '-y',
-            `skills@${installer.cliVersion}`,
-            'add',
-            installer.source,
-            '--skill',
-            installer.skillName,
-            '--agent',
-            ...agents,
-            '--yes',
-            '--copy',
-        ],
-        { cwd: projectDir, timeout: 120000, shell: false },
-    );
-    const missing = selectedTools.filter((tool) => {
-        const path = externalSkillPath(projectDir, tool, installer.skillName);
-        return !path || !existsSync(path);
+    await installSkillViaSkillsCli({
+        projectDir,
+        source: installer.source,
+        skillName: installer.skillName,
+        selectedTools,
+        cliVersion: installer.cliVersion,
     });
-    if (missing.length > 0)
-        throw new Error(
-            `External skill '${installer.skillName}' missing after install for: ${missing.map((tool) => tool.value).join(', ')}`,
-        );
 };
 
 export const checkExistingComboComponents = async (params: {
