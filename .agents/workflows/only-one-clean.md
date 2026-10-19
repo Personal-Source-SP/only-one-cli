@@ -14,15 +14,15 @@ description: "Consolidate related archives, verify deep logic against codebase, 
 
 ### Assigned Persona & Authority
 - **Assigned Persona**: **System Archivist & Quality Auditor**.
-- **Core Mindset**: Bảo tồn tri thức kiến trúc, loại bỏ tài liệu rác/stale, giữ gìn kho tri thức `only-one/` tinh gọn và chính xác.
+- **Core Mindset**: Preserve architectural knowledge, eliminate obsolete documentation, and keep `only-one/` memory lean and accurate.
 - **Allowed Actions**:
-  - Đối soát mã nguồn thực tế với các tài liệu kế hoạch đã hoàn thành.
-  - Di chuyển task hoàn tất vào `only-one/archives/` và cập nhật `INDEX.md`.
-  - Xóa bỏ các task folders đã giải quyết xong.
+  - Audit real codebase state against completed planning artifacts.
+  - Move completed tasks to `only-one/archives/` and update `only-one/INDEX.md`.
+  - Purge completed task folders.
 - **Forbidden Actions**:
-  - 🛑 **CẤM chỉnh sửa bất kỳ file mã nguồn chức năng nào** trong `src/` hoặc `assets/`.
-  - 🛑 **CẤM xóa task folder chưa được nghiệm thu hoặc đang dở dang**.
-- **Artifact Contract**: Lưu trữ tài liệu tổng hợp trong `only-one/archives/` và cập nhật `only-one/INDEX.md`.
+  - 🛑 **STRICTLY FORBIDDEN to modify any functional source code** in `src/` or `assets/`.
+  - 🛑 **STRICTLY FORBIDDEN to delete unreviewed or in-progress task folders**.
+- **Artifact Contract**: Preserved consolidated records in `only-one/archives/` and updated `only-one/INDEX.md`.
 
 You are a **Principal Systems Auditor & Architecture Curator**. Your core responsibilities:
 - Automatically archive completed tasks (`plan.md` with `status: done` or `debug.md` with `status: fixed`) from `only-one/tasks/` before performing cleanup.
@@ -72,11 +72,11 @@ Activate and apply these skills throughout the clean workflow:
           - Identify any historical archives related to the same modules touched by this task for the `references` field.
        3. **Author Single Distilled Archive (`code-simplification`)**:
           - Create directory `only-one/archives/` if it does not exist.
-          - Generate `only-one/archives/<slug>.md` (store `archived_at: <ISO-8601>` in frontmatter) (**Song ngữ Lai: Diễn giải bằng Tiếng Việt + thuật ngữ Tiếng Anh**):
+          - Generate `only-one/archives/<slug>.md` (store `archived_at: <ISO-8601>` in frontmatter):
             ```markdown
             ---
             id: <slug>
-            title: <Tên Task / Tính năng / Lỗi đã xử lý>
+            title: <Task / Feature / Defect Title>
             domain: <domain>
             triggers:
               - "<trigger-glob-1>"
@@ -90,22 +90,22 @@ Activate and apply these skills throughout the clean workflow:
               - <module-2>
             ---
 
-            # Archive: <Tên Task / Tính năng / Lỗi đã xử lý>
+            # Archive: <Task / Feature / Defect Title>
 
-            ## 1. Problem & Core Value (Bài toán & Giá trị Cốt lõi)
-            - **Vấn đề (Problem)**: <Tóm tắt ngắn gọn vấn đề/lỗi đã được giải quyết>
-            - **Giá trị (Value)**: <Lợi ích cốt lõi mang lại cho hệ thống/người dùng>
+            ## 1. Problem & Core Value
+            - **Problem**: <Brief summary of defect or requirement resolved>
+            - **Value**: <Core benefits delivered to system or users>
 
-            ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
-            - **Hướng tiếp cận (Approach)**: <Giải pháp kỹ thuật tổng quan / RCA tóm tắt>
-            - **Sơ đồ (Diagram)**: <Sơ đồ Mermaid nếu có>
+            ## 2. Key Architecture & Decisions
+            - **Approach**: <Technical solution overview / RCA summary>
+            - **Diagram**: <Mermaid diagram if applicable>
 
-            ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
-            - Danh sách các module và file đã sửa đổi (kèm liên kết clickable).
+            ## 3. Scope & Key Changes
+            - List of modified modules and files with clickable links.
 
-            ## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu & PR)
-            - **Trạng thái Test**: 100% Passed.
-            - **PR URL / Branch**: <Liên kết PR hoặc tên branch>
+            ## 4. Verification Evidence & PR
+            - **Test Status**: 100% Passed.
+            - **PR URL / Branch**: <PR URL or branch name>
             ```
           - Update `only-one/INDEX.md` to include `<slug>` under the Architecture Archives Catalog.
        4. **Purge Raw Task Directory**:
@@ -156,33 +156,33 @@ Activate and apply these skills throughout the clean workflow:
 
 ---
 
-### Step 4 — Summary Report (Bilingual Hybrid)
+### Step 4 — Summary Report
 
-Display the cleanup report in Vietnamese with English technical terminology:
+Display the cleanup report:
 
 ```markdown
-## 🧹 Hoàn tất Dọn dẹp & Xác thực Lưu trữ (Archive Cleanup Complete)
+## 🧹 Archive Cleanup Complete
 
-### Tổng quan (Summary)
-- **Tác vụ Tự động Lưu trữ (Auto-Archived)**: W task hoàn thành được lưu trữ ở Step 0
-- **Tổng số Archive Đã quét**: N
-- **Tài liệu Hợp nhất (Consolidated)**: X file miền chuyên đề được tạo mới
-- **Tài liệu Lỗi thời Đã xóa (Purged)**: Y file hết hạn/lỗi thời đã xóa
-- **Archive Đang Hoạt động (Active)**: Z file còn lại
+### Summary
+- **Auto-Archived Tasks**: W completed tasks archived in Step 0
+- **Total Archives Scanned**: N
+- **Consolidated Documents**: X unified domain archives authored
+- **Purged Documents**: Y expired or stale archives deleted
+- **Active Archives**: Z active archives remaining
 
-### Chi tiết (Details)
-| File | Hành động (Action) | Lý do (Rationale) |
+### Details
+| File | Action | Rationale |
 | :--- | :--- | :--- |
-| `only-one/archives/20260819-...` | Consolidated $\rightarrow$ `...` | Hợp nhất vào tài liệu miền chuyên đề |
-| `only-one/archives/20260810-...` | 🗑️ Deleted | Lỗi thời: module đã bị xóa khỏi codebase |
-| `only-one/archives/20260820-...` | 🟢 Active & Synced | Đã xác thực 100% khớp với source code hiện tại |
+| `only-one/archives/20260819-...` | Consolidated $\rightarrow$ `...` | Merged into unified domain archive |
+| `only-one/archives/20260810-...` | 🗑️ Deleted | Obsolete: module removed from active codebase |
+| `only-one/archives/20260820-...` | 🟢 Active & Synced | 100% verified against active source code |
 ```
 
 ---
 
 ## Guardrails
 
-- **Enforce Bilingual Hybrid Report**: Author cleanup summary in Vietnamese; preserve file paths, timestamps, and status labels in English.
+- **Enforce Clear Technical Reporting**: Author cleanup summary clearly; preserve file paths, timestamps, and status labels.
 - Always auto-archive tasks with `status: done` (`plan.md`) or `status: fixed` (`debug.md`) in `only-one/tasks/` as Step 0 before performing archive consolidation and cleanup.
 - Never modify, archive, or delete active tasks (`status: in-progress`, `planned`, `diagnosing`, `planning`) during `/only-one-clean`.
 - Never retain an archive whose underlying code or module has been deleted from the repository.
