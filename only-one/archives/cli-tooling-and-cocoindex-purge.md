@@ -1,10 +1,16 @@
 ---
-id: 20260909-100058-cli-tooling-and-cocoindex-purge
+id: cli-tooling-and-cocoindex-purge
 title: Dọn dẹp Tooling Scripts và Loại bỏ Triệt để Tính năng Legacy CocoIndex
-archived_at: 2026-09-09
+domain: cli
+triggers:
+  - "scripts/**"
+  - "package.json"
+  - "src/core/doctor/**"
+  - "src/core/indexing/**"
+archived_at: 2026-09-09T10:00:58+07:00
 status: active
 references:
-  - only-one/archives/20261010-224000-workflow-and-sdlc-systems.md
+  - only-one/archives/workflow-and-sdlc-systems.md
 affected_modules:
   - scripts
   - package.json

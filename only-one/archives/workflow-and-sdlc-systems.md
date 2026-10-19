@@ -1,14 +1,19 @@
 ---
-id: 20261010-224000-workflow-and-sdlc-systems
+id: workflow-and-sdlc-systems
 title: Kiến Trúc Hợp Nhất của Hệ Thống Workflows, SDLC Lanes, DAG Sub-agents, 80% ASD-STE100 & Visual Diagrams
-archived_at: 2026-10-10
+domain: workflow
+triggers:
+  - ".agents/workflows/**"
+  - "assets/workflows/**"
+  - ".agents/skills/**"
+archived_at: 2026-10-10T22:40:00+07:00
 status: active
 references:
-  - only-one/archives/20260824-103830-tui-modernization.md
-  - only-one/archives/20260917-101800-refactor-dev-skills-standards.md
-  - only-one/archives/20260917-105100-asset-versioning-and-sync-systems.md
-  - only-one/archives/20260904-140500-mcp-registry-and-servers.md
-  - only-one/archives/20260909-100058-cli-tooling-and-cocoindex-purge.md
+  - only-one/archives/tui-modernization.md
+  - only-one/archives/refactor-dev-skills-standards.md
+  - only-one/archives/asset-versioning-and-sync-systems.md
+  - only-one/archives/mcp-registry-and-servers.md
+  - only-one/archives/cli-tooling-and-cocoindex-purge.md
 affected_modules:
   - assets/skills
   - assets/workflows

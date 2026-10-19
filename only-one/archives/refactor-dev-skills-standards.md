@@ -1,10 +1,14 @@
 ---
-id: 20260917-101800-refactor-dev-skills-standards
+id: refactor-dev-skills-standards
 title: Nâng Cấp & Chuẩn Hóa Toàn Diện Bộ Skills Frontend (Next.js) & Backend (NestJS)
-archived_at: 2026-09-17
+domain: skills
+triggers:
+  - "assets/skills/**"
+  - "only-one/rules/**"
+archived_at: 2026-09-17T10:18:00+07:00
 status: active
 references:
-  - only-one/archives/20261010-224000-workflow-and-sdlc-systems.md
+  - only-one/archives/workflow-and-sdlc-systems.md
 affected_modules:
   - assets/skills/only-one-nextjs-development
   - assets/skills/only-one-nestjs-development

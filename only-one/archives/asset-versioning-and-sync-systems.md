@@ -1,10 +1,15 @@
 ---
-id: 20260917-105100-asset-versioning-and-sync-systems
+id: asset-versioning-and-sync-systems
 title: Architecture of Independent Asset Versioning, Unified Lockfile, Auto-Restore, and Pruning Systems
-archived_at: 2026-09-17
+domain: assets
+triggers:
+  - "assets/**"
+  - "src/core/assets/**"
+  - "src/commands/update/**"
+archived_at: 2026-09-17T10:51:00+07:00
 status: active
 references:
-  - only-one/archives/20261010-224000-workflow-and-sdlc-systems.md
+  - only-one/archives/workflow-and-sdlc-systems.md
 affected_modules:
   - assets/types.ts
   - assets/rules

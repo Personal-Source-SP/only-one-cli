@@ -1,10 +1,14 @@
 ---
-id: 20260824-103830-tui-modernization
+id: tui-modernization
 title: Modernizing Only-One CLI Terminal User Interface (TUI)
-archived_at: 2026-08-25
+domain: tui
+triggers:
+  - "src/tui/**"
+  - "src/prompts/**"
+archived_at: 2026-08-25T10:38:30+07:00
 status: active
 references:
-  - only-one/archives/20261010-224000-workflow-and-sdlc-systems.md
+  - only-one/archives/workflow-and-sdlc-systems.md
 affected_modules:
   - src/tui
   - test/tui

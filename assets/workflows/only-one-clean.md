@@ -27,7 +27,7 @@ Activate and apply these skills throughout the clean workflow:
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
 | **`task-lifecycle-resolution`** | Step 0 (Pre-clean task auto-archive) | Scans `only-one/tasks/` for completed tasks (`plan.md` with `status: done` or `debug.md` with `status: fixed`) and triggers the auto-archiving protocol before clean. |
-| **`context-engineering`** | Step 0 (Distilling negative rules) | Formats negative constraints and lessons learned into high-signal `[NEVER]` / `[AVOID]` rules inside `only-one/rules.md`. |
+| **`context-engineering`** | Step 0 (Distilling negative rules) | Formats negative constraints and lessons learned into atomic rules inside `only-one/rules/<domain>.md` and updates `only-one/INDEX.md`. |
 | **`code-simplification`** | Step 0 & Step 1 (Distillation & Consolidation) | Prunes raw task context into concise archive records and merges related domain archives into unified living documents. |
 | **`source-driven-development`** | Step 2 (Codebase Audit) | Inspects active source code to ground all documented logic against actual codebase truth. |
 | **`doubt-driven-development`** | Step 2 (Sanity Check & Purging) | Applies adversarial inquiry to identify stale logic and commands immediate deletion of dead documentation. |
@@ -47,22 +47,29 @@ Activate and apply these skills throughout the clean workflow:
        1. **Extract User Feedback & Distill Negative Rules (`context-engineering`)**:
           - Read `plan.md` or `debug.md` (and `concept.md` if present).
           - Extract any negative constraints, rules, anti-patterns, lessons learned (Section 5), or user warnings communicated during the task.
-          - Append new negative rules to `only-one/rules.md` (prevent duplicate entries):
+          - Determine target domain (`core`, `workflow`, `cli`, `tui`, `stack`) and append atomic rule to `only-one/rules/<domain>.md`:
             ```markdown
-            - **[NEVER]** <Action to avoid> — <Reason / Context>
-            - **[AVOID]** <Anti-pattern to avoid> — <Reason / Context>
+            ### DOMAIN-XXX: <Rule Title>
+            - **MUST_DO**: <Action to perform>
+            - **NEVER_DO**: <Action to avoid>
+            - **RATIONALE**: <Reason / Context>
             ```
+          - Register or update the entry in `only-one/INDEX.md` to keep the catalog synchronized.
        2. **Direct Reference Resolution**:
           - Scan existing archive files in `only-one/archives/*.md`.
           - Identify any historical archives related to the same modules touched by this task for the `references` field.
        3. **Author Single Distilled Archive (`code-simplification`)**:
           - Create directory `only-one/archives/` if it does not exist.
-          - Generate `only-one/archives/<timestamp>-<slug>.md` using the task's timestamp prefix (**Song ngữ Lai: Diễn giải bằng Tiếng Việt + thuật ngữ Tiếng Anh**):
+          - Generate `only-one/archives/<slug>.md` (store `archived_at: <ISO-8601>` in frontmatter) (**Song ngữ Lai: Diễn giải bằng Tiếng Việt + thuật ngữ Tiếng Anh**):
             ```markdown
             ---
-            id: <timestamp>-<slug>
+            id: <slug>
             title: <Tên Task / Tính năng / Lỗi đã xử lý>
-            archived_at: <YYYY-MM-DD>
+            domain: <domain>
+            triggers:
+              - "<trigger-glob-1>"
+              - "<trigger-glob-2>"
+            archived_at: <ISO-8601>
             status: active
             references:
               - only-one/archives/<previous-related-archive>.md
@@ -88,11 +95,12 @@ Activate and apply these skills throughout the clean workflow:
             - **Trạng thái Test**: 100% Passed.
             - **PR URL / Branch**: <Liên kết PR hoặc tên branch>
             ```
+          - Update `only-one/INDEX.md` to include `<slug>` under the Architecture Archives Catalog.
        4. **Purge Raw Task Directory**:
-          - Confirm that `only-one/archives/<timestamp>-<slug>.md` has been successfully created.
+          - Confirm that `only-one/archives/<slug>.md` has been successfully created.
           - Remove the raw task directory:
             ```bash
-            rm -rf only-one/tasks/<timestamp>-<slug>
+            rm -rf only-one/tasks/<slug>
             ```
 3. Check for active/in-progress tasks (`plan.md` with `status: in-progress | planned` or `debug.md` with `status: diagnosing | planning`):
    - Log notice: `ℹ️ Preserved active task: <slug>`.
@@ -105,9 +113,10 @@ Activate and apply these skills throughout the clean workflow:
 1. Read all files in `only-one/archives/*.md`.
 2. Group records by capability/domain/module (e.g. `workflow`, `auth`, `payment`, `ui`).
 3. For each group with multiple fragmented archives:
-   - Generate a single unified archive file: `only-one/archives/<YYYYMMDD-HHmmss>-<domain-slug>.md` (timestamped at current execution time).
+   - Generate a single unified archive file: `only-one/archives/<domain-slug>.md` (clean slug; store `archived_at: <ISO-8601>` in frontmatter).
    - Merge the architectural decisions, component flows, and active contracts into a unified domain summary.
    - Aggregate all active `references` and `affected_modules`.
+   - Update `only-one/INDEX.md` to synchronize catalog entries.
 
 ---
 
@@ -166,4 +175,6 @@ Display the cleanup report in Vietnamese with English technical terminology:
 - Never modify, archive, or delete active tasks (`status: in-progress`, `planned`, `diagnosing`, `planning`) during `/only-one-clean`.
 - Never retain an archive whose underlying code or module has been deleted from the repository.
 - Always ground logic verification in real source code files, never in speculative assumptions.
-- Maintain timestamps representing the clean execution moment for newly consolidated records.
+- Maintain timestamps representing the clean execution moment in frontmatter (`archived_at: <ISO-8601>`).
+- Always produce clean kebab-case slugs for archive filenames (`only-one/archives/<slug>.md`) without timestamp prefixes.
+- Always keep `only-one/INDEX.md` synchronized when distilling rules or authoring/consolidating archives.

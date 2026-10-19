@@ -1,11 +1,16 @@
 ---
-id: 20260828-203000-vs-environment-and-sync-systems
+id: vs-environment-and-sync-systems
 title: Unified Architecture of VS Editor Configurations, Asset Libraries, Multi-Platform Process Runners & Resilient Transactions
-archived_at: 2026-09-09
+domain: vs
+triggers:
+  - "src/core/vs/**"
+  - "src/commands/extensions-vs/**"
+  - "assets/vs/**"
+archived_at: 2026-09-09T20:30:00+07:00
 status: active
 references:
-  - only-one/archives/20260824-103830-tui-modernization.md
-  - only-one/archives/20261010-224000-workflow-and-sdlc-systems.md
+  - only-one/archives/tui-modernization.md
+  - only-one/archives/workflow-and-sdlc-systems.md
 affected_modules:
   - src/core/vs
   - src/commands/extensions-vs

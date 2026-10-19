@@ -1,39 +1,13 @@
-# Repository Negative Rules & Constraints
+# Repository Negative Rules & Architecture Index (Forwarding Shim)
 
-> File này được AI tự động đọc ở bước 1b của mọi workflow (`/only-one-plan`, `/only-one-apply`, `/only-one-idea`, `/only-one-debug`).
+> This file has been refactored into the **Tiered Progressive Disclosure Architecture** inspired by Hermes Agent.
+> To minimize token usage and load precise context, Agent MUST read [only-one/INDEX.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/INDEX.md) first.
 
-- **[NEVER]** Không di chuyển nguyên thư mục task thô vào `archives/`. Luôn chắt lọc thành 1 file Markdown duy nhất và xóa thư mục task thô để tránh biến `archives/` thành bãi rác tài liệu.
-- **[NEVER]** Không chỉ kiểm tra sự tồn tại của file trong `/only-one-clean`. Bắt buộc phải đối soát chi tiết logic, hàm, contract, schema với codebase thực tế và xóa bỏ dứt điểm các tài liệu đã cũ/không còn đúng.
-- **[ALWAYS]** Khai báo bảng `## 1. Skills Catalog` đầy đủ mô tả và trigger condition trong tất cả các file workflow `.md`.
-- **[ALWAYS]** Lưu trữ toàn bộ bài học và điều cấm kỵ chắt lọc vào 1 file duy nhất `only-one/rules.md` tại root của `only-one/`.
-- **[ALWAYS]** Viết toàn bộ tài liệu kỹ thuật (`concept.md`, `plan.md`) bằng tiếng Anh chuẩn kỹ thuật.
-- **[NEVER]** Không đặt `useInput` toàn cục bắt phím `Enter` ở wrapper cha khi component con cũng có `useInput` mà không qua router/focus lock, để tránh lỗi race condition gây thoát view trước khi action kịp thực thi.
-- **[ALWAYS]** Khai báo ordered machine-readable file task blocks trong Section 2 của `plan.md`; mỗi block bắt buộc có heading `### <order>. [<ACTION>] <path>` và các field `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, `Fast Test Command`.
-- **[ALWAYS]** Đảm bảo `assets/skills/index.ts`, `assets/workflows/index.ts` và `.agents/workflows/*.md` luôn đồng bộ 100% về danh mục kỹ năng (`SKILLS` và `requiredSkills`), tuyệt đối không để sót tham chiếu không tồn tại (dangling references).
-- **[ALWAYS]** Áp dụng nguyên tắc Reuse-First Invariant và quét các thư mục dùng chung (utils, helpers, hooks, common, components) trước khi viết code mới hoặc lập plan để ngăn chặn duplicate logic.
-- **[NEVER]** Không sửa source code hoặc thực thi thay đổi dự án trong lượt chạy của workflow `/only-one-idea`. Workflow này chỉ dừng lại ở việc tạo `concept.md` (Strict Lifecycle Isolation).
-- **[NEVER]** Không gọi `child_process.spawn` trên Windows (`win32`) với `{ shell: false }` khi thực thi các lệnh CLI hoặc wrapper dạng batch script (`.cmd`/`.bat`) như Antigravity IDE, VS Code, Cursor để tránh crash lỗi `ENOENT`.
-- **[NEVER]** Không để ngoại lệ thứ cấp trong quá trình `rollback()` làm ngắt quãng việc dọn dẹp journal/backup file hoặc che giấu lỗi gốc (*Error Masking*). Rollback phải có tính kiên cường (resilient) và bỏ qua các lỗi tài nguyên đã không còn tồn tại.
-- **[ALWAYS]** Khai báo và gán `version: string` tuân thủ cơ số 10 (`X.Y.Z`) cho 100% asset manifests trong `assets/` và cập nhật phiên bản khi thay đổi nội dung file template (bảo vệ CI version gate).
-- **[NEVER]** Không lưu trữ lockfile trong thư mục ẩn `.only-one/` hoặc phân mảnh ra các file phụ như `skills-lock.json`. Toàn bộ trạng thái phiên bản và remote metadata phải quy tụ duy nhất về `only-one/installed.json` (Single Source of Truth).
-- **[AVOID]** Không khởi chạy browser MCP tự động mà không chỉ định thư mục profile cô lập (`--user-data-dir`) nhằm ngăn chặn xung đột khóa tiến trình SingletonLock với trình duyệt cá nhân của developer.
-- **[NEVER]** Không tự ý viết code theo thiên kiến hoặc thói quen mặc định của LLM khi thực thi workflow `/only-one-apply`. Luôn đối chiếu và tuân thủ 100% các quy chuẩn, tiêu chuẩn code trong skills ngôn ngữ và `rules.md`.
-- **[AVOID]** Tránh sinh tài liệu task (`concept.md`, `plan.md`) dài dòng với văn mẫu sáo rỗng làm loãng nội dung kỹ thuật. Luôn trình bày code changes dưới dạng Unified Diff (`-` và `+`).
-- **[NEVER]** Không tái tạo Current State hoặc diễn giải lại high-level mechanism trong `plan.md` làm trùng lặp với `concept.md` (Anti-Concept-Duplication). Khi tồn tại, `concept.md` là Single Source of Truth; Section 2 của `plan.md` chỉ chứa executable file task blocks.
-- **[NEVER]** Không sinh tệp `walkthrough.md` riêng biệt trên đĩa khi kết thúc workflow `/only-one-apply`. Mỗi thư mục task bắt buộc chỉ chứa đúng 2 tệp: `concept.md` và `plan.md` (Strict Two-File Task Invariant); bằng chứng nghiệm thu ghi trực tiếp vào Section 3 của `plan.md` và trình bày qua chat.
-- **[ALWAYS]** Khi thực hiện các tác vụ code Frontend (Next.js/React) hoặc Backend (NestJS), Agent BẮT BUỘC PHẢI nạp và đọc kỹ tài liệu kỹ năng tương ứng (`only-one-nextjs-development` hoặc `only-one-nestjs-development`) cùng các tài liệu tham chiếu (`references/*.md`) trước khi sinh mã.
-- **[ALWAYS]** Khai báo props của React Component bằng `type <ComponentName>Props = { ... }` đặt ngay phía trên component. Tuyệt đối không dùng `interface` cho Component Props.
-- **[NEVER]** Không định nghĩa `interface` hoặc `type` trực tiếp trong tệp `.service.ts` hoặc các component `.tsx` (ngoại trừ `type Props` của chính component đó). Toàn bộ domain type contract phải được định nghĩa trong thư mục `types/` của feature và re-export qua `types/index.ts`.
-- **[NEVER]** Không trả về anonymous inline object types (ví dụ: `Promise<{ order: OrderEntity; payment: PaymentTransactionEntity } | null>`) trên bất kỳ phương thức nào của Service hoặc sử dụng anonymous inline `{}` lồng trong interface cha ở Frontend.
-- **[NEVER]** Không viết thẻ HTML thô (`<div>`, `<button>`, `<span>`) nối chuỗi TailwindCSS để tái tạo lại các thành phần giao diện đã được hỗ trợ bởi Ant Design (`Card`, `Flex`, `Space`, `Typography`, `Button`, `Tag`) hoặc `@/components`.
-- **[NEVER]** Không tự ý tạo thư mục task hoặc sinh các tài liệu markdown trên đĩa khi chạy workflow `/only-one-flash`. Toàn bộ plan phải được in ra chat cực ngắn gọn (gồm Mô tả tách bullet points khi có nhiều ý, Target Structure dạng sơ đồ cây ASCII, compact File Changes (`Target`, `Change`, `Preserve`, `Fast Test`), và Verification) để duy trì tốc độ và Zero Disk Footprint.
-- **[ALWAYS]** Bắt buộc phải tạm dừng và chờ người dùng xác nhận kế hoạch (Review Gate) sau khi xuất Flash Plan ở Step 2 của workflow `/only-one-flash` trước khi thực hiện bất kỳ chỉnh sửa mã nguồn nào ở Step 3.
-- **[NEVER]** Không tự ý sửa đổi mã nguồn sản phẩm hoặc thực thi bản vá trong lượt chạy của workflow `/only-one-debug`. Workflow này chỉ chẩn đoán lỗi, dựng Red feedback loop, phân tích RCA và lập kế hoạch vá trong `debug.md` trước khi bàn giao cho `/only-one-apply` (Strict Lifecycle Isolation).
-- **[ALWAYS]** `debug.md` phải có đúng 3 section chính: `Diagnosis`, full machine-readable `File Changes`, và `Verification`; mỗi Debug file task block dùng cùng metadata contract với `plan.md`.
-- **[ALWAYS]** Tuân thủ 4 Kỷ luật Thực thi của Andrej Karpathy: Think Before Coding (nêu rõ giả định, không suy diễn ngầm), Simplicity First (chọn giải pháp tối giản nhất, cấm over-engineering), Surgical Changes (chỉ sửa đúng file/dòng trong scope), và Goal-Driven Execution (nghiệm thu bằng test/lệnh tự động).
-- **[ALWAYS]** Áp dụng quy chuẩn 80% ASD-STE100 khi sinh tài liệu Markdown (`concept.md`, `plan.md`, `debug.md`): câu chỉ dẫn <= 20 từ, câu mô tả <= 25 từ, cấm triệt để thể bị động, cấu trúc 3 tầng Prerequisites -> Action -> Verification, triệt tiêu 100% văn phong rào đón xã giao (AI Slop).
-- **[ALWAYS]** Bắt buộc sử dụng sơ đồ trực quan Mermaid hoặc ASCII (`c4-diagrams`) thay cho văn xuôi dài khi mô tả luồng dữ liệu đa module, máy trạng thái trong `concept.md`, luồng tương tác >= 2 modules trong `plan.md`, hoặc luồng gãy vỡ (Failure Trace) trong `debug.md`.
-- **[ALWAYS]** Trình bày sơ đồ cây ASCII Directory Structure Changes ở đầu Section 2 của `debug.md` và `plan.md` để hiển thị trực quan toàn bộ các tệp kiểm thử và mã nguồn bị can thiệp kèm nhãn tag chuẩn (`[NEW]`, `[MODIFY]`, `[DELETE]`).
-- **[NEVER]** Không để Agent đồng thuận mù quáng hoặc dùng các câu mào đầu khen ngợi sáo rỗng (Sycophantic Fillers). Luôn bóc tách rủi ro theo 5 trục kỹ thuật (Boundary conditions, Simplicity, Blast radius, Concurrency, Security) trước khi đồng thuận.
-- **[NEVER]** Không cho phép 2 Sub-agents chỉnh sửa cùng một file cùng lúc (Disjoint File Invariant) trong quá trình thực thi song song của `/only-one-apply` để tránh race condition và mất mát dữ liệu.
+## Domain Rules Breakdown
+- **Core & Memory**: [only-one/rules/core.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/core.md)
+- **SDLC Workflows**: [only-one/rules/workflow.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/workflow.md)
+- **CLI & Runtime**: [only-one/rules/cli.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/cli.md)
+- **TUI & React**: [only-one/rules/tui.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/tui.md)
+- **Stack & Types**: [only-one/rules/stack.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/stack.md)
 
+Refer to [INDEX.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/INDEX.md) for trigger globs and architectural archive mapping.

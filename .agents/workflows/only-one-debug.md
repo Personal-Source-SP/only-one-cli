@@ -55,9 +55,9 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 
 ### Step 0 — Initialize `debug.md`
 
-1. Create or locate the task folder.
-2. Initialize frontmatter with `status: diagnosing`.
-3. Load `only-one/rules.md` and target-driven technical skills.
+1. Create or locate the task folder (`only-one/tasks/<slug>/`).
+2. Initialize frontmatter with `status: diagnosing` and `created_at: <ISO-8601>`.
+3. Read `only-one/INDEX.md` first (< 200 tokens). Match diagnosed subsystem files against `Trigger Globs` to load `only-one/rules/<domain>.md` and referenced `archives/`. Always enforce `only-one/rules/core.md` and `only-one/rules/workflow.md`.
 
 ### Step 1 — Reproduce Red
 
@@ -100,9 +100,9 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 3. Present concise Diagnosis and patch scope, then guide:
 
 ```text
-Tài liệu chẩn đoán & kế hoạch vá lỗi đã hoàn tất tại: only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md
+Tài liệu chẩn đoán & kế hoạch vá lỗi đã hoàn tất tại: only-one/tasks/<slug>/debug.md
 Để áp dụng bản vá và chạy nghiệm thu chống hồi quy, hãy chạy:
-/only-one-apply only-one/tasks/<YYYYMMDD-HHmmss>-debug-<slug>/debug.md
+/only-one-apply only-one/tasks/<slug>/debug.md
 ```
 
 ---
@@ -113,6 +113,7 @@ Tài liệu chẩn đoán & kế hoạch vá lỗi đã hoàn tất tại: only-
 ---
 status: diagnosing | planning | in-progress | fixed | failed
 slug: <kebab-case-slug>
+created_at: <ISO-8601>
 started_at: <YYYY-MM-DD HH:mm:ss>
 completed_at: ~
 reproduction_test: <Command or test path>

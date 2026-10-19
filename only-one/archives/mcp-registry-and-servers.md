@@ -1,10 +1,14 @@
 ---
-id: 20260904-140500-mcp-registry-and-servers
+id: mcp-registry-and-servers
 title: Kiến Trúc MCP Registry, Tích Hợp Playwright Browser & Chuẩn Hóa Danh Mục Built-in
-archived_at: 2026-09-04
+domain: mcp
+triggers:
+  - "assets/mcps/**"
+  - "src/core/mcp/**"
+archived_at: 2026-09-04T14:05:00+07:00
 status: active
 references:
-  - only-one/archives/20260917-105100-asset-versioning-and-sync-systems.md
+  - only-one/archives/asset-versioning-and-sync-systems.md
 affected_modules:
   - assets/mcps/index.ts
   - src/core/mcp

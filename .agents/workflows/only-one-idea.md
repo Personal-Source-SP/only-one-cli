@@ -90,9 +90,15 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 ### Step 3 — Author, Save `concept.md` & Hard Stop (Terminal Gate)
 
 1. **Save `concept.md` Artifact**:
-   - Consolidate findings into `only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/concept.md` using the template below (**Vietnamese narrative with English technical terminology**).
+   - Consolidate findings into `only-one/tasks/<kebab-case-slug>/concept.md` using the template below (store `created_at` in frontmatter) (**Vietnamese narrative with English technical terminology**).
 
 ```markdown
+---
+slug: <kebab-case-slug>
+created_at: <ISO-8601>
+status: concept
+---
+
 # Concept: <Tên Ý tưởng / Bài toán Kỹ thuật>
 
 ## 1. Problem & Goal (Vấn đề & Mục tiêu)
@@ -127,9 +133,9 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
    - Print completion message pointing to the newly created `concept.md`.
    - Recommend the next step to the user:
      ```text
-     Tài liệu Concept đã hoàn tất tại: only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/concept.md
+     Tài liệu Concept đã hoàn tất tại: only-one/tasks/<slug>/concept.md
      Để bắt đầu nghiên cứu mã nguồn và lập kế hoạch thực thi, hãy chạy:
-     /only-one-plan only-one/tasks/<YYYYMMDD-HHmmss>-<slug>
+     /only-one-plan only-one/tasks/<slug>
      ```
    - 🛑 **STOP IMMEDIATELY**: Do NOT modify any source code, tests, configs, skills, or other workflows in the project. Do NOT automatically trigger `/only-one-plan` or `/only-one-apply`. The turn strictly terminates here.
 
@@ -144,4 +150,4 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 - **Do not skip Phase 1 discovery**: Clarify problem and scope boundaries thoroughly before proposing solution options.
 - **Always explore and present at least 2 solution options with trade-offs** before finalizing the chosen strategy.
 - **Strict Concept Boundary**: Never include source code, pseudocode, unified diffs, symbol signatures, file paths, or file-level implementation instructions.
-- Always save `concept.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/concept.md`) and stop immediately.
+- Always save `concept.md` inside its dedicated task folder (`only-one/tasks/<kebab-case-slug>/concept.md`) and stop immediately.

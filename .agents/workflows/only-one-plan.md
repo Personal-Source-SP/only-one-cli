@@ -61,8 +61,9 @@ Do NOT bulk-load all rules, skills, and archives blindly (avoids context polluti
      - Read `.agents/rules/`, `.cursorrules`, and the `SKILL.md` of ONLY the matched framework skills. ❌ **Strict No-Bulk-Loading**: Do NOT load unrelated tech skills into working memory.
      - Extract exact naming conventions, DTO decorators, typing rules, and architectural constraints.
    - **Only-One Governance & Targeted Archives**:
-     - Read `only-one/rules.md` to strictly enforce mandatory negative rules (`[NEVER]`, `[ALWAYS]`, `[AVOID]`).
-     - Search and read ONLY the relevant `only-one/archives/*.md` files matching the domain/module of the target files to understand past architectural decisions, rationale, and invariants.
+     - Read `only-one/INDEX.md` first (< 200 tokens) to inspect the Domain Rules and Archives catalog.
+     - Match target files against the `Trigger Globs` in `INDEX.md` and on-demand read ONLY the relevant `only-one/rules/<domain>.md` and referenced `archives/`.
+     - Always enforce `only-one/rules/core.md` and `only-one/rules/workflow.md` as foundation invariants.
      - Check `only-one/CONTEXT.md` for domain terminology.
 
 3. **Step 3 — Mandatory Pre-Diff Blueprint Compliance Gate**:
@@ -105,7 +106,7 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 ### Task Storage Path
 Save the implementation plan directly inside the task folder:
 ```
-only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/plan.md
+only-one/tasks/<kebab-case-slug>/plan.md
 ```
 
 ### Frontmatter of `plan.md`
@@ -113,6 +114,7 @@ only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/plan.md
 ---
 status: planned
 slug: <kebab-case-slug>
+created_at: <ISO-8601>
 started_at: <YYYY-MM-DD>
 completed_at: ~
 pr_url: ~
@@ -188,7 +190,7 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 ## 4. Review Gate & Next Steps
 
 1. **Single Plan Document Authority (Zero IDE Artifact Duplication)**:
-   - Save ONLY to `only-one/tasks/<YYYYMMDD-HHmmss>-<kebab-case-slug>/plan.md`.
+   - Save ONLY to `only-one/tasks/<kebab-case-slug>/plan.md`.
    - ❌ **Strict No-Duplicate Artifacts**: Do NOT create secondary IDE-specific planning artifacts (such as `implementation_plan.md` in IDE brain/artifact directories). Present `plan.md` directly to the user.
 2. Stop after presenting the plan.
 3. Do not implement project changes before explicit user approval.
@@ -204,7 +206,7 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 - **🛑 Anti-Current-State-Duplication**: Never recreate Current State or high-level solution narratives in `plan.md`; `concept.md` is their authoritative Single Source of Truth when present.
 - **🛑 Machine-Readable Task Block Contract**: One Section 2 block equals one changed file. Preserve exact heading format and mandatory metadata labels.
 - **🛑 Mandatory File-Centric Research & Compliance Gate**: Always identify target files first, then selectively load matching IDE framework skills and `only-one` rules/archives. Proposed diffs must comply 100% with loaded skills and rules.
-- **🛑 Strict Single-Document Invariant (Zero IDE Plan Artifacts)**: Only produce the canonical `only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md`. Never generate duplicate IDE internal plan files (e.g. `implementation_plan.md`).
+- **🛑 Strict Single-Document Invariant (Zero IDE Plan Artifacts)**: Only produce the canonical `only-one/tasks/<slug>/plan.md`. Never generate duplicate IDE internal plan files (e.g. `implementation_plan.md`).
 - **Enforce Reuse-First Invariant**: Always identify and declare reused existing utilities/helpers in Section 2; never propose reinventing existing functions.
 - Always include `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` in every file task block.
-- Save `plan.md` inside its dedicated task folder (`only-one/tasks/<YYYYMMDD-HHmmss>-<slug>/plan.md`).
+- Save `plan.md` inside its dedicated task folder (`only-one/tasks/<slug>/plan.md`).

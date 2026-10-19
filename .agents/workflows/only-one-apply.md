@@ -76,7 +76,7 @@ grep -rlE "status: (planned|planning)" only-one/tasks/ --include="plan.md" --inc
 ### Step 1b — Load rules and skills (`context-engineering`)
 
 1. **Load Negative Rules (Mandatory Constraints)**:
-   Read `only-one/rules.md` if present. Strictly obey all negative constraints.
+   Read `only-one/INDEX.md` first (< 200 tokens). Match planned target files against `Trigger Globs` to load `only-one/rules/<domain>.md`. Always obey foundation constraints in `only-one/rules/core.md`.
 2. **Load Project Tech & Language Skills (Mandatory Standards)**:
    Check `only-one/skills/` (and `.agents/skills/`) for relevant technology and language skills (e.g. `nestjs-development`, TypeScript strict typing).
    Read their `SKILL.md` to extract coding conventions, naming patterns, typing rules, and architectural standards.
