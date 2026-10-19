@@ -1,30 +1,28 @@
 import React from 'react';
 import { Box, Text } from 'ink';
-import { DEFAULT_FOOTER_HINTS } from '../constants/index.js';
+import type { TuiMode } from '../types/task.js';
 
 interface FooterProps {
-    hints?: string[];
-    activePane?: string;
+    mode: TuiMode;
+    isMoving?: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ hints, activePane }) => {
-    const activeHints = hints || DEFAULT_FOOTER_HINTS;
+export const Footer: React.FC<FooterProps> = ({ mode, isMoving }) => {
+    const getHints = () => {
+        if (mode === 'viewer') {
+            return ['[↑/↓/PgUp/PgDn] Scroll', '[Tab] Switch Doc', '[e] Open Editor', '[Esc/q] Back to Board'];
+        }
+        if (isMoving) {
+            return ['[←/→] Select Target Col', '[m/Enter] Drop Card', '[Esc] Cancel'];
+        }
+        return ['[←/→] Col', '[↑/↓] Task', '[m] Move', '[Enter] View MD', '[p] Plan', '[a] Apply', '[d] Debug', '[r] Refresh', '[q] Quit'];
+    };
 
     return (
-        <Box
-            marginTop={1}
-            paddingTop={0}
-            borderStyle="single"
-            borderTop
-            borderBottom={false}
-            borderLeft={false}
-            borderRight={false}
-            borderColor="gray"
-            justifyContent="space-between"
-        >
+        <Box marginTop={1} borderStyle="round" paddingX={1} borderColor="gray" justifyContent="space-between">
             <Box>
                 <Text color="gray">
-                    {activeHints.map((hint, idx) => (
+                    {getHints().map((hint, idx) => (
                         <Text key={idx}>
                             {idx > 0 ? '  •  ' : ''}
                             <Text color="cyan">{hint}</Text>
@@ -32,16 +30,6 @@ export const Footer: React.FC<FooterProps> = ({ hints, activePane }) => {
                     ))}
                 </Text>
             </Box>
-            {activePane && (
-                <Box>
-                    <Text color="gray">
-                        Focus:{' '}
-                        <Text bold color="yellow">
-                            {activePane.toUpperCase()}
-                        </Text>
-                    </Text>
-                </Box>
-            )}
         </Box>
     );
 };

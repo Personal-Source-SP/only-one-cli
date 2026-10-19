@@ -1,95 +1,87 @@
 import type { ProgramDeps } from '@/cli/deps.js';
-import { Box, useApp, useInput } from 'ink';
-import React, { FC } from 'react';
-import { Header } from './components/Header.js';
+import { Box, Text, useApp, useInput } from 'ink';
+import React, { FC, useEffect, useState } from 'react';
 import { Footer } from './components/Footer.js';
-import { RouterProvider, useRouter } from './router/RouterContext.js';
-import { ComboView } from './views/ComboView.js';
-import { DoctorView } from './views/DoctorView.js';
-import { HomeView } from './views/HomeView.js';
-import { InitView } from './views/InitView.js';
-import { McpView } from './views/McpView.js';
-import { RuleView } from './views/RuleView.js';
-import { SettingsView } from './views/SettingsView.js';
-import { SkillView } from './views/SkillView.js';
-import { StructureView } from './views/StructureView.js';
-import { UpdateView } from './views/UpdateView.js';
-import { WorkflowView } from './views/WorkflowView.js';
-import { GitView } from './views/GitView.js';
+import { Header } from './components/Header.js';
+import { BoardView } from './components/BoardView.js';
+import { MarkdownViewer } from './components/MarkdownViewer.js';
+import { groupTasksByColumn, scanTasks, updateTaskStatus } from './services/taskScanner.js';
+import type { ColumnModel, ConfirmActionState, TaskModel, TaskStatus, TuiMode } from './types/task.js';
 
 interface AppProps {
     deps?: ProgramDeps;
 }
 
-const AppInner: FC<AppProps> = ({ deps }) => {
+export const App: FC<AppProps> = ({ deps }) => {
     const { exit } = useApp();
-    const { currentRoute, history, activePane, pop } = useRouter();
+    const [mode, setMode] = useState<TuiMode>('board');
+    const [tasks, setTasks] = useState<TaskModel[]>([]);
+    const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
+    const [confirmAction, setConfirmAction] = useState<ConfirmActionState | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const isHome = currentRoute.view === 'home';
+    const refresh = async () => {
+        setLoading(true);
+        const loaded = await scanTasks(deps?.cwd || process.cwd());
+        setTasks(loaded);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        refresh();
+    }, []);
 
     useInput((input, key) => {
-        if (activePane === 'search') return;
-
-        if (input === 'q' && isHome) {
-            exit();
-            return;
-        }
-
-        if (!isHome && (input === 'b' || key.escape)) {
-            pop();
+        if (confirmAction) {
+            if (input === 'y' || key.return) {
+                // Future expansion: execute workflow runner
+                setConfirmAction(null);
+            } else if (input === 'n' || key.escape) {
+                setConfirmAction(null);
+            }
         }
     });
 
-    const renderView = () => {
-        switch (currentRoute.view) {
-            case 'doctor':
-                return <DoctorView onBack={pop} />;
-            case 'init':
-                return <InitView deps={deps} onBack={pop} />;
-            case 'combo':
-                return <ComboView deps={deps} onBack={pop} />;
-            case 'skill':
-                return <SkillView deps={deps} onBack={pop} />;
-            case 'workflow':
-                return <WorkflowView deps={deps} onBack={pop} />;
-            case 'rule':
-                return <RuleView deps={deps} onBack={pop} />;
-            case 'mcp':
-                return <McpView deps={deps} onBack={pop} />;
-            case 'setting-vs':
-            case 'extensions-vs':
-                return <SettingsView deps={deps} onBack={pop} />;
-            case 'git':
-                return <GitView deps={deps} onBack={pop} />;
-            case 'structure-generate':
-                return <StructureView deps={deps} onBack={pop} />;
-            case 'update':
-                return <UpdateView deps={deps} onBack={pop} />;
-            case 'home':
-            default:
-                return <HomeView />;
-        }
+    const handleMoveTask = async (task: TaskModel, newStatus: TaskStatus) => {
+        await updateTaskStatus(task.folderPath, newStatus);
+        await refresh();
     };
 
-    const breadcrumbTrail = history.map((entry) => entry.title);
-
-    const footerHints = isHome
-        ? ['[Tab] Switch Pane', '[↑/↓] Navigate', '[/] Search', '[Enter] Open', '[q] Quit']
-        : ['[Enter] Run', '[b/Esc] Back to Dashboard', '[q] Quit'];
+    const columns: ColumnModel[] = groupTasksByColumn(tasks);
 
     return (
         <Box flexDirection="column" padding={1}>
-            <Header breadcrumb={breadcrumbTrail} />
-            {renderView()}
-            <Footer hints={footerHints} activePane={activePane} />
-        </Box>
-    );
-};
+            <Header workspacePath={deps?.cwd || process.cwd()} columns={columns} totalTasks={tasks.length} />
 
-export const App: FC<AppProps> = ({ deps }) => {
-    return (
-        <RouterProvider>
-            <AppInner deps={deps} />
-        </RouterProvider>
+            {loading ? (
+                <Text color="yellow">Scanning only-one/tasks...</Text>
+            ) : mode === 'viewer' && selectedTask ? (
+                <MarkdownViewer task={selectedTask} onClose={() => setMode('board')} />
+            ) : (
+                <BoardView
+                    columns={columns}
+                    onSelectTask={(task) => {
+                        setSelectedTask(task);
+                        setMode('viewer');
+                    }}
+                    onMoveTask={handleMoveTask}
+                    onTriggerAction={(task, action) => {
+                        setConfirmAction({ task, action });
+                    }}
+                    onRefresh={refresh}
+                    onQuit={exit}
+                />
+            )}
+
+            {confirmAction && (
+                <Box borderStyle="single" borderColor="yellow" paddingX={1} marginY={1}>
+                    <Text bold color="yellow">
+                        Action: Run /only-one-{confirmAction.action} for &quot;{confirmAction.task.slug}&quot;? (y/n)
+                    </Text>
+                </Box>
+            )}
+
+            <Footer mode={mode} />
+        </Box>
     );
 };
