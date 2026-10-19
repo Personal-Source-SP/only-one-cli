@@ -1,11 +1,21 @@
 import { homedir } from 'node:os';
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
-import { checkExistingComboComponents, summarizeComboInstallation, type ExtendedComboManifest } from '@/core/combo/index.js';
+import {
+    checkExistingComboComponents,
+    isComboAgentMatch,
+    isComboScopeMatch,
+    summarizeComboInstallation,
+    type ExtendedComboManifest,
+} from '@/core/combo/index.js';
 import { parseCsv } from '@/utils/index.js';
 
-const formatComboChoice = (combo: ExtendedComboManifest): string =>
-    [`${combo.id} — ${combo.name}`, `  ${combo.description || ''}`].join('\n');
+export const formatComboChoice = (combo: ExtendedComboManifest): string => {
+    const scopeTag = combo.scope === 'global' ? '[Global]' : combo.scope === 'project' ? '[Project]' : '[Global/Project]';
+    const agentsTag =
+        !combo.supportedAgents || combo.supportedAgents.includes('*') ? '[All Agents]' : `[Agents: ${combo.supportedAgents.join(', ')}]`;
+    return [`${combo.id} — ${combo.name} ${scopeTag} ${agentsTag}`, `  ${combo.description || ''}`].join('\n');
+};
 
 export const selectCombosStep = async (
     deps: ProgramDeps,
@@ -16,8 +26,10 @@ export const selectCombosStep = async (
     targetTools: AgentToolOption[],
     isGlobal = false,
 ): Promise<string[]> => {
+    const compatibleCombos = availableCombos.filter((combo) => isComboScopeMatch(combo, isGlobal) && isComboAgentMatch(combo, targetTools));
+
     const comboChecks = await Promise.all(
-        availableCombos.map(async (combo) => {
+        compatibleCombos.map(async (combo) => {
             const checks = await checkExistingComboComponents({
                 projectDir,
                 homeDir: homedir(),

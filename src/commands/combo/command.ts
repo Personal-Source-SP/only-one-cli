@@ -3,6 +3,7 @@ import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
+import { isComboScopeMatch } from '@/core/combo/index.js';
 import type { ComboCommandOptions } from './types.js';
 import {
     confirmComboOverwriteStep,
@@ -53,6 +54,13 @@ export function createComboCommand(deps: ProgramDeps): Command {
                 );
                 if (!combo) {
                     throw new Error(`Combo '${comboName}' not found in assets/combos`);
+                }
+
+                if (!isComboScopeMatch(combo, Boolean(options.global))) {
+                    const targetScope = options.global ? 'global' : 'local project';
+                    throw new Error(
+                        `Combo '${combo.name}' is scoped for '${combo.scope}' only and cannot be installed in ${targetScope} mode.`,
+                    );
                 }
 
                 deps.stdout(`\nProcessing combo: ${COLORS.primary(combo.name)}...`);

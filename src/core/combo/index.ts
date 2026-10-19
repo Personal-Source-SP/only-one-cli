@@ -45,6 +45,18 @@ export interface ExtendedComboManifest extends ComboManifest {
     mcps?: string[];
 }
 
+export const isComboScopeMatch = (combo: ComboManifest, isGlobal: boolean): boolean => {
+    const scope = combo.scope ?? 'both';
+    if (scope === 'both') return true;
+    return isGlobal ? scope === 'global' : scope === 'project';
+};
+
+export const isComboAgentMatch = (combo: ComboManifest, targetTools: AgentToolOption[]): boolean => {
+    const agents = combo.supportedAgents ?? ['*'];
+    if (agents.includes('*') || targetTools.length === 0) return true;
+    return targetTools.some((tool) => agents.includes(tool.value));
+};
+
 export type ComboComponentStatus = 'installed' | 'missing' | 'partial' | 'not-applicable';
 
 export interface ExistingComboComponent {

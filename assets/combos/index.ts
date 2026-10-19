@@ -6,6 +6,8 @@ export const COMBOS: ComboManifest[] = [
         version: '0.0.10',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
+        scope: 'project',
+        supportedAgents: ['antigravity', 'cursor', 'claude', 'windsurf', 'codex'],
         packages: ['ui-ux-pro-max-cli'],
         skills: [
             'i-have-adhd',
@@ -48,6 +50,8 @@ export const COMBOS: ComboManifest[] = [
         version: '0.0.10',
         name: 'Backend Flow Setup',
         description: 'NestJS backend development toolkit with architecture design, security audit, and API standards',
+        scope: 'project',
+        supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
         skills: [
             'i-have-adhd',
             'grill-with-docs',
@@ -85,10 +89,12 @@ export const COMBOS: ComboManifest[] = [
         ],
     },
     {
-        id: 'full-sdlc-flow',
+        id: 'only-one-flow',
         version: '0.0.10',
-        name: 'Full SDLC Universal Flow Setup',
+        name: 'Only One Universal Flow Setup',
         description: 'Stack-agnostic end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, testing, and review',
+        scope: 'both',
+        supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
         skills: [
             'i-have-adhd',
             'grill-with-docs',
@@ -137,6 +143,8 @@ export const COMBOS: ComboManifest[] = [
         version: '0.0.1',
         name: 'MCP Flow Setup',
         description: 'Model Context Protocol (MCP) servers toolkit',
+        scope: 'both',
+        supportedAgents: ['antigravity', 'cursor'],
         mcps: ['fetch', 'tavily', 'github', 'postgres', 'playwright-browser'],
     },
     {
@@ -144,6 +152,8 @@ export const COMBOS: ComboManifest[] = [
         version: '0.0.1',
         name: 'Git Flow Setup',
         description: 'GitHub PR automation and Git state management toolkit',
+        scope: 'both',
+        supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
         skills: ['only-one-pr-git-skill'],
         workflows: ['only-one-pr-git'],
     },

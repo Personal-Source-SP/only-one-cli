@@ -61,7 +61,7 @@ export function createProgram(deps: ProgramDeps) {
             `\n${COLORS.cli.header('Examples:')}\n` +
                 `  ${COLORS.cli.command('$ only-one init')}                             # Initialize project workspace configs & templates\n` +
                 `  ${COLORS.cli.command('$ only-one init --step skills --yes')}          # Initialize skills step non-interactively\n` +
-                `  ${COLORS.cli.command('$ only-one combo full-sdlc-flow')}              # Install pre-defined tool, package, & skill combos\n` +
+                `  ${COLORS.cli.command('$ only-one combo only-one-flow')}              # Install pre-defined tool, package, & skill combos\n` +
                 `  ${COLORS.cli.command('$ only-one skill --tool cursor')}               # Manage/sync custom agent skills for Cursor\n` +
                 `  ${COLORS.cli.command('$ only-one workflow --tool cursor')}            # Manage/sync custom agent workflows for Cursor\n` +
                 `  ${COLORS.cli.command('$ only-one rule')}                              # Manage and copy persistent agent rules\n` +

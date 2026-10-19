@@ -10,7 +10,13 @@ import { SKILLS } from '@assets/skills/index.js';
 import { WORKFLOWS } from '@assets/workflows/index.js';
 import { describe, expect, it } from 'vitest';
 import { checkExistingSkills } from '@/core/skill/index.js';
-import { buildComboDependencyPlan, summarizeComboInstallation, validateComboManifestReferences } from '@/core/combo/index.js';
+import {
+    buildComboDependencyPlan,
+    isComboAgentMatch,
+    isComboScopeMatch,
+    summarizeComboInstallation,
+    validateComboManifestReferences,
+} from '@/core/combo/index.js';
 
 describe('combo manifest preflight', () => {
     const registries = {
@@ -108,7 +114,7 @@ describe('prebuilt combo completeness', () => {
         expect(() => validateComboManifestReferences(COMBOS, productionRegistries)).not.toThrow();
     });
 
-    it.each(['frontend-flow', 'backend-flow', 'full-sdlc-flow'])('includes i-have-adhd in %s', (comboId) => {
+    it.each(['frontend-flow', 'backend-flow', 'only-one-flow'])('includes i-have-adhd in %s', (comboId) => {
         const combo = COMBOS.find(({ id }) => id === comboId);
         expect(combo?.skills).toContain('i-have-adhd');
     });
@@ -197,5 +203,27 @@ describe('combo component existence', () => {
         } finally {
             await rm(projectDir, { recursive: true, force: true });
         }
+    });
+});
+
+describe('scope and agent compatibility predicates', () => {
+    it('matches scope correctly across global and local modes', () => {
+        expect(isComboScopeMatch({ id: 'a', name: 'A', version: '1', scope: 'global' }, true)).toBe(true);
+        expect(isComboScopeMatch({ id: 'a', name: 'A', version: '1', scope: 'global' }, false)).toBe(false);
+        expect(isComboScopeMatch({ id: 'b', name: 'B', version: '1', scope: 'project' }, false)).toBe(true);
+        expect(isComboScopeMatch({ id: 'b', name: 'B', version: '1', scope: 'project' }, true)).toBe(false);
+        expect(isComboScopeMatch({ id: 'c', name: 'C', version: '1', scope: 'both' }, true)).toBe(true);
+        expect(isComboScopeMatch({ id: 'c', name: 'C', version: '1', scope: 'both' }, false)).toBe(true);
+        expect(isComboScopeMatch({ id: 'd', name: 'D', version: '1' }, true)).toBe(true);
+        expect(isComboScopeMatch({ id: 'd', name: 'D', version: '1' }, false)).toBe(true);
+    });
+
+    it('matches agent compatibility correctly', () => {
+        const tool = { name: 'Antigravity', value: 'antigravity', available: true };
+        expect(isComboAgentMatch({ id: 'a', name: 'A', version: '1', supportedAgents: ['antigravity', 'cursor'] }, [tool])).toBe(true);
+        expect(isComboAgentMatch({ id: 'b', name: 'B', version: '1', supportedAgents: ['cursor'] }, [tool])).toBe(false);
+        expect(isComboAgentMatch({ id: 'c', name: 'C', version: '1', supportedAgents: ['*'] }, [tool])).toBe(true);
+        expect(isComboAgentMatch({ id: 'd', name: 'D', version: '1' }, [tool])).toBe(true);
+        expect(isComboAgentMatch({ id: 'e', name: 'E', version: '1', supportedAgents: ['antigravity'] }, [])).toBe(true);
     });
 });

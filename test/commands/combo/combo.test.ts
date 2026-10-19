@@ -126,8 +126,26 @@ describe('combo command', () => {
             await program.parseAsync(['combo', cwd, '--tool', 'cursor'], { from: 'user' });
 
             const frontend = comboChoices.find((choice) => choice.name.includes('frontend-flow'));
-            expect(frontend?.name).toBe('frontend-flow — Frontend Flow Setup\n  Next.js and React frontend development toolkit');
+            expect(frontend?.name).toContain('frontend-flow — Frontend Flow Setup [Project]');
             expect(frontend?.checked).toBe(true);
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
+
+    it('rejects installing project-only combo in global mode', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'combo-scope-err-'));
+        try {
+            const program = createProgram({
+                cwd,
+                env: {},
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: () => undefined,
+            });
+
+            await expect(
+                program.parseAsync(['combo', cwd, 'frontend-flow', '--global', '--tool', 'cursor'], { from: 'user' }),
+            ).rejects.toThrow("Combo 'Frontend Flow Setup' is scoped for 'project' only");
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

@@ -61,7 +61,7 @@ Initialize a project from predefined combinations of packages, plugins, skills, 
 only-one combo [path] [names]
 only-one combo frontend-flow
 only-one combo backend-flow
-only-one combo full-sdlc-flow
+only-one combo only-one-flow
 only-one combo git-flow
 only-one combo mcp-flow
 ```
@@ -70,7 +70,7 @@ Predefined combos include:
 
 - `frontend-flow`: Next.js & React frontend toolkit with UI engineering and verification workflows.
 - `backend-flow`: NestJS backend toolkit with architecture design, security hardening, and API standards.
-- `full-sdlc-flow`: End-to-end SDLC enterprise toolkit (Ideation, 5-section planning, quality gates, and review).
+- `only-one-flow`: End-to-end SDLC enterprise toolkit (Ideation, 5-section planning, quality gates, and review).
 - `git-flow`: GitHub PR automation toolkit.
 - `mcp-flow`: Complete Model Context Protocol (MCP) server suite.
 

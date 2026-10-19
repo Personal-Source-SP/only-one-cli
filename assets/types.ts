@@ -79,11 +79,15 @@ export interface ConfigManifest {
     files: ConfigFileEntry[];
 }
 
+export type ComboScope = 'global' | 'project' | 'both';
+
 export interface ComboManifest {
     id: string;
     version: string;
     name: string;
     description?: string;
+    scope?: ComboScope;
+    supportedAgents?: string[];
     packages?: string[];
     mcps?: string[];
     skills?: string[];
