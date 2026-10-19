@@ -3,7 +3,7 @@ import type { ComboManifest } from '../types.js';
 export const COMBOS: ComboManifest[] = [
     {
         id: 'frontend-flow',
-        version: '0.0.11',
+        version: '0.0.12',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
         scope: 'project',
@@ -13,6 +13,7 @@ export const COMBOS: ComboManifest[] = [
             'i-have-adhd',
             'grill-with-docs',
             'grill-me',
+            'sparring-partner',
             'interview-me',
             'idea-refine',
             'to-tickets',
@@ -31,6 +32,7 @@ export const COMBOS: ComboManifest[] = [
             'source-driven-development',
             'resolving-merge-conflicts',
             'karpathy-ste100-discipline',
+            'task-lifecycle-resolution',
         ],
         rules: ['next-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
         workflows: [
@@ -46,7 +48,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'backend-flow',
-        version: '0.0.11',
+        version: '0.0.12',
         name: 'Backend Flow Setup',
         description: 'NestJS backend development toolkit with architecture design, security audit, and API standards',
         scope: 'project',
@@ -55,6 +57,7 @@ export const COMBOS: ComboManifest[] = [
             'i-have-adhd',
             'grill-with-docs',
             'grill-me',
+            'sparring-partner',
             'interview-me',
             'idea-refine',
             'to-tickets',
@@ -73,6 +76,7 @@ export const COMBOS: ComboManifest[] = [
             'source-driven-development',
             'resolving-merge-conflicts',
             'karpathy-ste100-discipline',
+            'task-lifecycle-resolution',
         ],
         rules: ['nest-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
         workflows: [
@@ -88,7 +92,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'only-one-flow',
-        version: '0.0.11',
+        version: '0.0.12',
         name: 'Only One Universal Flow Setup',
         description: 'Stack-agnostic end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, testing, and review',
         scope: 'global',
@@ -97,6 +101,7 @@ export const COMBOS: ComboManifest[] = [
             'i-have-adhd',
             'grill-with-docs',
             'grill-me',
+            'sparring-partner',
             'interview-me',
             'idea-refine',
             'domain-modeling',
@@ -121,6 +126,7 @@ export const COMBOS: ComboManifest[] = [
             'code-review-and-quality',
             'karpathy-ste100-discipline',
             'only-one-pr-git-skill',
+            'task-lifecycle-resolution',
         ],
         rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
         workflows: [
