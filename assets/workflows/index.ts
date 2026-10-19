@@ -2,20 +2,8 @@ import type { WorkflowManifest } from '../types.js';
 
 export const WORKFLOWS: WorkflowManifest[] = [
     {
-        name: 'only-one',
-        version: '0.0.2',
-        description:
-            'Triage user intent, inspect workspace state, and route to the matching specialized workflow.',
-        requiredSkills: [
-            'i-have-adhd',
-            'karpathy-ste100-discipline',
-            'ponytail',
-            'doubt-driven-development',
-        ],
-    },
-    {
         name: 'only-one-idea',
-        version: '0.0.10',
+        version: '0.0.11',
         description:
             'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         requiredSkills: [
@@ -34,7 +22,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-plan',
-        version: '0.0.13',
+        version: '0.0.14',
         description:
             'Research current code and create a focused, diff-centric implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification.',
         requiredSkills: [
@@ -54,7 +42,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.12',
+        version: '0.0.13',
         description:
             'Implement tasks from an approved plan.md, debug.md, or selected findings in review.md with dependency-ordered verification.',
         requiredSkills: [
@@ -69,7 +57,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-debug',
-        version: '0.0.11',
+        version: '0.0.12',
         description:
             'Perform systematic RCA in a three-section debug.md and formulate executable file-centric patch blocks with a red feedback loop.',
         requiredSkills: [
@@ -85,20 +73,20 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-review',
-        version: '0.0.3',
+        version: '0.0.4',
         description: 'Run Open CodeReview and produce selectable debug-grade executable findings.',
         requiredSkills: ['sparring-partner', 'diagnosing-bugs', 'doubt-driven-development', 'test-driven-development', 'code-simplification', 'ponytail'],
     },
     {
         name: 'only-one-conflict',
-        version: '0.0.1',
+        version: '0.0.2',
         description:
             'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
         requiredSkills: ['resolving-merge-conflicts'],
     },
     {
         name: 'only-one-pr-git',
-        version: '0.0.2',
+        version: '0.0.3',
         description:
             'Create or update a GitHub PR from the current branch using validated Git state and GitHub MCP.',
         requiredSkills: ['only-one-pr-git-skill'],
@@ -106,7 +94,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-clean',
-        version: '0.0.5',
+        version: '0.0.6',
         description:
             'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
         requiredSkills: [
@@ -119,7 +107,7 @@ export const WORKFLOWS: WorkflowManifest[] = [
     },
     {
         name: 'only-one-flash',
-        version: '0.0.7',
+        version: '0.0.8',
         description:
             'Execute small, rapid tasks with zero disk plan footprint, compact in-chat File Changes, a user confirmation review gate, and fast verification.',
         requiredSkills: [

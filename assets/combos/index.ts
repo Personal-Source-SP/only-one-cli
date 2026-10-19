@@ -3,7 +3,7 @@ import type { ComboManifest } from '../types.js';
 export const COMBOS: ComboManifest[] = [
     {
         id: 'frontend-flow',
-        version: '0.0.10',
+        version: '0.0.11',
         name: 'Frontend Flow Setup',
         description: 'Next.js and React frontend development toolkit',
         scope: 'project',
@@ -34,7 +34,6 @@ export const COMBOS: ComboManifest[] = [
         ],
         rules: ['next-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
         workflows: [
-            'only-one',
             'only-one-idea',
             'only-one-plan',
             'only-one-apply',
@@ -47,7 +46,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'backend-flow',
-        version: '0.0.10',
+        version: '0.0.11',
         name: 'Backend Flow Setup',
         description: 'NestJS backend development toolkit with architecture design, security audit, and API standards',
         scope: 'project',
@@ -77,7 +76,6 @@ export const COMBOS: ComboManifest[] = [
         ],
         rules: ['nest-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
         workflows: [
-            'only-one',
             'only-one-idea',
             'only-one-plan',
             'only-one-apply',
@@ -90,7 +88,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'only-one-flow',
-        version: '0.0.10',
+        version: '0.0.11',
         name: 'Only One Universal Flow Setup',
         description: 'Stack-agnostic end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, testing, and review',
         scope: 'global',
@@ -126,7 +124,6 @@ export const COMBOS: ComboManifest[] = [
         ],
         rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
         workflows: [
-            'only-one',
             'only-one-idea',
             'only-one-plan',
             'only-one-apply',
