@@ -4,15 +4,11 @@ import { cursorCommandAdapter } from '@src/core/command-generation/adapters/curs
 import { generateCommand } from '@src/core/command-generation/generator.js';
 import {
     AgentWorkflowCommandId,
-    CLOCKIFY_DEFAULT_TASKS_PER_DAY,
-    INTRANET_DEFAULT_TASKS_PER_DAY,
     PR_GIT_DEFAULT_BRANCH,
     PR_GIT_DEFAULT_TAG,
     SUPPORTED_PR_GIT_TAGS,
     buildAgentWorkflowCommandContents,
     buildUiCommandContent,
-    buildClockifyCommandContent,
-    buildIntranetCommandContent,
     buildPrGitCommandContent,
 } from '@src/core/templates/agent-workflows.js';
 import { normalizeStructureCommandPath } from '@src/core/agent/command-path.js';
@@ -32,31 +28,6 @@ describe('agent workflow command sources', () => {
         expect(command.body).toContain('github');
     });
 
-    it('defines clockify required option contract', () => {
-        const command = buildClockifyCommandContent();
-
-        expect(command.id).toBe(AgentWorkflowCommandId.Clockify);
-        expect(command.body).toContain('--date <DD/MM/YYYY>');
-        expect(command.body).toContain('--project <project-name>');
-        expect(command.body).toContain(`Default: \`${CLOCKIFY_DEFAULT_TASKS_PER_DAY}\``);
-        expect(command.body).toContain('--validate');
-        expect(command.body).toContain('only-one-clockify-skill');
-        expect(command.body).toContain('clockify');
-    });
-
-    it('defines intranet required option contract and reporting', () => {
-        const command = buildIntranetCommandContent();
-
-        expect(command.id).toBe(AgentWorkflowCommandId.Intranet);
-        expect(command.body).toContain('--date <DD/MM/YYYY>');
-        expect(command.body).toContain('--project <project-name>');
-        expect(command.body).toContain(`Default: \`${INTRANET_DEFAULT_TASKS_PER_DAY}\``);
-        expect(command.body).toContain('--validate');
-        expect(command.body).toContain('only-one-intranet-skill');
-        expect(command.body).toContain('zodinet-timesheet');
-        expect(command.body).toContain('get_my_timesheet_summary');
-    });
-
     it('defines UI workflow approval and viewport validation', () => {
         const command = buildUiCommandContent();
 
@@ -69,12 +40,7 @@ describe('agent workflow command sources', () => {
     });
 
     it('exports all workflow commands in deterministic order', () => {
-        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual([
-            'only-one-pr-git',
-            'only-one-clockify',
-            'only-one-intranet',
-            'only-one-ui',
-        ]);
+        expect(buildAgentWorkflowCommandContents().map((command) => command.id)).toEqual(['only-one-pr-git', 'only-one-ui']);
     });
 });
 

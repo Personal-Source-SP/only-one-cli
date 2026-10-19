@@ -16,7 +16,7 @@ describe('Workflow Command Unit & Integration Tests', () => {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
                     if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
-                    if (opts.message.includes('workflows to add')) return ['only-one-clockify'];
+                    if (opts.message.includes('workflows to add')) return ['only-one-pr-git'];
                     return [];
                 },
             },
@@ -54,10 +54,10 @@ describe('Workflow Command Unit & Integration Tests', () => {
 
         const cmd = createWorkflowCommand(deps as ProgramDeps);
         // Cài đặt trực tiếp qua đối số
-        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-clockify']);
+        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-pr-git']);
 
-        const workflowDest = join(testProjectDir, '.agents/workflows/only-one-clockify.md');
-        const skillDest = join(testProjectDir, '.agents/skills/only-one-clockify-skill/SKILL.md');
+        const workflowDest = join(testProjectDir, '.agents/workflows/only-one-pr-git.md');
+        const skillDest = join(testProjectDir, '.agents/skills/only-one-pr-git-skill/SKILL.md');
 
         expect(existsSync(workflowDest)).toBe(true);
         expect(existsSync(skillDest)).toBe(false);

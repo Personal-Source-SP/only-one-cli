@@ -21,7 +21,7 @@ import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
 import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import { generateCommand } from '@/core/command-generation/generator.js';
 import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
-import { buildPrGitCommandContent, buildClockifyCommandContent } from '@/core/templates/agent-workflows.js';
+import { buildPrGitCommandContent } from '@/core/templates/agent-workflows.js';
 import { parseJsoncObject } from '@/core/vs/json.js';
 import { cursorMcpAdapter, antigravityMcpAdapter } from '@/core/mcp/adapters.js';
 import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
@@ -461,7 +461,6 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                 let secretKey: string | undefined;
                 let usageNote: string | undefined;
                 if (mcpId === 'github') secretKey = 'GITHUB_PERSONAL_ACCESS_TOKEN';
-                else if (mcpId === 'clockify') secretKey = 'CLOCKIFY_API_KEY';
 
                 return {
                     id: wf.name,

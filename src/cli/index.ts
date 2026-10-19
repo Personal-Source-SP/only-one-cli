@@ -65,7 +65,7 @@ export function createProgram(deps: ProgramDeps) {
                 `  ${COLORS.cli.command('$ only-one skill --tool cursor')}               # Manage/sync custom agent skills for Cursor\n` +
                 `  ${COLORS.cli.command('$ only-one workflow --tool cursor')}            # Manage/sync custom agent workflows for Cursor\n` +
                 `  ${COLORS.cli.command('$ only-one rule')}                              # Manage and copy persistent agent rules\n` +
-                `  ${COLORS.cli.command('$ only-one mcp github,clockify')}               # Configure global Model Context Protocol servers\n` +
+                `  ${COLORS.cli.command('$ only-one mcp github,postgres')}               # Configure global Model Context Protocol servers\n` +
                 `  ${COLORS.cli.command('$ only-one package ui-ux-pro-max-cli')}         # Install specialized CLI packages and skill sets\n` +
                 `  ${COLORS.cli.command('$ only-one git --snippets nvm,git-alias')}      # Sync shell profiles (.bashrc/.zshrc) and aliases\n` +
                 `  ${COLORS.cli.command('$ only-one structure-generate')}                # Scaffold structural blueprint files for agents\n` +

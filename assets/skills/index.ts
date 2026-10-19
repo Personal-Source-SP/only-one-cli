@@ -252,18 +252,6 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
     },
     {
-        name: 'only-one-clockify-skill',
-        version: '0.0.1',
-        description: 'Validate and log Clockify time entries from task lines.',
-        sourceType: 'local',
-    },
-    {
-        name: 'only-one-intranet-skill',
-        version: '0.0.1',
-        description: 'Validate and log Intranet timesheet entries from task lines using zodinet-timesheet MCP.',
-        sourceType: 'local',
-    },
-    {
         name: 'only-one-pr-git-skill',
         version: '0.0.1',
         description: 'Create or update a GitHub Pull Request from current branch.',

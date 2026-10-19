@@ -35,7 +35,7 @@ export const MAIN_MENU_ITEMS: MenuItem[] = [
         label: 'Configure MCP Servers (mcp)',
         value: 'mcp',
         icon: '🌐',
-        description: 'Configure global Model Context Protocol servers (GitHub, Clockify, etc.)',
+        description: 'Configure global Model Context Protocol servers (GitHub, Playwright, etc.)',
     },
     {
         label: 'Sync Editor Settings (setting-vs)',
@@ -123,7 +123,7 @@ export const MCP_MENU_ITEMS: MenuItem[] = [
         label: 'View Registered MCP Servers',
         value: 'list',
         icon: '🔍',
-        description: 'Check status of GitHub, Clockify, and custom MCP servers',
+        description: 'Check status of GitHub, Playwright, and custom MCP servers',
     },
     {
         label: 'Sync MCP Configurations',

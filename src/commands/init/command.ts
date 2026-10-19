@@ -114,7 +114,7 @@ export function createInitCommand(deps: ProgramDeps): Command {
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
-                `  ${COLORS.cli.command('$ only-one init mcp github,clockify --ide antigravity,claude,cursor,codex')}\n` +
+                `  ${COLORS.cli.command('$ only-one init mcp github,postgres --ide antigravity,claude,cursor,codex')}\n` +
                 `  ${COLORS.cli.command('$ only-one init mcp')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - ${COLORS.dim('MCP config is global and supports Antigravity, Claude, Cursor, and Codex.')}\n` +

@@ -3,7 +3,7 @@ import type { WorkflowManifest } from '../types.js';
 export const WORKFLOWS: WorkflowManifest[] = [
     {
         name: 'only-one',
-        version: '0.0.1',
+        version: '0.0.2',
         description:
             'Triage user intent, inspect workspace state, and route to the matching specialized workflow.',
         requiredSkills: [
@@ -95,21 +95,6 @@ export const WORKFLOWS: WorkflowManifest[] = [
         description:
             'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
         requiredSkills: ['resolving-merge-conflicts'],
-    },
-    {
-        name: 'only-one-clockify',
-        version: '0.0.1',
-        description: 'Validate and log Clockify tasks using only-one-clockify-skill and Clockify MCP.',
-        requiredSkills: ['only-one-clockify-skill'],
-        requiredMcps: ['clockify'],
-    },
-    {
-        name: 'only-one-intranet',
-        version: '0.0.1',
-        description:
-            'Validate, log Intranet timesheet entries, and output monthly summary using only-one-intranet-skill and zodinet-timesheet MCP.',
-        requiredSkills: ['only-one-intranet-skill'],
-        requiredMcps: ['zodinet-timesheet'],
     },
     {
         name: 'only-one-pr-git',

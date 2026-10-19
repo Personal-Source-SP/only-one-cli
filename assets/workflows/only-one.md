@@ -60,7 +60,6 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 | Code quality audit, uncommitted review, PR inspection | Open CodeReview | `/only-one-review` |
 | Stale task archive, outdated docs cleanup | Repo Maintenance | `/only-one-clean` |
 | Git branch ready for Pull Request | PR Submission | `/only-one-pr-git` |
-| Timesheet logging or daily work tracking | Time Logging | `/only-one-clockify` \| `/only-one-intranet` |
 
 ---
 

@@ -28,4 +28,11 @@ describe('MCP Registry & Predefined Manifests', () => {
         const memoryMcp = manifests.find((m) => m.id === 'memory');
         expect(memoryMcp).toBeUndefined();
     });
+
+    it('ensures clockify and zodinet-timesheet MCPs are excluded from active manifests', async () => {
+        const { manifests } = await readMcpManifests();
+        expect(manifests.find((m) => m.id === 'clockify')).toBeUndefined();
+        expect(manifests.find((m) => m.id === 'zodinet-timesheet')).toBeUndefined();
+        expect(manifests).toHaveLength(5);
+    });
 });

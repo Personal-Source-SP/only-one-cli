@@ -235,12 +235,12 @@ describe('init command', () => {
                 stdout: (line) => writes.push(line),
             });
 
-            await program.parseAsync(['init', 'mcp', 'github,clockify', '--ide', 'cursor'], { from: 'user' });
+            await program.parseAsync(['init', 'mcp', 'github,postgres', '--ide', 'cursor'], { from: 'user' });
 
             const output = writes.join('\n').replace(/\u001b\[\d+m/g, '');
             expect(output).toContain('Cursor (');
             expect(output).toContain('github: added');
-            expect(output).toContain('clockify: added');
+            expect(output).toContain('postgres: added');
 
             const cursorConfigPath = join(tempHome, '.cursor', 'mcp.json');
             const { existsSync } = await import('node:fs');
@@ -274,9 +274,9 @@ describe('init command', () => {
 
         try {
             const mockCheckbox = vi.fn().mockImplementation(async (opts: any) => {
-                if (opts?.message?.includes('Select MCP servers')) return ['github', 'clockify'];
+                if (opts?.message?.includes('Select MCP servers')) return ['github', 'postgres'];
                 if (opts?.message?.includes('Select IDEs')) return ['cursor'];
-                return ['github', 'clockify'];
+                return ['github', 'postgres'];
             });
             const program = createProgram({
                 cwd,
@@ -296,7 +296,7 @@ describe('init command', () => {
             expect(mockCheckbox).toHaveBeenCalled();
             const output = writes.join('\n').replace(/\u001b\[\d+m/g, '');
             expect(output).toContain('github: skipped');
-            expect(output).toContain('clockify: added');
+            expect(output).toContain('postgres: added');
 
             const cursorConfig = JSON.parse(await import('node:fs/promises').then((fs) => fs.readFile(cursorMcpPath, 'utf-8')));
             expect(cursorConfig.mcpServers.github.command).toBe('existing-command');

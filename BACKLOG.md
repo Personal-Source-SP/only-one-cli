@@ -6,7 +6,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 
 - [x] **Project initialization** — `init` chạy luồng cài đặt workspace theo bước, hỗ trợ chọn agent target, bỏ qua bước, và xác nhận trước khi thực thi.
 - [x] **Package installer** — `package` và `init package` cài package từ typed registry: `ui-ux-pro-max-cli`, `wondelai/skills/system-design`, `ux-flow-designer`.
-- [x] **Combo setup** — `combo` và `init combo` cài bộ bundle cấu hình định sẵn: `frontend-flow`, `backend-flow`, `full-sdlc-flow`, `git-timesheet-flow`, `mcp-flow`.
+- [x] **Combo setup** — `combo` và `init combo` cài bộ bundle cấu hình định sẵn: `frontend-flow`, `backend-flow`, `full-sdlc-flow`, `git-flow`, `mcp-flow`.
 - [x] **Agent target selection** — Hỗ trợ 4 agent targets chính: Antigravity, Claude, Cursor, Codex; tự động kiểm tra và reject target không hợp lệ trước khi áp dụng side effect.
 - [x] **Machine-readable output** — Hỗ trợ `--json` cho command output.
 - [x] **Environment diagnostics** — `doctor` kiểm tra trạng thái môi trường (Node.js, Git, CLI paths).
@@ -16,22 +16,20 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 
 - [x] **Remote skill synchronization** — Tự động fetch và inspect remote skills từ GitHub (`addyosmani/agent-skills`, `mattpocock/skills`, `bdfinst/agentic-dev-team`) và lưu trữ lockfile tại `only-one/skills-lock.json`.
 - [x] **Lockfile multi-path resolution** — Tự động phát hiện và migrate lockfile linh hoạt giữa thư mục gốc và thư mục `only-one/`.
-- [x] **Curated SDLC skills (22 skills)**:
+- [x] **Curated SDLC skills (20 skills)**:
   - *Define*: `interview-me`, `idea-refine`, `spec-driven-development`, `grill-me`.
   - *Architecture & Design*: `c4-diagrams`, `api-and-interface-design`, `frontend-ui-engineering`, `source-driven-development`, `doubt-driven-development`, `gherkin-authoring`.
   - *Build & Implementation*: `context-engineering`, `incremental-implementation`, `test-driven-development`, `debugging-and-error-recovery`.
   - *Review & Quality*: `code-review-and-quality`, `code-simplification`, `security-and-hardening`, `performance-optimization`.
-  - *Local Custom*: `only-one-nestjs-development`, `only-one-nextjs-development`, `only-one-clockify-skill`, `only-one-intranet-skill`, `only-one-pr-git-skill`.
+  - *Local Custom*: `only-one-nestjs-development`, `only-one-nextjs-development`, `only-one-pr-git-skill`.
 - [x] **Task lifecycle management**:
   - `only-one-clean`: tự động lưu trữ task đã hoàn thành (`status: done`), chưng cất rules, tổng hợp archive cùng miền, và đối chiếu logic sâu với codebase thực tế.
-- [x] **Standardized SDLC workflows (9 workflows)**:
+- [x] **Standardized SDLC workflows (7 workflows)**:
   - `only-one-idea`: làm rõ và thẩm định ý tưởng ban đầu trước khi lập kế hoạch.
   - `only-one-plan`: nghiên cứu codebase và tạo kế hoạch 5 phần (User Review, Open Questions, Proposed Changes, Verification Plan, Automated Tests).
   - `only-one-apply`: triển khai từng file theo plan đã duyệt, TDD, tự động tạo walkthrough documentation.
   - `only-one-debug`: phân tích RCA 5 bước và sửa lỗi tối giản kèm kiểm chứng.
   - `only-one-review`: OCR review theo branch/changes/commit, tạo executable findings để người dùng chọn sửa qua `only-one-apply`.
-  - `only-one-clockify`: xác thực task time entry GMT+7 và log vào Clockify qua MCP.
-  - `only-one-intranet`: xác thực và log timesheet Intranet, xuất báo cáo tháng qua `zodinet-timesheet` MCP.
   - `only-one-pr-git`: tạo/cập nhật GitHub Pull Request với pre-review quality gates.
   - `only-one-clean`: quản lý toàn diện vòng đời task, lưu trữ và thanh lọc tri thức hệ thống.
 - [x] **Full TUI command parity** — `only-one tui` giao diện terminal tương tác 1-1 với toàn bộ 13 subcommands thông qua Ink components (`ComboView`, `WorkflowView`, `RuleView`, `StructureView`, `UpdateView`, `DoctorView`, `McpView`, `SkillView`, `InitView`, `GitView`, `SettingsView`).
@@ -42,7 +40,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 - [x] **MCP sync** — `mcp` và `init mcp` chọn MCP server và merge config vào Antigravity, Claude, Cursor, Codex.
 - [x] **Multi-format config** — Đọc/ghi JSON (Antigravity, Claude, Cursor) và TOML (Codex).
 - [x] **Pre-write validation** — Dừng trước khi ghi nếu file cấu hình hiện tại bị malformed/syntax error.
-- [x] **MCP registry** — Cung cấp sẵn manifests: `clockify`, `fetch`, `github`, `postgres`, `tavily`, `zodinet-timesheet`.
+- [x] **MCP registry** — Cung cấp sẵn manifests: `fetch`, `github`, `playwright-browser`, `postgres`, `tavily`.
 
 ## Đã có — Editor synchronization
 

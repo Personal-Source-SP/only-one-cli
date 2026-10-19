@@ -62,7 +62,7 @@ only-one combo [path] [names]
 only-one combo frontend-flow
 only-one combo backend-flow
 only-one combo full-sdlc-flow
-only-one combo git-timesheet-flow
+only-one combo git-flow
 only-one combo mcp-flow
 ```
 
@@ -70,8 +70,8 @@ Predefined combos include:
 
 - `frontend-flow`: Next.js & React frontend toolkit with UI engineering and verification workflows.
 - `backend-flow`: NestJS backend toolkit with architecture design, security hardening, and API standards.
-- `full-sdlc-flow`: End-to-end SDLC enterprise toolkit (Ideation, 5-section planning, quality gates, timesheets, and review).
-- `git-timesheet-flow`: GitHub PR, Clockify, and Intranet Timesheet logging integration.
+- `full-sdlc-flow`: End-to-end SDLC enterprise toolkit (Ideation, 5-section planning, quality gates, and review).
+- `git-flow`: GitHub PR automation toolkit.
 - `mcp-flow`: Complete Model Context Protocol (MCP) server suite.
 
 ### `skill`
@@ -100,8 +100,6 @@ Standardized workflows include:
 - `only-one-debug`: Systematic 5-step Root Cause Analysis (RCA) and minimal verified bug fixes.
 - `only-one-review`: Open CodeReview for branch, uncommitted changes, or commit changes with selectable executable fixes via `only-one-apply`.
 - `only-one-clean`: Consolidate related archives and purge stale task files.
-- `only-one-clockify`: Validate task time entries and log to Clockify.
-- `only-one-intranet`: Validate and log Intranet timesheet entries with monthly summary output.
 - `only-one-pr-git`: Create or update GitHub PRs with quality gate checks.
 
 ### `rule`
@@ -124,7 +122,7 @@ Merge global MCP server definitions into supported agent configurations.
 
 ```bash
 only-one mcp [names] --ide antigravity,claude,cursor,codex
-only-one mcp github,clockify,zodinet-timesheet,tavily,fetch,postgres
+only-one mcp github,tavily,fetch,postgres,playwright-browser
 ```
 
 MCP synchronization supports Antigravity, Claude, Cursor, and Codex JSON or TOML formats. Existing malformed configurations are checked before writes.
@@ -210,14 +208,6 @@ Initialization can merge bundled Git, Docker, and npm ignore templates. Git igno
 ### GitHub Pull Requests
 
 `only-one-pr-git` requires its bundled skill, GitHub MCP server, and `GITHUB_PERSONAL_ACCESS_TOKEN`.
-
-### Clockify
-
-`only-one-clockify` requires its bundled skill, Clockify MCP server, and `CLOCKIFY_API_KEY`. Task lines follow `[Label] Description | start-endh`.
-
-### Intranet Timesheet
-
-`only-one-intranet` requires its bundled skill, `zodinet-timesheet` remote MCP server, and `TIMESHEET_PAT`.
 
 ### Task Lifecycle (Clean)
 

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-19T07:41:07.719Z",
+  "installed": {
+    "workflows": {
+      "only-one-idea": {
+        "version": "0.0.10",
+        "installedAt": "2026-10-19T07:41:07.719Z",
+        "updatedAt": "2026-10-19T07:41:07.719Z"
+      },
+      "only-one-plan": {
+        "version": "0.0.13",
+        "installedAt": "2026-10-19T07:41:07.719Z",
+        "updatedAt": "2026-10-19T07:41:07.719Z"
+      },
+      "only-one-apply": {
+        "version": "0.0.12",
+        "installedAt": "2026-10-19T07:41:07.719Z",
+        "updatedAt": "2026-10-19T07:41:07.719Z"
+      },
+      "only-one-clean": {
+        "version": "0.0.5",
+        "installedAt": "2026-10-19T07:41:07.719Z",
+        "updatedAt": "2026-10-19T07:41:07.719Z"
+      },
+      "only-one-debug": {
+        "version": "0.0.11",
+        "installedAt": "2026-10-19T07:41:07.719Z",
+        "updatedAt": "2026-10-19T07:41:07.719Z"
+      }
+    }
+  }
+}

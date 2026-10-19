@@ -27,9 +27,9 @@ describe('Update Command Integration Tests', () => {
         };
 
         // Record a valid workflow in lockfile, but do NOT create the file on disk
-        await recordInstalledAssetsBatch(testProjectDir, [{ type: 'workflows', id: 'only-one-clockify', version: '1.0.0' }]);
+        await recordInstalledAssetsBatch(testProjectDir, [{ type: 'workflows', id: 'only-one-pr-git', version: '1.0.0' }]);
 
-        const targetFilePath = join(testProjectDir, '.agents/workflows/only-one-clockify.md');
+        const targetFilePath = join(testProjectDir, '.agents/workflows/only-one-pr-git.md');
         expect(existsSync(targetFilePath)).toBe(false);
 
         const cmd = createUpdateCommand(deps as ProgramDeps);
