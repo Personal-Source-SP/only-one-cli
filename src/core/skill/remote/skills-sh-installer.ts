@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import { cp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
@@ -26,11 +27,7 @@ export const getExternalSkillPath = (
 ): string | undefined => {
     if (isGlobal) {
         const globalPath = resolveToolDestinationPaths(tool, 'skills', projectDir, true);
-        const skillMd = join(globalPath, skillName, 'SKILL.md');
-        if (existsSync(skillMd)) return skillMd;
-        const fallbackPath = join(projectDir, '.agents', 'skills', skillName, 'SKILL.md');
-        if (existsSync(fallbackPath)) return fallbackPath;
-        return skillMd;
+        return join(globalPath, skillName, 'SKILL.md');
     }
     return tool.skillsDir ? join(projectDir, tool.skillsDir, 'skills', skillName, 'SKILL.md') : undefined;
 };
@@ -63,6 +60,19 @@ export async function installSkillViaSkillsCli(params: {
         timeout: 120000,
         shell: process.platform === 'win32',
     });
+
+    for (const tool of selectedTools) {
+        const targetSkillDir = resolveToolDestinationPaths(tool, 'skills', projectDir, isGlobal);
+        const targetSkillPath = join(targetSkillDir, skillName);
+        const localSkillPath = join(projectDir, '.agents', 'skills', skillName);
+
+        if (targetSkillPath !== localSkillPath && existsSync(localSkillPath)) {
+            await cp(localSkillPath, targetSkillPath, { recursive: true, force: true });
+            if (isGlobal) {
+                await rm(localSkillPath, { recursive: true, force: true });
+            }
+        }
+    }
 
     const missing = selectedTools.filter((tool) => {
         const path = getExternalSkillPath(projectDir, tool, skillName, isGlobal);

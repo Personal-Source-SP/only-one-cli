@@ -109,6 +109,7 @@ export const installSkills = async (request: {
                         source: manifest.source,
                         skillName,
                         selectedTools: [tool],
+                        isGlobal,
                     });
                     await saveSkillToLockfile(
                         projectDir,

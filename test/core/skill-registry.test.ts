@@ -58,9 +58,9 @@ describe('skill registry integrity', () => {
         expect(existsSync(join(skillsDir, 'nestjs-development'))).toBe(false);
     });
 
-    it('registers the 10 curated mattpocock/skills with valid paths', () => {
+    it('registers the 9 curated mattpocock/skills with valid paths', () => {
         const mattSkills = SKILLS.filter((s) => s.source === 'mattpocock/skills');
-        expect(mattSkills).toHaveLength(10);
+        expect(mattSkills).toHaveLength(9);
 
         const expectedNames = [
             'grill-me',
@@ -72,7 +72,6 @@ describe('skill registry integrity', () => {
             'diagnosing-bugs',
             'prototype',
             'wizard',
-            'resolving-merge-conflicts',
         ];
 
         const mattSkillNames = mattSkills.map((s) => s.name);
@@ -81,6 +80,11 @@ describe('skill registry integrity', () => {
         for (const skill of mattSkills) {
             expect(skill.sourceType).toBe('skills.sh');
         }
+
+        const conflictSkill = SKILLS.find((s) => s.name === 'resolving-merge-conflicts');
+        expect(conflictSkill).toBeDefined();
+        expect(conflictSkill?.source).toBe('warpdotdev/common-skills');
+        expect(conflictSkill?.sourceType).toBe('skills.sh');
     });
 
     it('does not ship obsolete subagent-driven-development', () => {

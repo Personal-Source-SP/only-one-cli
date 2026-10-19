@@ -182,11 +182,11 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'resolving-merge-conflicts',
-        version: '0.0.1',
+        version: '0.0.2',
         description: 'Resolve git merge/rebase conflicts hunk by hunk based on intent.',
-        source: 'mattpocock/skills',
+        source: 'warpdotdev/common-skills',
         sourceType: 'skills.sh',
-        skillPath: 'skills/engineering/resolving-merge-conflicts/SKILL.md',
+        skillPath: 'skills/resolve-merge-conflicts/SKILL.md',
     },
 
     // --- 5. Review & Quality Gates Phase ---
