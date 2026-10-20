@@ -17,6 +17,13 @@ This skill guides the discovery phase by conducting focused interviews, challeng
 
 If input does not describe the idea or problem, ask a focused question before proceeding.
 
+## Available Scripts
+
+- **`scripts/scaffold-concept.ts`**: Deterministically scaffolds concept.md with validated slug and STE-100 sections.
+  ```bash
+  npx tsx assets/skills/only-one-idea/scripts/scaffold-concept.ts <slug> [Title]
+  ```
+
 ## Role & Collaboration Model
 
 ### Assigned Persona & Authority

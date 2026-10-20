@@ -25,6 +25,17 @@ This skill executes an approved plan, debug document, or review finding set with
   - If multiple found, display the list and ask the user to select.
   - If none found, report: "No active plan, debug, or review task found in only-one/tasks/." and stop.
 
+## Available Scripts
+
+- **`scripts/plan-status.ts`**: Fast deterministic task parser and DAG execution wave calculator.
+  ```bash
+  npx tsx assets/skills/only-one-apply/scripts/plan-status.ts <path-to-plan.md>
+  ```
+- **`scripts/record-improvement.ts`**: Appends in-task friction notes deterministically.
+  ```bash
+  npx tsx assets/skills/only-one-apply/scripts/record-improvement.ts <slug> <skill> <deficiency> <cause>
+  ```
+
 ## Role
 
 ### Assigned Persona & Authority
@@ -194,11 +205,19 @@ Execute wave-by-wave until all tasks are marked `[x]`:
    - Output a clean, structured walkthrough summary directly in the chat response.
    - ❌ **Strict No-Extra-File Invariant**: Do NOT create a separate `walkthrough.md` file on disk.
 
+4. **Capture In-Task Friction Points & Opportunities (`improvements.md`)**:
+   - If test failures, lint retries, or user corrective prompts occurred during task execution:
+     - Execute:
+       ```bash
+       npx tsx assets/skills/only-one-apply/scripts/record-improvement.ts <slug> <target-skill> "<deficiency>" "<root-cause>"
+       ```
+   - If execution completed 100% cleanly without friction or user corrections, omit this file.
+
 ---
 
 ## Guardrails
 
-- **🛑 Strict Task Document Invariant (Zero walkthrough.md Creation)**: Each task folder must contain ONLY `concept.md` and `plan.md` (or `debug.md`). Never generate a separate `walkthrough.md` file on disk. Present walkthrough results directly in the conversation response.
+- **🛑 Strict Task Document Invariant (Zero walkthrough.md Creation)**: Each task folder must contain ONLY `concept.md`, `plan.md` (or `debug.md`), and optional `improvements.md`. Never generate a separate `walkthrough.md` file on disk. Present walkthrough results directly in the conversation response.
 - **🛑 Strict Tech Skill & Rule Adherence**: Applied code must strictly adhere to active language/tech skills and repository rules. Agent MUST NOT write arbitrary code based on personal assumptions.
 - **Enforce Reuse-First Verification**: Always inspect target file imports and utilize project shared utilities; never duplicate existing code.
 - Prioritize parsing ordered Section 2 file task blocks identically for `plan.md` and `debug.md`.

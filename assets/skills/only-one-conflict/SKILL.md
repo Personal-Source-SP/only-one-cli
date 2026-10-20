@@ -15,6 +15,13 @@ This skill guides interactive conflict resolution by analyzing both branches' in
 /only-one-conflict
 ```
 
+## Available Scripts
+
+- **`scripts/scan-conflicts.ts`**: Scans the workspace deterministically for merge conflict markers (`<<<<<<<`).
+  ```bash
+  npx tsx assets/skills/only-one-conflict/scripts/scan-conflicts.ts
+  ```
+
 ## Role
 
 ### Assigned Persona & Authority

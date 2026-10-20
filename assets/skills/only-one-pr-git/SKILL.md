@@ -19,6 +19,13 @@ This skill prepares, validates, and publishes GitHub pull requests from local br
 - `--tag`: Conventional Commit type. Default: `feat`.
 - Supported tags: `feat`, `fix`, `refactor`, `style`, `chore`, `docs`, `test`, `perf`, `ci`, `build`.
 
+## Available Scripts
+
+- **`scripts/check-git-status.ts`**: Deterministically checks branch readiness, uncommitted files, and unpushed commits.
+  ```bash
+  npx tsx assets/skills/only-one-pr-git/scripts/check-git-status.ts
+  ```
+
 ## Role
 
 ### Assigned Persona & Authority

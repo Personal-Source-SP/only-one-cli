@@ -7,7 +7,7 @@ description: Use when consolidating related archives, verifying deep logic again
 
 ## Overview
 
-This skill resolves finished tasks, updates consolidated knowledge archives in only-one/archives/, and purges stale temporary task folders.
+This skill resolves finished tasks, updates consolidated knowledge archives in only-one/archives/, stages pending skill improvements in only-one/improvements/, and purges stale temporary task folders.
 
 ## Input
 
@@ -16,6 +16,13 @@ This skill resolves finished tasks, updates consolidated knowledge archives in o
 ```
 
 - `--dry-run`: Analyze archives, preview consolidation and deletion actions without modifying files.
+
+## Available Scripts
+
+- **`scripts/auto-archive.ts`**: Deterministically scans completed tasks, stages improvements, generates archives, and cleans task folders.
+  ```bash
+  npx tsx assets/skills/only-one-clean/scripts/auto-archive.ts [--dry-run]
+  ```
 
 ## Role
 
@@ -115,7 +122,14 @@ Activate and apply these skills throughout the clean workflow:
             - **PR URL / Branch**: <PR URL or branch name>
             ```
           - Update `only-one/INDEX.md` to include `<slug>` under the Architecture Archives Catalog.
-       4. **Purge Raw Task Directory**:
+       4. **Stage Task Improvements for Skill Evolution**:
+          - Check if `only-one/tasks/<slug>/improvements.md` exists.
+          - If found:
+            - Create directory `only-one/improvements/` if it does not exist.
+            - Copy/move file to `only-one/improvements/<slug>.md`.
+            - Ensure YAML frontmatter contains `task_slug: <slug>`, `archived_at: <ISO-8601>`, and `status: pending`.
+            - Log: `[CLEAN] Staged task improvements at only-one/improvements/<slug>.md. Run /only-one-evolve to apply.`
+       5. **Purge Raw Task Directory**:
           - Confirm that `only-one/archives/<slug>.md` has been successfully created.
           - Remove the raw task directory:
             ```bash

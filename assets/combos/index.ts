@@ -88,7 +88,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'only-one-flow',
-        version: '0.0.12',
+        version: '0.0.13',
         name: 'Only One Universal Flow Setup',
         description: 'Stack-agnostic end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, testing, and review',
         scope: 'global',
@@ -131,6 +131,7 @@ export const COMBOS: ComboManifest[] = [
             'only-one-review',
             'only-one-conflict',
             'only-one-clean',
+            'only-one-evolve',
             'only-one-pr-git',
         ],
         rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],

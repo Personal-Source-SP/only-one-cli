@@ -20,6 +20,13 @@ This skill researches current codebase implementations, evaluates architectural 
 - **With `<change description>`**: Search `only-one/tasks/` for a matching task folder. If none exists and the change is complex/ambiguous, recommend running `/only-one-idea` first.
 - **If input is missing or empty**: Ask the user to provide the task folder or change description.
 
+## Available Scripts
+
+- **`scripts/validate-plan.ts`**: Deterministically verifies plan.md sections, diff syntax, and DAG dependencies.
+  ```bash
+  npx tsx assets/skills/only-one-plan/scripts/validate-plan.ts <path-to-plan.md>
+  ```
+
 ## Role
 
 ### Assigned Persona & Authority

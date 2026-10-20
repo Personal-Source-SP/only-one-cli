@@ -99,6 +99,7 @@ Standardized workflows include:
 - `only-one-apply`: Implement tasks from an approved plan with TDD and automated walkthrough creation.
 - `only-one-debug`: Systematic 5-step Root Cause Analysis (RCA) and minimal verified bug fixes.
 - `only-one-review`: Open CodeReview for branch, uncommitted changes, or commit changes with selectable executable fixes via `only-one-apply`.
+- `only-one-evolve`: Consolidate pending task improvements and upgrade only-one-* skills with lean, verified diffs.
 - `only-one-clean`: Consolidate related archives and purge stale task files.
 - `only-one-pr-git`: Create or update GitHub PRs with quality gate checks.
 

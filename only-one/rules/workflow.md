@@ -14,8 +14,8 @@ triggers:
 - **NEVER_DO**: Modify source code, tests, or configs during scoping (`/only-one-idea`) or diagnosis (`/only-one-debug`).
 - **RATIONALE**: Prevents premature, unverified code modifications before architectural alignment.
 
-### WF-002: Strict Two-File Task Invariant & Clean Slug Directory
-- **MUST_DO**: Store task documents in `only-one/tasks/<slug>/` containing only `concept.md` and `plan.md` (or `debug.md`). Store `created_at` in frontmatter.
+### WF-002: Strict Task Directory Invariant & Clean Slug Directory
+- **MUST_DO**: Store task documents in `only-one/tasks/<slug>/` containing only `concept.md`, `plan.md` (or `debug.md`), and optional `improvements.md`. Store `created_at` in frontmatter.
 - **NEVER_DO**: Prefix task directory names with timestamps or create separate walkthrough files on disk.
 - **RATIONALE**: Keeps directory structure readable and permalinks stable across branch switches.
 

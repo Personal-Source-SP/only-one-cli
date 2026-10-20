@@ -12,6 +12,7 @@ const SDLC_SKILLS = [
     'only-one-conflict',
     'only-one-pr-git',
     'only-one-clean',
+    'only-one-evolve',
     'only-one-flash',
 ];
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
@@ -104,7 +105,7 @@ describe('skill registry integrity', () => {
         expect(existsSync(join(skillsDir, 'subagent-driven-development'))).toBe(false);
     });
 
-    it('registers all 9 core SDLC skills with valid local assets', () => {
+    it('registers all 10 core SDLC skills with valid local assets', () => {
         for (const skillName of SDLC_SKILLS) {
             const skill = SKILLS.find((s) => s.name === skillName);
             expect(skill, `SDLC skill '${skillName}' must be registered`).toBeDefined();

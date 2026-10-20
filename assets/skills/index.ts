@@ -267,7 +267,7 @@ export const SKILLS: SkillManifest[] = [
     // --- 9. SDLC Core Skills (Converged from Workflows) ---
     {
         name: 'only-one-idea',
-        version: '0.0.11',
+        version: '0.0.12',
         description: 'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         sourceType: 'local',
         requiredSkills: [
@@ -286,7 +286,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-plan',
-        version: '0.0.14',
+        version: '0.0.15',
         description: 'Research current code and create a focused, diff-centric implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification.',
         sourceType: 'local',
         requiredSkills: [
@@ -306,7 +306,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-apply',
-        version: '0.0.13',
+        version: '0.0.14',
         description: 'Implement tasks from an approved plan.md, debug.md, or selected findings in review.md with dependency-ordered verification.',
         sourceType: 'local',
         requiredSkills: [
@@ -321,7 +321,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-debug',
-        version: '0.0.12',
+        version: '0.0.13',
         description: 'Perform systematic RCA in a three-section debug.md and formulate executable file-centric patch blocks with a red feedback loop.',
         sourceType: 'local',
         requiredSkills: [
@@ -337,21 +337,21 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-review',
-        version: '0.0.4',
+        version: '0.0.5',
         description: 'Run Open CodeReview and produce selectable debug-grade executable findings.',
         sourceType: 'local',
         requiredSkills: ['sparring-partner', 'diagnosing-bugs', 'doubt-driven-development', 'test-driven-development', 'code-simplification', 'ponytail'],
     },
     {
         name: 'only-one-conflict',
-        version: '0.0.2',
+        version: '0.0.3',
         description: 'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
         sourceType: 'local',
         requiredSkills: ['resolving-merge-conflicts'],
     },
     {
         name: 'only-one-pr-git',
-        version: '0.0.3',
+        version: '0.0.4',
         description: 'Create or update a GitHub PR from the current branch using validated Git state and GitHub MCP.',
         sourceType: 'local',
         requiredSkills: ['only-one-pr-git-skill'],
@@ -359,14 +359,21 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-clean',
-        version: '0.0.6',
+        version: '0.0.7',
         description: 'Consolidate related archives, verify deep logic against codebase, and purge stale documents.',
         sourceType: 'local',
         requiredSkills: ['i-have-adhd', 'sparring-partner', 'c4-diagrams', 'ponytail', 'karpathy-ste100-discipline'],
     },
     {
-        name: 'only-one-flash',
+        name: 'only-one-evolve',
         version: '0.0.1',
+        description: 'Consolidate pending task improvements and apply lean, verified upgrades to target only-one-* skills.',
+        sourceType: 'local',
+        requiredSkills: ['i-have-adhd', 'sparring-partner', 'karpathy-ste100-discipline'],
+    },
+    {
+        name: 'only-one-flash',
+        version: '0.0.2',
         description: 'Execute small, rapid tasks with zero disk plan footprint, clean in-chat plan, and fast verification.',
         sourceType: 'local',
         requiredSkills: ['i-have-adhd', 'ponytail', 'karpathy-ste100-discipline'],
