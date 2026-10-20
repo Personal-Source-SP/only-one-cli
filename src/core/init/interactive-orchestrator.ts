@@ -23,8 +23,8 @@ export interface InitSelectionInputs {
 export async function promptInitSelectionsViaTui(projectDir: string, explicitTools?: string): Promise<InitSelectionInputs | null> {
     const React = (await import('react')).default;
     const { render } = await import('ink');
-    const { scanWorkspaceAssets } = await import('@/tui/init/services/workspaceScanner.js');
-    const { InitWizardApp } = await import('@/tui/init/InitWizardApp.js');
+    const { scanWorkspaceAssets } = await import('@/ui/init/services/workspaceScanner.js');
+    const { InitWizardApp } = await import('@/ui/init/InitWizardApp.js');
 
     const parsedTools = explicitTools ? explicitTools.split(',').map((s) => s.trim()) : ['antigravity'];
     const resources = scanWorkspaceAssets(projectDir, parsedTools);
