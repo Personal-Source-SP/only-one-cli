@@ -27,12 +27,10 @@ describe('AI_TOOLS catalog', () => {
         expect(resolveToolDestinationPaths(antigravity, 'workflows', dummyProject, false)).toBe(join(dummyProject, '.agents', 'workflows'));
 
         // Global checks
-        expect(resolveToolDestinationPaths(antigravity, 'skills', dummyHome, true)).toBe(join(dummyHome, '.gemini', 'config', 'skills'));
-        expect(resolveToolDestinationPaths(antigravity, 'workflows', dummyHome, true)).toBe(
-            join(dummyHome, '.gemini', 'config', 'workflows'),
-        );
-        expect(resolveToolDestinationPaths(claude, 'skills', dummyHome, true)).toBe(join(dummyHome, '.claude', 'skills'));
-        expect(resolveToolDestinationPaths(cursor, 'rules', dummyHome, true)).toBe(join(dummyHome, '.cursor', 'rules'));
-        expect(resolveToolDestinationPaths(codex, 'workflows', dummyHome, true)).toBe(join(dummyHome, '.codex', 'workflows'));
+        expect(resolveToolDestinationPaths(antigravity, 'skills', dummyHome, true)).toBe(join(dummyHome, '.agents', 'skills'));
+        expect(resolveToolDestinationPaths(antigravity, 'workflows', dummyHome, true)).toBe(join(dummyHome, '.agents', 'workflows'));
+        expect(resolveToolDestinationPaths(claude, 'skills', dummyHome, true)).toBe(join(dummyHome, '.agents', 'skills'));
+        expect(resolveToolDestinationPaths(cursor, 'rules', dummyHome, true)).toBe(join(dummyHome, '.agents', 'rules'));
+        expect(resolveToolDestinationPaths(codex, 'workflows', dummyHome, true)).toBe(join(dummyHome, '.agents', 'workflows'));
     });
 });

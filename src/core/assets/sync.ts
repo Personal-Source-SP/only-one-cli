@@ -33,7 +33,7 @@ const AGENT_DIRS = ['.agents', '.cursor', '.claude'];
 
 function getTargetAgentDirs(projectDir: string, isGlobal = false): string[] {
     if (isGlobal) {
-        return ['.gemini/config', '.claude', '.cursor', '.codex'];
+        return ['.agents'];
     }
     const existing = AGENT_DIRS.filter((ad) => existsSync(join(projectDir, ad)));
     return existing.length > 0 ? existing : ['.agents'];

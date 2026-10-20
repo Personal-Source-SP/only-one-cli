@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
 import { resolveToolDestinationPaths, type AgentToolOption } from '@/core/agent/tools.js';
+import { syncGlobalSkillsManifest } from '../manifest-bridge.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -80,5 +81,9 @@ export async function installSkillViaSkillsCli(params: {
     });
     if (missing.length > 0) {
         throw new Error(`External skill '${skillName}' missing after install for: ${missing.map((tool) => tool.value).join(', ')}`);
+    }
+
+    if (isGlobal) {
+        await syncGlobalSkillsManifest(projectDir);
     }
 }

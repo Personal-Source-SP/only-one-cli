@@ -42,8 +42,10 @@ describe('Global Commands Integration (--global flag)', () => {
         const cmd = createSkillCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', tempHome, 'c4-diagrams', '--tool', 'antigravity', '--global']);
 
-        const skillDest = join(tempHome, '.gemini/config/skills/c4-diagrams/SKILL.md');
+        const skillDest = join(tempHome, '.agents/skills/c4-diagrams/SKILL.md');
         expect(existsSync(skillDest)).toBe(true);
+        expect(existsSync(join(tempHome, '.agents/skills.json'))).toBe(true);
+        expect(existsSync(join(tempHome, '.gemini/config/skills.json'))).toBe(true);
 
         const lockPath = resolveInstalledLockfilePath(tempHome, true);
         expect(existsSync(lockPath)).toBe(true);
@@ -65,7 +67,7 @@ describe('Global Commands Integration (--global flag)', () => {
         const cmd = createWorkflowCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', tempHome, 'only-one-idea', '--tool', 'antigravity', '--global']);
 
-        const wfDest = join(tempHome, '.gemini/config/workflows/only-one-idea.md');
+        const wfDest = join(tempHome, '.agents/workflows/only-one-idea.md');
         expect(existsSync(wfDest)).toBe(true);
 
         const lock = await readInstalledLockfile(tempHome, true);
@@ -83,7 +85,7 @@ describe('Global Commands Integration (--global flag)', () => {
         const cmd = createRuleCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', tempHome, 'next-architecture-stack', '--tool', 'antigravity', '--global']);
 
-        const ruleDest = join(tempHome, '.gemini/config/rules/02-next-architecture-stack.md');
+        const ruleDest = join(tempHome, '.agents/rules/02-next-architecture-stack.md');
         expect(existsSync(ruleDest)).toBe(true);
 
         const lock = await readInstalledLockfile(tempHome, true);
@@ -101,7 +103,7 @@ describe('Global Commands Integration (--global flag)', () => {
         const cmd = createComboCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', tempHome, 'git-flow', '--tool', 'antigravity', '--global']);
 
-        const wfDest = join(tempHome, '.gemini/config/workflows/only-one-pr-git.md');
+        const wfDest = join(tempHome, '.agents/workflows/only-one-pr-git.md');
         expect(existsSync(wfDest)).toBe(true);
 
         const lock = await readInstalledLockfile(tempHome, true);

@@ -23,19 +23,7 @@ export function resolveToolDestinationPaths(
         return join(targetDir, tool.rulesDir || (tool.skillsDir ? join(tool.skillsDir, 'rules') : '.agents/rules'));
     }
 
-    if (tool.value === 'antigravity') {
-        return join(targetDir, '.gemini/config', assetType);
-    }
-    if (tool.value === 'claude') {
-        return join(targetDir, '.claude', assetType);
-    }
-    if (tool.value === 'cursor') {
-        return join(targetDir, '.cursor', assetType);
-    }
-    if (tool.value === 'codex') {
-        return join(targetDir, '.codex', assetType);
-    }
-    return join(targetDir, tool.skillsDir || '.agents', assetType);
+    return join(targetDir, '.agents', assetType);
 }
 
 export const AI_TOOLS: AgentToolOption[] = [
