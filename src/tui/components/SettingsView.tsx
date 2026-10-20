@@ -1,6 +1,8 @@
 import { Box, Text, useInput } from 'ink';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+import { isHerdrSessionActive, listHerdrAgents, normalizePhaseRoute } from '../services/herdrService.js';
 import type { OnlyOneGlobalConfig } from '../types/config.js';
+import type { HerdrAgent } from '../types/task.js';
 
 type SettingsViewProps = {
     initialConfig: OnlyOneGlobalConfig;
@@ -8,11 +10,20 @@ type SettingsViewProps = {
     onClose: () => void;
 };
 
-const AGENT_OPTIONS = ['antigravity', 'claude', 'codex', 'claudecode'];
+const SUPPORTED_CLI_TOOLS = ['agy', 'codex', 'claude', 'cursor', 'gemini'];
 
 export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onClose }) => {
     const [config, setConfig] = useState<OnlyOneGlobalConfig>(initialConfig);
+    const [herdrAgents, setHerdrAgents] = useState<HerdrAgent[]>([]);
     const [focusIndex, setFocusIndex] = useState(0);
+
+    useEffect(() => {
+        listHerdrAgents().then((agents) => {
+            if (agents.length > 0) {
+                setHerdrAgents(agents);
+            }
+        });
+    }, []);
 
     const settingItems = [
         { id: 'clean_enabled', label: 'Bật tự động dọn dẹp (Auto-Clean)' },
@@ -21,6 +32,8 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
         { id: 'agent_plan', label: "Agent cho Phase 'plan'" },
         { id: 'agent_apply', label: "Agent cho Phase 'apply'" },
         { id: 'agent_debug', label: "Agent cho Phase 'debug'" },
+        { id: 'agent_review', label: "Agent cho Phase 'review'" },
+        { id: 'agent_clean', label: "Agent cho Tác vụ 'clean'" },
         { id: 'herdr_direction', label: 'Hướng chia màn hình Herdr (Split)' },
     ];
 
@@ -68,13 +81,42 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
             }
         } else if (currentItem?.startsWith('agent_')) {
             const phase = currentItem.replace('agent_', '') as keyof OnlyOneGlobalConfig['agentRouting'];
-            const currentAgent = config.agentRouting[phase] || 'antigravity';
-            const idx = AGENT_OPTIONS.indexOf(currentAgent);
-            const nextIdx = (idx + 1) % AGENT_OPTIONS.length;
-            setConfig((prev) => ({
-                ...prev,
-                agentRouting: { ...prev.agentRouting, [phase]: AGENT_OPTIONS[nextIdx] },
-            }));
+            const currentRoute = normalizePhaseRoute(config.agentRouting[phase]);
+            const availablePanes = ['auto', ...herdrAgents.map((a) => a.pane_id).filter(Boolean)];
+
+            // [←/→]: Đổi Target Pane
+            if (key.leftArrow) {
+                const pIdx = availablePanes.indexOf(currentRoute.pane);
+                const nextPIdx = pIdx > 0 ? pIdx - 1 : availablePanes.length - 1;
+                setConfig((prev) => ({
+                    ...prev,
+                    agentRouting: {
+                        ...prev.agentRouting,
+                        [phase]: { ...currentRoute, pane: availablePanes[nextPIdx] },
+                    },
+                }));
+            } else if (key.rightArrow) {
+                const pIdx = availablePanes.indexOf(currentRoute.pane);
+                const nextPIdx = (pIdx + 1) % availablePanes.length;
+                setConfig((prev) => ({
+                    ...prev,
+                    agentRouting: {
+                        ...prev.agentRouting,
+                        [phase]: { ...currentRoute, pane: availablePanes[nextPIdx] },
+                    },
+                }));
+                // [Space/Enter]: Đổi CLI Tool
+            } else if (input === ' ' || key.return) {
+                const cIdx = SUPPORTED_CLI_TOOLS.indexOf(currentRoute.cli);
+                const nextCIdx = (cIdx + 1) % SUPPORTED_CLI_TOOLS.length;
+                setConfig((prev) => ({
+                    ...prev,
+                    agentRouting: {
+                        ...prev.agentRouting,
+                        [phase]: { ...currentRoute, cli: SUPPORTED_CLI_TOOLS[nextCIdx] },
+                    },
+                }));
+            }
         } else if (currentItem === 'herdr_direction' && (input === ' ' || key.return)) {
             setConfig((prev) => ({
                 ...prev,
@@ -95,6 +137,34 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
                 <Text dimColor>[Esc / s] Lưu & Quay lại</Text>
             </Box>
 
+            {/* Panel danh sách Herdr Active Agents */}
+            <Box flexDirection="column" borderStyle="single" borderColor="green" paddingX={1} marginBottom={1}>
+                <Box justifyContent="space-between">
+                    <Text bold color="green">
+                        🟢 HERDR ACTIVE AGENTS ({herdrAgents.length} agents đang chạy)
+                    </Text>
+                    <Text dimColor>{isHerdrSessionActive() ? 'SESSION: CONNECTED' : 'SESSION: OFF'}</Text>
+                </Box>
+                {herdrAgents.length === 0 ? (
+                    <Text dimColor italic>
+                        {isHerdrSessionActive()
+                            ? 'Chưa có agent nào đang chạy trong Herdr session.'
+                            : 'Herdr session không hoạt động (HERDR_ENV != 1).'}
+                    </Text>
+                ) : (
+                    herdrAgents.map((a) => (
+                        <Box key={a.pane_id || a.agent} gap={1}>
+                            <Text color="cyan">{a.pane_id}</Text>
+                            <Text color="white">({a.agent})</Text>
+                            <Text color={a.agent_status === 'idle' ? 'green' : 'yellow'}>
+                                [{a.agent_status === 'idle' ? '🟢 idle' : '🟡 working'}]
+                            </Text>
+                            {a.cwd && <Text dimColor>cwd: {a.cwd}</Text>}
+                        </Box>
+                    ))
+                )}
+            </Box>
+
             <Box flexDirection="column" gap={1}>
                 {settingItems.map((item, idx) => {
                     const isFocused = idx === focusIndex;
@@ -106,7 +176,9 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
                         valueDisplay = `< ${config.cleanPolicy.thresholdCount} tasks > (dùng phím ←/→ để chỉnh)`;
                     } else if (item.id.startsWith('agent_')) {
                         const phase = item.id.replace('agent_', '') as keyof OnlyOneGlobalConfig['agentRouting'];
-                        valueDisplay = `[ ${config.agentRouting[phase]} ] (Space/Enter để đổi)`;
+                        const route = normalizePhaseRoute(config.agentRouting[phase]);
+                        const paneLabel = route.pane === 'auto' ? 'Auto (Mở mới)' : route.pane;
+                        valueDisplay = `Pane: [ ${paneLabel} ] (←/→)  |  CLI: [ ${route.cli} ] (Space/Enter)`;
                     } else if (item.id === 'herdr_direction') {
                         valueDisplay = `[ ${config.herdr.splitDirection.toUpperCase()} ] (Space để đổi)`;
                     }

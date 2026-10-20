@@ -33,7 +33,7 @@ describe('Herdr Service', () => {
         expect(plan.splitCommand).toContain('--no-focus');
         expect(plan.splitCommand).toContain('/my/workspace');
 
-        expect(plan.agentStartCommand).toContain('herdr agent start agy-authfeature --kind antigravity');
+        expect(plan.agentStartCommand).toContain('herdr agent start agy-authfeature --kind agy');
         expect(plan.agentPromptCommand).toContain('herdr agent prompt agy-authfeature');
         expect(plan.agentPromptCommand).toContain('/only-one-plan only-one/tasks/auth-feature');
     });
@@ -41,7 +41,7 @@ describe('Herdr Service', () => {
     it('xây dựng chính xác kế hoạch điều phối clean toàn hệ thống', () => {
         const plan = buildHerdrCleanDispatchPlan(DEFAULT_GLOBAL_CONFIG, '/my/workspace');
         expect(plan.splitCommand).toContain('herdr pane split');
-        expect(plan.agentStartCommand).toContain('herdr agent start agy-archivist --kind antigravity');
+        expect(plan.agentStartCommand).toContain('herdr agent start agy-archivist --kind agy');
         expect(plan.agentPromptCommand).toContain('herdr agent prompt agy-archivist "/only-one-clean"');
     });
 

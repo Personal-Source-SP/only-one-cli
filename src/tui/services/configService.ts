@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import { homedir } from 'node:os';
 import path from 'node:path';
+import { normalizePhaseRoute } from './herdrService.js';
 import { DEFAULT_GLOBAL_CONFIG, type OnlyOneGlobalConfig } from '../types/config.js';
 
 export function getGlobalConfigPath(customHome?: string): string {
@@ -22,7 +23,9 @@ export async function loadGlobalConfig(customHome?: string): Promise<OnlyOneGlob
             },
             agentRouting: {
                 ...DEFAULT_GLOBAL_CONFIG.agentRouting,
-                ...(parsed.agentRouting || {}),
+                ...(Object.fromEntries(
+                    Object.entries(parsed.agentRouting || {}).map(([key, val]) => [key, normalizePhaseRoute(val as any)]),
+                ) as any),
             },
             herdr: {
                 ...DEFAULT_GLOBAL_CONFIG.herdr,

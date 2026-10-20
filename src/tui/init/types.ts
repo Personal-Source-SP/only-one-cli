@@ -1,6 +1,6 @@
-export type AssetCategory = 'rule' | 'skill' | 'config' | 'package' | 'combo';
+export type AssetCategory = 'combo' | 'skill' | 'rule' | 'package' | 'config' | 'mcp' | 'hook' | 'git' | 'vs' | 'ignore' | 'eslint';
 
-export type WizardFocusArea = 'header-ide' | 'header-overwrite' | 'list';
+export type WizardFocusArea = 'header-ide' | 'header-overwrite' | 'sidebar' | 'content';
 
 export interface IdeTargetOption {
     id: string;
@@ -25,5 +25,12 @@ export interface InitWizardResult {
     selectedSkills: string[];
     selectedConfigs: string[];
     selectedPackages: string[];
+    selectedCombos?: string[];
+    selectedMcps?: string[];
+    selectedHooks?: string[];
+    selectedGit?: string[];
+    selectedVs?: string[];
+    selectedIgnore?: string[];
+    selectedEslint?: string[];
     confirmed: boolean;
 }

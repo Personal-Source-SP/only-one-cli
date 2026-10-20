@@ -1,6 +1,25 @@
 import { exec } from 'node:child_process';
-import type { OnlyOneGlobalConfig } from '../types/config.js';
+import type { OnlyOneGlobalConfig, PhaseAgentRoute } from '../types/config.js';
 import type { HerdrAgent, TaskModel, TaskStatus } from '../types/task.js';
+
+export function toCanonicalHerdrKind(kind: string): string {
+    const normalized = (kind || '').toLowerCase().trim();
+    if (normalized === 'antigravity') return 'agy';
+    if (normalized === 'claudecode') return 'claude';
+    return normalized || 'agy';
+}
+
+export function normalizePhaseRoute(raw: unknown): PhaseAgentRoute {
+    if (!raw) return { pane: 'auto', cli: 'agy' };
+    if (typeof raw === 'string') {
+        return { pane: 'auto', cli: toCanonicalHerdrKind(raw) };
+    }
+    const obj = raw as Partial<PhaseAgentRoute>;
+    return {
+        pane: obj.pane || 'auto',
+        cli: toCanonicalHerdrKind(obj.cli || 'agy'),
+    };
+}
 
 export function isHerdrSessionActive(env: NodeJS.ProcessEnv = process.env): boolean {
     return env.HERDR_ENV === '1';
@@ -25,7 +44,8 @@ export function buildHerdrDispatchPlan(
     workspaceDir: string,
 ): HerdrDispatchPlan {
     const routingKey = (phase === 'processing' ? 'apply' : phase) as keyof OnlyOneGlobalConfig['agentRouting'];
-    const targetAgent = config.agentRouting[routingKey] || 'antigravity';
+    const route = normalizePhaseRoute(config.agentRouting[routingKey]);
+    const targetAgent = route.cli;
     const agentName = `agy-${task.slug
         .replace(/[^a-z0-9]/gi, '')
         .slice(0, 15)
@@ -42,7 +62,8 @@ export function buildHerdrDispatchPlan(
 }
 
 export function buildHerdrCleanDispatchPlan(config: OnlyOneGlobalConfig, workspaceDir: string): HerdrDispatchPlan {
-    const targetAgent = config.agentRouting.clean || 'antigravity';
+    const route = normalizePhaseRoute(config.agentRouting.clean);
+    const targetAgent = route.cli;
     const agentName = 'agy-archivist';
     const direction = config.herdr.splitDirection;
     const focusFlag = config.herdr.focusOnSpawn ? '' : '--no-focus';
@@ -116,6 +137,31 @@ export async function dispatchTaskViaHerdr(
         };
     }
 
+    const routingKey = (phase === 'processing' ? 'apply' : phase) as keyof OnlyOneGlobalConfig['agentRouting'];
+    const route = normalizePhaseRoute(config.agentRouting[routingKey]);
+    const phaseCmd = phase === 'concept' ? 'idea' : phase === 'processing' ? 'apply' : phase;
+    const promptText = `/only-one-${phaseCmd} only-one/tasks/${task.slug}`;
+
+    // 1. Nếu có chỉ định Target Pane cụ thể (khác 'auto') và pane đó đang hoạt động trong Herdr
+    if (route.pane && route.pane !== 'auto') {
+        const activeAgents = await listHerdrAgents();
+        const livePane = activeAgents.find((a) => a.pane_id === route.pane);
+        if (livePane) {
+            // Gửi prompt trực tiếp vào Pane có sẵn, KHÔNG split pane!
+            await waitHerdrAgent(route.pane, 45000);
+            return new Promise((resolve) => {
+                exec(`herdr agent prompt ${route.pane} "${promptText}"`, (err) => {
+                    if (err) {
+                        resolve({ success: false, message: `Lỗi khi gửi prompt tới pane ${route.pane}: ${err.message}` });
+                    } else {
+                        resolve({ success: true, message: `Đã gửi lệnh thực thi phase ${phase} tới pane ${route.pane}.` });
+                    }
+                });
+            });
+        }
+    }
+
+    // 2. Nếu Pane chưa mở hoặc ở chế độ 'auto' -> Mở pane mới và start agent với cli tương ứng
     const plan = buildHerdrDispatchPlan(task, phase, config, workspaceDir);
 
     return new Promise((resolve) => {

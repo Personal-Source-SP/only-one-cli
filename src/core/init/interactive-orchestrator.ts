@@ -44,7 +44,7 @@ export async function promptInitSelectionsViaTui(projectDir: string, explicitToo
                         mode: 'custom',
                         packages: res.selectedPackages,
                         configs: res.selectedConfigs,
-                        mcps: [],
+                        mcps: res.selectedMcps || [],
                         skills: res.selectedSkills,
                         rulesPerAgent: res.selectedRules,
                         overwrite: res.overwrite,

@@ -9,7 +9,7 @@ import { MarkdownViewer } from './components/MarkdownViewer.js';
 import { SettingsView } from './components/SettingsView.js';
 import { cleanCompletedTasks } from './services/taskCleaner.js';
 import { loadGlobalConfig, saveGlobalConfig } from './services/configService.js';
-import { dispatchCleanViaHerdr, dispatchTaskToHerdrAgents } from './services/herdrService.js';
+import { dispatchCleanViaHerdr, dispatchTaskToHerdrAgents, dispatchTaskViaHerdr } from './services/herdrService.js';
 import { startTaskWatcher } from './services/taskWatcher.js';
 import { DEFAULT_GLOBAL_CONFIG, type OnlyOneGlobalConfig } from './types/config.js';
 import { groupTasksByColumn, scanTasks, updateTaskStatus } from './services/taskScanner.js';
@@ -60,8 +60,15 @@ export const App: FC<AppProps> = ({ deps }) => {
     useInput((input, key) => {
         if (confirmAction) {
             if (input === 'y' || key.return) {
-                // Future expansion: execute workflow runner
+                const targetTask = confirmAction.task;
+                const targetAction = confirmAction.action;
                 setConfirmAction(null);
+                setStatusMessage(`Đang điều phối /only-one-${targetAction} cho "${targetTask.slug}" qua Herdr...`);
+                const phaseStatus: TaskStatus = targetAction === 'apply' ? 'processing' : (targetAction as TaskStatus);
+                dispatchTaskViaHerdr(targetTask, phaseStatus, globalConfig, workspaceDir).then((res) => {
+                    setStatusMessage(res.message);
+                    refresh();
+                });
             } else if (input === 'n' || key.escape) {
                 setConfirmAction(null);
             }

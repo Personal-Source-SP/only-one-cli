@@ -20,20 +20,20 @@ describe('Config Service (~/.only-one/config.json)', () => {
         const config = await loadGlobalConfig(tempDir);
         expect(config.schemaVersion).toBe(1);
         expect(config.cleanPolicy.thresholdCount).toBe(5);
-        expect(config.agentRouting.plan).toBe('antigravity');
+        expect(config.agentRouting.plan).toEqual({ pane: 'auto', cli: 'agy' });
     });
 
     it('lưu trữ và tải lại chính xác giá trị đã sửa đổi', async () => {
         const updated = {
             ...DEFAULT_GLOBAL_CONFIG,
             cleanPolicy: { enabled: false, trigger: 'immediate' as const, thresholdCount: 10 },
-            agentRouting: { ...DEFAULT_GLOBAL_CONFIG.agentRouting, plan: 'claudecode' },
+            agentRouting: { ...DEFAULT_GLOBAL_CONFIG.agentRouting, plan: { pane: 'auto', cli: 'claude' } },
         };
         await saveGlobalConfig(updated, tempDir);
 
         const loaded = await loadGlobalConfig(tempDir);
         expect(loaded.cleanPolicy.enabled).toBe(false);
         expect(loaded.cleanPolicy.thresholdCount).toBe(10);
-        expect(loaded.agentRouting.plan).toBe('claudecode');
+        expect(loaded.agentRouting.plan).toEqual({ pane: 'auto', cli: 'claude' });
     });
 });
