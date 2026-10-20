@@ -7,7 +7,7 @@ const LIFECYCLE_COLUMNS: { id: TaskStatus; title: string; color: ColumnModel['co
     { id: 'concept', title: 'CONCEPT', color: 'cyan' },
     { id: 'plan', title: 'PLAN', color: 'blue' },
     { id: 'processing', title: 'PROCESSING', color: 'yellow' },
-    { id: 'review', title: 'REVIEW', color: 'magenta' },
+    { id: 'done', title: 'DONE', color: 'green' },
 ];
 
 export function parseFrontmatter(content: string): { data: Record<string, unknown>; body: string } {

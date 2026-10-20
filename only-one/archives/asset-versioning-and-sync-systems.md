@@ -6,10 +6,11 @@ triggers:
   - "assets/**"
   - "src/core/assets/**"
   - "src/commands/update/**"
-archived_at: 2026-10-19T19:18:00+07:00
+archived_at: 2026-10-20T18:35:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
+  - only-one/archives/tui-modernization.md
 affected_modules:
   - assets/types.ts
   - assets/rules
@@ -23,6 +24,7 @@ affected_modules:
   - src/core/assets
   - src/core/skill/remote
   - src/commands/update
+  - src/tui/init/services
 ---
 
 # Archive: Architecture of Independent Asset Versioning, Unified Lockfile, Auto-Restore, and Pruning Systems
@@ -74,6 +76,10 @@ flowchart TD
    - `applyAssetUpdates()` tự động cập nhật hoặc khôi phục file bị thiếu vào thư mục target agent (`.agents`, `.cursor`, `.claude`) và cập nhật lockfile đồng thời.
    - Chỉ xóa file mồ côi khi có cờ tường minh `--prune`, tuyệt đối không xóa file tùy biến do người dùng tự tạo nếu không có trong `installed.json`.
 
+4. **Extended Multi-Asset State Detection Engine ([src/tui/init/services/workspaceScanner.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/services/workspaceScanner.ts))**:
+   - Quét trạng thái tồn tại và cài đặt của tài nguyên từ cả hai lockfile: project lockfile (`only-one/installed.json`) và global lockfile (`~/.only-one/installed.json`).
+   - Mở rộng cơ chế kiểm tra ngoại vi: duyệt thư mục extensions của VS Code / Cursor (`.vscode/extensions`, `.cursor/extensions`) và cấu hình MCP Servers (`~/.gemini/config/mcp_config.json`, `~/.cursor/mcp.json`) để xác định chính xác trạng thái cài đặt mà không phụ thuộc đơn thuần vào file cục bộ.
+
 ## 3. Scope & Key Modules (Phạm vi & Các Module Chính)
 - **Asset Types & Manifests**:
   - [`assets/types.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/types.ts): Bổ sung `version: string` cho tất cả manifest interfaces.
@@ -87,6 +93,8 @@ flowchart TD
 - **Developer Tooling & CI Gate**:
   - [`src/core/assets/bump.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/bump.ts) & [`scripts/bump-asset.ts`](file:///d:/Sources/PERSONAL/only-one-cli/scripts/bump-asset.ts): Tự động bump version.
   - [`src/core/assets/gate.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/gate.ts): Zero-bypass gate kiểm tra coverage và version bumps.
+- **Workspace Scanner & Multi-Asset Detection**:
+  - [`src/tui/init/services/workspaceScanner.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/services/workspaceScanner.ts): Quét trạng thái tài nguyên đa nguồn cho TUI Init Wizard.
 - **Installers & Update Command Integration**:
   - [`src/commands/update/command.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/commands/update/command.ts): Hỗ trợ cờ `--prune`.
   - [`src/commands/update/actions/step-2-update-artifacts.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/commands/update/actions/step-2-update-artifacts.ts): Kết nối logic auto-restore và prune.

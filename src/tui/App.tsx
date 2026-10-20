@@ -9,7 +9,7 @@ import { MarkdownViewer } from './components/MarkdownViewer.js';
 import { SettingsView } from './components/SettingsView.js';
 import { cleanCompletedTasks } from './services/taskCleaner.js';
 import { loadGlobalConfig, saveGlobalConfig } from './services/configService.js';
-import { dispatchCleanViaHerdr, dispatchTaskToHerdrAgents, dispatchTaskViaHerdr } from './services/herdrService.js';
+import { dispatchCleanViaHerdr, dispatchTaskToHerdrAgents, dispatchTaskViaHerdr, isHerdrSessionActive } from './services/herdrService.js';
 import { startTaskWatcher } from './services/taskWatcher.js';
 import { DEFAULT_GLOBAL_CONFIG, type OnlyOneGlobalConfig } from './types/config.js';
 import { groupTasksByColumn, scanTasks, updateTaskStatus } from './services/taskScanner.js';
@@ -29,6 +29,7 @@ export const App: FC<AppProps> = ({ deps }) => {
     const [loading, setLoading] = useState(true);
     const [globalConfig, setGlobalConfig] = useState<OnlyOneGlobalConfig>(DEFAULT_GLOBAL_CONFIG);
     const [statusMessage, setStatusMessage] = useState<string | null>(null);
+    const [isCleaning, setIsCleaning] = useState(false);
 
     const workspaceDir = deps?.cwd || process.cwd();
 
@@ -98,16 +99,34 @@ export const App: FC<AppProps> = ({ deps }) => {
     };
 
     const handleCleanNow = async () => {
-        setStatusMessage('Đang điều phối tác vụ Clean tới Agent qua Herdr...');
-        const res = await dispatchCleanViaHerdr(globalConfig, workspaceDir);
-        setStatusMessage(res.message);
+        if (isCleaning) return;
+        setIsCleaning(true);
+        setStatusMessage('🧹 Đang tiến hành dọn dẹp các task đã hoàn thành...');
+        try {
+            if (isHerdrSessionActive()) {
+                const res = await dispatchCleanViaHerdr(globalConfig, workspaceDir);
+                setStatusMessage(res.message);
+            } else {
+                const res = await cleanCompletedTasks(workspaceDir, 0);
+                if (res.archivedSlugs.length > 0) {
+                    setStatusMessage(`Đã dọn dẹp và lưu trữ ${res.archivedSlugs.length} task hoàn thành vào only-one/archives/.`);
+                } else {
+                    setStatusMessage('Không có task nào ở trạng thái hoàn thành để lưu trữ.');
+                }
+            }
+            await refresh();
+        } catch (err: any) {
+            setStatusMessage(`Lỗi khi dọn dẹp: ${err.message || String(err)}`);
+        } finally {
+            setIsCleaning(false);
+        }
     };
 
     const columns: ColumnModel[] = groupTasksByColumn(tasks);
 
     return (
         <Box flexDirection="column" padding={1}>
-            <Header workspacePath={workspaceDir} columns={columns} totalTasks={tasks.length} />
+            <Header workspacePath={workspaceDir} columns={columns} totalTasks={tasks.length} isCleaning={isCleaning} />
 
             {loading ? (
                 <Text color="yellow">Scanning only-one/tasks...</Text>
@@ -132,22 +151,31 @@ export const App: FC<AppProps> = ({ deps }) => {
             ) : mode === 'viewer' && selectedTask ? (
                 <MarkdownViewer task={selectedTask} onClose={() => setMode('board')} />
             ) : (
-                <BoardView
-                    columns={columns}
-                    onSelectTask={(task) => {
-                        setSelectedTask(task);
-                        setMode('viewer');
-                    }}
-                    onMoveTask={handleMoveTask}
-                    onTriggerAction={(task, action) => {
-                        setConfirmAction({ task, action });
-                    }}
-                    onRefresh={refresh}
-                    onOpenSettings={() => setMode('settings')}
-                    onCleanNow={handleCleanNow}
-                    onDispatchTask={handleOpenDispatch}
-                    onQuit={exit}
-                />
+                <>
+                    {isCleaning && (
+                        <Box borderStyle="round" borderColor="yellow" paddingX={1} marginY={1}>
+                            <Text bold color="yellow">
+                                🧹 TIẾN TRÌNH CLEAN ĐANG DIỄN RA: Đang xử lý lưu trữ các task hoàn thành vào archives...
+                            </Text>
+                        </Box>
+                    )}
+                    <BoardView
+                        columns={columns}
+                        onSelectTask={(task) => {
+                            setSelectedTask(task);
+                            setMode('viewer');
+                        }}
+                        onMoveTask={handleMoveTask}
+                        onTriggerAction={(task, action) => {
+                            setConfirmAction({ task, action });
+                        }}
+                        onRefresh={refresh}
+                        onOpenSettings={() => setMode('settings')}
+                        onCleanNow={handleCleanNow}
+                        onDispatchTask={handleOpenDispatch}
+                        onQuit={exit}
+                    />
+                </>
             )}
 
             {confirmAction && (

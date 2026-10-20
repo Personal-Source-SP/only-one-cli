@@ -23,13 +23,13 @@ describe('Task Scanner & Lifecycle Mapper', () => {
             { slug: 't1', folderPath: '/t1', status: 'concept', title: 'T1', docs: [], activeDocIndex: 0 },
             { slug: 't2', folderPath: '/t2', status: 'plan', title: 'T2', docs: [], activeDocIndex: 0 },
             { slug: 't3', folderPath: '/t3', status: 'processing', title: 'T3', docs: [], activeDocIndex: 0 },
-            { slug: 't4', folderPath: '/t4', status: 'review', title: 'T4', docs: [], activeDocIndex: 0 },
+            { slug: 't4', folderPath: '/t4', status: 'done', title: 'T4', docs: [], activeDocIndex: 0 },
         ];
         const columns = groupTasksByColumn(mockTasks);
         expect(columns.length).toBe(4);
         expect(columns.find((c) => c.id === 'concept')?.tasks.length).toBe(1);
         expect(columns.find((c) => c.id === 'plan')?.tasks.length).toBe(1);
         expect(columns.find((c) => c.id === 'processing')?.tasks.length).toBe(1);
-        expect(columns.find((c) => c.id === 'review')?.tasks.length).toBe(1);
+        expect(columns.find((c) => c.id === 'done')?.tasks.length).toBe(1);
     });
 });

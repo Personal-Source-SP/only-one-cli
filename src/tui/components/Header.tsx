@@ -8,9 +8,10 @@ interface HeaderProps {
     workspacePath: string;
     columns: ColumnModel[];
     totalTasks: number;
+    isCleaning?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ workspacePath, columns, totalTasks }) => {
+export const Header: React.FC<HeaderProps> = ({ workspacePath, columns, totalTasks, isCleaning }) => {
     const iconMap: Record<string, string> = {
         concept: '💡',
         plan: '📋',
@@ -33,6 +34,11 @@ export const Header: React.FC<HeaderProps> = ({ workspacePath, columns, totalTas
                     ) : (
                         <Text dimColor color="gray">
                             [HERDR: OFF]
+                        </Text>
+                    )}
+                    {isCleaning && (
+                        <Text bold color="yellow">
+                            [🧹 CLEANING]
                         </Text>
                     )}
                 </Box>

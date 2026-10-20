@@ -19,7 +19,7 @@ const COLUMN_ICONS: Record<string, string> = {
     concept: '💡',
     plan: '📋',
     processing: '⚡',
-    review: '🔍',
+    done: '✅',
 };
 
 export const BoardView: FC<BoardViewProps> = ({

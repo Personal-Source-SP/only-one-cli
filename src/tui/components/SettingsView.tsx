@@ -1,6 +1,6 @@
 import { Box, Text, useInput } from 'ink';
 import React, { FC, useEffect, useState } from 'react';
-import { isHerdrSessionActive, listHerdrAgents, normalizePhaseRoute } from '../services/herdrService.js';
+import { isHerdrSessionActive, listHerdrPanes, normalizePhaseRoute } from '../services/herdrService.js';
 import type { OnlyOneGlobalConfig } from '../types/config.js';
 import type { HerdrAgent } from '../types/task.js';
 
@@ -18,7 +18,7 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
     const [focusIndex, setFocusIndex] = useState(0);
 
     useEffect(() => {
-        listHerdrAgents().then((agents) => {
+        listHerdrPanes().then((agents) => {
             if (agents.length > 0) {
                 setHerdrAgents(agents);
             }
@@ -34,7 +34,6 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
         { id: 'agent_debug', label: "Agent cho Phase 'debug'" },
         { id: 'agent_review', label: "Agent cho Phase 'review'" },
         { id: 'agent_clean', label: "Agent cho Tác vụ 'clean'" },
-        { id: 'herdr_direction', label: 'Hướng chia màn hình Herdr (Split)' },
     ];
 
     useInput((input, key) => {
@@ -117,14 +116,6 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
                     },
                 }));
             }
-        } else if (currentItem === 'herdr_direction' && (input === ' ' || key.return)) {
-            setConfig((prev) => ({
-                ...prev,
-                herdr: {
-                    ...prev.herdr,
-                    splitDirection: prev.herdr.splitDirection === 'right' ? 'down' : 'right',
-                },
-            }));
         }
     });
 
@@ -160,8 +151,8 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
                             <Text color="gray">
                                 ({a.agent} - {a.pane_id})
                             </Text>
-                            <Text color={a.agent_status === 'idle' ? 'green' : 'yellow'}>
-                                [{a.agent_status === 'idle' ? '🟢 idle' : '🟡 working'}]
+                            <Text color={a.agent_status === 'idle' ? 'green' : a.agent_status === 'terminal' ? 'gray' : 'yellow'}>
+                                [{a.agent_status === 'idle' ? '🟢 idle' : a.agent_status === 'terminal' ? '⚪ terminal' : '🟡 working'}]
                             </Text>
                             {a.cwd && <Text dimColor>cwd: {a.cwd}</Text>}
                         </Box>
@@ -184,8 +175,6 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
                         const targetAgent = herdrAgents.find((a) => a.pane_id === route.pane);
                         const paneLabel = route.pane === 'auto' ? 'Auto (Mở mới)' : targetAgent?.name ? targetAgent.name : route.pane;
                         valueDisplay = `Agent: [ ${paneLabel} ] (←/→)  |  CLI: [ ${route.cli} ] (Space/Enter)`;
-                    } else if (item.id === 'herdr_direction') {
-                        valueDisplay = `[ ${config.herdr.splitDirection.toUpperCase()} ] (Space để đổi)`;
                     }
 
                     return (

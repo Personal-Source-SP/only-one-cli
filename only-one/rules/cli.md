@@ -1,6 +1,6 @@
 ---
 domain: cli
-version: 1.0.0
+version: 1.1.0
 triggers:
   - "src/commands/**"
   - "src/core/runtime/**"
@@ -34,3 +34,7 @@ triggers:
 - **NEVER_DO**: Fall back to manual git repository cloning into skill folders.
 - **RATIONALE**: Ensures upstream schema conformity, automatic updates, and standard lockfile registration.
 
+### CLI-006: Graceful SIGINT Promise Settlement
+- **MUST_DO**: Intercept `SIGINT` / `Ctrl+C` in asynchronous CLI wizard workflows and cleanly resolve or reject outstanding top-level promises before process exit.
+- **NEVER_DO**: Exit immediately via `process.exit()` while top-level async/await promises are pending in interactive wizards.
+- **RATIONALE**: Prevents Node.js runtime warning `Detected unsettled top-level await` and uncommitted state corruption.

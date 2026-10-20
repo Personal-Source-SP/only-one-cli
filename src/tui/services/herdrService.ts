@@ -238,6 +238,43 @@ export async function listHerdrAgents(): Promise<HerdrAgent[]> {
     });
 }
 
+export async function listHerdrPanes(): Promise<HerdrAgent[]> {
+    if (!isHerdrSessionActive()) return [];
+    return new Promise((resolve) => {
+        exec('herdr pane list', (err, stdout) => {
+            if (err) {
+                resolve([]);
+                return;
+            }
+            try {
+                const data = JSON.parse(stdout);
+                const rawPanes = data?.result?.panes || [];
+                exec('herdr tab list', (tabErr, tabStdout) => {
+                    const tabMap = new Map<string, string>();
+                    if (!tabErr && tabStdout) {
+                        try {
+                            const tabData = JSON.parse(tabStdout);
+                            for (const t of tabData?.result?.tabs || []) {
+                                tabMap.set(t.tab_id, t.label);
+                            }
+                        } catch {}
+                    }
+                    const result: HerdrAgent[] = rawPanes.map((p: any) => ({
+                        pane_id: p.pane_id,
+                        agent: p.agent || p.terminal_title_stripped || 'terminal',
+                        agent_status: p.agent_status === 'unknown' ? 'terminal' : p.agent_status || 'idle',
+                        name: (p.tab_id && tabMap.get(p.tab_id)) || p.pane_id,
+                        cwd: p.cwd,
+                    }));
+                    resolve(result);
+                });
+            } catch {
+                resolve([]);
+            }
+        });
+    });
+}
+
 export async function waitHerdrAgent(target: string, timeoutMs: number = 60000): Promise<boolean> {
     if (!isHerdrSessionActive()) return false;
     return new Promise((resolve) => {

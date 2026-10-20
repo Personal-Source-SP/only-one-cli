@@ -4,6 +4,7 @@ import {
     buildHerdrDispatchPlan,
     isHerdrSessionActive,
     listHerdrAgents,
+    listHerdrPanes,
     waitHerdrAgent,
 } from '@/tui/services/herdrService.js';
 import { DEFAULT_GLOBAL_CONFIG } from '@/tui/types/config.js';
@@ -48,6 +49,11 @@ describe('Herdr Service', () => {
     it('trả về mảng rỗng cho listHerdrAgents khi không trong Herdr session', async () => {
         const agents = await listHerdrAgents();
         expect(Array.isArray(agents)).toBe(true);
+    });
+
+    it('trả về mảng rỗng cho listHerdrPanes khi không trong Herdr session', async () => {
+        const panes = await listHerdrPanes();
+        expect(Array.isArray(panes)).toBe(true);
     });
 
     it('trả về false cho waitHerdrAgent khi không trong Herdr session', async () => {

@@ -189,8 +189,65 @@ Main Agent directly applies each file diff in sequence adhering strictly to `Dep
    completed_at: <YYYY-MM-DD>
    ```
 3. **In-Chat Walkthrough Presentation (Zero walkthrough.md File Creation)**:
-   - Output a clean, structured walkthrough summary directly in the chat response.
-   - ❌ **Strict No-Extra-File Invariant**: Do NOT create a separate `walkthrough.md` file on disk.
+   - Output a structured, production-grade walkthrough report directly in chat.
+   - 🛑 **Strict Vietnamese Language Requirement**: Explanatory text MUST be in Vietnamese. Keep symbols, paths, and commands in English.
+   - 🛑 **Strict No-Extra-File Invariant**: Never create a separate `walkthrough.md` file on disk.
+   - Report MUST strictly follow this 5-part schema:
+
+```markdown
+# 🏁 BÁO CÁO NGHIỆM THU HOÀN THÀNH TÁC VỤ: `<slug>`
+
+## 📌 1. Tóm tắt nhanh (Executive Summary)
+- **Mục tiêu**: <Tóm tắt 1 câu về mục tiêu bài toán>.
+- **Giải pháp**: <Giải pháp kiến trúc hoặc kỹ thuật đã áp dụng>.
+- **Kết quả**: Đã áp dụng thành công X/X task blocks, 100% test suites vượt qua.
+
+---
+
+## 🗂 2. Cấu trúc Source & Chi tiết từng file
+
+### Cây thư mục tác động (Directory Tree)
+```text
+src/
+├── [NEW]    path/to/newFile.ts
+└── [MODIFY] path/to/modifiedFile.ts
+```
+
+### Chi tiết thay đổi theo từng file
+1. **`path/to/file.ts`** `[NEW | MODIFY | DELETE]`
+   - **Mục đích**: <Lý do thay đổi file>.
+   - **Symbols/Hàm chính**: `<symbol1>`, `<symbol2>`.
+   - **Chi tiết thay đổi**: <Mô tả cụ thể logic đã sửa đổi hoặc bổ sung>.
+   - **Fast Test**: `<fast test command>` (PASS).
+
+---
+
+## ✅ 3. Điều kiện nghiệm thu & Bằng chứng kiểm thử (Verification Proof)
+
+### Tiêu chí nghiệm thu (Acceptance Criteria)
+- [x] <Tiêu chí 1>: <Đã đáp ứng>.
+- [x] <Tiêu chí 2>: <Đã đáp ứng>.
+
+### Bằng chứng kiểm thử định lượng
+- **Fast Tests**: Đã chạy qua từng file thay đổi, 100% PASS.
+- **Full Test Suite**: `npm test` -> `PASS (X test files, Y passed, 0 failed)`.
+- **Lint & Format**: `npm run format:check` -> `Clean`.
+- **Cập nhật tài liệu task**: Frontmatter đã đổi thành `status: done` (hoặc `fixed`), `completed_at: <YYYY-MM-DD>`.
+
+---
+
+## 🛡️ 4. Kiểm soát An toàn & Rủi ro (Safety Checks)
+- [x] **Beyoncé Rule**: 100% hành vi mới hoặc sửa đổi đều có test chứng minh.
+- [x] **Ponytail Reuse**: Tận dụng tối đa logic và helper có sẵn, không trùng lặp mã.
+- [x] **Side-effects**: Xác nhận không gây ảnh hưởng tiêu cực tới các module liên đới.
+
+---
+
+## 🚀 5. Bước tiếp theo đề xuất (Next Steps)
+- Kiểm tra lại code review: `/only-one-review`
+- Đóng gói / Tạo Pull Request: `/only-one-pr-git`
+- Hoặc dọn dẹp task đã xong: `/only-one-clean`
+```
 
 4. **Capture In-Task Friction Points & Opportunities (`improvements.md`)**:
    - If test failures, lint retries, or user corrective prompts occurred during task execution:
