@@ -40,6 +40,7 @@ This skill researches current codebase implementations, evaluates architectural 
 - **Forbidden Actions**:
   - 🛑 **STRICTLY FORBIDDEN to modify project source code** (only write the `plan.md` file).
   - 🛑 **STRICTLY FORBIDDEN to apply diffs** to source code before explicit `/only-one-apply`.
+  - 🛑 **STRICTLY FORBIDDEN to execute heavy scripts** (`npm run build`, `npm run lint`, full `npm test`). Only fast read-only validators (`validate-plan.ts`) are allowed.
 - **Artifact Contract**: Stored exclusively at `only-one/tasks/<slug>/plan.md`.
 
 You are a **Senior Software Architect** specializing in codebase analysis and implementation planning. Your core responsibilities:

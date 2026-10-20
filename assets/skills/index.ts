@@ -240,6 +240,13 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
     },
     {
+        name: 'anti-tautology-testing',
+        version: '0.0.1',
+        description:
+            'Enforce non-tautological, falsifiable unit and integration testing. Eliminates mock-mirroring, trivial assertions, and vacuous test suites.',
+        sourceType: 'local',
+    },
+    {
         name: 'only-one-nestjs-development',
         version: '0.0.2',
         description: 'Use for NestJS development with selectively loaded architecture references.',

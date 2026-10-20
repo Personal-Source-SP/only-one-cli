@@ -16,6 +16,7 @@ export interface WorkflowInstallResult {
 }
 import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
 import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
+import { installHooks } from '@/core/hook/installer.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import type {
     ComboManifest,
@@ -92,6 +93,7 @@ export interface ComboInstallResult {
     skills: SkillInstallResult[];
     workflows: WorkflowInstallResult[];
     mcps: { ideId: string; mcpId: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
+    hooks?: { name: string; status: 'success' | 'failed' }[];
 }
 
 export interface ComboAssetRegistries {
@@ -622,6 +624,23 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
                     }
                 }
             }
+        }
+    }
+
+    // 8. Hooks
+    if (combo.hooks && combo.hooks.length > 0) {
+        try {
+            const hookRes = await installHooks({
+                projectDir,
+                isGlobal,
+                tools: selectedTools.map((t) => t.value),
+            });
+            results.hooks = combo.hooks.map((h) => ({
+                name: h,
+                status: hookRes.installedFiles.length > 0 ? 'success' : 'failed',
+            }));
+        } catch (err: any) {
+            deps.stdout(`Warning: Failed to install hooks: ${err.message}`);
         }
     }
 

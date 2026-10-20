@@ -145,8 +145,8 @@ Use heading order as execution order. Keep Flash blocks compact: do not add `Sta
 
 ### Step 4 — Fast Verification & Walkthrough
 
-1. Execute aggregate verification (e.g., `npm test -- <test-file>`, `npm run build`, or typecheck) after all per-file Fast Tests pass.
-2. If errors occur, diagnose and resolve them following `diagnosing-bugs`.
+1. Execute comprehensive verification (`npm test`, `npm run lint`, `npm run build`) strictly after all file changes are applied.
+2. If any test or build fails, enter the Auto-Remediation Loop immediately to isolate and fix errors without stopping.
 3. Provide a brief completion summary in chat (1–3 sentences) highlighting changed files and test results.
 
 ---

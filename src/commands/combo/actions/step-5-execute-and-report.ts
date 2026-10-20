@@ -97,6 +97,14 @@ export const executeAndReportComboStep = async (
         }
     }
 
+    if (results.hooks?.length) {
+        deps.stdout('\nHooks:');
+        for (const h of results.hooks) {
+            const statusColor = h.status === 'success' ? COLORS.success : COLORS.error;
+            deps.stdout(`  - ${COLORS.secondary(h.name)} in ${COLORS.primary('.agents/hooks')}: ${statusColor(h.status)}`);
+        }
+    }
+
     deps.stdout('\n==================================================\n');
 
     if (!options.global) {

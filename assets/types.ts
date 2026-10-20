@@ -96,6 +96,7 @@ export interface ComboManifest {
     rules?: string[];
     configs?: string[];
     workflows?: string[];
+    hooks?: string[];
 }
 
 export interface GitAssetManifest {

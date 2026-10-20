@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command|Bash",
+        "command": ".agents/hooks/block-heavy-scripts.sh"
+      },
+      {
+        "matcher": "write_to_file|replace_file_content|Write|Edit",
+        "command": ".agents/hooks/no-secrets.sh"
+      },
+      {
+        "matcher": "write_to_file|replace_file_content|Write|Edit",
+        "command": ".agents/hooks/protect-configs.sh"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|Write|Edit",
+        "command": ".agents/hooks/format-on-edit.sh"
+      }
+    ],
+    "Stop": [
+      {
+        "command": ".agents/hooks/test-gate.sh"
+      }
+    ]
+  }
+}

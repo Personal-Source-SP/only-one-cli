@@ -31,6 +31,7 @@ This skill isolates bug triggers, reproduces failures via red feedback loops, an
 - **Forbidden Actions**:
   - 🛑 **STRICTLY FORBIDDEN to modify product source code** prior to proving Root Cause in `debug.md`.
   - 🛑 **STRICTLY FORBIDDEN to perform broad refactoring** outside the direct defect boundary.
+  - 🛑 **STRICTLY FORBIDDEN to execute heavy commands** (`npm run build`, `npm run lint`, full `npm test`). Only the targeted reproduction test command is permitted.
 - **Artifact Contract**: Stored exclusively at `only-one/tasks/<slug>/debug.md`.
 
 You are a **Senior Debugging Specialist**. Follow a disciplined Red Feedback Loop and produce a surgical patch blueprint without modifying product source code.

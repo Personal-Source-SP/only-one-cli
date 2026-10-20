@@ -158,32 +158,19 @@ For `review.md`:
 
 ---
 
-### Step 4 — Apply Selected File Changes via Parallel Waves & Sub-agents (`incremental-implementation`)
+### Step 4 — Apply File Changes Sequentially (Zero Sub-agents Batch Coding)
 
-Execute wave-by-wave until all tasks are marked `[x]`:
+Main Agent directly applies each file diff in sequence adhering strictly to `Depends On` ordering without sub-agent overhead:
 
-1. **Wave Dispatch Strategy**:
-   - **Single-Task Wave**: Main Agent applies the change directly (no Sub-agent overhead).
-   - **Multi-Task Wave (Independent Slices)**: Main Agent acts as Orchestrator and delegates each task in the wave to an isolated Sub-agent:
-     - Spawn concurrent Sub-agents (1 worker per independent task block).
-     - Provide each Sub-agent with its dedicated task context, file diff, and Fast Test Command.
+1. **Direct Sequential Application**:
+   - Mark task `Status` as `[/]` in `plan.md` or `debug.md`.
+   - Inspect target file imports and enforce Reuse-First Invariant.
+   - Apply code modification precisely via `replace_file_content` or `write_to_file`.
+   - Mark task `Status` as `[x]`.
+   - Proceed immediately to the next task block without pausing to run test commands.
 
-2. **Per-Task Execution Protocol (Main Agent or Worker Sub-agent)**:
-   - Mark task `Status` as `[/]` (in-progress) in `plan.md` or `debug.md`.
-   - **Step 4a — Pre-apply Context, Existing Imports & Language Skill Compliance Gate**:
-     - Read target file (`view_file`), verify imports and enforce Reuse-First Invariant.
-     - Adhere 100% to active language/tech skills and `only-one/rules.md`.
-   - **Step 4b — Ponytail Revalidation Before Edit**: Re-verify checklist for plan drift.
-   - **Step 4c — Apply Code Modification (Diff Application)**: Precisely replace deleted lines (`-`) with added lines (`+`).
-   - **Step 4d — Fast Test Command**:
-     - Run targeted `Fast Test Command` immediately.
-     - If test passes: Report `SUCCESS` and mark task `Status` as `[x]`.
-     - If test fails: Report `FAILED`, halt dependent waves, and activate `diagnosing-bugs`.
-
-3. **Barrier Synchronization Gate**:
-   - Main Agent waits for all workers in the active wave to finish.
-   - Aggregate test outputs and update `plan.md` statuses to `[x]`.
-   - Only advance to the next wave when 100% of tasks in the current wave pass verification.
+2. **Fast Continuous Workflow**:
+   - Continue applying all remaining task blocks until 100% of planned files are written to disk.
 
 ---
 
