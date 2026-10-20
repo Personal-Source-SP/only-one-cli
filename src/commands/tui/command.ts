@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
 import { App } from '@/tui/App.js';
+import { launchGoTui, resolveGoBinaryPath } from '@/tui/bridge.js';
 
 export function createTuiCommand(deps: ProgramDeps): Command {
     return new Command('tui')
@@ -17,6 +18,10 @@ export function createTuiCommand(deps: ProgramDeps): Command {
                 `  - ${COLORS.dim('Launches an interactive Ink-powered dashboard in terminal.')}`,
         )
         .action(async () => {
+            if (resolveGoBinaryPath()) {
+                await launchGoTui(process.cwd());
+                return;
+            }
             const instance = render(React.createElement(App, { deps }));
             await instance.waitUntilExit();
         });
