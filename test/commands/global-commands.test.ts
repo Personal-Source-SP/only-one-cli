@@ -57,7 +57,7 @@ describe('Global Commands Integration (--global flag)', () => {
         expect(existsSync(join(tempHome, '.gitignore'))).toBe(false);
     });
 
-    it('installs workflows globally into simulated user home directory', async () => {
+    it('redirects workflow install globally into skills in simulated user home directory', async () => {
         const logs: string[] = [];
         const deps: Partial<ProgramDeps> = {
             stdout: (msg) => logs.push(msg),
@@ -67,11 +67,12 @@ describe('Global Commands Integration (--global flag)', () => {
         const cmd = createWorkflowCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', tempHome, 'only-one-idea', '--tool', 'antigravity', '--global']);
 
-        const wfDest = join(tempHome, '.agents/workflows/only-one-idea.md');
-        expect(existsSync(wfDest)).toBe(true);
+        const skillDest = join(tempHome, '.agents/skills/only-one-idea/SKILL.md');
+        expect(existsSync(skillDest)).toBe(true);
 
         const lock = await readInstalledLockfile(tempHome, true);
-        expect(lock.installed.workflows?.['only-one-idea']).toBeDefined();
+        expect(lock.installed.skills?.['only-one-idea']).toBeDefined();
+        expect(logs.some((msg) => msg.includes('[DEPRECATED]'))).toBe(true);
         expect(existsSync(join(tempHome, '.gitignore'))).toBe(false);
     });
 

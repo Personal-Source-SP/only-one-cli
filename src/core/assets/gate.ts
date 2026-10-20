@@ -1,6 +1,5 @@
 import { execSync } from 'node:child_process';
 import { RULES } from '../../../assets/rules/index.js';
-import { WORKFLOWS } from '../../../assets/workflows/index.js';
 import { SKILLS } from '../../../assets/skills/index.js';
 import { MCPS } from '../../../assets/mcps/index.js';
 import { PACKAGES } from '../../../assets/packages/index.js';
@@ -61,12 +60,6 @@ export function detectChangedAssetFiles(baseRef = 'origin/main'): string[] {
 export function mapChangedFileToAsset(filePath: string): { type: string; id: string } | null {
     const normalized = filePath.replace(/\\/g, '/');
 
-    // workflows: assets/workflows/foo.md
-    const wfMatch = normalized.match(/^assets\/workflows\/([^/]+)\.md$/);
-    if (wfMatch) {
-        return { type: 'workflows', id: wfMatch[1] };
-    }
-
     // skills: assets/skills/skill-name/...
     const skillMatch = normalized.match(/^assets\/skills\/([^/]+)\//);
     if (skillMatch) {
@@ -101,7 +94,6 @@ export function verifyAllAssetsHaveValidVersions(): { valid: boolean; errors: st
     };
 
     RULES.forEach((r) => check('rules', r.id, r.version));
-    WORKFLOWS.forEach((w) => check('workflows', w.name, w.version));
     SKILLS.forEach((s) => check('skills', s.name, s.version));
     MCPS.forEach((m) => check('mcps', m.id, m.version));
     PACKAGES.forEach((p) => check('packages', p.id, p.version));

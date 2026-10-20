@@ -33,10 +33,24 @@ export async function readInstalledLockfile(projectDir: string, isGlobal = false
     try {
         const raw = await readFile(lockPath, 'utf-8');
         const parsed = JSON.parse(raw) as OnlyOneInstalledState;
+        const installed = parsed.installed || {};
+        const legacyWorkflows = (installed as any).workflows;
+
+        if (legacyWorkflows && typeof legacyWorkflows === 'object') {
+            installed.skills = installed.skills || {};
+            for (const [wfName, record] of Object.entries(legacyWorkflows)) {
+                if (!installed.skills[wfName]) {
+                    installed.skills[wfName] = record as InstalledAssetRecord;
+                }
+            }
+            delete (installed as any).workflows;
+            await writeFile(lockPath, JSON.stringify({ ...parsed, installed }, null, 2) + '\n', 'utf-8');
+        }
+
         return {
             schemaVersion: 1,
             updatedAt: parsed.updatedAt || new Date().toISOString(),
-            installed: parsed.installed || {},
+            installed,
         };
     } catch {
         return {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import {
     readInstalledLockfile,
     recordInstalledAssetsBatch,
@@ -53,7 +53,7 @@ describe('Assets Lockfile Management', () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-'));
         try {
             await recordInstalledAssetsBatch(cwd, [
-                { type: 'workflows', id: 'only-one-idea', version: '0.0.1' },
+                { type: 'rules', id: 'next-architecture-stack', version: '0.0.1' },
                 { type: 'skills', id: 'c4-diagrams', version: '0.0.1' },
             ]);
 
@@ -63,16 +63,40 @@ describe('Assets Lockfile Management', () => {
             expect(existsSync(join(cwd, '.only-one'))).toBe(false);
 
             const state = await readInstalledLockfile(cwd);
-            expect(state.installed.workflows?.['only-one-idea']?.version).toBe('0.0.1');
+            expect(state.installed.rules?.['next-architecture-stack']?.version).toBe('0.0.1');
             expect(state.installed.skills?.['c4-diagrams']?.version).toBe('0.0.1');
-            expect(state.installed.workflows?.['only-one-idea']?.installedAt).toBeDefined();
+            expect(state.installed.rules?.['next-architecture-stack']?.installedAt).toBeDefined();
 
             // Bump version
-            await recordInstalledAssetsBatch(cwd, [{ type: 'workflows', id: 'only-one-idea', version: '0.0.2' }]);
+            await recordInstalledAssetsBatch(cwd, [{ type: 'rules', id: 'next-architecture-stack', version: '0.0.2' }]);
 
             const updated = await readInstalledLockfile(cwd);
-            expect(updated.installed.workflows?.['only-one-idea']?.version).toBe('0.0.2');
+            expect(updated.installed.rules?.['next-architecture-stack']?.version).toBe('0.0.2');
             expect(updated.installed.skills?.['c4-diagrams']?.version).toBe('0.0.1');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
+
+    it('auto-migrates legacy installed.workflows to installed.skills', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-legacy-'));
+        try {
+            const lockPath = resolveInstalledLockfilePath(cwd);
+            await mkdir(dirname(lockPath), { recursive: true });
+            const legacyState = {
+                schemaVersion: 1,
+                updatedAt: new Date().toISOString(),
+                installed: {
+                    workflows: {
+                        'only-one-idea': { version: '0.0.1', installedAt: new Date().toISOString() },
+                    },
+                },
+            };
+            await writeFile(lockPath, JSON.stringify(legacyState, null, 2), 'utf-8');
+
+            const state = await readInstalledLockfile(cwd);
+            expect(state.installed.skills?.['only-one-idea']?.version).toBe('0.0.1');
+            expect((state.installed as any).workflows).toBeUndefined();
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

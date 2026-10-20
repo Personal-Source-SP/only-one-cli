@@ -1,22 +1,25 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { createWorkflowCommand } from '@/commands/workflow/command.js';
-import { mkdir, rm, writeFile, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { mkdir as mkdirP, rm as rmP, readFile as fsReadFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const testProjectDir = join(process.cwd(), 'tmp/workflow-command-test');
 
-describe('Workflow Command Unit & Integration Tests', () => {
-    it('workflow command prompts agent target first, then workflows', async () => {
+describe('Workflow Command Unit & Integration Tests (Deprecated & Forwarded)', () => {
+    it('outputs deprecation warning and redirects workflow command to skill command', async () => {
+        const outputs: string[] = [];
         const checkboxCalls: Array<{ message: string; choices: any[] }> = [];
         const deps: Partial<ProgramDeps> = {
-            stdout: () => {},
+            stdout: (msg) => {
+                outputs.push(msg);
+            },
             prompts: {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
                     if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
-                    if (opts.message.includes('workflows to add')) return ['only-one-pr-git'];
+                    if (opts.message.includes('skills to add')) return ['only-one-idea'];
                     return [];
                 },
             },
@@ -28,14 +31,15 @@ describe('Workflow Command Unit & Integration Tests', () => {
         const cmd = createWorkflowCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir]);
 
+        expect(outputs.some((msg) => msg.includes('[DEPRECATED]') && msg.includes('only-one skill'))).toBe(true);
         expect(checkboxCalls.length).toBe(3);
         expect(checkboxCalls[0].message).toContain('Select target IDEs/Tools');
-        expect(checkboxCalls[1].message).toContain('Select workflows to add');
+        expect(checkboxCalls[1].message).toContain('Select custom skills to add');
 
         await rmP(testProjectDir, { recursive: true, force: true });
     });
 
-    it('installs workflows without implicitly installing skills', async () => {
+    it('redirects direct workflow installation to skill installation', async () => {
         const outputs: string[] = [];
         const deps: Partial<ProgramDeps> = {
             stdout: (msg) => {
@@ -53,45 +57,19 @@ describe('Workflow Command Unit & Integration Tests', () => {
         await mkdirP(testProjectDir, { recursive: true });
 
         const cmd = createWorkflowCommand(deps as ProgramDeps);
-        // Cài đặt trực tiếp qua đối số
-        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-pr-git']);
-
-        const workflowDest = join(testProjectDir, '.agents/workflows/only-one-pr-git.md');
-        const skillDest = join(testProjectDir, '.agents/skills/only-one-pr-git-skill/SKILL.md');
-
-        expect(existsSync(workflowDest)).toBe(true);
-        expect(existsSync(skillDest)).toBe(false);
-
-        await rmP(testProjectDir, { recursive: true, force: true });
-    });
-
-    it('installs only-one-clean workflow properly', async () => {
-        const deps: Partial<ProgramDeps> = {
-            stdout: () => {},
-            prompts: {
-                checkbox: async (opts) => {
-                    if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
-                    return [];
-                },
-            },
-        };
-
-        await rmP(testProjectDir, { recursive: true, force: true });
-        await mkdirP(testProjectDir, { recursive: true });
-
-        const cmd = createWorkflowCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-clean']);
 
-        const cleanDest = join(testProjectDir, '.agents/workflows/only-one-clean.md');
+        const cleanSkillDest = join(testProjectDir, '.agents/skills/only-one-clean/SKILL.md');
 
-        expect(existsSync(cleanDest)).toBe(true);
+        expect(outputs.some((msg) => msg.includes('[DEPRECATED]'))).toBe(true);
+        expect(existsSync(cleanSkillDest)).toBe(true);
 
         await rmP(testProjectDir, { recursive: true, force: true });
     });
 
     it('ensures only-one-idea and only-one-plan do not retain conversational english coaching or english learning extraction', async () => {
-        const ideaContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-idea.md'), 'utf-8');
-        const planContent = await fsReadFile(join(process.cwd(), 'assets/workflows/only-one-plan.md'), 'utf-8');
+        const ideaContent = await fsReadFile(join(process.cwd(), 'assets/skills/only-one-idea/SKILL.md'), 'utf-8');
+        const planContent = await fsReadFile(join(process.cwd(), 'assets/skills/only-one-plan/SKILL.md'), 'utf-8');
 
         expect(ideaContent).not.toContain('conversational-english-coaching');
         expect(ideaContent).not.toContain('english-learning-extraction');

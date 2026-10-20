@@ -1,6 +1,13 @@
 ---
-description: "Execute small, rapid tasks with zero disk plan footprint, clean in-chat plan, user confirmation review gate, strict rule/skill compliance, and fast verification."
+name: only-one-flash
+description: Use when executing small, rapid tasks (< 100 lines) with zero disk plan footprint, in-chat review gates, and instant verification.
 ---
+
+# Only-One Flash (Fast-Track Execution Skill)
+
+## Overview
+
+This skill provides an accelerated workflow for small, bounded changes and quick fixes without creating task documents on disk while preserving quality gates.
 
 ## Input
 

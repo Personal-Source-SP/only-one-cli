@@ -26,10 +26,10 @@ describe('Update Command Integration Tests', () => {
             cwd: testProjectDir,
         };
 
-        // Record a valid workflow in lockfile, but do NOT create the file on disk
-        await recordInstalledAssetsBatch(testProjectDir, [{ type: 'workflows', id: 'only-one-pr-git', version: '1.0.0' }]);
+        // Record a valid skill in lockfile, but do NOT create the file on disk
+        await recordInstalledAssetsBatch(testProjectDir, [{ type: 'skills', id: 'only-one-pr-git', version: '1.0.0' }]);
 
-        const targetFilePath = join(testProjectDir, '.agents/workflows/only-one-pr-git.md');
+        const targetFilePath = join(testProjectDir, '.agents/skills/only-one-pr-git/SKILL.md');
         expect(existsSync(targetFilePath)).toBe(false);
 
         const cmd = createUpdateCommand(deps as ProgramDeps);
@@ -49,10 +49,11 @@ describe('Update Command Integration Tests', () => {
             cwd: testProjectDir,
         };
 
-        // Create an orphaned workflow in lockfile and on disk
-        await recordInstalledAssetsBatch(testProjectDir, [{ type: 'workflows', id: 'obsolete-workflow', version: '1.0.0' }]);
-        const orphanFile = join(testProjectDir, '.agents/workflows/obsolete-workflow.md');
-        await mkdir(join(testProjectDir, '.agents/workflows'), { recursive: true });
+        // Create an orphaned skill in lockfile and on disk
+        await recordInstalledAssetsBatch(testProjectDir, [{ type: 'skills', id: 'obsolete-skill', version: '1.0.0' }]);
+        const orphanDir = join(testProjectDir, '.agents/skills/obsolete-skill');
+        const orphanFile = join(orphanDir, 'SKILL.md');
+        await mkdir(orphanDir, { recursive: true });
         await writeFile(orphanFile, '# Obsolete\n');
 
         // 1. Run update without --prune -> should warn but NOT delete
@@ -61,7 +62,7 @@ describe('Update Command Integration Tests', () => {
 
         const output1 = stdoutLines1.join('\n');
         expect(output1).toContain('orphaned asset(s) no longer provided upstream');
-        expect(output1).toContain('obsolete-workflow');
+        expect(output1).toContain('obsolete-skill');
         expect(output1).toContain('Run "only-one update --prune"');
         expect(existsSync(orphanFile)).toBe(true);
 
@@ -78,11 +79,11 @@ describe('Update Command Integration Tests', () => {
 
         const output2 = stdoutLines2.join('\n');
         expect(output2).toContain('Pruned Orphaned Assets');
-        expect(output2).toContain('obsolete-workflow');
+        expect(output2).toContain('obsolete-skill');
         expect(existsSync(orphanFile)).toBe(false);
 
         const lockfile = await readInstalledLockfile(testProjectDir);
-        expect(lockfile.installed.workflows?.['obsolete-workflow']).toBeUndefined();
+        expect(lockfile.installed.skills?.['obsolete-skill']).toBeUndefined();
     });
 
     it('supports json output with asset prune and restore details', async () => {

@@ -7,7 +7,6 @@ import { MCPS } from '@assets/mcps/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
 import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
-import { WORKFLOWS } from '@assets/workflows/index.js';
 import { describe, expect, it } from 'vitest';
 import { checkExistingSkills } from '@/core/skill/index.js';
 import {
@@ -106,7 +105,7 @@ describe('prebuilt combo completeness', () => {
         rules: RULES,
         skills: SKILLS,
         configs: CONFIGS,
-        workflows: WORKFLOWS,
+        workflows: [],
         mcps: MCPS,
     };
 
@@ -152,10 +151,6 @@ describe('prebuilt combo completeness', () => {
             expect(plan.skills).toEqual(expect.arrayContaining(rule?.requiredSkills ?? []));
             expect(plan.mcps).toEqual(expect.arrayContaining(rule?.requiredMcps ?? []));
         }
-        for (const workflowName of plan.workflows) {
-            const workflow = WORKFLOWS.find(({ name }) => name === workflowName);
-            expect(plan.mcps).toEqual(expect.arrayContaining(workflow?.requiredMcps ?? []));
-        }
     });
 
     it('mcp-flow resolves defined MCP tools', () => {
@@ -167,14 +162,14 @@ describe('prebuilt combo completeness', () => {
         expect(plan.mcps).toEqual(expect.arrayContaining(['fetch', 'tavily', 'github', 'postgres', 'playwright-browser']));
     });
 
-    it('git-flow resolves skills, workflows and required MCPs', () => {
+    it('git-flow resolves skills and required MCPs', () => {
         const combo = COMBOS.find(({ id }) => id === 'git-flow');
         expect(combo).toBeDefined();
         if (!combo) return;
 
         const plan = buildComboDependencyPlan(combo, productionRegistries);
-        expect(plan.skills).toEqual(['only-one-pr-git-skill']);
-        expect(plan.workflows).toEqual(['only-one-pr-git']);
+        expect(plan.skills).toEqual(['only-one-pr-git-skill', 'only-one-pr-git']);
+        expect(plan.workflows).toEqual([]);
         expect(plan.mcps).toEqual(['github']);
     });
 

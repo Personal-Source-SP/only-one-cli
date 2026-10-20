@@ -1,6 +1,13 @@
 ---
-description: Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.
+name: only-one-conflict
+description: Use when resolving git merge or rebase conflicts hunk by hunk based on semantic intent without aborting or losing changes.
 ---
+
+# Only-One Conflict (Git Conflict Resolution Skill)
+
+## Overview
+
+This skill guides interactive conflict resolution by analyzing both branches' intent, reconciling conflicting hunks, and validating test suites before completing the merge or rebase.
 
 ## Input
 

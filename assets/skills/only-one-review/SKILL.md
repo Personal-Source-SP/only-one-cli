@@ -1,6 +1,13 @@
 ---
-description: Run Open CodeReview for branch, uncommitted changes, or commit changes and produce selectable executable findings.
+name: only-one-review
+description: Use when performing structured code review on git branches, uncommitted changes, or commits to produce debug-grade executable findings.
 ---
+
+# Only-One Review (Code Review & Quality Skill)
+
+## Overview
+
+This skill inspects code changes against architectural standards and quality invariants, producing interactive, selectable findings that can be directly applied.
 
 ## Input
 

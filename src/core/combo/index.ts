@@ -6,7 +6,14 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
-import { checkExistingWorkflows, installWorkflows, type WorkflowInstallResult } from '@/core/workflow/index.js';
+
+export interface WorkflowInstallResult {
+    toolId: string;
+    toolName: string;
+    workflowName: string;
+    status: 'success' | 'skipped' | 'failed';
+    error?: string;
+}
 import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
 import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import type { ProgramDeps } from '@/cli/deps.js';
@@ -26,7 +33,6 @@ import { PACKAGES } from '@assets/packages/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
 import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
-import { WORKFLOWS } from '@assets/workflows/index.js';
 import { MCPS } from '@assets/mcps/index.js';
 import {
     SKILLS_CLI_TARGETS,
@@ -111,7 +117,7 @@ const comboRegistries = (): ComboAssetRegistries => ({
     rules: RULES,
     skills: SKILLS,
     configs: CONFIGS,
-    workflows: WORKFLOWS,
+    workflows: [],
     mcps: MCPS,
 });
 
@@ -173,17 +179,26 @@ export const buildComboDependencyPlan = (
         const workflow = registries.workflows.find((item) => item.name === name);
         return workflow ? [workflow] : [];
     });
+    const skillDependencies = (combo.skills || []).flatMap((name) => {
+        const skill = registries.skills.find((item) => item.name === name);
+        return skill ? [skill] : [];
+    });
 
     return {
         packages: unique([...(combo.packages || []), ...ruleDependencies.flatMap((rule) => rule.requiredPackages || [])]),
         rules: unique(combo.rules || []),
-        skills: unique([...(combo.skills || []), ...ruleDependencies.flatMap((rule) => rule.requiredSkills || [])]),
+        skills: unique([
+            ...(combo.skills || []),
+            ...ruleDependencies.flatMap((rule) => rule.requiredSkills || []),
+            ...skillDependencies.flatMap((skill) => skill.requiredSkills || []),
+        ]),
         configs: unique(combo.configs || []),
         workflows: unique(combo.workflows || []),
         mcps: unique([
             ...(combo.mcps || []),
             ...ruleDependencies.flatMap((rule) => rule.requiredMcps || []),
             ...workflowDependencies.flatMap((workflow) => workflow.requiredMcps || []),
+            ...skillDependencies.flatMap((skill) => skill.requiredMcps || []),
         ]),
     };
 };
@@ -352,23 +367,6 @@ export const checkExistingComboComponents = async (params: {
                 exists: check.exists,
                 status: check.exists ? 'installed' : 'missing',
                 meta: { ruleId: check.ruleId, toolId: check.toolId },
-            });
-        }
-    }
-
-    // 5. Workflows
-    if (combo.workflows?.length) {
-        const workflowChecks = await checkExistingWorkflows(projectDir, selectedTools, combo.workflows, isGlobal);
-        for (const check of workflowChecks) {
-            results.push({
-                type: 'workflow',
-                id: `workflow:${check.toolId}:${check.workflowName}`,
-                name: check.workflowName,
-                toolId: check.toolId,
-                label: `Workflow: ${check.workflowName} in ${check.toolName}`,
-                exists: check.exists,
-                status: check.exists ? 'installed' : 'missing',
-                meta: { workflowName: check.workflowName, toolId: check.toolId },
             });
         }
     }
@@ -575,19 +573,6 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
         } catch (err: any) {
             deps.stdout(`Warning: Failed to load config templates: ${err.message}`);
         }
-    }
-
-    // 6. Workflows
-    if (plan.workflows.length > 0 && selectedTools.length > 0) {
-        results.workflows = await installWorkflows({
-            deps,
-            projectDir,
-            selectedTools,
-            workflowNames: plan.workflows,
-            overwriteList: overwriteList.filter((item) => item.startsWith('workflow:')).map((item) => item.substring(9)),
-            noIgnore: noIgnore || isGlobal,
-            isGlobal,
-        });
     }
 
     // 7. MCPs

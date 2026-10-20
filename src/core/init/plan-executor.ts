@@ -4,7 +4,6 @@ import { executePackageActions } from './package-installer.js';
 import { PACKAGES } from '@assets/packages/index.js';
 import { readMcpManifests, syncMcpGlobalConfig } from '../mcp/index.js';
 import { installSkills } from '../skill/index.js';
-import { installWorkflows } from '../workflow/index.js';
 import { installRules } from '../rule/index.js';
 import { updateGitignore } from './gitignore.js';
 import { getAllowedAgentTargets } from '../target-selection/catalog.js';
@@ -156,39 +155,6 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
                 results.push({ item, status, error: res.error });
                 if (status === 'installed') installedCount++;
                 else if (status === 'overwritten') overwrittenCount++;
-                else if (status === 'skipped') skippedCount++;
-                else failedCount++;
-            } else {
-                results.push({ item, status: 'skipped' });
-                skippedCount++;
-            }
-        }
-    }
-
-    // 5. Workflows
-    const workflowItems = plan.items.filter((i) => i.category === 'workflow');
-    if (workflowItems.length > 0) {
-        const allowedTargets = getAllowedAgentTargets();
-        const toolsForWorkflows = allowedTargets
-            .map((t) => t.agent)
-            .filter((agent): agent is NonNullable<typeof agent> => agent !== undefined && plan.selectedTools.includes(agent.value));
-        const workflowNames = Array.from(new Set(workflowItems.map((i) => i.name)));
-        const overwriteList = workflowItems.filter((i) => i.state === 'existing').map((i) => `${i.target}:${i.name}`);
-
-        const installRes = await installWorkflows({
-            deps,
-            projectDir: plan.projectDir,
-            selectedTools: toolsForWorkflows,
-            workflowNames,
-            overwriteList,
-        });
-
-        for (const item of workflowItems) {
-            const res = installRes.find((r) => r.toolId === item.target && r.workflowName === item.name);
-            if (res) {
-                const status = res.status === 'success' ? 'installed' : res.status === 'skipped' ? 'skipped' : 'failed';
-                results.push({ item, status, error: res.error });
-                if (status === 'installed') installedCount++;
                 else if (status === 'skipped') skippedCount++;
                 else failedCount++;
             } else {

@@ -1,9 +1,13 @@
 ---
 name: only-one-pr-git-skill
-description: Create or update a GitHub Pull Request from the current branch using Git analysis and the GitHub MCP. Use when running the pr-git workflow or when asked to draft and create a PR.
+description: Use when drafting, creating, or updating a GitHub Pull Request using local Git state and the GitHub MCP server.
 ---
 
-Act as a Senior Software Engineer. Analyze the current branch and create or update a Pull Request through the GitHub MCP only after explicit user confirmation.
+# Only-One PR Git Engine Skill
+
+## Overview
+
+Analyze the current branch and create or update a Pull Request through the GitHub MCP only after explicit user confirmation.
 
 ## Inputs
 

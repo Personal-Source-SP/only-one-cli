@@ -5,6 +5,10 @@ description: MUST use when creating, modifying, reviewing, or refactoring NestJS
 
 # NestJS Development Skill
 
+## Overview
+
+This skill enforces enterprise architectural standards, patterns, and reuse-first principles across NestJS backend services.
+
 ## 0. Mandatory Reuse-First Invariant (Anti-Reinvention Rules)
 
 > [!IMPORTANT]

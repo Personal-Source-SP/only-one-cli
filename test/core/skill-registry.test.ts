@@ -2,6 +2,18 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { SKILLS } from '@assets/skills/index.js';
+
+const SDLC_SKILLS = [
+    'only-one-idea',
+    'only-one-plan',
+    'only-one-apply',
+    'only-one-debug',
+    'only-one-review',
+    'only-one-conflict',
+    'only-one-pr-git',
+    'only-one-clean',
+    'only-one-flash',
+];
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
 const packageRoot = resolvePackageRoot(import.meta.url);
@@ -90,5 +102,25 @@ describe('skill registry integrity', () => {
     it('does not ship obsolete subagent-driven-development', () => {
         expect(SKILLS.some(({ name }) => name === 'subagent-driven-development')).toBe(false);
         expect(existsSync(join(skillsDir, 'subagent-driven-development'))).toBe(false);
+    });
+
+    it('registers all 9 core SDLC skills with valid local assets', () => {
+        for (const skillName of SDLC_SKILLS) {
+            const skill = SKILLS.find((s) => s.name === skillName);
+            expect(skill, `SDLC skill '${skillName}' must be registered`).toBeDefined();
+            expect(existsSync(join(skillsDir, skillName, 'SKILL.md'))).toBe(true);
+        }
+    });
+
+    it('enforces Agent Skills specification format on all local skills', () => {
+        const localSkills = SKILLS.filter((s) => s.sourceType === 'local');
+        for (const skill of localSkills) {
+            const skillPath = join(skillsDir, skill.name, 'SKILL.md');
+            expect(existsSync(skillPath), `Skill '${skill.name}' must have SKILL.md`).toBe(true);
+            const content = readFileSync(skillPath, 'utf8');
+            expect(content).toMatch(/^---[\s\S]*?^name:\s*.+$[\s\S]*?^description:\s*.+$[\s\S]*?^---$/m);
+            expect(content).toMatch(/^#\s+.+$/m);
+            expect(content).toMatch(/^##\s+(Overview|Core Purpose)/m);
+        }
     });
 });

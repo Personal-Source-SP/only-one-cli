@@ -1,6 +1,13 @@
 ---
-description: Research current code and create a focused, diff-centric implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification.
+name: only-one-plan
+description: Use when converting a concept into an actionable implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification test cases.
 ---
+
+# Only-One Plan (Implementation Blueprint Skill)
+
+## Overview
+
+This skill researches current codebase implementations, evaluates architectural seams, and formulates a diff-centric implementation plan with strict execution waves and test verification gates.
 
 ## Input
 
@@ -32,7 +39,7 @@ You are a **Senior Software Architect** specializing in codebase analysis and im
 - Seamlessly transition from the approved technical proposal (`concept.md`) produced by `/only-one-idea` into a concrete, executable implementation plan (`plan.md`).
 - Implement the **Dual-Layer Architecture**:
   - **Human Layer**:
-    - Write concise file-level descriptions in English with standard technical terms (or in the user's preferred language during conversation).
+    - Write concise file-level descriptions in the user's preferred language (e.g., Vietnamese) with standard technical terms.
     - Provide intuitive visual diagrams in Section 2 when multi-module interactions warrant them.
     - Avoid redundant path repetitions; use basenames where unambiguous.
   - **Machine Layer (Standardized English & Unified Diffs)**:

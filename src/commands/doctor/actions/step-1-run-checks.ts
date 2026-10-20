@@ -10,7 +10,6 @@ import { findVsEditor } from '@/core/vs/index.js';
 import { findMcpIdeAdapter } from '@/core/mcp/index.js';
 import { MCPS } from '../../../../assets/mcps/index.js';
 import { SKILLS } from '../../../../assets/skills/index.js';
-import { WORKFLOWS } from '../../../../assets/workflows/index.js';
 import { VS_LIBRARY } from '../../../../assets/vs/index.js';
 import { RULES } from '../../../../assets/rules/index.js';
 
@@ -212,25 +211,6 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
             detail: exists ? '.agents/skills' : 'Missing',
             required: false,
             remediation: exists ? undefined : `Sync skill '${skill.name}' via only-one`,
-        });
-    }
-
-    // Workflows: Check against WORKFLOWS manifest
-    for (const workflow of WORKFLOWS) {
-        const workflowPath = join(cwd, '.agents', 'workflows', `${workflow.name}.md`);
-        let exists = false;
-        try {
-            await access(workflowPath);
-            exists = true;
-        } catch {}
-
-        results.push({
-            category: 'Agent Workflows',
-            name: `workflow: ${workflow.name}.md`,
-            ok: exists,
-            detail: exists ? '.agents/workflows' : 'Missing',
-            required: false,
-            remediation: exists ? undefined : `Sync workflow '${workflow.name}' via only-one`,
         });
     }
 

@@ -1,7 +1,6 @@
 import { join } from 'node:path';
 import { cp, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { WORKFLOWS } from '../../../assets/workflows/index.js';
 import { SKILLS } from '../../../assets/skills/index.js';
 import { RULES } from '../../../assets/rules/index.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
@@ -39,11 +38,6 @@ function getTargetAgentDirs(projectDir: string, isGlobal = false): string[] {
     return existing.length > 0 ? existing : ['.agents'];
 }
 
-function checkWorkflowExists(projectDir: string, id: string, isGlobal = false): boolean {
-    const dirs = getTargetAgentDirs(projectDir, isGlobal);
-    return dirs.some((ad) => existsSync(join(projectDir, ad, 'workflows', `${id}.md`)));
-}
-
 function checkSkillExists(projectDir: string, id: string, isGlobal = false): boolean {
     const dirs = getTargetAgentDirs(projectDir, isGlobal);
     return dirs.some((ad) => existsSync(join(projectDir, ad, 'skills', id, 'SKILL.md')));
@@ -60,35 +54,6 @@ function checkRuleExists(projectDir: string, sourceFile: string, isGlobal = fals
 export async function inspectAssetUpdates(projectDir: string, isGlobal = false): Promise<AssetSyncResult> {
     const lockfile = await readInstalledLockfile(projectDir, isGlobal);
     const inspected: AssetInspectionItem[] = [];
-
-    // Inspect Workflows
-    const installedWorkflows = lockfile.installed.workflows || {};
-    for (const [wfName, record] of Object.entries(installedWorkflows)) {
-        const manifest = WORKFLOWS.find((w) => w.name === wfName);
-        if (!manifest) {
-            inspected.push({
-                type: 'workflows',
-                id: wfName,
-                name: wfName,
-                installedVersion: record.version,
-                latestVersion: 'deleted',
-                status: 'removed',
-            });
-            continue;
-        }
-
-        const existsOnDisk = checkWorkflowExists(projectDir, wfName, isGlobal);
-        const latestVersion = manifest.version;
-        const cmp = compareDecimalVersions(record.version, latestVersion);
-        inspected.push({
-            type: 'workflows',
-            id: wfName,
-            name: manifest.name,
-            installedVersion: record.version,
-            latestVersion,
-            status: !existsOnDisk ? 'missing' : cmp < 0 ? 'outdated' : 'up-to-date',
-        });
-    }
 
     // Inspect Skills
     const installedSkills = lockfile.installed.skills || {};
@@ -178,16 +143,7 @@ export async function applyAssetUpdates(
 
     for (const item of itemsToUpdate) {
         try {
-            if (item.type === 'workflows') {
-                const srcPath = join(packageRoot, 'assets/workflows', `${item.id}.md`);
-                if (existsSync(srcPath)) {
-                    for (const ad of agentDirs) {
-                        const targetDir = join(projectDir, ad, 'workflows');
-                        await mkdir(targetDir, { recursive: true });
-                        await cp(srcPath, join(targetDir, `${item.id}.md`), { force: true });
-                    }
-                }
-            } else if (item.type === 'rules') {
+            if (item.type === 'rules') {
                 const manifest = RULES.find((r) => r.id === item.id);
                 if (manifest) {
                     const srcPath = join(packageRoot, 'assets/rules', manifest.sourceFile);
@@ -262,13 +218,7 @@ export async function pruneAssetUpdates(
         try {
             const deletedPaths: string[] = [];
             for (const ad of agentDirs) {
-                if (item.type === 'workflows') {
-                    const filePath = join(projectDir, ad, 'workflows', `${item.id}.md`);
-                    if (existsSync(filePath)) {
-                        await rm(filePath, { force: true });
-                        deletedPaths.push(join(ad, 'workflows', `${item.id}.md`));
-                    }
-                } else if (item.type === 'skills') {
+                if (item.type === 'skills') {
                     const dirPath = join(projectDir, ad, 'skills', item.id);
                     if (existsSync(dirPath)) {
                         await rm(dirPath, { recursive: true, force: true });

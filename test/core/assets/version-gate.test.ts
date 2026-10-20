@@ -12,8 +12,8 @@ describe('Assets Version Gate & Integrity Verification', () => {
     });
 
     it('maps modified asset template files to corresponding asset types and IDs', () => {
-        expect(mapChangedFileToAsset('assets/workflows/only-one-idea.md')).toEqual({
-            type: 'workflows',
+        expect(mapChangedFileToAsset('assets/skills/only-one-idea/SKILL.md')).toEqual({
+            type: 'skills',
             id: 'only-one-idea',
         });
 

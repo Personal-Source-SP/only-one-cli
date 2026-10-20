@@ -1,6 +1,13 @@
 ---
-description: "Consolidate related archives, verify deep logic against codebase, and purge stale documents."
+name: only-one-clean
+description: Use when consolidating related archives, verifying deep logic against codebase, and purging stale task documents.
 ---
+
+# Only-One Clean (Archive & Task Cleanup Skill)
+
+## Overview
+
+This skill resolves finished tasks, updates consolidated knowledge archives in only-one/archives/, and purges stale temporary task folders.
 
 ## Input
 

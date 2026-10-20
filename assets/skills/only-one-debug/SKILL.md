@@ -1,6 +1,13 @@
 ---
-description: Perform systematic Root Cause Analysis (RCA), document findings in a three-section debug.md, and formulate executable file-centric patch blocks with a red feedback loop.
+name: only-one-debug
+description: Use when investigating regressions, test failures, or runtime bugs using systematic RCA and formulating executable patch blocks in debug.md.
 ---
+
+# Only-One Debug (Root Cause Analysis Skill)
+
+## Overview
+
+This skill isolates bug triggers, reproduces failures via red feedback loops, and documents actionable root causes and targeted patch plans in debug.md.
 
 ## Input
 

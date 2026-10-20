@@ -30,8 +30,6 @@ import { COMBOS } from '@assets/combos/index.js';
 import { PACKAGES } from '@assets/packages/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
 import { SKILLS } from '@assets/skills/index.js';
-import { WORKFLOWS } from '@assets/workflows/index.js';
-import { installWorkflows, checkExistingWorkflows } from '@/core/workflow/index.js';
 import type {
     InitCommandRequest,
     InitCommandResponse,
@@ -456,7 +454,18 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
             deps.stdout('                READINESS REPORT');
             deps.stdout('==================================================');
 
-            const workflows = WORKFLOWS.map((wf) => {
+            const SDLC_SKILL_NAMES = [
+                'only-one-idea',
+                'only-one-plan',
+                'only-one-apply',
+                'only-one-debug',
+                'only-one-review',
+                'only-one-conflict',
+                'only-one-pr-git',
+                'only-one-clean',
+                'only-one-flash',
+            ];
+            const workflows = SKILLS.filter((s) => SDLC_SKILL_NAMES.includes(s.name)).map((wf) => {
                 const mcpId = wf.requiredMcps?.[0];
                 let secretKey: string | undefined;
                 let usageNote: string | undefined;

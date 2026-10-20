@@ -1,6 +1,13 @@
 ---
-description: 'Clarify business problems, explore multiple solution options, create UI mockups, define scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a high-confidence concept.md specification.'
+name: only-one-idea
+description: Use when exploring rough ideas, clarifying business pain points, or defining strict scope boundaries before implementation. Guides interview and produces concept.md.
 ---
+
+# Only-One Idea (Concept Discovery Skill)
+
+## Overview
+
+This skill guides the discovery phase by conducting focused interviews, challenging fuzzy assumptions, evaluating trade-offs, and producing a lean concept.md specification before planning.
 
 ## Input
 
@@ -31,8 +38,7 @@ If input does not describe the idea or problem, ask a focused question before pr
 - **User Role**:
   - **Project Manager (PM) / Product Owner**: Directs project goals, reviews trade-offs, selects the preferred solution option, and makes final architectural/scope decisions.
 - **Enforce Technical Documentation Integrity**:
-  - Conduct interactive Q&A and interview turns in the user's preferred language (e.g., Vietnamese).
-  - Author `concept.md` using concise, professional English technical specifications.
+  - Conduct interactive Q&A and author `concept.md` in the user's preferred language (e.g., Vietnamese) while preserving standard English technical terms, code symbols, commands, and paths.
 - Activate and follow the Define skills (`grill-with-docs`, `grill-me`, `sparring-partner`, `domain-modeling`, `interview-me`, `idea-refine`, `wait-what`, `c4-diagrams`).
 - Activate and follow `karpathy-ste100-discipline` for zero-slop 80% ASD-STE100 specification writing.
 - Before the first user-visible response, read and activate `i-have-adhd`; keep it active throughout this workflow.
@@ -103,7 +109,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 ### Step 3 — Author, Save `concept.md` & Hard Stop (Terminal Gate)
 
 1. **Save `concept.md` Artifact**:
-   - Consolidate findings into `only-one/tasks/<kebab-case-slug>/concept.md` using the template below (store `created_at` in frontmatter) with crisp English technical specifications.
+   - Consolidate findings into `only-one/tasks/<kebab-case-slug>/concept.md` using the template below (store `created_at` in frontmatter) with crisp technical specifications in the user's preferred language (e.g., Vietnamese) while preserving standard English technical terms.
 
 ```markdown
 ---
@@ -157,7 +163,7 @@ status: concept
 ## Guardrails
 
 - **🛑 Strict Lifecycle Isolation (Zero Source Code Modifications)**: `/only-one-idea` is strictly a scoping and conceptual specification workflow. The agent MUST NEVER edit source code, tests, configs, or other workflows during `/only-one-idea`.
-- **Enforce Clear Technical Writing**: Write concise English specifications, preserving standard technical terms.
+- **Enforce Clear Technical Writing**: Write concise specifications in the user's preferred language (e.g., Vietnamese), preserving standard English technical terms.
 - **Enforce 80% ASD-STE100 Writing Standard**: Eliminate AI slop, restrict sentence length (instructions <= 20 words, descriptions <= 25 words), ban passive voice, and structure actions using Prerequisites -> Action -> Verification.
 - **Enforce Visual-First Domain Modeling**: Mandatory Mermaid/ASCII diagram in Section 3 for multi-step flows; never replace diagrams with monolithic narrative blocks.
 - **Do not skip Phase 1 discovery**: Clarify problem and scope boundaries thoroughly before proposing solution options.

@@ -33,9 +33,6 @@ export const COMBOS: ComboManifest[] = [
             'resolving-merge-conflicts',
             'karpathy-ste100-discipline',
             'task-lifecycle-resolution',
-        ],
-        rules: ['next-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
-        workflows: [
             'only-one-idea',
             'only-one-plan',
             'only-one-apply',
@@ -45,6 +42,7 @@ export const COMBOS: ComboManifest[] = [
             'only-one-conflict',
             'only-one-clean',
         ],
+        rules: ['next-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
     },
     {
         id: 'backend-flow',
@@ -77,9 +75,6 @@ export const COMBOS: ComboManifest[] = [
             'resolving-merge-conflicts',
             'karpathy-ste100-discipline',
             'task-lifecycle-resolution',
-        ],
-        rules: ['nest-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
-        workflows: [
             'only-one-idea',
             'only-one-plan',
             'only-one-apply',
@@ -89,6 +84,7 @@ export const COMBOS: ComboManifest[] = [
             'only-one-conflict',
             'only-one-clean',
         ],
+        rules: ['nest-architecture-stack', 'context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
     },
     {
         id: 'only-one-flow',
@@ -127,9 +123,6 @@ export const COMBOS: ComboManifest[] = [
             'karpathy-ste100-discipline',
             'only-one-pr-git-skill',
             'task-lifecycle-resolution',
-        ],
-        rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
-        workflows: [
             'only-one-idea',
             'only-one-plan',
             'only-one-apply',
@@ -140,6 +133,7 @@ export const COMBOS: ComboManifest[] = [
             'only-one-clean',
             'only-one-pr-git',
         ],
+        rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
     },
     {
         id: 'mcp-flow',
@@ -157,7 +151,6 @@ export const COMBOS: ComboManifest[] = [
         description: 'GitHub PR automation and Git state management toolkit',
         scope: 'global',
         supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
-        skills: ['only-one-pr-git-skill'],
-        workflows: ['only-one-pr-git'],
+        skills: ['only-one-pr-git-skill', 'only-one-pr-git'],
     },
 ];

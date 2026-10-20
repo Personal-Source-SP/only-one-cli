@@ -1,45 +1,45 @@
 ---
-status: done
+status: planned
 slug: unified-global-agents-standard
 created_at: 2026-10-20T10:07:00+07:00
-started_at: 2026-10-20T10:09:00+07:00
-completed_at: 2026-10-20T10:16:30+07:00
+started_at: ~
+completed_at: ~
 pr_url: ~
 branch: ~
 ---
 
-# Plan: Unified Global Agents Standard & Skills Manifest
+# Plan: Chuẩn hóa Global Agents và Manifest Skills Đa Nền tảng
 
-## Section 1. Directory Structure Changes
+## Section 1. Thay đổi Cấu trúc Thư mục (Directory Structure Changes)
 
 ```text
 src/
 ├── core/
 │   ├── agent/
-│   │   └── [MODIFY] tools.ts                      # Route all global asset paths to ~/.agents/
+│   │   └── [MODIFY] tools.ts                      # Định tuyến toàn bộ global assets về ~/.agents/
 │   ├── assets/
-│   │   └── [MODIFY] sync.ts                       # Constrain global sync directory to ['.agents']
+│   │   └── [MODIFY] sync.ts                       # Thu gọn thư mục quét global thành ['.agents']
 │   └── skill/
-│       ├── [NEW]    manifest-bridge.ts            # Non-destructive manifest sync for skills.json
-│       ├── [MODIFY] index.ts                      # Trigger manifest bridge on global skill installation
+│       ├── [NEW]    manifest-bridge.ts            # Đồng bộ an toàn file manifest skills.json
+│       ├── [MODIFY] index.ts                      # Kích hoạt manifest bridge khi cài skill global
 │       └── remote/
-│           └── [MODIFY] skills-sh-installer.ts    # Trigger manifest bridge on remote skill install
+│           └── [MODIFY] skills-sh-installer.ts    # Kích hoạt manifest bridge khi cài remote skill
 test/
 ├── core/
-│   ├── [NEW]    manifest-bridge.test.ts           # Unit tests for skills.json idempotency & merging
-│   └── [MODIFY] skill-installer-global.test.ts    # Update destination assertion to ~/.agents/skills
+│   ├── [NEW]    manifest-bridge.test.ts           # Unit tests kiểm tra merge và tính bất biến của skills.json
+│   └── [MODIFY] skill-installer-global.test.ts    # Cập nhật assertion đích đến về ~/.agents/skills
 └── commands/
-    └── [MODIFY] global-commands.test.ts           # Update global integration assertions to ~/.agents/
+    └── [MODIFY] global-commands.test.ts           # Cập nhật integration assertions về ~/.agents/
 ```
 
-## Section 2. File Changes
+## Section 2. Chi tiết Thay đổi File (File Changes)
 
-### Architectural Interaction Diagram
+### Sơ đồ Tương tác Kiến trúc (Architectural Interaction Diagram)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User
+    actor User as Người dùng
     participant CLI as CLI Engine
     participant Tools as tools.ts (resolveToolDestinationPaths)
     participant Bridge as manifest-bridge.ts (syncGlobalSkillsManifest)
@@ -49,35 +49,35 @@ sequenceDiagram
     User->>CLI: only-one skill/workflow/rule install --global
     CLI->>Tools: resolveToolDestinationPaths(tool, type, homedir, isGlobal=true)
     Tools-->>CLI: ~/.agents/{skills,workflows,rules}
-    CLI->>Disk: Write asset files to ~/.agents/<type>
-    opt Asset is Skill
+    CLI->>Disk: Ghi file asset vào ~/.agents/<type>
+    opt Asset là Skill
         CLI->>Bridge: syncGlobalSkillsManifest(homedir)
-        Bridge->>Disk: Ensure ~/.agents/skills.json contains ~/.agents/skills
-        Bridge->>Gemini: Non-destructively merge entry into ~/.gemini/config/skills.json
+        Bridge->>Disk: Đảm bảo ~/.agents/skills.json chứa entry ~/.agents/skills
+        Bridge->>Gemini: Merge không phá hủy entry vào ~/.gemini/config/skills.json
     end
-    CLI-->>User: Installation completed successfully
+    CLI-->>User: Thông báo cài đặt thành công
 ```
 
 ---
 
 ### 1. `[MODIFY]` `src/core/agent/tools.ts`
 
-- **Status**: `[x]`
-- **Context**: Resolves destination path for assets across tools and global/local scopes.
+- **Status**: `[ ]`
+- **Context**: Định tuyến đường dẫn đích cho assets qua các tool và phạm vi global/local.
 - **Target Symbols / AST Seams**: `resolveToolDestinationPaths`
-- **Invariants**: When `isGlobal` is true, all tools strictly resolve to `join(targetDir, '.agents', assetType)`.
-- **Depends On**: None.
+- **Invariants**: Khi `isGlobal` là true, mọi tool đều phân giải về `join(targetDir, '.agents', assetType)`.
+- **Depends On**: Không có.
 - **Fast Test Command**: `npm test test/core/agent/tools.test.ts`
 
-> **Action**: Route all global assets to `.agents/{skills,workflows,rules}`.
+> **Action**: Chuyển hướng toàn bộ global assets về `.agents/{skills,workflows,rules}`.
 
 **Ponytail checklist**
 - [x] Required by acceptance criteria.
 - [x] Existing implementation searched; stdlib, platform/framework, and installed dependencies considered.
 - [x] No duplicate logic or speculative extension point.
 - [x] Minimum diff preserves correctness and safety.
-- **Decision**: Collapse fragmented tool branches in `resolveToolDestinationPaths` when `isGlobal` is true.
-- **Rejected alternative**: Keeping tool-specific global folders and duplicating assets across them.
+- **Decision**: Thu gọn các nhánh rẽ tool riêng biệt trong `resolveToolDestinationPaths` khi `isGlobal` là true.
+- **Rejected alternative**: Giữ thư mục riêng cho từng tool dẫn đến nhân bản dữ liệu nhiều lần.
 
 ```diff
 @@ -25,14 +25,2 @@ export function resolveToolDestinationPaths(
@@ -102,22 +102,22 @@ sequenceDiagram
 
 ### 2. `[MODIFY]` `src/core/assets/sync.ts`
 
-- **Status**: `[x]`
-- **Context**: Provides active target directories for inspecting and syncing assets.
+- **Status**: `[ ]`
+- **Context**: Xác định các thư mục agent cần kiểm tra, khôi phục hoặc dọn dẹp assets.
 - **Target Symbols / AST Seams**: `getTargetAgentDirs`
-- **Invariants**: When `isGlobal` is true, return `['.agents']` to prevent duplicated copies across legacy folders.
-- **Depends On**: None.
+- **Invariants**: Khi `isGlobal` là true, chỉ trả về `['.agents']` để tránh tạo bản sao thừa.
+- **Depends On**: Không có.
 - **Fast Test Command**: `npm test test/core/assets/sync.test.ts`
 
-> **Action**: Unify global target agent directories to `['.agents']`.
+> **Action**: Thống nhất danh sách thư mục agent global về duy nhất `['.agents']`.
 
 **Ponytail checklist**
 - [x] Required by acceptance criteria.
 - [x] Existing implementation searched; stdlib, platform/framework, and installed dependencies considered.
 - [x] No duplicate logic or speculative extension point.
 - [x] Minimum diff preserves correctness and safety.
-- **Decision**: Return `['.agents']` when `isGlobal` is true.
-- **Rejected alternative**: Returning `['.gemini/config', '.claude', '.cursor', '.codex']` which causes 4x duplicate copies.
+- **Decision**: Trả về `['.agents']` khi `isGlobal` là true.
+- **Rejected alternative**: Trả về `['.gemini/config', '.claude', '.cursor', '.codex']` gây nhân bản 4 lần file vật lý.
 
 ```diff
 @@ -35,3 +35,3 @@ function getTargetAgentDirs(projectDir: string, isGlobal = false): string[] {
@@ -131,22 +131,22 @@ sequenceDiagram
 
 ### 3. `[NEW]` `src/core/skill/manifest-bridge.ts`
 
-- **Status**: `[x]`
-- **Context**: Manifest bridge maintaining `skills.json` registration for universal standard and Antigravity.
+- **Status**: `[ ]`
+- **Context**: Cầu nối quản lý manifest `skills.json` cho chuẩn mở chung và Antigravity IDE.
 - **Target Symbols / AST Seams**: `syncGlobalSkillsManifest`
-- **Invariants**: Non-destructively parse and merge `{ path: '~/.agents/skills' }` into existing manifests.
-- **Depends On**: None.
+- **Invariants**: Merge an toàn không phá hủy `{ path: '~/.agents/skills' }` vào manifest hiện có.
+- **Depends On**: Không có.
 - **Fast Test Command**: `npm test test/core/manifest-bridge.test.ts`
 
-> **Action**: Create manifest bridge for `skills.json` synchronization.
+> **Action**: Tạo manifest bridge module để đồng bộ `skills.json`.
 
 **Ponytail checklist**
 - [x] Required by acceptance criteria.
 - [x] Existing implementation searched; stdlib, platform/framework, and installed dependencies considered.
 - [x] No duplicate logic or speculative extension point.
 - [x] Minimum diff preserves correctness and safety.
-- **Decision**: New focused helper to read, merge, and write `skills.json` cleanly.
-- **Rejected alternative**: Inlining JSON manipulation across multiple command files.
+- **Decision**: Module riêng chuyên trách đọc, merge và lưu `skills.json` an toàn.
+- **Rejected alternative**: Viết code inline rải rác trong các command file.
 
 ```typescript
 import { existsSync } from 'node:fs';
@@ -202,22 +202,22 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 
 ### 4. `[MODIFY]` `src/core/skill/index.ts`
 
-- **Status**: `[x]`
-- **Context**: Installs skills into destination tool directories.
+- **Status**: `[ ]`
+- **Context**: Cài đặt skills nội bộ vào các thư mục công cụ đích.
 - **Target Symbols / AST Seams**: `installSkills`
-- **Invariants**: Execute `syncGlobalSkillsManifest` when `isGlobal` is true.
+- **Invariants**: Kích hoạt `syncGlobalSkillsManifest` khi `isGlobal` là true.
 - **Depends On**: `src/core/skill/manifest-bridge.ts`
 - **Fast Test Command**: `npm test test/commands/skill/skill.test.ts`
 
-> **Action**: Call manifest bridge when installing skills globally.
+> **Action**: Gọi manifest bridge sau khi hoàn tất cài đặt skill global.
 
 **Ponytail checklist**
 - [x] Required by acceptance criteria.
 - [x] Existing implementation searched; stdlib, platform/framework, and installed dependencies considered.
 - [x] No duplicate logic or speculative extension point.
 - [x] Minimum diff preserves correctness and safety.
-- **Decision**: Invoke `syncGlobalSkillsManifest(projectDir)` after successful global installation.
-- **Rejected alternative**: Manually creating `skills.json` outside the install pipeline.
+- **Decision**: Gọi `syncGlobalSkillsManifest(projectDir)` sau khi lưu skill global.
+- **Rejected alternative**: Bắt người dùng tự tạo `skills.json` thủ công.
 
 ```diff
 @@ -6,2 +6,3 @@ import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
@@ -229,7 +229,7 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 +
 +    if (isGlobal) {
 +        await syncGlobalSkillsManifest(projectDir);
-+    }
+     }
  
      return results;
 ```
@@ -238,22 +238,22 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 
 ### 5. `[MODIFY]` `src/core/skill/remote/skills-sh-installer.ts`
 
-- **Status**: `[x]`
-- **Context**: Remote skill installer downloading skills through `skills.sh`.
+- **Status**: `[ ]`
+- **Context**: Trình cài đặt remote skills từ `skills.sh`.
 - **Target Symbols / AST Seams**: `installSkillViaSkillsCli`
-- **Invariants**: Sync manifests when `isGlobal` is true.
+- **Invariants**: Đồng bộ manifests khi `isGlobal` là true.
 - **Depends On**: `src/core/skill/manifest-bridge.ts`
 - **Fast Test Command**: `npm test test/core/skill-installer-global.test.ts`
 
-> **Action**: Call manifest bridge after remote skills install globally.
+> **Action**: Kích hoạt manifest bridge sau khi cài remote skill global.
 
 **Ponytail checklist**
 - [x] Required by acceptance criteria.
 - [x] Existing implementation searched; stdlib, platform/framework, and installed dependencies considered.
 - [x] No duplicate logic or speculative extension point.
 - [x] Minimum diff preserves correctness and safety.
-- **Decision**: Trigger `syncGlobalSkillsManifest(projectDir)` if `isGlobal`.
-- **Rejected alternative**: Leaving remote skills unindexed in `skills.json`.
+- **Decision**: Gọi `syncGlobalSkillsManifest(projectDir)` nếu `isGlobal` là true.
+- **Rejected alternative**: Bỏ quên việc index remote skills trong `skills.json`.
 
 ```diff
 @@ -7,2 +7,3 @@ import { resolveToolDestinationPaths, type AgentToolOption } from '@/core/agent/
@@ -264,7 +264,7 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 +
 +    if (isGlobal) {
 +        await syncGlobalSkillsManifest(projectDir);
-+    }
+     }
  }
 ```
 
@@ -272,22 +272,22 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 
 ### 6. `[NEW]` `test/core/manifest-bridge.test.ts`
 
-- **Status**: `[x]`
-- **Context**: Unit test for `syncGlobalSkillsManifest` and `mergeSkillsManifest`.
+- **Status**: `[ ]`
+- **Context**: Unit tests cho `syncGlobalSkillsManifest` và `mergeSkillsManifest`.
 - **Target Symbols / AST Seams**: `mergeSkillsManifest`, `syncGlobalSkillsManifest`
-- **Invariants**: Must verify idempotency, existing entry preservation, and directory creation.
+- **Invariants**: Kiểm tra tính bất biến (idempotency), bảo toàn cấu hình cũ và tạo thư mục cha.
 - **Depends On**: `src/core/skill/manifest-bridge.ts`
 - **Fast Test Command**: `npm test test/core/manifest-bridge.test.ts`
 
-> **Action**: Add unit tests for manifest synchronization.
+> **Action**: Bổ sung bộ unit test cho việc đồng bộ manifest.
 
 **Test checklist**
 - [x] Fixture/helper reuse verified.
 - [x] No duplicate setup.
 - [x] Tests changed behavior only.
 - [x] Existing toolchain (Vitest) used.
-- **Decision**: Test file creation, idempotency, and non-destructive merging.
-- **Rejected alternative**: Relying only on integration tests.
+- **Decision**: Kiểm tra việc tạo file, tính bất biến khi chạy lặp lại và merge an toàn.
+- **Rejected alternative**: Chỉ trông cậy vào integration test.
 
 ```typescript
 import { describe, expect, it, beforeEach, afterEach } from 'vitest';
@@ -358,22 +358,22 @@ describe('Skills Manifest Bridge', () => {
 
 ### 7. `[MODIFY]` `test/core/skill-installer-global.test.ts`
 
-- **Status**: `[x]`
-- **Context**: Tests global skill destination resolution.
+- **Status**: `[ ]`
+- **Context**: Kiểm tra định tuyến đường dẫn cài đặt global skill.
 - **Target Symbols / AST Seams**: `global skill destination sync`
-- **Invariants**: Must assert that global skill path resolves to `.agents/skills` for Antigravity.
+- **Invariants**: Khẳng định đường dẫn global skill của Antigravity trỏ về `.agents/skills`.
 - **Depends On**: `src/core/agent/tools.ts`
 - **Fast Test Command**: `npm test test/core/skill-installer-global.test.ts`
 
-> **Action**: Update global destination test to assert `.agents/skills` canonical path.
+> **Action**: Cập nhật bài test định tuyến global để assert đường dẫn canonical `.agents/skills`.
 
 **Ponytail checklist**
 - [x] Required by acceptance criteria.
 - [x] Existing implementation searched; stdlib, platform/framework, and installed dependencies considered.
 - [x] No duplicate logic or speculative extension point.
 - [x] Minimum diff preserves correctness and safety.
-- **Decision**: Update assertion to verify `.agents/skills` is returned when `isGlobal` is true.
-- **Rejected alternative**: Deleting test entirely.
+- **Decision**: Khẳng định `~/.agents/skills` được trả về khi `isGlobal` là true.
+- **Rejected alternative**: Xóa bài test.
 
 ```diff
 @@ -9,4 +9,4 @@ describe('global skill destination sync', () => {
@@ -399,22 +399,22 @@ describe('Skills Manifest Bridge', () => {
 
 ### 8. `[MODIFY]` `test/commands/global-commands.test.ts`
 
-- **Status**: `[x]`
-- **Context**: Integration tests for CLI commands with `--global` flag.
+- **Status**: `[ ]`
+- **Context**: Integration test cho các lệnh CLI chạy với cờ `--global`.
 - **Target Symbols / AST Seams**: `Global Commands Integration (--global flag)`
-- **Invariants**: Assert assets install to `.agents/` and `skills.json` manifests exist.
+- **Invariants**: Đảm bảo assets được cài vào `.agents/` và file manifest `skills.json` được tạo.
 - **Depends On**: `src/core/agent/tools.ts`, `src/core/assets/sync.ts`
 - **Fast Test Command**: `npm test test/commands/global-commands.test.ts`
 
-> **Action**: Update integration assertions to `.agents/` and verify manifests.
+> **Action**: Cập nhật assertions tích hợp global về `.agents/` và kiểm tra sinh manifests.
 
 **Ponytail checklist**
 - [x] Required by acceptance criteria.
 - [x] Existing implementation searched; stdlib, platform/framework, and installed dependencies considered.
 - [x] No duplicate logic or speculative extension point.
 - [x] Minimum diff preserves correctness and safety.
-- **Decision**: Align test expectations with canonical storage and manifest generation.
-- **Rejected alternative**: Keeping outdated `.gemini/config` assertions.
+- **Decision**: Cập nhật kỳ vọng kiểm thử theo chuẩn canonical và manifest bridge.
+- **Rejected alternative**: Giữ assertion cũ trỏ về `.gemini/config`.
 
 ```diff
 @@ -44,3 +44,5 @@ describe('Global Commands Integration (--global flag)', () => {
@@ -443,17 +443,16 @@ describe('Skills Manifest Bridge', () => {
 
 ---
 
-## Section 3. Test Cases & Verification
+## Section 3. Kế hoạch Kiểm thử & Nghiệm thu (Test Cases & Verification)
 
-- **Automated Tests**:
-  - [x] `npm test test/core/agent/tools.test.ts` (PASS - 3 tests passed)
-  - [x] `npm test test/core/assets/sync.test.ts` (PASS - 4 tests passed)
-  - [x] `npm test test/core/manifest-bridge.test.ts` (PASS - 4 tests passed)
-  - [x] `npm test test/core/skill-installer-global.test.ts` (PASS - 1 test passed)
-  - [x] `npm test test/commands/global-commands.test.ts` (PASS - 5 tests passed)
-  - [x] Full suite validation: `npm test` (PASS - 58 test files passed, 256 tests passed, 0 failures)
-  - [x] Formatting & Typecheck: `npm run format:check` and `npx tsc --noEmit` (PASS - 0 errors)
-- **Manual Checks**:
-  - [x] Run `only-one skill install c4-diagrams --global` and inspect `~/.agents/skills/c4-diagrams/SKILL.md` (Verified via `global-commands.test.ts`).
-  - [x] Verify `~/.agents/skills.json` and `~/.gemini/config/skills.json` contain `{ "path": "~/.agents/skills" }` (Verified via `global-commands.test.ts` and `manifest-bridge.test.ts`).
-  - [x] Run `only-one workflow install only-one-idea --global` and verify file exists in `~/.agents/workflows/only-one-idea.md` (Verified via `global-commands.test.ts`).
+- **Kiểm thử tự động (Automated Tests)**:
+  - `npm test test/core/agent/tools.test.ts`
+  - `npm test test/core/assets/sync.test.ts`
+  - `npm test test/core/manifest-bridge.test.ts`
+  - `npm test test/core/skill-installer-global.test.ts`
+  - `npm test test/commands/global-commands.test.ts`
+  - Chạy toàn bộ test suite: `npm test`
+- **Kiểm thử thủ công (Manual Checks)**:
+  - Chạy `only-one skill install c4-diagrams --global` và kiểm tra file tại `~/.agents/skills/c4-diagrams/SKILL.md`.
+  - Xác nhận `~/.agents/skills.json` và `~/.gemini/config/skills.json` chứa `{ "path": "~/.agents/skills" }`.
+  - Chạy `only-one workflow install only-one-idea --global` và xác nhận file tại `~/.agents/workflows/only-one-idea.md`.

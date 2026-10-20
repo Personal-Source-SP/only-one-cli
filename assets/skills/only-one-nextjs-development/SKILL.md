@@ -5,6 +5,10 @@ description: MUST use when creating, modifying, reviewing, or refactoring Fronte
 
 # Master Next.js / Frontend Development Skill (Central Coordinator)
 
+## Overview
+
+This skill provides comprehensive frontend engineering guidelines, React patterns, and reuse-first principles for Next.js applications.
+
 ## 0. Mandatory Reuse-First Invariant (Anti-Reinvention Rules)
 
 > [!IMPORTANT]

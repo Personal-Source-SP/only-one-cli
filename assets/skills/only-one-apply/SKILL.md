@@ -1,6 +1,13 @@
 ---
-description: "Implement tasks from an approved plan.md, debug.md, or selected findings in review.md with dependency-ordered verification."
+name: only-one-apply
+description: Use when implementing changes from an approved plan.md, debug.md, or selected findings in review.md with dependency-ordered verification.
 ---
+
+# Only-One Apply (Plan Implementation Skill)
+
+## Overview
+
+This skill executes an approved plan, debug document, or review finding set with vertical slice discipline, running fast verification tests per file change.
 
 ## Input
 

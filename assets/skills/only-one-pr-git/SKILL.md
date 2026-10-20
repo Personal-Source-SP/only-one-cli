@@ -1,6 +1,13 @@
 ---
-description: Create or update a GitHub PR from the current branch using validated Git state and GitHub MCP.
+name: only-one-pr-git
+description: Use when creating or updating a GitHub Pull Request from the current branch with automated Git state validation.
 ---
+
+# Only-One PR Git (Pull Request Management Skill)
+
+## Overview
+
+This skill prepares, validates, and publishes GitHub pull requests from local branch changes following repository standards.
 
 ## Input
 

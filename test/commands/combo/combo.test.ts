@@ -95,10 +95,9 @@ describe('combo command', () => {
 
             expect(existsSync(join(cwd, '.cursor', 'rules', '02-next-architecture-stack.md'))).toBe(true);
             expect(existsSync(join(cwd, '.cursor', 'rules', '01-context-and-tools.md'))).toBe(true);
-            expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan.md'))).toBe(true);
-            expect(existsSync(join(cwd, '.cursor', 'workflows', 'only-one-plan-fe.md'))).toBe(false);
+            expect(existsSync(join(cwd, '.cursor', 'skills', 'only-one-plan', 'SKILL.md'))).toBe(true);
             expect(writes.join('\n')).toContain('Rules:');
-            expect(writes.join('\n')).toContain('Workflows:');
+            expect(writes.join('\n')).toContain('Skills:');
             expect(writes.join('\n')).toContain('Initializing UI/UX Pro Max CLI...');
             expect(writes.join('\n')).toContain('UI/UX Pro Max initialized successfully for Cursor');
         } finally {
