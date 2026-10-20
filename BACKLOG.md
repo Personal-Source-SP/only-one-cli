@@ -6,7 +6,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
 
 - [x] **Project initialization** — `init` chạy luồng cài đặt workspace theo bước, hỗ trợ chọn agent target, bỏ qua bước, và xác nhận trước khi thực thi.
 - [x] **Package installer** — `package` và `init package` cài package từ typed registry: `ui-ux-pro-max-cli`, `wondelai/skills/system-design`, `ux-flow-designer`.
-- [x] **Combo setup** — `combo` và `init combo` cài bộ bundle cấu hình định sẵn: `frontend-flow`, `backend-flow`, `full-sdlc-flow`, `git-flow`, `mcp-flow`.
+- [x] **Combo setup** — `combo` và `init combo` cài bộ bundle cấu hình định sẵn: `only-one-flow` (Global SDLC & MCP), `frontend-flow` (Next.js), `backend-flow` (NestJS).
 - [x] **Agent target selection** — Hỗ trợ 4 agent targets chính: Antigravity, Claude, Cursor, Codex; tự động kiểm tra và reject target không hợp lệ trước khi áp dụng side effect.
 - [x] **Machine-readable output** — Hỗ trợ `--json` cho command output.
 - [x] **Environment diagnostics** — `doctor` kiểm tra trạng thái môi trường (Node.js, Git, CLI paths).

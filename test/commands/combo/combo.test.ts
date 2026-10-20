@@ -40,7 +40,7 @@ describe('combo command', () => {
             expect(output).toContain("COMBO 'BACKEND FLOW SETUP' REPORT");
 
             // Verify skill copy
-            const skillPath = join(cwd, '.cursor', 'skills', 'grill-me');
+            const skillPath = join(cwd, '.cursor', 'skills', 'only-one-nestjs-development');
             expect(existsSync(skillPath)).toBe(true);
         } finally {
             await rm(cwd, { recursive: true, force: true });
@@ -52,8 +52,8 @@ describe('combo command', () => {
         const prompts: Array<{ message: string; choices: Array<{ checked?: boolean }> }> = [];
 
         try {
-            await mkdir(join(cwd, '.cursor', 'skills', 'grill-me'), { recursive: true });
-            await writeFile(join(cwd, '.cursor', 'skills', 'grill-me', 'SKILL.md'), 'existing: true\n');
+            await mkdir(join(cwd, '.cursor', 'skills', 'only-one-nestjs-development'), { recursive: true });
+            await writeFile(join(cwd, '.cursor', 'skills', 'only-one-nestjs-development', 'SKILL.md'), 'existing: true\n');
             const program = createProgram({
                 cwd,
                 env: {},
@@ -94,8 +94,8 @@ describe('combo command', () => {
             await program.parseAsync(['combo', cwd, 'frontend-flow', '--tool', 'cursor'], { from: 'user' });
 
             expect(existsSync(join(cwd, '.cursor', 'rules', '02-next-architecture-stack.md'))).toBe(true);
-            expect(existsSync(join(cwd, '.cursor', 'rules', '01-context-and-tools.md'))).toBe(true);
-            expect(existsSync(join(cwd, '.cursor', 'skills', 'only-one-plan', 'SKILL.md'))).toBe(true);
+
+            expect(existsSync(join(cwd, '.cursor', 'skills', 'only-one-nextjs-development', 'SKILL.md'))).toBe(true);
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Skills:');
             expect(writes.join('\n')).toContain('Initializing UI/UX Pro Max CLI...');

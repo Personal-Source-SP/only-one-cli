@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
@@ -10,6 +10,7 @@ import { createRuleCommand } from '@/commands/rule/command.js';
 import { createComboCommand } from '@/commands/combo/command.js';
 import { createUpdateCommand } from '@/commands/update/command.js';
 import { readInstalledLockfile, resolveInstalledLockfilePath } from '@/core/assets/lockfile.js';
+import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 
 let tempHome: string;
 
@@ -18,6 +19,23 @@ vi.mock('node:os', async () => {
     return {
         ...actual,
         homedir: () => tempHome,
+    };
+});
+
+vi.mock('@/core/skill/remote/skills-sh-installer.js', async () => {
+    const actual = await vi.importActual<typeof import('@/core/skill/remote/skills-sh-installer.js')>(
+        '@/core/skill/remote/skills-sh-installer.js',
+    );
+    return {
+        ...actual,
+        installSkillViaSkillsCli: vi.fn(async ({ projectDir, skillName, selectedTools, isGlobal }: any) => {
+            for (const tool of selectedTools) {
+                const targetSkillDir = resolveToolDestinationPaths(tool, 'skills', projectDir, isGlobal);
+                const destPath = join(targetSkillDir, skillName);
+                await mkdir(destPath, { recursive: true });
+                await writeFile(join(destPath, 'SKILL.md'), `# ${skillName}\n`, 'utf-8');
+            }
+        }),
     };
 });
 
@@ -102,13 +120,13 @@ describe('Global Commands Integration (--global flag)', () => {
         };
 
         const cmd = createComboCommand(deps as ProgramDeps);
-        await cmd.parseAsync(['node', 'test', tempHome, 'git-flow', '--tool', 'antigravity', '--global']);
+        await cmd.parseAsync(['node', 'test', tempHome, 'only-one-flow', '--tool', 'antigravity', '--global']);
 
         const wfDest = join(tempHome, '.agents/workflows/only-one-pr-git.md');
         expect(existsSync(wfDest)).toBe(true);
 
         const lock = await readInstalledLockfile(tempHome, true);
-        expect(lock.installed.combos?.['git-flow']).toBeDefined();
+        expect(lock.installed.combos?.['only-one-flow']).toBeDefined();
         expect(existsSync(join(tempHome, '.gitignore'))).toBe(false);
     });
 

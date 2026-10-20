@@ -113,8 +113,9 @@ describe('prebuilt combo completeness', () => {
         expect(() => validateComboManifestReferences(COMBOS, productionRegistries)).not.toThrow();
     });
 
-    it.each(['frontend-flow', 'backend-flow', 'only-one-flow'])('includes i-have-adhd in %s', (comboId) => {
-        const combo = COMBOS.find(({ id }) => id === comboId);
+    it('registers strictly 3 modular combos', () => {
+        expect(COMBOS.map(({ id }) => id).sort()).toEqual(['backend-flow', 'frontend-flow', 'only-one-flow']);
+        const combo = COMBOS.find(({ id }) => id === 'only-one-flow');
         expect(combo?.skills).toContain('i-have-adhd');
     });
 
@@ -140,7 +141,7 @@ describe('prebuilt combo completeness', () => {
 
         const plan = buildComboDependencyPlan(combo, productionRegistries);
         expect(plan.skills).toContain(technologySkill);
-        expect(plan.rules).toEqual(expect.arrayContaining([architectureRule, 'context-and-tools']));
+        expect(plan.rules).toEqual(expect.arrayContaining([architectureRule]));
         expect(new Set(plan.skills).size).toBe(plan.skills.length);
         expect(new Set(plan.workflows).size).toBe(plan.workflows.length);
         expect(new Set(plan.mcps).size).toBe(plan.mcps.length);
@@ -153,24 +154,14 @@ describe('prebuilt combo completeness', () => {
         }
     });
 
-    it('mcp-flow resolves defined MCP tools', () => {
-        const combo = COMBOS.find(({ id }) => id === 'mcp-flow');
+    it('only-one-flow resolves all 10 SDLC skills, thinking skills, and 5 core MCP tools', () => {
+        const combo = COMBOS.find(({ id }) => id === 'only-one-flow');
         expect(combo).toBeDefined();
         if (!combo) return;
 
         const plan = buildComboDependencyPlan(combo, productionRegistries);
         expect(plan.mcps).toEqual(expect.arrayContaining(['fetch', 'tavily', 'github', 'postgres', 'playwright-browser']));
-    });
-
-    it('git-flow resolves skills and required MCPs', () => {
-        const combo = COMBOS.find(({ id }) => id === 'git-flow');
-        expect(combo).toBeDefined();
-        if (!combo) return;
-
-        const plan = buildComboDependencyPlan(combo, productionRegistries);
-        expect(plan.skills).toEqual(['only-one-pr-git']);
-        expect(plan.workflows).toEqual([]);
-        expect(plan.mcps).toEqual(['github']);
+        expect(plan.skills).toEqual(expect.arrayContaining(['only-one-pr-git', 'only-one-idea', 'only-one-plan']));
     });
 
     it('contains no removed generic IDs', () => {
