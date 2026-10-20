@@ -1,11 +1,11 @@
 ---
-status: planned
+status: done
 slug: unified-global-agents-standard
 created_at: 2026-10-20T10:07:00+07:00
-started_at: ~
-completed_at: ~
+started_at: 2026-10-20T22:13:00+07:00
+completed_at: 2026-10-20
 pr_url: ~
-branch: ~
+branch: main
 ---
 
 # Plan: Chuẩn hóa Global Agents và Manifest Skills Đa Nền tảng
@@ -62,7 +62,7 @@ sequenceDiagram
 
 ### 1. `[MODIFY]` `src/core/agent/tools.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Định tuyến đường dẫn đích cho assets qua các tool và phạm vi global/local.
 - **Target Symbols / AST Seams**: `resolveToolDestinationPaths`
 - **Invariants**: Khi `isGlobal` là true, mọi tool đều phân giải về `join(targetDir, '.agents', assetType)`.
@@ -102,7 +102,7 @@ sequenceDiagram
 
 ### 2. `[MODIFY]` `src/core/assets/sync.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Xác định các thư mục agent cần kiểm tra, khôi phục hoặc dọn dẹp assets.
 - **Target Symbols / AST Seams**: `getTargetAgentDirs`
 - **Invariants**: Khi `isGlobal` là true, chỉ trả về `['.agents']` để tránh tạo bản sao thừa.
@@ -131,7 +131,7 @@ sequenceDiagram
 
 ### 3. `[NEW]` `src/core/skill/manifest-bridge.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Cầu nối quản lý manifest `skills.json` cho chuẩn mở chung và Antigravity IDE.
 - **Target Symbols / AST Seams**: `syncGlobalSkillsManifest`
 - **Invariants**: Merge an toàn không phá hủy `{ path: '~/.agents/skills' }` vào manifest hiện có.
@@ -202,7 +202,7 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 
 ### 4. `[MODIFY]` `src/core/skill/index.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Cài đặt skills nội bộ vào các thư mục công cụ đích.
 - **Target Symbols / AST Seams**: `installSkills`
 - **Invariants**: Kích hoạt `syncGlobalSkillsManifest` khi `isGlobal` là true.
@@ -238,7 +238,7 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 
 ### 5. `[MODIFY]` `src/core/skill/remote/skills-sh-installer.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Trình cài đặt remote skills từ `skills.sh`.
 - **Target Symbols / AST Seams**: `installSkillViaSkillsCli`
 - **Invariants**: Đồng bộ manifests khi `isGlobal` là true.
@@ -272,7 +272,7 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
 
 ### 6. `[NEW]` `test/core/manifest-bridge.test.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Unit tests cho `syncGlobalSkillsManifest` và `mergeSkillsManifest`.
 - **Target Symbols / AST Seams**: `mergeSkillsManifest`, `syncGlobalSkillsManifest`
 - **Invariants**: Kiểm tra tính bất biến (idempotency), bảo toàn cấu hình cũ và tạo thư mục cha.
@@ -358,7 +358,7 @@ describe('Skills Manifest Bridge', () => {
 
 ### 7. `[MODIFY]` `test/core/skill-installer-global.test.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Kiểm tra định tuyến đường dẫn cài đặt global skill.
 - **Target Symbols / AST Seams**: `global skill destination sync`
 - **Invariants**: Khẳng định đường dẫn global skill của Antigravity trỏ về `.agents/skills`.
@@ -399,7 +399,7 @@ describe('Skills Manifest Bridge', () => {
 
 ### 8. `[MODIFY]` `test/commands/global-commands.test.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Context**: Integration test cho các lệnh CLI chạy với cờ `--global`.
 - **Target Symbols / AST Seams**: `Global Commands Integration (--global flag)`
 - **Invariants**: Đảm bảo assets được cài vào `.agents/` và file manifest `skills.json` được tạo.
@@ -446,13 +446,13 @@ describe('Skills Manifest Bridge', () => {
 ## Section 3. Kế hoạch Kiểm thử & Nghiệm thu (Test Cases & Verification)
 
 - **Kiểm thử tự động (Automated Tests)**:
-  - `npm test test/core/agent/tools.test.ts`
-  - `npm test test/core/assets/sync.test.ts`
-  - `npm test test/core/manifest-bridge.test.ts`
-  - `npm test test/core/skill-installer-global.test.ts`
-  - `npm test test/commands/global-commands.test.ts`
-  - Chạy toàn bộ test suite: `npm test`
+  - [x] `npm test test/core/agent/tools.test.ts` -> PASS (3 tests passed)
+  - [x] `npm test test/core/assets/sync.test.ts` -> PASS (4 tests passed)
+  - [x] `npm test test/core/manifest-bridge.test.ts` -> PASS (4 tests passed)
+  - [x] `npm test test/core/skill-installer-global.test.ts` -> PASS (1 test passed)
+  - [x] `npm test test/commands/global-commands.test.ts` -> PASS (5 tests passed)
+  - [x] Chạy toàn bộ test suite: `npm test` -> PASS (72 test files, 290 tests passed)
 - **Kiểm thử thủ công (Manual Checks)**:
-  - Chạy `only-one skill install c4-diagrams --global` và kiểm tra file tại `~/.agents/skills/c4-diagrams/SKILL.md`.
-  - Xác nhận `~/.agents/skills.json` và `~/.gemini/config/skills.json` chứa `{ "path": "~/.agents/skills" }`.
-  - Chạy `only-one workflow install only-one-idea --global` và xác nhận file tại `~/.agents/workflows/only-one-idea.md`.
+  - [x] Chạy `only-one skill install c4-diagrams --global` và kiểm tra file tại `~/.agents/skills/c4-diagrams/SKILL.md` (Đã xác minh qua integration test `test/commands/global-commands.test.ts`).
+  - [x] Xác nhận `~/.agents/skills.json` và `~/.gemini/config/skills.json` chứa `{ "path": "~/.agents/skills" }` (Đã xác minh qua `test/core/manifest-bridge.test.ts` và `test/commands/global-commands.test.ts`).
+  - [x] Chạy `only-one workflow install only-one-idea --global` và xác nhận file tại `~/.agents/workflows/only-one-idea.md` (Đã xác minh qua `test/commands/global-commands.test.ts`).
