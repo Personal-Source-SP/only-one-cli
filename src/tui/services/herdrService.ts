@@ -41,6 +41,68 @@ export function buildHerdrDispatchPlan(
     };
 }
 
+export function buildHerdrCleanDispatchPlan(config: OnlyOneGlobalConfig, workspaceDir: string): HerdrDispatchPlan {
+    const targetAgent = config.agentRouting.clean || 'antigravity';
+    const agentName = 'agy-archivist';
+    const direction = config.herdr.splitDirection;
+    const focusFlag = config.herdr.focusOnSpawn ? '' : '--no-focus';
+
+    return {
+        splitCommand: `herdr pane split --current --direction ${direction} --cwd "${workspaceDir}" ${focusFlag}`.trim(),
+        agentStartCommand: `herdr agent start ${agentName} --kind ${targetAgent}`,
+        agentPromptCommand: `herdr agent prompt ${agentName} "/only-one-clean"`,
+        targetAgent,
+    };
+}
+
+export async function dispatchCleanViaHerdr(config: OnlyOneGlobalConfig, workspaceDir: string): Promise<HerdrDispatchResult> {
+    if (!isHerdrSessionActive()) {
+        return {
+            success: false,
+            message: 'Herdr session không hoạt động (HERDR_ENV != 1). Vui lòng mở trong Herdr workspace.',
+        };
+    }
+
+    const plan = buildHerdrCleanDispatchPlan(config, workspaceDir);
+
+    return new Promise((resolve) => {
+        exec(plan.splitCommand, (splitErr, splitStdout) => {
+            if (splitErr) {
+                resolve({ success: false, message: `Lỗi khi split pane: ${splitErr.message}` });
+                return;
+            }
+
+            let paneId = '';
+            try {
+                const parsed = JSON.parse(splitStdout);
+                paneId = parsed?.result?.pane?.pane_id || '';
+            } catch {
+                // Bỏ qua lỗi parse
+            }
+
+            const startCmd = paneId ? `${plan.agentStartCommand} --pane ${paneId}` : plan.agentStartCommand;
+
+            exec(startCmd, (startErr) => {
+                if (startErr) {
+                    resolve({ success: false, message: `Lỗi khi start agent: ${startErr.message}` });
+                    return;
+                }
+
+                exec(plan.agentPromptCommand, (promptErr) => {
+                    if (promptErr) {
+                        resolve({ success: false, message: `Lỗi khi prompt agent: ${promptErr.message}` });
+                        return;
+                    }
+                    resolve({
+                        success: true,
+                        message: `Đã điều phối tác vụ Clean tới ${plan.targetAgent} (/only-one-clean) trong pane kế bên.`,
+                    });
+                });
+            });
+        });
+    });
+}
+
 export async function dispatchTaskViaHerdr(
     task: TaskModel,
     phase: TaskStatus,

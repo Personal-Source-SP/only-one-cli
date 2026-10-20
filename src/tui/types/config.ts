@@ -10,6 +10,7 @@ export interface AgentRoutingConfig {
     apply: string;
     debug: string;
     review: string;
+    clean?: string;
 }
 
 export interface HerdrConfig {
@@ -37,6 +38,7 @@ export const DEFAULT_GLOBAL_CONFIG: OnlyOneGlobalConfig = {
         apply: 'codex',
         debug: 'claudecode',
         review: 'claudecode',
+        clean: 'antigravity',
     },
     herdr: {
         splitDirection: 'right',

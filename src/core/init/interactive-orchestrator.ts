@@ -17,6 +17,42 @@ export interface InitSelectionInputs {
     mcps: string[];
     skills: string[];
     rulesPerAgent: Record<string, string[]>;
+    overwrite?: boolean;
+}
+
+export async function promptInitSelectionsViaTui(projectDir: string, explicitTools?: string): Promise<InitSelectionInputs | null> {
+    const React = (await import('react')).default;
+    const { render } = await import('ink');
+    const { scanWorkspaceAssets } = await import('@/tui/init/services/workspaceScanner.js');
+    const { InitWizardApp } = await import('@/tui/init/InitWizardApp.js');
+
+    const parsedTools = explicitTools ? explicitTools.split(',').map((s) => s.trim()) : ['antigravity'];
+    const resources = scanWorkspaceAssets(projectDir, parsedTools);
+
+    return new Promise((resolve) => {
+        render(
+            React.createElement(InitWizardApp, {
+                initialResources: resources,
+                initialTools: parsedTools,
+                onComplete: (res) => {
+                    if (!res.confirmed) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve({
+                        selectedTools: res.selectedTools,
+                        mode: 'custom',
+                        packages: res.selectedPackages,
+                        configs: res.selectedConfigs,
+                        mcps: [],
+                        skills: res.selectedSkills,
+                        rulesPerAgent: res.selectedRules,
+                        overwrite: res.overwrite,
+                    });
+                },
+            }),
+        );
+    });
 }
 
 export async function promptInitSelections(

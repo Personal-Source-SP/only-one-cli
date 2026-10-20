@@ -8,7 +8,7 @@ import { MarkdownViewer } from './components/MarkdownViewer.js';
 import { SettingsView } from './components/SettingsView.js';
 import { cleanCompletedTasks } from './services/taskCleaner.js';
 import { loadGlobalConfig, saveGlobalConfig } from './services/configService.js';
-import { dispatchTaskViaHerdr } from './services/herdrService.js';
+import { dispatchCleanViaHerdr, dispatchTaskViaHerdr } from './services/herdrService.js';
 import { startTaskWatcher } from './services/taskWatcher.js';
 import { DEFAULT_GLOBAL_CONFIG, type OnlyOneGlobalConfig } from './types/config.js';
 import { groupTasksByColumn, scanTasks, updateTaskStatus } from './services/taskScanner.js';
@@ -78,9 +78,9 @@ export const App: FC<AppProps> = ({ deps }) => {
     };
 
     const handleCleanNow = async () => {
-        const res = await cleanCompletedTasks(workspaceDir, 0);
-        setStatusMessage(`Đã dọn dẹp ${res.archivedSlugs.length} task sang only-one/archives/.`);
-        await refresh();
+        setStatusMessage('Đang điều phối tác vụ Clean tới Agent qua Herdr...');
+        const res = await dispatchCleanViaHerdr(globalConfig, workspaceDir);
+        setStatusMessage(res.message);
     };
 
     const columns: ColumnModel[] = groupTasksByColumn(tasks);

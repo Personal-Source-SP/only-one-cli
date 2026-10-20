@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildHerdrDispatchPlan, isHerdrSessionActive } from '@/tui/services/herdrService.js';
+import { buildHerdrCleanDispatchPlan, buildHerdrDispatchPlan, isHerdrSessionActive } from '@/tui/services/herdrService.js';
 import { DEFAULT_GLOBAL_CONFIG } from '@/tui/types/config.js';
 import type { TaskModel } from '@/tui/types/task.js';
 
@@ -30,5 +30,12 @@ describe('Herdr Service', () => {
         expect(plan.agentStartCommand).toContain('herdr agent start agy-authfeature --kind antigravity');
         expect(plan.agentPromptCommand).toContain('herdr agent prompt agy-authfeature');
         expect(plan.agentPromptCommand).toContain('/only-one-plan only-one/tasks/auth-feature');
+    });
+
+    it('xây dựng chính xác kế hoạch điều phối clean toàn hệ thống', () => {
+        const plan = buildHerdrCleanDispatchPlan(DEFAULT_GLOBAL_CONFIG, '/my/workspace');
+        expect(plan.splitCommand).toContain('herdr pane split');
+        expect(plan.agentStartCommand).toContain('herdr agent start agy-archivist --kind antigravity');
+        expect(plan.agentPromptCommand).toContain('herdr agent prompt agy-archivist "/only-one-clean"');
     });
 });
