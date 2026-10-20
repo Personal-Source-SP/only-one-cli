@@ -92,6 +92,39 @@ export async function dispatchCleanViaHerdr(config: OnlyOneGlobalConfig, workspa
         };
     }
 
+    const route = normalizePhaseRoute(config.agentRouting.clean);
+    if (route.pane && route.pane !== 'auto') {
+        const allPanes = await listHerdrPanes();
+        const targetPane = allPanes.find((p) => p.pane_id === route.pane);
+        if (targetPane) {
+            const activeAgents = await listHerdrAgents();
+            const hasAgent = activeAgents.some((a) => a.pane_id === route.pane);
+            if (hasAgent) {
+                await waitHerdrAgent(route.pane, 30000);
+                return new Promise((resolve) => {
+                    exec(`herdr agent prompt ${route.pane} "/only-one-clean"`, (err) => {
+                        if (err) resolve({ success: false, message: `Lỗi khi prompt pane ${route.pane}: ${err.message}` });
+                        else resolve({ success: true, message: `Đã gửi tác vụ Clean tới pane ${route.pane}.` });
+                    });
+                });
+            } else {
+                const agentName = 'agy-archivist';
+                return new Promise((resolve) => {
+                    exec(`herdr agent start ${agentName} --kind ${route.cli} --pane ${route.pane}`, (startErr) => {
+                        if (startErr) {
+                            resolve({ success: false, message: `Lỗi khi start agent trên pane ${route.pane}: ${startErr.message}` });
+                            return;
+                        }
+                        exec(`herdr agent prompt ${route.pane} "/only-one-clean"`, (promptErr) => {
+                            if (promptErr) resolve({ success: false, message: `Lỗi khi prompt pane ${route.pane}: ${promptErr.message}` });
+                            else resolve({ success: true, message: `Đã khởi chạy agent và gửi lệnh Clean tới pane ${route.pane}.` });
+                        });
+                    });
+                });
+            }
+        }
+    }
+
     const plan = buildHerdrCleanDispatchPlan(config, workspaceDir);
 
     return new Promise((resolve) => {
@@ -152,20 +185,43 @@ export async function dispatchTaskViaHerdr(
 
     // 1. Nếu có chỉ định Target Pane cụ thể (khác 'auto') và pane đó đang hoạt động trong Herdr
     if (route.pane && route.pane !== 'auto') {
-        const activeAgents = await listHerdrAgents();
-        const livePane = activeAgents.find((a) => a.pane_id === route.pane);
+        const allPanes = await listHerdrPanes();
+        const livePane = allPanes.find((a) => a.pane_id === route.pane);
         if (livePane) {
-            // Gửi prompt trực tiếp vào Pane có sẵn, KHÔNG split pane!
-            await waitHerdrAgent(route.pane, 45000);
-            return new Promise((resolve) => {
-                exec(`herdr agent prompt ${route.pane} "${promptText}"`, (err) => {
-                    if (err) {
-                        resolve({ success: false, message: `Lỗi khi gửi prompt tới pane ${route.pane}: ${err.message}` });
-                    } else {
-                        resolve({ success: true, message: `Đã gửi lệnh thực thi phase ${phase} tới pane ${route.pane}.` });
-                    }
+            const activeAgents = await listHerdrAgents();
+            const hasAgent = activeAgents.some((a) => a.pane_id === route.pane);
+            if (hasAgent) {
+                await waitHerdrAgent(route.pane, 45000);
+                return new Promise((resolve) => {
+                    exec(`herdr agent prompt ${route.pane} "${promptText}"`, (err) => {
+                        if (err) {
+                            resolve({ success: false, message: `Lỗi khi gửi prompt tới pane ${route.pane}: ${err.message}` });
+                        } else {
+                            resolve({ success: true, message: `Đã gửi lệnh thực thi phase ${phase} tới pane ${route.pane}.` });
+                        }
+                    });
                 });
-            });
+            } else {
+                const agentName = `agy-${task.slug
+                    .replace(/[^a-z0-9]/gi, '')
+                    .slice(0, 15)
+                    .toLowerCase()}`;
+                return new Promise((resolve) => {
+                    exec(`herdr agent start ${agentName} --kind ${route.cli} --pane ${route.pane}`, (startErr) => {
+                        if (startErr) {
+                            resolve({ success: false, message: `Lỗi khi start agent trên pane ${route.pane}: ${startErr.message}` });
+                            return;
+                        }
+                        exec(`herdr agent prompt ${route.pane} "${promptText}"`, (promptErr) => {
+                            if (promptErr) {
+                                resolve({ success: false, message: `Lỗi khi gửi prompt tới pane ${route.pane}: ${promptErr.message}` });
+                            } else {
+                                resolve({ success: true, message: `Đã khởi chạy agent và gửi lệnh thực thi tới pane ${route.pane}.` });
+                            }
+                        });
+                    });
+                });
+            }
         }
     }
 
