@@ -150,7 +150,7 @@ export const installSkills = async (request: {
 
                 let commandContent = null;
                 let commandId = '';
-                if (skillName === 'only-one-pr-git-skill') {
+                if (skillName === 'only-one-pr-git') {
                     commandContent = buildPrGitCommandContent();
                     commandId = 'only-one-pr-git';
                 }

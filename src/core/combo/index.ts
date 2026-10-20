@@ -373,7 +373,7 @@ export const checkExistingComboComponents = async (params: {
 
     // 6. MCPs (Explicit + Inferred from skills)
     const mcps = new Set<string>(plan.mcps);
-    if (plan.skills.includes('only-one-pr-git-skill')) mcps.add('github');
+    if (plan.skills.includes('only-one-pr-git')) mcps.add('github');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
         const supportedIdeIds: string[] = selectedTools
@@ -577,7 +577,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
 
     // 7. MCPs
     const mcps = new Set<string>(plan.mcps);
-    if (plan.skills.includes('only-one-pr-git-skill')) mcps.add('github');
+    if (plan.skills.includes('only-one-pr-git')) mcps.add('github');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
         const mcpIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');

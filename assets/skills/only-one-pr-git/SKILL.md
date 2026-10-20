@@ -48,11 +48,10 @@ Create or update a GitHub Pull Request without coupling PR creation to any revie
 
 ---
 
-## 1. Skills Catalog
+## 1. Required References & Assets
 
-| Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
-| :--- | :--- | :--- |
-| **`only-one-pr-git-skill`** | Every PR workflow step | Validate Git preflight, draft conventional PR title/body, and call GitHub MCP safely. |
+- **Template**: Read `assets/pr-template.md` before drafting the PR body.
+- **MCP Server**: Use `github` MCP server for fetching and creating Pull Requests.
 
 ---
 
@@ -60,16 +59,16 @@ Create or update a GitHub Pull Request without coupling PR creation to any revie
 
 ### Step 1 — Git Preflight Checks
 
-1. Verify current branch differs from `<base-branch>`.
-2. Check working tree state with `git status`.
-3. Check source branch push state against remote.
+1. Run `scripts/check-git-status.ts` to deterministically verify git readiness.
+2. Verify current branch differs from `<base-branch>`.
+3. Check working tree state has no uncommitted files.
 4. Ensure source branch has commits or diff against `<base-branch>`.
 
 ### Step 2 — Draft PR Title and Description
 
 1. Title: `<tag>: <imperative summary in English>`.
-2. English PR body covers Summary, Problem & Solution, Testing & Verification.
-3. Display title, base branch, body, and concise summary for user review.
+2. English PR body MUST use the exact Markdown structure from `assets/pr-template.md`.
+3. Display title, base branch, body, and concise Vietnamese summary for user review in chat.
 
 ### Step 3 — Confirmation & GitHub Mutation
 

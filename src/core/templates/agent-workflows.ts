@@ -18,7 +18,7 @@ export enum PrGitTag {
     Build = 'build',
 }
 
-export const PR_GIT_SKILL_NAME = 'only-one-pr-git-skill';
+export const PR_GIT_SKILL_NAME = 'only-one-pr-git';
 
 export const PR_GIT_DEFAULT_BRANCH = 'main';
 export const PR_GIT_DEFAULT_TAG = PrGitTag.Feat;
@@ -105,7 +105,7 @@ export const buildUiCommandContent = (): CommandContent => ({
 export const buildPrGitCommandContent = (): CommandContent => ({
     body: buildPrGitCommandBody(),
     category: 'Workflow',
-    description: 'Create or update a GitHub PR from current branch using only-one-pr-git-skill and GitHub MCP.',
+    description: 'Create or update a GitHub PR from current branch using only-one-pr-git and GitHub MCP.',
     id: AgentWorkflowCommandId.PrGit,
     name: AgentWorkflowCommandId.PrGit,
     tags: ['only-one', 'github', 'mcp', 'pr'],

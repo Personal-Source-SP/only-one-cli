@@ -168,7 +168,7 @@ describe('prebuilt combo completeness', () => {
         if (!combo) return;
 
         const plan = buildComboDependencyPlan(combo, productionRegistries);
-        expect(plan.skills).toEqual(['only-one-pr-git-skill', 'only-one-pr-git']);
+        expect(plan.skills).toEqual(['only-one-pr-git']);
         expect(plan.workflows).toEqual([]);
         expect(plan.mcps).toEqual(['github']);
     });

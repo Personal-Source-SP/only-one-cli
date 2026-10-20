@@ -252,12 +252,6 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
     },
     {
-        name: 'only-one-pr-git-skill',
-        version: '0.0.1',
-        description: 'Create or update a GitHub Pull Request from current branch.',
-        sourceType: 'local',
-    },
-    {
         name: 'task-lifecycle-resolution',
         version: '0.0.2',
         description: 'Resolve and auto-archive completed tasks before running clean and maintenance workflows.',
@@ -351,10 +345,9 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-pr-git',
-        version: '0.0.4',
+        version: '0.0.5',
         description: 'Create or update a GitHub PR from the current branch using validated Git state and GitHub MCP.',
         sourceType: 'local',
-        requiredSkills: ['only-one-pr-git-skill'],
         requiredMcps: ['github'],
     },
     {

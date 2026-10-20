@@ -21,7 +21,7 @@ Danh mục đầy đủ tính năng hiện có và hạng mục kế tiếp củ
   - *Architecture & Design*: `c4-diagrams`, `api-and-interface-design`, `frontend-ui-engineering`, `source-driven-development`, `doubt-driven-development`, `gherkin-authoring`.
   - *Build & Implementation*: `context-engineering`, `incremental-implementation`, `test-driven-development`, `debugging-and-error-recovery`.
   - *Review & Quality*: `code-review-and-quality`, `code-simplification`, `security-and-hardening`, `performance-optimization`.
-  - *Local Custom*: `only-one-nestjs-development`, `only-one-nextjs-development`, `only-one-pr-git-skill`.
+  - *Local Custom*: `only-one-nestjs-development`, `only-one-nextjs-development`, `only-one-pr-git`.
 - [x] **Task lifecycle management**:
   - `only-one-clean`: tự động lưu trữ task đã hoàn thành (`status: done`), chưng cất rules, tổng hợp archive cùng miền, và đối chiếu logic sâu với codebase thực tế.
 - [x] **Standardized SDLC workflows (7 workflows)**:

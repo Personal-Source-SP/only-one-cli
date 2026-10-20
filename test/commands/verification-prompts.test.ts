@@ -17,15 +17,15 @@ describe('Existing-resource verification prompts & non-TTY skip (Tasks 4.2 & 4.3
         };
 
         await rm(testProjectDir, { recursive: true, force: true });
-        await mkdir(join(testProjectDir, '.agents/skills/only-one-pr-git-skill'), { recursive: true });
-        await writeFile(join(testProjectDir, '.agents/skills/only-one-pr-git-skill/SKILL.md'), 'existing content');
+        await mkdir(join(testProjectDir, '.agents/skills/only-one-pr-git'), { recursive: true });
+        await writeFile(join(testProjectDir, '.agents/skills/only-one-pr-git/SKILL.md'), 'existing content');
 
         const cmd = createSkillCommand(deps as ProgramDeps);
-        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-pr-git-skill', '--tool', 'antigravity']);
+        await cmd.parseAsync(['node', 'test', testProjectDir, 'only-one-pr-git', '--tool', 'antigravity']);
 
         const fullLog = stdoutLogs.join('\n').replace(/\u001b\[\d+m/g, '');
         expect(fullLog).toContain('Skipped (Kept Existing)');
-        expect(fullLog).toContain('only-one-pr-git-skill in Antigravity');
+        expect(fullLog).toContain('only-one-pr-git in Antigravity');
 
         await rm(testProjectDir, { recursive: true, force: true });
     });

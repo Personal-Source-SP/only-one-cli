@@ -88,7 +88,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'only-one-flow',
-        version: '0.0.13',
+        version: '0.0.14',
         name: 'Only One Universal Flow Setup',
         description: 'Stack-agnostic end-to-end SDLC toolkit: Ideation, Dual-layer planning, quality gates, security, testing, and review',
         scope: 'global',
@@ -121,7 +121,6 @@ export const COMBOS: ComboManifest[] = [
             'resolving-merge-conflicts',
             'code-review-and-quality',
             'karpathy-ste100-discipline',
-            'only-one-pr-git-skill',
             'task-lifecycle-resolution',
             'only-one-idea',
             'only-one-plan',
@@ -147,11 +146,11 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'git-flow',
-        version: '0.0.1',
+        version: '0.0.2',
         name: 'Git Flow Setup',
         description: 'GitHub PR automation and Git state management toolkit',
         scope: 'global',
         supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
-        skills: ['only-one-pr-git-skill', 'only-one-pr-git'],
+        skills: ['only-one-pr-git'],
     },
 ];

@@ -30,11 +30,11 @@ describe('Agent Planners (Tasks 3.1 - 3.7)', () => {
             const { skillItems } = await planSkills({
                 projectDir: cwd,
                 selectedTools: ['cursor'],
-                selectedSkillNames: ['only-one-pr-git-skill'],
+                selectedSkillNames: ['only-one-pr-git'],
             });
 
             expect(skillItems.length).toBe(1);
-            expect(skillItems[0].key).toBe('skill:cursor:only-one-pr-git-skill');
+            expect(skillItems[0].key).toBe('skill:cursor:only-one-pr-git');
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
