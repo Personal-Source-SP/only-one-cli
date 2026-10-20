@@ -125,34 +125,34 @@ created_at: <ISO-8601>
 status: concept
 ---
 
-# Concept: <Idea Name / Technical Challenge>
+# Concept: <Tên ý tưởng / Thách thức kỹ thuật>
 
-## 1. Problem & Goal
+## 1. Problem & Goal (Vấn đề & Mục tiêu)
 
-### Problem (Current Bottlenecks & Deficiencies)
-- **Context & Trigger**: <Where the issue occurs or the user action leading to it>.
-- **Symptom & Defect**: <Specific error behavior or technical bottleneck>.
-- **Root Cause**: <Technical cause (unsynchronized state, missing validation, race condition, etc.)>.
-- **Impact / Blast Radius**: <Impact on users, system, or data integrity>.
+### Problem (Điểm nghẽn & Thiếu sót hiện tại)
+- **Context & Trigger**: <Nơi sự cố phát sinh hoặc thao tác của người dùng dẫn đến sự cố>.
+- **Symptom & Defect**: <Hành vi lỗi cụ thể hoặc điểm nghẽn kỹ thuật>.
+- **Root Cause**: <Nguyên nhân gốc rễ kỹ thuật (trạng thái lệch đồng bộ, thiếu kiểm tra, race condition, v.v.)>.
+- **Impact / Blast Radius**: <Tác động tới người dùng, hệ thống hoặc tính toàn vẹn dữ liệu>.
 
-### Goal (Target Technical Outcomes)
-- **Core Goal**: <Primary technical outcome required>.
+### Goal (Kết quả kỹ thuật mục tiêu)
+- **Core Goal**: <Kết quả kỹ thuật chính cần đạt được>.
 - **Acceptance Criteria**:
-  - <Item 1: UI/State handling, value reset, disabled states, etc.>.
-  - <Item 2: Sync query params / API payloads, etc.>.
-  - <Item 3: Fallbacks, edge cases, or notifications, etc.>.
+  - <Tiêu chí 1: Xử lý giao diện/trạng thái, reset giá trị, disabled state, v.v.>.
+  - <Tiêu chí 2: Đồng bộ query params / payload API, v.v.>.
+  - <Tiêu chí 3: Cơ chế dự phòng (fallback), xử lý ngoại lệ hoặc thông báo, v.v.>.
 
-## 2. Scope Boundaries
-- **In-Scope**: <Mandatory features, behaviors, and modules to implement>.
-- **Explicit Out-of-Scope**: <Deferred items or intentionally excluded items to prevent scope creep>.
+## 2. Scope Boundaries (Ranh giới phạm vi)
+- **In-Scope**: <Các tính năng, hành vi và module bắt buộc phải triển khai>.
+- **Explicit Out-of-Scope**: <Các hạng mục hoãn lại hoặc chủ động loại trừ để tránh phình phạm vi>.
 
-## 3. Proposed Solution & Core Mechanism
-- **Core Mechanism**: <Conceptual solution and operating model; no source code, pseudocode, symbol signatures, file paths, or file-level implementation instructions>.
-- **Conceptual Flow / Domain Model**: <Mandatory Mermaid or ASCII diagram representing data flow, state transitions, or system interactions via c4-diagrams; no monolithic prose>.
-- *(Optional)* **UI Wireframe**: <ASCII wireframe if feature includes UI>.
+## 3. Proposed Solution & Core Mechanism (Giải pháp đề xuất & Cơ chế cốt lõi)
+- **Core Mechanism**: <Giải pháp khái niệm và mô hình hoạt động; không viết mã nguồn, mã giả, chữ ký hàm hoặc đường dẫn file cụ thể>.
+- **Conceptual Flow / Domain Model**: <Bắt buộc có sơ đồ Mermaid hoặc ASCII biểu diễn luồng dữ liệu, chuyển đổi trạng thái hoặc tương tác hệ thống qua c4-diagrams; không viết văn xuôi đơn điệu>.
+- *(Optional)* **UI Wireframe**: <Giao diện wireframe ASCII nếu tính năng có UI>.
 
-## 4. Critical Risks & Edge Cases
-- <Technical risks, race conditions, timeouts, or rollback strategies if applicable>.
+## 4. Critical Risks & Edge Cases (Rủi ro & Xử lý ngoại lệ)
+- <Các rủi ro kỹ thuật, race condition, timeout hoặc chiến lược rollback nếu áp dụng>.
 ```
 
 2. **Handoff & Hard Stop (🛑 Mandatory Terminal Gate)**:
@@ -169,6 +169,9 @@ status: concept
 
 ## Guardrails
 
+- **🛑 Mandatory Primary Language Invariant (Vietnamese / User Preferred Language)**:
+  - All interactive interview questions, problem/goal deconstruction, scope boundaries, solution explanations, and `concept.md` content MUST be written in the user's primary language (e.g., Tiếng Việt).
+  - ONLY code symbols, variables, CLI commands, file paths, and standard English technical terms (*race condition, blast radius, payload, lockfile, AST seam, debounce, etc.*) remain in English.
 - **🛑 Strict Lifecycle Isolation (Zero Source Code Modifications)**: `/only-one-idea` is strictly a scoping and conceptual specification workflow. The agent MUST NEVER edit source code, tests, configs, or other workflows during `/only-one-idea`.
 - **Enforce Clear Technical Writing**: Write concise specifications in the user's preferred language (e.g., Vietnamese), preserving standard English technical terms.
 - **Enforce 80% ASD-STE100 Writing Standard**: Eliminate AI slop, restrict sentence length (instructions <= 20 words, descriptions <= 25 words), ban passive voice, and structure actions using Prerequisites -> Action -> Verification.

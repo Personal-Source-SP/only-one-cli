@@ -57,3 +57,8 @@ Use consistent technical verbs. Never interchange synonyms arbitrarily:
 - **Strictly Prohibited**: Conversational filler, throat-clearing, and verbose pleasantries (*"It is important to note that...", "As we know...", "Please make sure to..."*).
 - Start directly with the subject or an imperative verb.
 - Preserve standard English for technical terminology (*race condition, idempotency, blast radius, payload, lockfile, AST seam*).
+
+### F. Primary Language Enforcement (Bilingual Balance)
+- **Mandatory User Preferred Language**: All human-facing narratives, problem statements, contexts, actions, invariants, checklists, decisions, and manual verification steps MUST be authored in the user's primary language (e.g., Tiếng Việt).
+- **English Isolation**: Restrict English exclusively to code symbols, variable names, interfaces, unified diff blocks, CLI commands, file paths, and standard technical terms.
+

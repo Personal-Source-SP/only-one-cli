@@ -8,6 +8,9 @@ interface BoardViewProps {
     onSelectTask: (task: TaskModel) => void;
     onMoveTask: (task: TaskModel, newStatus: TaskStatus) => void;
     onTriggerAction: (task: TaskModel, action: 'plan' | 'apply' | 'debug') => void;
+    onDispatchTask: (task: TaskModel) => void;
+    onOpenSettings: () => void;
+    onCleanNow: () => void;
     onRefresh: () => void;
     onQuit: () => void;
 }
@@ -20,7 +23,17 @@ const COLUMN_ICONS: Record<string, string> = {
     done: '✅',
 };
 
-export const BoardView: FC<BoardViewProps> = ({ columns, onSelectTask, onMoveTask, onTriggerAction, onRefresh, onQuit }) => {
+export const BoardView: FC<BoardViewProps> = ({
+    columns,
+    onSelectTask,
+    onMoveTask,
+    onTriggerAction,
+    onDispatchTask,
+    onOpenSettings,
+    onCleanNow,
+    onRefresh,
+    onQuit,
+}) => {
     const [colIndex, setColIndex] = useState(0);
     const [cardIndices, setCardIndices] = useState<Record<number, number>>({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 });
     const [grabbedTask, setGrabbedTask] = useState<TaskModel | null>(null);
@@ -36,6 +49,14 @@ export const BoardView: FC<BoardViewProps> = ({ columns, onSelectTask, onMoveTas
         }
         if (input === 'r') {
             onRefresh();
+            return;
+        }
+        if (input === 's') {
+            onOpenSettings();
+            return;
+        }
+        if (input === 'c') {
+            onCleanNow();
             return;
         }
         if (key.leftArrow) {
@@ -82,7 +103,7 @@ export const BoardView: FC<BoardViewProps> = ({ columns, onSelectTask, onMoveTas
         if (currentTask && !grabbedTask) {
             if (input === 'p') onTriggerAction(currentTask, 'plan');
             if (input === 'a') onTriggerAction(currentTask, 'apply');
-            if (input === 'd') onTriggerAction(currentTask, 'debug');
+            if (input === 'd') onDispatchTask(currentTask);
         }
     });
 

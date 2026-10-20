@@ -12,10 +12,23 @@ export const Footer: React.FC<FooterProps> = ({ mode, isMoving }) => {
         if (mode === 'viewer') {
             return ['[↑/↓/PgUp/PgDn] Scroll', '[Tab] Switch Doc', '[e] Open Editor', '[Esc/q] Back to Board'];
         }
+        if (mode === 'settings') {
+            return ['[↑/↓] Chọn mục', '[Space/Enter] Đổi giá trị', '[←/→] Tăng giảm', '[Esc/s] Lưu & Thoát'];
+        }
         if (isMoving) {
             return ['[←/→] Select Target Col', '[m/Enter] Drop Card', '[Esc] Cancel'];
         }
-        return ['[←/→] Col', '[↑/↓] Task', '[m] Move', '[Enter] View MD', '[p] Plan', '[a] Apply', '[d] Debug', '[r] Refresh', '[q] Quit'];
+        return [
+            '[←/→] Col',
+            '[↑/↓] Task',
+            '[m] Move',
+            '[Enter] View MD',
+            '[d] Dispatch',
+            '[s] Settings',
+            '[c] Clean',
+            '[r] Refresh',
+            '[q] Quit',
+        ];
     };
 
     return (

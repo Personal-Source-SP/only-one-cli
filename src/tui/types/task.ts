@@ -24,7 +24,7 @@ export interface ColumnModel {
     tasks: TaskModel[];
 }
 
-export type TuiMode = 'board' | 'viewer' | 'confirm';
+export type TuiMode = 'board' | 'viewer' | 'confirm' | 'settings';
 
 export interface ConfirmActionState {
     task: TaskModel;

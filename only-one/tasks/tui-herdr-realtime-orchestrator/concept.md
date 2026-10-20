@@ -4,49 +4,49 @@ created_at: 2026-10-20T14:18:33+07:00
 status: concept
 ---
 
-# Concept: TUI Realtime Task Watcher & Herdr Agent Orchestrator
+# Concept: TUI Realtime Task Watcher & Bộ Điều Phối Herdr Agent
 
 ## 1. Problem & Goal
 
-### Problem (Current Bottlenecks & Deficiencies)
-- **Context & Trigger**: User interacts with tasks via TUI, but task board only scans on initial launch.
-- **Symptom & Defect**: Board requires manual restart to see new files. Pending tasks require manual execution in separate terminals.
-- **Root Cause**: TUI lacks filesystem event watchers, process orchestration bindings, and global configuration storage.
-- **Impact / Blast Radius**: Workflows stay fragmented. Users perform repetitive terminal commands and manual task cleanup.
+### Problem (Điểm nghẽn & Thiếu sót hiện tại)
+- **Context & Trigger**: Người dùng quản lý task qua TUI, nhưng task board chỉ scan dữ liệu 1 lần lúc khởi chạy.
+- **Symptom & Defect**: Board yêu cầu khởi động lại TUI mới thấy task mới. Task ở trạng thái pending phải mở terminal riêng để chạy thủ công.
+- **Root Cause**: TUI chưa có file watcher, thiếu cơ chế điều phối process và chưa có file cấu hình global.
+- **Impact / Blast Radius**: Quy trình làm việc bị gián đoạn. Người dùng tốn nhiều thao tác gõ lệnh thủ công và dọn dẹp task board.
 
-### Goal (Target Technical Outcomes)
-- **Core Goal**: Transform TUI into an interactive, realtime task dispatcher and lifecycle supervisor using Herdr.
+### Goal (Kết quả kỹ thuật mục tiêu)
+- **Core Goal**: Biến TUI thành trung tâm điều phối realtime, tương tác và quản lý lifecycle task qua Herdr.
 - **Acceptance Criteria**:
-  - Watch `only-one/tasks/` continuously and refresh board state without restart.
-  - Dispatch pending tasks to target agents via Herdr CLI commands (`pane split`, `agent start`, `agent prompt`).
-  - Read and persist user configurations in global `~/.only-one/config.json`.
-  - Provide an interactive Settings screen within TUI to customize routing rules and cleanup thresholds.
-  - Auto-archive completed tasks into `only-one/archives/` when completed task count exceeds configured threshold.
+  - Theo dõi liên tục thư mục `only-one/tasks/` và cập nhật board realtime không cần khởi động lại.
+  - Điều phối task pending tới đúng AI Agent qua lệnh Herdr CLI (`pane split`, `agent start`, `agent prompt`).
+  - Đọc và lưu trữ cấu hình người dùng tại file global `~/.only-one/config.json`.
+  - Cung cấp màn hình Settings tương tác trực tiếp trên TUI để cấu hình agent routing và ngưỡng clean.
+  - Tự động chuyển task đã hoàn thành sang `only-one/archives/` khi vượt ngưỡng số lượng thiết lập (> 5 tasks).
 
-## 2. Scope Boundaries
+## 2. Scope Boundaries (Ranh giới phạm vi)
 - **In-Scope**:
-  - Realtime filesystem watcher with debounced event processing for task files.
-  - Interactive dispatch action (`[D]`) mapping phases to target AI agents via Herdr.
-  - Global configuration storage schema at `~/.only-one/config.json`.
-  - Dedicated interactive Settings view in TUI for cleanup policies and agent routing.
-  - Herdr session detection (`HERDR_ENV`) with visual status indicators and safety fallbacks.
-  - Configurable auto-archive engine triggered by task count thresholds.
+  - File watcher theo dõi realtime với cơ chế debounce xử lý sự kiện file.
+  - Thao tác dispatch tương tác (`[D]`) định tuyến task phase sang AI Agent qua Herdr.
+  - Schema lưu trữ cấu hình global tại `~/.only-one/config.json`.
+  - Màn hình Settings chuyên biệt trên TUI (`[S]`) để chỉnh sửa policy clean và routing agent.
+  - Kiểm tra môi trường Herdr session (`HERDR_ENV`) với badge hiển thị và fallback an toàn.
+  - Dịch vụ tự động archive task khi số lượng task hoàn thành vượt ngưỡng cấu hình.
 - **Explicit Out-of-Scope**:
-  - Direct AI API integration inside TUI (Herdr manages agent processes).
-  - Background daemon process running independently when TUI exits.
-  - Editing raw task markdown contents directly from TUI screens.
+  - Tích hợp trực tiếp AI API vào trong source code TUI (Herdr chịu trách nhiệm quản lý agent process).
+  - Background daemon chạy ngầm độc lập 24/7 khi TUI đã đóng.
+  - Chỉnh sửa trực tiếp nội dung chi tiết markdown của task trên màn hình TUI.
 
-## 3. Proposed Solution & Core Mechanism
+## 3. Proposed Solution & Core Mechanism (Giải pháp đề xuất & Cơ chế cốt lõi)
 
-### Core Mechanism
-The system adopts a Hybrid Herdr Context Engine architecture:
-1. **Realtime Watcher Engine**: A background file watcher tracks directory modifications in `only-one/tasks/`. Debounced updates trigger state refreshes in the React Ink board.
-2. **Global Configuration Manager**: Manages read/write operations for `~/.only-one/config.json`. Config defines agent routing tables and auto-archive thresholds.
-3. **Interactive Settings Screen**: An accessible view (`[S]`) renders interactive controls. Users configure policies without manually modifying JSON files.
-4. **Herdr Dispatch Supervisor**: Validates session context. When triggered, it splits a sibling pane, starts the designated agent, and passes the execution prompt.
-5. **Lifecycle Cleaner Service**: Inspects task board state. When completed items exceed threshold, it automatically moves archived directories.
+### Core Mechanism (Cơ chế hoạt động)
+Hệ thống sử dụng kiến trúc Hybrid Herdr Context Engine:
+1. **Realtime Watcher Engine**: Background file watcher theo dõi thay đổi trong `only-one/tasks/`. Áp dụng debounce (300ms–500ms) trước khi refresh state trên React Ink board.
+2. **Global Configuration Manager**: Quản lý đọc/ghi file `~/.only-one/config.json`. Cấu hình định nghĩa bảng routing agent và ngưỡng auto-archive.
+3. **Interactive Settings Screen**: Màn hình cấu hình trực quan (`[S]`). Người dùng tinh chỉnh policy bằng phím điều hướng mà không cần sửa file JSON bằng tay.
+4. **Herdr Dispatch Supervisor**: Kiểm tra session context. Khi kích hoạt, chia sibling pane (`herdr pane split`), khởi tạo agent tương ứng (`herdr agent start`), và gửi prompt thực thi (`herdr agent prompt`).
+5. **Lifecycle Cleaner Service**: Giám sát số lượng task hoàn thành. Khi vượt ngưỡng, tự động di chuyển thư mục task sang `only-one/archives/`.
 
-### Conceptual Flow & State Transitions
+### Conceptual Flow & State Transitions (Luồng hoạt động)
 ```mermaid
 flowchart TD
     subgraph Filesystem
@@ -56,16 +56,16 @@ flowchart TD
     end
 
     subgraph TUI["only-one TUI Engine"]
-        Watcher["File Watcher"]
+        Watcher["File Watcher (Debounced)"]
         BoardState["Board State Store"]
         Dispatcher["Herdr Dispatcher"]
-        SettingsUI["Settings Screen"]
+        SettingsUI["Settings Screen [S]"]
         CleanService["Lifecycle Cleaner"]
     end
 
-    subgraph HerdrSession["Herdr Multiplexer"]
-        SplitPane["Split Sibling Pane"]
-        StartAgent["Start Assigned Agent"]
+    subgraph HerdrSession["Herdr Session (Multiplexer)"]
+        SplitPane["Split Sibling Pane (--no-focus)"]
+        StartAgent["Start Assigned Agent (antigravity/claude)"]
         SubmitPrompt["Submit Prompt to Agent"]
     end
 
@@ -75,18 +75,18 @@ flowchart TD
     Config -->|Routing Rules| Dispatcher
     Config -->|Threshold Rule| CleanService
 
-    BoardState -->|User Triggers Dispatch [D]| Dispatcher
-    Dispatcher -->|Check HERDR_ENV| SplitPane
+    BoardState -->|User nhấn [D] Dispatch| Dispatcher
+    Dispatcher -->|Kiểm tra HERDR_ENV| SplitPane
     SplitPane --> StartAgent
     StartAgent --> SubmitPrompt
 
-    BoardState -->|Done Tasks Exceed Threshold| CleanService
+    BoardState -->|Task Done vượt ngưỡng| CleanService
     CleanService -->|Move Task Directory| Archives
 ```
 
-### UI Wireframes
+### UI Wireframes (Giao diện wireframe)
 
-#### 1. Realtime Task Board with Herdr Status
+#### 1. Realtime Task Board với Trạng thái Herdr
 ```text
 ┌─ ONLY-ONE TASK MANAGER ───────────────────────────────── [HERDR: CONNECTED] ─┐
 │                                                                             │
@@ -99,40 +99,41 @@ flowchart TD
 │                     │ Pending          │                      └───────────┘ │
 │                     └──────────────────┘                                    │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ Task: tui-herdr-sync | Target Agent: antigravity (from config)              │
-│ Status: Ready to dispatch | Clean trigger: 6 done tasks (Threshold: 5) ⚠️   │
+│ Task: tui-herdr-sync | Target Agent: antigravity (từ config)                │
+│ Status: Sẵn sàng dispatch | Clean: 6 done tasks (Ngưỡng: 5) ⚠️              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ [↑↓←→] Navigate  [D] Dispatch via Herdr  [C] Clean Now  [S] Settings  [Q] Quit│
+│ [↑↓←→] Điều hướng  [D] Dispatch qua Herdr  [C] Clean Ngay  [S] Settings  [Q] Thoát│
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### 2. Interactive Settings Screen (`[S]`)
+#### 2. Màn hình Cấu hình Tương tác (`[S]`)
+*(Đồng bộ 2 chiều với `~/.only-one/config.json`)*
 ```text
 ┌─ ONLY-ONE SETTINGS (~/.only-one/config.json) ───────────────────────────────┐
 │                                                                             │
-│  1. AUTO-CLEAN POLICY                                                       │
-│     ( ) Disabled                                                            │
-│     (•) When Completed Tasks exceed threshold                               │
-│         Threshold Count: [ 5 ] tasks                                        │
-│     ( ) Immediately on task completion                                      │
+│  1. CHÍNH SÁCH AUTO-CLEAN                                                   │
+│     ( ) Vô hiệu hóa                                                         │
+│     (•) Khi số task hoàn thành vượt ngưỡng                                  │
+│         Số lượng ngưỡng: [ 5 ] task                                         │
+│     ( ) Tự động dọn ngay khi task chuyển sang Done                          │
 │                                                                             │
-│  2. AGENT DISPATCH ROUTING (HERDR)                                          │
+│  2. ĐỊNH TUYẾN AGENT (HERDR ROUTING MATRIX)                                 │
 │     Phase 'idea'      ──► Agent Kind: [ antigravity            ▼ ]          │
 │     Phase 'plan'      ──► Agent Kind: [ antigravity            ▼ ]          │
 │     Phase 'apply'     ──► Agent Kind: [ codex                  ▼ ]          │
 │     Phase 'debug'     ──► Agent Kind: [ claudecode             ▼ ]          │
 │                                                                             │
-│  3. HERDR TOPOLOGY PREFERENCES                                              │
-│     Split Direction:  (•) Right   ( ) Down                                  │
-│     Focus on Spawn:   ( ) Yes     (•) No (Keep focus on TUI)                │
+│  3. CẤU HÌNH HERDR TOPOLOGY                                                 │
+│     Hướng chia Pane:  (•) Phải (Right)   ( ) Dưới (Down)                    │
+│     Focus khi mở:     ( ) Có             (•) Không (Giữ focus tại TUI)      │
 │                                                                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ [Tab / ↑↓] Select Option   [Space / Enter] Toggle / Edit   [Esc / S] Save & Back│
+│ [Tab / ↑↓] Chọn mục   [Space / Enter] Bật tắt / Sửa   [Esc / S] Lưu & Quay lại│
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## 4. Critical Risks & Edge Cases
-- **Non-Herdr Environments**: Running TUI outside Herdr causes dispatch commands to fail. The system inspects environment variables and displays clear fallback warnings.
-- **Filesystem Write Debouncing**: Concurrent agent writes cause incomplete parse events. The watcher enforces debouncing windows before parsing tasks.
-- **Agent Input Blocking**: Agents prompt users for interactive approvals. Panes launch side-by-side without focus hijacking so users can respond directly.
-- **Missing Global Configuration**: Missing config files trigger automatic creation using safe default values.
+## 4. Critical Risks & Edge Cases (Rủi ro & Xử lý ngoại lệ)
+- **Môi trường ngoài Herdr**: Chạy TUI bên ngoài Herdr khiến lệnh dispatch thất bại. Hệ thống kiểm tra biến môi trường `HERDR_ENV`, hiển thị badge cảnh báo và hướng dẫn mở trong Herdr.
+- **Race Condition khi ghi file**: Agent ghi file đồng thời khiến file watcher nhận dữ liệu đứt đoạn. Hệ thống áp dụng debounce window để đảm bảo file ghi xong mới parse.
+- **Agent yêu cầu tương tác (Blocked)**: Agent hỏi quyền thực thi lệnh từ người dùng. Pane mới mở ở chế độ `--no-focus` bên cạnh, cho phép người dùng click sang trả lời mà không treo TUI.
+- **Thiếu file config global**: Lần đầu chạy chưa có `~/.only-one/config.json`. Hệ thống tự động khởi tạo file với giá trị mặc định an toàn.

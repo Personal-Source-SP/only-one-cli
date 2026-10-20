@@ -234,7 +234,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'karpathy-ste100-discipline',
-        version: '0.0.2',
+        version: '0.0.3',
         description:
             "Enforce Andrej Karpathy's 4 Core Disciplines and 80% ASD-STE100 Aviation Technical Writing Specification for zero-slop Markdown.",
         sourceType: 'local',
@@ -261,7 +261,7 @@ export const SKILLS: SkillManifest[] = [
     // --- 9. SDLC Core Skills (Converged from Workflows) ---
     {
         name: 'only-one-idea',
-        version: '0.0.12',
+        version: '0.0.13',
         description: 'Clarify business problems, define strict scope boundaries, build domain models, update CONTEXT.md & ADRs, and produce a lean concept.md specification.',
         sourceType: 'local',
         requiredSkills: [
@@ -280,7 +280,7 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-plan',
-        version: '0.0.15',
+        version: '0.0.16',
         description: 'Research current code and create a focused, diff-centric implementation plan with Directory Structure, machine-readable File Changes, Unified Diffs, and Verification.',
         sourceType: 'local',
         requiredSkills: [

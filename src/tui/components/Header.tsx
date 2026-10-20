@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import { VERSION } from '@/constants/index.js';
+import { isHerdrSessionActive } from '../services/herdrService.js';
 import type { ColumnModel } from '../types/task.js';
 
 interface HeaderProps {
@@ -24,7 +25,18 @@ export const Header: React.FC<HeaderProps> = ({ workspacePath, columns, totalTas
                 <Text bold color="cyan">
                     🚀 ONLY-ONE ⚡ WORKFLOW BOARD <Text color="gray">v{VERSION}</Text>
                 </Text>
-                <Text dimColor>Workspace: {workspacePath}</Text>
+                <Box gap={2}>
+                    <Text dimColor>Workspace: {workspacePath}</Text>
+                    {isHerdrSessionActive() ? (
+                        <Text bold color="green">
+                            [HERDR: CONNECTED]
+                        </Text>
+                    ) : (
+                        <Text dimColor color="gray">
+                            [HERDR: OFF]
+                        </Text>
+                    )}
+                </Box>
             </Box>
             <Box marginTop={1} justifyContent="space-between">
                 <Box gap={2}>
