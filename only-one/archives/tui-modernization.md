@@ -6,7 +6,7 @@ triggers:
   - "src/tui/**"
   - "src/core/init/**"
   - "src/prompts/**"
-archived_at: 2026-10-20T18:35:00+07:00
+archived_at: 2026-10-20T22:06:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -25,10 +25,12 @@ affected_modules:
   - Cột Kanban cũ dùng trạng thái `review` gây ẩn task đột ngột thay vì hiển thị cột hoàn thành `done`.
   - Herdr Process Manager thiếu phân biệt cấu hình giữa Target Pane và CLI Tool, hiển thị mã định danh nội bộ (`w3:p1`) thay vì tên tab có ý nghĩa (`Human-Readable Name`).
   - Init Wizard ban đầu hiển thị danh sách đơn luồng thiếu phân loại danh mục, và gặp lỗi cảnh báo runtime "Detected unsettled top-level await" khi người dùng nhấn `Ctrl+C`.
+  - Bộ điều phối Herdr (`dispatchTaskViaHerdr` & `dispatchCleanViaHerdr`) chỉ truy vấn `listHerdrAgents` thay vì `listHerdrPanes`, dẫn đến việc coi các terminal shell thông thường (`pwsh`, `cmd`, `bash`) là chưa mở và liên tục tự động split terminal mới ngoài ý muốn.
 - **Value**:
   - Xây dựng bảng Kanban 4 cột tinh gọn chính quy (`concept`, `plan`, `processing`, `done`), tự động phản chiếu thay đổi file trên đĩa qua bộ quét debounce và duy trì task `done` trực quan.
   - Tích hợp trực tiếp với Herdr Process Manager: nạp danh sách agent thời gian thực, hiển thị nhãn tab người dùng (`enrichAgentsWithTabLabels`), tách bạch Target Pane và CLI Tool qua `normalizePhaseRoute`, và điều phối tuần tự (Pipeline Queue) an toàn.
   - Cung cấp Interactive Init Wizard (`InitWizardApp`) dạng component Ink với kiến trúc Split-Pane 2 cột (`CategorySidebar` và `ResourceList`), quét trạng thái cài đặt thời gian thực và thoát an toàn không rò rỉ promise unhandled.
+  - Kiểm tra và tái sử dụng Target Pane triệt để: đối soát qua `listHerdrPanes()`, tự động kích hoạt agent trên shell có sẵn (`herdr agent start --pane`) và gửi prompt trực tiếp, loại bỏ hoàn toàn tình trạng split pane thừa.
 
 ## 2. Key Architecture & Decisions
 - **4-Column Kanban Lifecycle**:
@@ -38,6 +40,12 @@ affected_modules:
   - `enrichAgentsWithTabLabels`: Ánh xạ `tab_id` sang `label` thực tế từ Herdr, hiển thị dạng `${agent.name || agent.pane_id} (${agent.agent} - ${agent.pane_id})`.
   - `normalizePhaseRoute`: Chuẩn hóa đối tượng `{ pane: string, cli: string }`, cho phép người dùng tùy chỉnh độc lập pane thực thi và binary agent (`agy`, `claude`).
   - `dispatchTaskToHerdrAgents`: Hỗ trợ gán nhiều agent cho 1 task và thực thi tuần tự (Pipeline Queue) loại bỏ race condition sửa code.
+- **Target Pane Verification & In-Place Shell Promotion**:
+  - `dispatchTaskViaHerdr` và `dispatchCleanViaHerdr` kiểm tra `route.pane` bằng `listHerdrPanes()` thay vì chỉ kiểm tra agent đang chạy.
+  - Nếu pane mục tiêu đã tồn tại:
+    - Nếu đã có agent: Chờ agent nhàn rỗi (`waitHerdrAgent`) rồi gửi prompt trực tiếp (`herdr agent prompt <pane>`).
+    - Nếu là shell terminal: Gọi `herdr agent start <name> --kind <cli> --pane <pane>` trực tiếp trên pane đó, sau đó prompt mà không gọi `splitCommand`.
+  - Chỉ fallback sang split pane mới khi `route.pane === 'auto'` hoặc pane chưa được mở trong Herdr.
 - **Interactive Init Wizard App (Split-Pane Architecture)**:
   - [CategorySidebar.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/components/CategorySidebar.tsx): Cột trái hiển thị 9 danh mục tài nguyên (`combos`, `skills`, `rules`, `packages`, `configs`, `mcps`, `git`, `vs`, `ignore`) kèm bộ đếm `[selected/total]`.
   - [ResourceList.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/components/ResourceList.tsx): Cột phải hiển thị danh sách tài nguyên tương ứng danh mục đang chọn.
@@ -49,7 +57,10 @@ flowchart TD
     Board --> Watcher["taskWatcher (Debounced file changes)"]
     Board --> AgentModal["AgentSelectorModal (Tab label names & status)"]
     AgentModal --> HerdrQueue["Sequential Pipeline Dispatcher (wait idle -> prompt)"]
-    HerdrQueue --> Agents["Active Herdr Agents (Pane & CLI routing)"]
+    HerdrQueue --> TargetCheck{"Target Pane có trong listHerdrPanes?"}
+    TargetCheck -->|Có: Đã có Agent| PromptDirect["Prompt trực tiếp pane"]
+    TargetCheck -->|Có: Shell thuần| StartOnPane["Start agent trên pane -> Prompt (Không split)"]
+    TargetCheck -->|Không / Auto| SplitPane["Split pane mới"]
     User --> InitWizard["InitWizardApp (Split-Pane: CategorySidebar + ResourceList)"]
     InitWizard --> Scanner["workspaceScanner (Lockfile + FS Detection)"]
 ```
@@ -64,13 +75,14 @@ flowchart TD
   - [InitWizardApp.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/InitWizardApp.tsx): Trình hướng dẫn thiết lập tương tác 2 cột.
 - **Core Orchestrator & Services**:
   - [interactive-orchestrator.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/init/interactive-orchestrator.ts): Promise wrapper an toàn chống rò rỉ unsettled await trên SIGINT.
-  - [herdrService.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/services/herdrService.ts): `listHerdrAgents`, `enrichAgentsWithTabLabels`, `normalizePhaseRoute`, `dispatchTaskToHerdrAgents`.
+  - [herdrService.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/services/herdrService.ts): `listHerdrAgents`, `listHerdrPanes`, `enrichAgentsWithTabLabels`, `normalizePhaseRoute`, `dispatchTaskViaHerdr`, `dispatchCleanViaHerdr`.
   - [taskScanner.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/services/taskScanner.ts): Gom nhóm 4 cột chính quy `concept`, `plan`, `processing`, `done`.
 - **Unit Tests**:
   - [test/tui/herdrService.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/herdrService.test.ts)
+  - [test/tui/herdrTargetPaneDispatch.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/herdrTargetPaneDispatch.test.ts)
   - [test/tui/taskScanner.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/taskScanner.test.ts)
   - [test/tui/cleanWorkflow.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/cleanWorkflow.test.ts)
 
 ## 4. Verification Evidence & PR
-- **Test Status**: 100% Passed.
+- **Test Status**: 100% Passed (72 passed test files, 290 unit tests passed).
 - **Branch**: `main`

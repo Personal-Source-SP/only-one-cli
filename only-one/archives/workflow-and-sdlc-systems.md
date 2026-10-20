@@ -6,7 +6,7 @@ triggers:
   - ".agents/workflows/**"
   - "assets/workflows/**"
   - ".agents/skills/**"
-archived_at: 2026-10-19T19:18:00+07:00
+archived_at: 2026-10-20T22:06:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -21,6 +21,7 @@ affected_modules:
   - assets/rules
   - .agents/workflows
   - .agents/skills
+  - test/skills
   - only-one/rules.md
 ---
 
@@ -35,6 +36,7 @@ affected_modules:
 4. **Chi phí thời gian lớn cho Quick Tasks**: Các tác vụ nhỏ bị bắt buộc phải chạy qua 3 giai đoạn độc lập nặng nề.
 5. **Thực thi tuần tự gây nghẽn (Sequential Bottleneck)**: `/only-one-apply` chạy từng file một làm chậm tiến độ và phình to ngữ cảnh Main Agent.
 6. **Vi phạm ranh giới vòng đời (Lifecycle Drift)**: Debug tự ý sửa code sản phẩm; review không có định dạng thực thi chuẩn.
+7. **Báo cáo Hoàn thành Chat Tùy tiện & Khó Quét Mắt**: Khi `/only-one-apply` kết thúc, báo cáo chat quá sơ sài hoặc phân rã chi tiết từng file rườm rà, pha trộn tiếng Anh thiếu tự nhiên, làm chậm quá trình nghiệm thu.
 
 ### 1.2. Core Value & Solutions
 1. **Direct Specialized Workflow Invocation**: Loại bỏ gateway router trung gian, cho phép kích hoạt trực tiếp các workflows chuyên biệt (`/only-one-idea`, `/only-one-plan`, `/only-one-apply`, `/only-one-flash`, `/only-one-debug`, `/only-one-review`, `/only-one-conflict`, `/only-one-clean`, `/only-one-pr-git`).
@@ -53,19 +55,26 @@ affected_modules:
      - Kế hoạch trình bày trực tiếp qua chat, có Review Gate bắt buộc ở Step 2 trước khi sửa code ở Step 3.
    - **Strict Lifecycle RCA Lane (`/only-one-debug`)**:
      - Tuân thủ 2 pha tách biệt: Pha 1 chẩn đoán lỗi, dựng Red feedback loop, lập kế hoạch vá trong `debug.md` và dừng tại Review Gate (Zero Direct Code Modifications); Pha 2 giao cho `/only-one-apply` thực thi.
-3. **Quy Chuẩn Viết 80% ASD-STE100 & Triệt Tiêu Thể Bị Động ([`karpathy-ste100-discipline`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/karpathy-ste100-discipline/SKILL.md))**:
+6. **Mẫu Báo Cáo Hoàn Thành Tinh Gọn 4 Mục (Crisp In-Chat Completion Report)**:
+   - Chuẩn hóa Step 5 của `only-one-apply` với 4 mục súc tích bằng tiếng Việt:
+     1. Cấu trúc source thay đổi (cây thư mục trực quan kèm tag `[NEW]`, `[MODIFY]`, `[DELETE]`).
+     2. Các công việc đã xử lý (tóm tắt toàn bộ tiến trình thay vì mô tả rời rạc theo file).
+     3. Nghiệm thu & Kiểm thử (trạng thái task `done`/`fixed` và kết quả test).
+     4. Bước tiếp theo (gợi ý lệnh kế tiếp trên 1 dòng).
+   - Bảo toàn triệt để invariant không sinh file `walkthrough.md` trên đĩa.
+7. **Quy Chuẩn Viết 80% ASD-STE100 & Triệt Tiêu Thể Bị Động ([`karpathy-ste100-discipline`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/karpathy-ste100-discipline/SKILL.md))**:
    - Khống chế trần từ: Câu chỉ dẫn $\le 20$ từ, câu mô tả/ngữ cảnh $\le 25$ từ.
    - Cấm triệt để thể bị động (*passive voice*); 100% sử dụng câu chủ động trực diện.
    - Cấu trúc 3 tầng: Prerequisites $\rightarrow$ Action $\rightarrow$ Verification.
-4. **Bắt Buộc Trực Quan Hóa Bằng Sơ Đồ ([`c4-diagrams`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/c4-diagrams/SKILL.md))**:
+8. **Bắt Buộc Trực Quan Hóa Bằng Sơ Đồ ([`c4-diagrams`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/c4-diagrams/SKILL.md))**:
    - `concept.md`: Bắt buộc Mermaid Flowchart/State Diagram cho luồng dữ liệu nghiệp vụ và máy trạng thái.
    - `plan.md`: Bắt buộc C4 Component Diagram hoặc Mermaid Sequence Diagram khi có $\ge 2$ modules tương tác hoặc luồng bất đồng bộ.
    - `debug.md`: Bắt buộc Mermaid Failure Call Trace Diagram hoặc State Divergence Diagram chứng minh cơ học điểm gãy vỡ của hợp đồng hệ thống.
-5. **Cơ chế Thực thi Song song Sub-agent theo DAG trong `/only-one-apply`**:
+9. **Cơ chế Thực thi Song song Sub-agent theo DAG trong `/only-one-apply`**:
    - Phân tích trường `Depends On` để nhóm các task độc lập thành các Execution Waves.
    - Áp dụng **Disjoint File Invariant** ngăn chặn 2 Sub-agents sửa chung 1 file cùng lúc.
    - Parallel Dispatch với 3-4 Sub-agents chạy song song và Barrier Synchronization giữa các wave.
-6. **Chống Nịnh bợ & Tư duy Phản biện ([`sparring-partner`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/sparring-partner/SKILL.md))**:
+10. **Chống Nịnh bợ & Tư duy Phản biện ([`sparring-partner`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/sparring-partner/SKILL.md))**:
    - Loại bỏ lời khen sáo rỗng (*Zero Sycophantic Fillers*), đánh giá rủi ro theo 5 trục kỹ thuật (Boundary conditions, Simplicity, Blast radius, Concurrency, Security) và đề xuất phương án thay thế tốt hơn trước khi đồng thuận.
 
 ---
@@ -136,7 +145,8 @@ flowchart TD
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
 
 - [`assets/skills/karpathy-ste100-discipline/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/karpathy-ste100-discipline/SKILL.md): Nâng chuẩn 80% ASD-STE100, khống chế 20/25 từ, cấm thể bị động.
-- [`assets/skills/only-one-apply/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-apply/SKILL.md): Tinh giản thực thi trực tiếp coder-first, chạy test gate cuối cùng thay vì lặp qua sub-agent.
+- [`assets/skills/only-one-apply/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-apply/SKILL.md): Tinh giản thực thi trực tiếp coder-first, bổ sung schema chuẩn mực cho Báo cáo Hoàn thành Chat tinh gọn 4 mục bằng tiếng Việt.
+- [`test/skills/applyReportTemplate.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/applyReportTemplate.test.ts): Unit test kiểm thử cấu trúc schema báo cáo 4 mục và kiểm tra độ dài câu theo tiêu chuẩn ASD-STE100.
 - [`.agents/hooks/`](file:///d:/Sources/PERSONAL/only-one-cli/.agents/hooks/): Bổ sung 5 chốt chặn an toàn (`block-heavy-scripts.sh`, `no-secrets.sh`, `format-on-edit.sh`, `test-gate.sh`, `protect-configs.sh`).
 - [`assets/combos/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/combos/index.ts): Tích hợp hooks vào combo `only-one-flow` (v0.0.16).
 - Hợp nhất toàn diện các workflows vào hệ thống Agent Skills (`assets/skills/only-one-*`), khai tử `.agents/workflows/`.
@@ -145,6 +155,6 @@ flowchart TD
 
 ## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu)
 
-- **Trạng thái Test**: 100% Passed (Toàn bộ 64 test suites / 266 unit tests).
+- **Trạng thái Test**: 100% Passed (Toàn bộ 72 test suites / 290 unit tests).
 - **Format & Build**: `npm run format:check && npm run build` (passed, zero errors).
 - **Đồng bộ**: 100% giữa `assets/` và `.agents/`.

@@ -1,6 +1,6 @@
 ---
 domain: tui
-version: 1.1.0
+version: 1.2.0
 triggers:
   - "src/tui/**"
   - "src/prompts/**"
@@ -32,3 +32,9 @@ triggers:
 - **MUST_DO**: Maintain the 4 standard Kanban columns: `concept`, `plan`, `processing`, and `done`.
 - **NEVER_DO**: Introduce intermediate or ad-hoc column names (such as `review`) that deviate from the standard 4-column model.
 - **RATIONALE**: Ensures consistent task tracking across all workflows and clean automatic filtering of completed tasks.
+
+### TUI-006: Target Pane Verification Before Split Dispatch
+- **MUST_DO**: Verify target pane existence against the full session pane collection (`listHerdrPanes`) and reuse existing pane terminals before invoking split commands.
+- **NEVER_DO**: Filter target panes only against active agent lists (`listHerdrAgents`) or unconditionally trigger split commands when a target pane is configured.
+- **RATIONALE**: Plain shell terminals (`pwsh`, `cmd`, `bash`) do not run an active agent until initialized, causing false negatives and duplicate terminal panes.
+

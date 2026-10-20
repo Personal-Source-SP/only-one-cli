@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.0.0
+version: 1.1.0
 triggers:
   - ".agents/workflows/**"
   - "assets/workflows/**"
@@ -43,4 +43,9 @@ triggers:
 - **MUST_DO**: Declare agent personas, authorities, and role boundaries directly inside each workflow under `## Role & Collaboration Model` -> `### Assigned Persona & Authority`.
 - **NEVER_DO**: Create unstandardized subdirectories (such as `.agents/agents/` or `assets/agents/`) outside standard Antigravity customization roots (`workflows`, `skills`, `rules`, `plugins`).
 - **RATIONALE**: Antigravity does not recognize `.agents/agents/`, risking discovery failure and maintenance fragmentation.
+
+### WF-008: Crisp Completion Report Format in Chat
+- **MUST_DO**: Present the final completion report in chat using the 4 crisp sections (Source Structure Changes, Work Processed, Acceptance & Tests, Next Steps) with zero extra disk files (`walkthrough.md`).
+- **NEVER_DO**: Emit verbose per-file descriptions, raw unformatted diffs, or loose unstandardized chat summaries upon task completion.
+- **RATIONALE**: Standardizes scanning speed, keeps context token-efficient, and guarantees instantaneous reviewer comprehension.
 
