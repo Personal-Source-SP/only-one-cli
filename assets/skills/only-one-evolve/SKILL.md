@@ -30,6 +30,10 @@ This skill bundles deterministic helper scripts to avoid manual token-heavy file
   ```bash
   npx tsx assets/skills/only-one-evolve/scripts/lint-skill.ts <path-to-skill>
   ```
+- **`scripts/scaffold-linter-rule.ts`**: Tự động sinh mã ESLint AST rule khi phát hiện lỗi lặp lại có tính chất cú pháp.
+  ```bash
+  npx tsx assets/skills/only-one-evolve/scripts/scaffold-linter-rule.ts <rule-slug> "<description>" <ASTNode>
+  ```
 
 ## Role
 
@@ -43,6 +47,7 @@ This skill bundles deterministic helper scripts to avoid manual token-heavy file
   - Synthesize concise, atomic additions/modifications.
   - Present proposed Unified Diff to user for review and approval.
   - Run `scripts/lint-skill.ts` to verify post-patch quality.
+  - Khi phát hiện lỗi lặp lại (>= 2 lần) có thể chặn bằng AST, đề xuất sinh rule ESLint trong `eslint-rules/rules/`.
   - On approval, apply changes and update improvement file frontmatter to `status: applied`.
 - **Forbidden Actions**:
   - 🛑 **STRICTLY FORBIDDEN to overwrite `SKILL.md` without explicit human confirmation**.
