@@ -1,6 +1,8 @@
 ---
 task_slug: only-one-reflect-workflow
 created_at: 2026-10-20T13:47:00+07:00
+archived_at: 2026-10-20T16:08:35+07:00
+status: pending
 target_skills:
   - only-one-apply
   - only-one-evolve

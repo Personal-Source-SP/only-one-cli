@@ -136,26 +136,15 @@ flowchart TD
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
 
 - [`assets/skills/karpathy-ste100-discipline/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/karpathy-ste100-discipline/SKILL.md): Nâng chuẩn 80% ASD-STE100, khống chế 20/25 từ, cấm thể bị động.
-- [`.agents/skills/karpathy-ste100-discipline/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/.agents/skills/karpathy-ste100-discipline/SKILL.md): Đồng bộ với assets.
-- [`assets/rules/04-karpathy-ste100-discipline.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/rules/04-karpathy-ste100-discipline.md): Cập nhật rule manifest và version `0.0.2`.
-- [`assets/skills/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/index.ts): Version `0.0.2` cho `karpathy-ste100-discipline`.
-- [`assets/rules/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/rules/index.ts): Version `0.0.2` cho `karpathy-ste100-discipline`.
-- [`assets/workflows/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/index.ts): Bổ sung `c4-diagrams` vào `requiredSkills`, bump versions `only-one-idea` (`0.0.9`), `only-one-plan` (`0.0.12`), `only-one-debug` (`0.0.10`).
-- [`assets/workflows/only-one-idea.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-idea.md): Tích hợp chuẩn sơ đồ luồng dữ liệu/trạng thái nghiệp vụ và 80% STE100.
-- [`.agents/workflows/only-one-idea.md`](file:///d:/Sources/PERSONAL/only-one-cli/.agents/workflows/only-one-idea.md): Đồng bộ với assets.
-- [`assets/workflows/only-one-plan.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-plan.md): Bắt buộc C4 Component hoặc Sequence Diagram khi có $\ge 2$ modules hoặc async, chuẩn 80% STE100.
-- [`.agents/workflows/only-one-plan.md`](file:///d:/Sources/PERSONAL/only-one-cli/.agents/workflows/only-one-plan.md): Đồng bộ với assets.
-- [`assets/workflows/only-one-debug.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/workflows/only-one-debug.md): Bắt buộc Mermaid Failure Call Trace Diagram trong Section 1, chuẩn 80% STE100.
-- [`.agents/workflows/only-one-debug.md`](file:///d:/Sources/PERSONAL/only-one-cli/.agents/workflows/only-one-debug.md): Đồng bộ với assets.
-- [`only-one/rules.md`](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules.md): Cập nhật Rule 34 (80% ASD-STE100) và Rule 35 (Sơ đồ trực quan `c4-diagrams`).
+- [`assets/skills/only-one-apply/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-apply/SKILL.md): Tinh giản thực thi trực tiếp coder-first, chạy test gate cuối cùng thay vì lặp qua sub-agent.
+- [`.agents/hooks/`](file:///d:/Sources/PERSONAL/only-one-cli/.agents/hooks/): Bổ sung 5 chốt chặn an toàn (`block-heavy-scripts.sh`, `no-secrets.sh`, `format-on-edit.sh`, `test-gate.sh`, `protect-configs.sh`).
+- [`assets/combos/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/combos/index.ts): Tích hợp hooks vào combo `only-one-flow` (v0.0.16).
+- Hợp nhất toàn diện các workflows vào hệ thống Agent Skills (`assets/skills/only-one-*`), khai tử `.agents/workflows/`.
 
 ---
 
 ## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu)
 
-- **Trạng thái Test**: 100% Passed.
-  - `npx vitest run test/core/workflow-registry.test.ts` (10/10 passed)
-  - `npx vitest run test/core/assets/version-gate.test.ts` (2/2 passed)
-  - `npx vitest run test/core/rule-adapters.test.ts` (3/3 passed)
-  - `npm run format:check && npx tsc --noEmit` (passed, zero errors)
+- **Trạng thái Test**: 100% Passed (Toàn bộ 64 test suites / 266 unit tests).
+- **Format & Build**: `npm run format:check && npm run build` (passed, zero errors).
 - **Đồng bộ**: 100% giữa `assets/` và `.agents/`.

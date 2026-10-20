@@ -4,11 +4,12 @@ import React, { FC, useEffect, useState } from 'react';
 import { Footer } from './components/Footer.js';
 import { Header } from './components/Header.js';
 import { BoardView } from './components/BoardView.js';
+import { AgentSelectorModal } from './components/AgentSelectorModal.js';
 import { MarkdownViewer } from './components/MarkdownViewer.js';
 import { SettingsView } from './components/SettingsView.js';
 import { cleanCompletedTasks } from './services/taskCleaner.js';
 import { loadGlobalConfig, saveGlobalConfig } from './services/configService.js';
-import { dispatchCleanViaHerdr, dispatchTaskViaHerdr } from './services/herdrService.js';
+import { dispatchCleanViaHerdr, dispatchTaskToHerdrAgents } from './services/herdrService.js';
 import { startTaskWatcher } from './services/taskWatcher.js';
 import { DEFAULT_GLOBAL_CONFIG, type OnlyOneGlobalConfig } from './types/config.js';
 import { groupTasksByColumn, scanTasks, updateTaskStatus } from './services/taskScanner.js';
@@ -23,6 +24,7 @@ export const App: FC<AppProps> = ({ deps }) => {
     const [mode, setMode] = useState<TuiMode>('board');
     const [tasks, setTasks] = useState<TaskModel[]>([]);
     const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
+    const [dispatchingTask, setDispatchingTask] = useState<TaskModel | null>(null);
     const [confirmAction, setConfirmAction] = useState<ConfirmActionState | null>(null);
     const [loading, setLoading] = useState(true);
     const [globalConfig, setGlobalConfig] = useState<OnlyOneGlobalConfig>(DEFAULT_GLOBAL_CONFIG);
@@ -71,9 +73,20 @@ export const App: FC<AppProps> = ({ deps }) => {
         await refresh();
     };
 
-    const handleDispatch = async (task: TaskModel) => {
-        setStatusMessage(`Đang điều phối ${task.slug} qua Herdr...`);
-        const res = await dispatchTaskViaHerdr(task, task.status, globalConfig, workspaceDir);
+    const handleOpenDispatch = (task: TaskModel) => {
+        setDispatchingTask(task);
+        setMode('dispatch');
+    };
+
+    const handleConfirmAgentDispatch = async (selectedTargets: string[]) => {
+        if (!dispatchingTask) return;
+        const targetTask = dispatchingTask;
+        setMode('board');
+        setDispatchingTask(null);
+        setStatusMessage(`Bắt đầu điều phối ${targetTask.slug} tới ${selectedTargets.length} agent...`);
+        const res = await dispatchTaskToHerdrAgents(targetTask, selectedTargets, workspaceDir, (progressMsg) => {
+            setStatusMessage(progressMsg);
+        });
         setStatusMessage(res.message);
     };
 
@@ -100,6 +113,15 @@ export const App: FC<AppProps> = ({ deps }) => {
                     }}
                     onClose={() => setMode('board')}
                 />
+            ) : mode === 'dispatch' && dispatchingTask ? (
+                <AgentSelectorModal
+                    task={dispatchingTask}
+                    onConfirm={handleConfirmAgentDispatch}
+                    onCancel={() => {
+                        setDispatchingTask(null);
+                        setMode('board');
+                    }}
+                />
             ) : mode === 'viewer' && selectedTask ? (
                 <MarkdownViewer task={selectedTask} onClose={() => setMode('board')} />
             ) : (
@@ -116,7 +138,7 @@ export const App: FC<AppProps> = ({ deps }) => {
                     onRefresh={refresh}
                     onOpenSettings={() => setMode('settings')}
                     onCleanNow={handleCleanNow}
-                    onDispatchTask={handleDispatch}
+                    onDispatchTask={handleOpenDispatch}
                     onQuit={exit}
                 />
             )}

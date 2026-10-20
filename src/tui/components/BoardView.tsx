@@ -18,9 +18,8 @@ interface BoardViewProps {
 const COLUMN_ICONS: Record<string, string> = {
     concept: '💡',
     plan: '📋',
-    in_progress: '⚡',
+    processing: '⚡',
     review: '🔍',
-    done: '✅',
 };
 
 export const BoardView: FC<BoardViewProps> = ({
@@ -35,7 +34,7 @@ export const BoardView: FC<BoardViewProps> = ({
     onQuit,
 }) => {
     const [colIndex, setColIndex] = useState(0);
-    const [cardIndices, setCardIndices] = useState<Record<number, number>>({ 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 });
+    const [cardIndices, setCardIndices] = useState<Record<number, number>>({ 0: 0, 1: 0, 2: 0, 3: 0 });
     const [grabbedTask, setGrabbedTask] = useState<TaskModel | null>(null);
 
     const currentCol = columns[colIndex];

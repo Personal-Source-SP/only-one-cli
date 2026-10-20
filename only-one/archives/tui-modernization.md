@@ -1,11 +1,11 @@
 ---
 id: tui-modernization
-title: Modernizing Only-One CLI Terminal User Interface (TUI)
+title: Modernizing Only-One CLI Terminal User Interface (TUI) & Task Board
 domain: tui
 triggers:
   - "src/tui/**"
   - "src/prompts/**"
-archived_at: 2026-08-25T10:38:30+07:00
+archived_at: 2026-10-20T16:09:40+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -14,30 +14,48 @@ affected_modules:
   - test/tui
 ---
 
-# Archive: Modernizing Only-One CLI Terminal User Interface (TUI)
+# Archive: Modernizing Only-One CLI Terminal User Interface (TUI) & Task Board
 
 ## 1. Problem & Core Value
-- **Problem**: The legacy TUI relied on a single-column layout with 13 un-categorized menu items, simulated mock delays instead of real actions, and suffered from input race conditions between nested `useInput` hooks.
-- **Value**: Transformed the terminal interface into a modern 2-pane Master-Detail dashboard with categorized accordion menus, fuzzy searching, live task execution with streaming stdout logs, and deterministic focus routing.
+- **Problem**: 
+  - Giao diện TUI cũ phân mảnh, thiếu cơ chế theo dõi nhiệm vụ Kanban thời gian thực, điều phối Agent tĩnh gán cứng IDE/CLI gây xung đột tiến trình terminal, và lệnh init thiếu wizard trực quan.
+- **Value**:
+  - Xây dựng bảng Kanban 4 cột tinh gọn (`concept`, `plan`, `processing`, `review`), tự động phản chiếu thay đổi file trên đĩa qua bộ quét debounce.
+  - Tích hợp trực tiếp với Herdr Process Manager: nạp danh sách agent thời gian thực (`idle` / `working`), hỗ trợ chọn nhiều agent cùng lúc và điều phối tuần tự (Pipeline Queue) an toàn.
+  - Cung cấp Interactive Init Wizard (`InitWizardApp`) dạng component Ink với hỗ trợ quét workspace và phím tắt điều hướng nhanh.
 
 ## 2. Key Architecture & Decisions
-- **Router & Focus Machine**: Centralized [RouterContext.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/router/RouterContext.tsx) manages history stack and pane focus (`sidebar` vs `content` vs `search`), preventing input collisions.
-- **Master-Detail Layout**: [MasterDetailLayout.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/MasterDetailLayout.tsx) splits the screen (36% sidebar / 64% content) with responsive fallback.
-- **Live Task Runner**: [TaskRunnerView.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/TaskRunnerView.tsx) provides animated execution feedback with real-time log buffers.
+- **4-Column Kanban Lifecycle**:
+  - Chuẩn hóa vòng đời task: `concept` $\rightarrow$ `plan` $\rightarrow$ `processing` $\rightarrow$ `review`.
+  - Task vượt qua `review` sẽ tự động kích hoạt tiến trình Clean/Archive và ẩn khỏi bảng điều khiển.
+- **Herdr Runtime Agent Selector & Queue**:
+  - `listHerdrAgents`: Phân tích kết quả JSON từ `herdr agent list`.
+  - `waitHerdrAgent`: Chờ agent đạt trạng thái `idle` qua `herdr agent wait <target> --until idle` trước khi gửi prompt.
+  - `dispatchTaskToHerdrAgents`: Hỗ trợ gán nhiều agent cho 1 task và thực thi tuần tự (Pipeline Queue) loại bỏ race condition sửa code.
+- **Interactive Init Wizard App**:
+  - [InitWizardApp.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/InitWizardApp.tsx) cung cấp giao diện trực quan chọn Tool, Combo, Package, Skill, Config kèm cơ chế overwrite an toàn.
 
 ```mermaid
 flowchart TD
-    App["App.tsx"] --> Router["RouterProvider (RouterContext)"]
-    Router --> Layout["MasterDetailLayout"]
-    Layout --> Sidebar["Left: CategoryMenu & SearchFilter"]
-    Layout --> Content["Right: PreviewCard / Active View / TaskRunnerView"]
+    User([Người dùng]) --> Board["BoardView (4 cột: concept, plan, processing, review)"]
+    Board --> Watcher["taskWatcher (Debounced file changes)"]
+    Board --> AgentModal["AgentSelectorModal (Herdr runtime agents)"]
+    AgentModal --> HerdrQueue["Sequential Pipeline Dispatcher (wait idle -> prompt)"]
+    HerdrQueue --> Agents["Active Herdr Agents"]
 ```
 
 ## 3. Scope & Key Changes
-- **New Core Components**: [RouterContext.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/router/RouterContext.tsx), [routes.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/router/routes.ts), [MasterDetailLayout.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/MasterDetailLayout.tsx), [HomeDashboardView.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/views/HomeDashboardView.tsx), [fuzzy.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/utils/fuzzy.ts).
-- **Refactored Views**: Re-wired all 11 subviews to real action runners.
-- **Unit Tests**: Added [test/tui/router.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/router.test.ts), [test/tui/fuzzy.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/fuzzy.test.ts).
+- **Core TUI Components**:
+  - [BoardView.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/BoardView.tsx): Bảng Kanban 4 cột tinh gọn.
+  - [AgentSelectorModal.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/AgentSelectorModal.tsx): Modal chọn multi-agent với trạng thái runtime `idle` / `working`.
+  - [Header.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/Header.tsx) & [Footer.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/Footer.tsx): Đồng bộ biểu tượng 4 cột và phím tắt điều hướng `dispatch`.
+  - [InitWizardApp.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/InitWizardApp.tsx): Trình hướng dẫn thiết lập tương tác.
+- **Services**:
+  - [herdrService.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/services/herdrService.ts): Bổ sung `listHerdrAgents`, `waitHerdrAgent`, `dispatchTaskToHerdrAgents`.
+  - [taskScanner.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/services/taskScanner.ts): Gom nhóm 4 cột chính quy và chuẩn hóa ánh xạ trạng thái sang `processing`.
+- **Unit Tests**:
+  - [test/tui/herdrService.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/herdrService.test.ts), [test/tui/taskScanner.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/taskScanner.test.ts).
 
 ## 4. Verification Evidence & PR
-- **Test Status**: 100% Passed (`npm test` and `npm run build`).
+- **Test Status**: 100% Passed (Toàn bộ 64 test suites / 266 unit tests).
 - **Branch**: `main`

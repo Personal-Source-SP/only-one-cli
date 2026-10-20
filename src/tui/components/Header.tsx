@@ -14,9 +14,8 @@ export const Header: React.FC<HeaderProps> = ({ workspacePath, columns, totalTas
     const iconMap: Record<string, string> = {
         concept: '💡',
         plan: '📋',
-        in_progress: '⚡',
+        processing: '⚡',
         review: '🔍',
-        done: '✅',
     };
 
     return (

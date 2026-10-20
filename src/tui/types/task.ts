@@ -1,4 +1,13 @@
-export type TaskStatus = 'concept' | 'plan' | 'in_progress' | 'review' | 'done';
+export type TaskStatus = 'concept' | 'plan' | 'processing' | 'review' | 'done';
+
+export interface HerdrAgent {
+    agent: string;
+    agent_status: 'idle' | 'working' | 'blocked' | 'done' | 'unknown' | string;
+    pane_id: string;
+    workspace_id?: string;
+    cwd?: string;
+    focused?: boolean;
+}
 
 export interface TaskDoc {
     name: string;
@@ -24,7 +33,7 @@ export interface ColumnModel {
     tasks: TaskModel[];
 }
 
-export type TuiMode = 'board' | 'viewer' | 'confirm' | 'settings';
+export type TuiMode = 'board' | 'viewer' | 'confirm' | 'settings' | 'dispatch';
 
 export interface ConfirmActionState {
     task: TaskModel;

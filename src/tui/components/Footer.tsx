@@ -15,6 +15,9 @@ export const Footer: React.FC<FooterProps> = ({ mode, isMoving }) => {
         if (mode === 'settings') {
             return ['[↑/↓] Chọn mục', '[Space/Enter] Đổi giá trị', '[←/→] Tăng giảm', '[Esc/s] Lưu & Thoát'];
         }
+        if (mode === 'dispatch') {
+            return ['[↑/↓] Di chuyển', '[Space] Chọn/Bỏ chọn', '[Enter] Dispatch', '[Esc] Hủy'];
+        }
         if (isMoving) {
             return ['[←/→] Select Target Col', '[m/Enter] Drop Card', '[Esc] Cancel'];
         }

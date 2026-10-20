@@ -6,9 +6,8 @@ import type { ColumnModel, TaskDoc, TaskModel, TaskStatus } from '../types/task.
 const LIFECYCLE_COLUMNS: { id: TaskStatus; title: string; color: ColumnModel['color'] }[] = [
     { id: 'concept', title: 'CONCEPT', color: 'cyan' },
     { id: 'plan', title: 'PLAN', color: 'blue' },
-    { id: 'in_progress', title: 'IN-PROGRESS', color: 'yellow' },
+    { id: 'processing', title: 'PROCESSING', color: 'yellow' },
     { id: 'review', title: 'REVIEW', color: 'magenta' },
-    { id: 'done', title: 'DONE', color: 'green' },
 ];
 
 export function parseFrontmatter(content: string): { data: Record<string, unknown>; body: string } {
@@ -58,13 +57,14 @@ export async function scanTasks(workspaceDir: string = process.cwd()): Promise<T
                 if (data.status && typeof data.status === 'string') {
                     const s = data.status.toLowerCase();
                     if (s === 'plan' || s === 'planned') status = 'plan';
-                    else if (s === 'in_progress' || s === 'in-progress' || s === 'debug') status = 'in_progress';
+                    else if (s === 'processing' || s === 'in_progress' || s === 'in-progress' || s === 'debug' || s === 'apply')
+                        status = 'processing';
                     else if (s === 'review') status = 'review';
                     else if (s === 'done' || s === 'completed' || s === 'fixed' || s === 'resolved') status = 'done';
                     else status = 'concept';
                 } else {
                     if (docs.some((d) => d.name === 'review.md')) status = 'review';
-                    else if (docs.some((d) => d.name === 'debug.md')) status = 'in_progress';
+                    else if (docs.some((d) => d.name === 'debug.md')) status = 'processing';
                     else if (docs.some((d) => d.name === 'plan.md')) status = 'plan';
                 }
 

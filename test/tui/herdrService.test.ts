@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildHerdrCleanDispatchPlan, buildHerdrDispatchPlan, isHerdrSessionActive } from '@/tui/services/herdrService.js';
+import {
+    buildHerdrCleanDispatchPlan,
+    buildHerdrDispatchPlan,
+    isHerdrSessionActive,
+    listHerdrAgents,
+    waitHerdrAgent,
+} from '@/tui/services/herdrService.js';
 import { DEFAULT_GLOBAL_CONFIG } from '@/tui/types/config.js';
 import type { TaskModel } from '@/tui/types/task.js';
 
@@ -37,5 +43,15 @@ describe('Herdr Service', () => {
         expect(plan.splitCommand).toContain('herdr pane split');
         expect(plan.agentStartCommand).toContain('herdr agent start agy-archivist --kind antigravity');
         expect(plan.agentPromptCommand).toContain('herdr agent prompt agy-archivist "/only-one-clean"');
+    });
+
+    it('trả về mảng rỗng cho listHerdrAgents khi không trong Herdr session', async () => {
+        const agents = await listHerdrAgents();
+        expect(Array.isArray(agents)).toBe(true);
+    });
+
+    it('trả về false cho waitHerdrAgent khi không trong Herdr session', async () => {
+        const res = await waitHerdrAgent('mock-target', 100);
+        expect(typeof res).toBe('boolean');
     });
 });

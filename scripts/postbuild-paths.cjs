@@ -15,22 +15,26 @@ function replaceInDir(dir) {
             let cleaned = content;
             let needsWrite = false;
 
-            if (content.includes("from '@/") || content.includes('from "@/')) {
+            if (content.includes("'@/") || content.includes('"@/')) {
                 const rel = relative(dir, join(distDir, 'src'));
                 const prefix = rel ? rel.split(sep).join('/') + '/' : './';
                 cleaned = cleaned
                     .replaceAll(/from '@\//g, "from '" + prefix)
-                    .replaceAll(/from "@\//g, 'from "' + prefix);
+                    .replaceAll(/from "@\//g, 'from "' + prefix)
+                    .replaceAll(/import\('@\//g, "import('" + prefix)
+                    .replaceAll(/import\("@\//g, 'import("' + prefix);
                 needsWrite = true;
             }
 
-            if (content.includes("from '@assets/") || content.includes('from "@assets/')) {
+            if (content.includes("'@assets/") || content.includes('"@assets/')) {
                 const relToAssets = relative(dir, join(distDir, 'assets'));
                 const prefixAssets = relToAssets.split(sep).join('/');
                 const prefix = prefixAssets.startsWith('.') ? prefixAssets + '/' : './' + prefixAssets + '/';
                 cleaned = cleaned
                     .replaceAll(/from '@assets\//g, "from '" + prefix)
-                    .replaceAll(/from "@assets\//g, 'from "' + prefix);
+                    .replaceAll(/from "@assets\//g, 'from "' + prefix)
+                    .replaceAll(/import\('@assets\//g, "import('" + prefix)
+                    .replaceAll(/import\("@assets\//g, 'import("' + prefix);
                 needsWrite = true;
             }
 
