@@ -1,9 +1,16 @@
 export type TaskStatus = 'concept' | 'plan' | 'processing' | 'review' | 'done';
 
+export interface HerdrTab {
+    tab_id: string;
+    label?: string;
+}
+
 export interface HerdrAgent {
     agent: string;
     agent_status: 'idle' | 'working' | 'blocked' | 'done' | 'unknown' | string;
     pane_id: string;
+    name?: string;
+    tab_id?: string;
     workspace_id?: string;
     cwd?: string;
     focused?: boolean;

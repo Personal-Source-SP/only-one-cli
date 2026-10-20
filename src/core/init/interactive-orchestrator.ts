@@ -30,16 +30,24 @@ export async function promptInitSelectionsViaTui(projectDir: string, explicitToo
     const resources = scanWorkspaceAssets(projectDir, parsedTools);
 
     return new Promise((resolve) => {
-        render(
+        let isResolved = false;
+        const safeResolve = (val: InitSelectionInputs | null) => {
+            if (isResolved) return;
+            isResolved = true;
+            resolve(val);
+        };
+
+        const instance = render(
             React.createElement(InitWizardApp, {
                 initialResources: resources,
                 initialTools: parsedTools,
                 onComplete: (res) => {
                     if (!res.confirmed) {
-                        resolve(null);
+                        safeResolve(null);
+                        instance.unmount();
                         return;
                     }
-                    resolve({
+                    safeResolve({
                         selectedTools: res.selectedTools,
                         mode: 'custom',
                         packages: res.selectedPackages,
@@ -49,9 +57,15 @@ export async function promptInitSelectionsViaTui(projectDir: string, explicitToo
                         rulesPerAgent: res.selectedRules,
                         overwrite: res.overwrite,
                     });
+                    instance.unmount();
                 },
             }),
+            { exitOnCtrlC: false },
         );
+
+        instance.waitUntilExit().then(() => {
+            safeResolve(null);
+        });
     });
 }
 

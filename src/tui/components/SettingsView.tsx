@@ -154,8 +154,12 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
                 ) : (
                     herdrAgents.map((a) => (
                         <Box key={a.pane_id || a.agent} gap={1}>
-                            <Text color="cyan">{a.pane_id}</Text>
-                            <Text color="white">({a.agent})</Text>
+                            <Text bold color="cyan">
+                                {a.name || a.pane_id}
+                            </Text>
+                            <Text color="gray">
+                                ({a.agent} - {a.pane_id})
+                            </Text>
                             <Text color={a.agent_status === 'idle' ? 'green' : 'yellow'}>
                                 [{a.agent_status === 'idle' ? '🟢 idle' : '🟡 working'}]
                             </Text>
@@ -177,8 +181,9 @@ export const SettingsView: FC<SettingsViewProps> = ({ initialConfig, onSave, onC
                     } else if (item.id.startsWith('agent_')) {
                         const phase = item.id.replace('agent_', '') as keyof OnlyOneGlobalConfig['agentRouting'];
                         const route = normalizePhaseRoute(config.agentRouting[phase]);
-                        const paneLabel = route.pane === 'auto' ? 'Auto (Mở mới)' : route.pane;
-                        valueDisplay = `Pane: [ ${paneLabel} ] (←/→)  |  CLI: [ ${route.cli} ] (Space/Enter)`;
+                        const targetAgent = herdrAgents.find((a) => a.pane_id === route.pane);
+                        const paneLabel = route.pane === 'auto' ? 'Auto (Mở mới)' : targetAgent?.name ? targetAgent.name : route.pane;
+                        valueDisplay = `Agent: [ ${paneLabel} ] (←/→)  |  CLI: [ ${route.cli} ] (Space/Enter)`;
                     } else if (item.id === 'herdr_direction') {
                         valueDisplay = `[ ${config.herdr.splitDirection.toUpperCase()} ] (Space để đổi)`;
                     }

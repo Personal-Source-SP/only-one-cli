@@ -83,7 +83,7 @@ export const AgentSelectorModal: FC<AgentSelectorModalProps> = ({ task, onConfir
                     return (
                         <Box key={target} paddingLeft={1} backgroundColor={isFocused ? 'gray' : undefined}>
                             <Text color={isFocused ? 'black' : isChecked ? 'green' : 'white'} bold={isChecked}>
-                                [{isChecked ? 'x' : ' '}] {agent.pane_id} ({agent.agent}) - {statusBadge}
+                                [{isChecked ? 'x' : ' '}] {agent.name || agent.pane_id} ({agent.agent} - {agent.pane_id}) - {statusBadge}
                             </Text>
                         </Box>
                     );

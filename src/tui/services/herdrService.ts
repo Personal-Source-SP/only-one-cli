@@ -1,6 +1,6 @@
 import { exec } from 'node:child_process';
 import type { OnlyOneGlobalConfig, PhaseAgentRoute } from '../types/config.js';
-import type { HerdrAgent, TaskModel, TaskStatus } from '../types/task.js';
+import type { HerdrAgent, HerdrTab, TaskModel, TaskStatus } from '../types/task.js';
 
 export function toCanonicalHerdrKind(kind: string): string {
     const normalized = (kind || '').toLowerCase().trim();
@@ -19,6 +19,14 @@ export function normalizePhaseRoute(raw: unknown): PhaseAgentRoute {
         pane: obj.pane || 'auto',
         cli: toCanonicalHerdrKind(obj.cli || 'agy'),
     };
+}
+
+export function enrichAgentsWithTabLabels(agents: HerdrAgent[], tabs: HerdrTab[]): HerdrAgent[] {
+    const tabMap = new Map(tabs.map((t) => [t.tab_id, t.label]));
+    return agents.map((a) => ({
+        ...a,
+        name: (a.tab_id && tabMap.get(a.tab_id)) || a.pane_id,
+    }));
 }
 
 export function isHerdrSessionActive(env: NodeJS.ProcessEnv = process.env): boolean {
@@ -212,8 +220,17 @@ export async function listHerdrAgents(): Promise<HerdrAgent[]> {
             }
             try {
                 const data = JSON.parse(stdout);
-                const agents: HerdrAgent[] = data?.result?.agents || [];
-                resolve(agents);
+                let agents: HerdrAgent[] = data?.result?.agents || [];
+                exec('herdr tab list', (tabErr, tabStdout) => {
+                    if (!tabErr && tabStdout) {
+                        try {
+                            const tabData = JSON.parse(tabStdout);
+                            const tabs: HerdrTab[] = tabData?.result?.tabs || [];
+                            agents = enrichAgentsWithTabLabels(agents, tabs);
+                        } catch {}
+                    }
+                    resolve(agents);
+                });
             } catch {
                 resolve([]);
             }
