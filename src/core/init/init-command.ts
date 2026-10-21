@@ -13,7 +13,8 @@ import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/global
 import { getAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
-import { promptInitSelections, promptInitSelectionsViaTui } from './interactive-orchestrator.js';
+import { promptInitSelections } from './interactive-orchestrator.js';
+import { launchGoInit, resolveGoBinaryPath } from '@/tui/bridge.js';
 import { buildInitPlan } from './plan-builder.js';
 import { renderPreExecutionSummary, renderFinalReport } from './plan-utils.js';
 import { executeInitPlan } from './plan-executor.js';
@@ -318,14 +319,30 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
 
         // Prompt selections via TUI Wizard when running in interactive terminal
         const isInteractive = !isJson && Boolean(process.stdout.isTTY);
-        const selections = isInteractive
-            ? await promptInitSelectionsViaTui(projectDir, options.tools || options.tool || options.ide || options.target)
-            : await promptInitSelections(deps, {
-                  explicitTools: options.tools || options.tool || options.ide || options.target,
-                  explicitCombo: options.combo,
-                  explicitPackages: options.packages,
-                  explicitSkills: options.skills,
-              });
+        if (isInteractive && resolveGoBinaryPath()) {
+            await launchGoInit(projectDir);
+            return {
+                projectDir,
+                installedPackages: [],
+                installedConfigs: [],
+                installedSkills: [],
+                installedRules: {},
+                installedCombos: [],
+                installedMcps: [],
+                installedShell: [],
+                installedVs: [],
+                writtenIgnoreFiles: [],
+                generatedCommands: [],
+                status: 'success',
+            } as any;
+        }
+
+        const selections = await promptInitSelections(deps, {
+            explicitTools: options.tools || options.tool || options.ide || options.target,
+            explicitCombo: options.combo,
+            explicitPackages: options.packages,
+            explicitSkills: options.skills,
+        });
 
         if (!selections) {
             deps.stdout('\nInitialization cancelled. No changes were made.');

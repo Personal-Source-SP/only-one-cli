@@ -1,9 +1,6 @@
-import React from 'react';
-import { render } from 'ink';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { App } from '@/tui/App.js';
 import { launchGoTui, resolveGoBinaryPath } from '@/tui/bridge.js';
 
 export function createTuiCommand(deps: ProgramDeps): Command {
@@ -16,14 +13,13 @@ export function createTuiCommand(deps: ProgramDeps): Command {
             `\n${COLORS.cli.header('Examples:')}\n` +
                 `  ${COLORS.cli.command('$ only-one tui')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
-                `  - ${COLORS.dim('Launches an interactive Ink-powered dashboard in terminal.')}`,
+                `  - ${COLORS.dim('Launches an interactive Bubble Tea dashboard in terminal.')}`,
         )
         .action(async () => {
             if (resolveGoBinaryPath()) {
                 await launchGoTui(process.cwd());
                 return;
             }
-            const instance = render(React.createElement(App, { deps }));
-            await instance.waitUntilExit();
+            deps.stdout(COLORS.error('Go TUI Engine binary không tìm thấy. Vui lòng chạy "npm run build:go".'));
         });
 }

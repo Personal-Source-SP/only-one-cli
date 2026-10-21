@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const rootDir = process.cwd();
-const pkgDir = path.join(rootDir, 'packages', 'tui-engine');
+const pkgDir = path.join(rootDir, 'src', 'tui');
 const binDir = path.join(rootDir, 'bin');
 
 if (!fs.existsSync(binDir)) {

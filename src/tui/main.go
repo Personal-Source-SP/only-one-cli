@@ -5,6 +5,7 @@ import (
 	"os"
 	"tui-engine/internal/board"
 	"tui-engine/internal/taskscanner"
+	"tui-engine/internal/wizard"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -31,7 +32,12 @@ func main() {
 			os.Exit(1)
 		}
 	case "init":
-		fmt.Println("{\"status\":\"ready\",\"mode\":\"init\"}")
+		m := wizard.New(cwd)
+		p := tea.NewProgram(m, tea.WithAltScreen())
+		if _, err := p.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "Lỗi khi chạy init wizard: %v\n", err)
+			os.Exit(1)
+		}
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown mode: %s\n", mode)
 		os.Exit(1)

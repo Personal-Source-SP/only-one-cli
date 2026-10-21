@@ -10,7 +10,7 @@ export function resolveGoBinaryPath(baseDir?: string): string | null {
     if (baseDir) {
         const candidates = [
             path.join(baseDir, 'bin', binaryName),
-            path.join(baseDir, 'packages', 'tui-engine', binaryName),
+            path.join(baseDir, 'src', 'tui', binaryName),
             path.join(baseDir, 'dist', 'bin', binaryName),
         ];
         for (const p of candidates) {
@@ -21,7 +21,7 @@ export function resolveGoBinaryPath(baseDir?: string): string | null {
 
     const defaultCandidates = [
         path.join(process.cwd(), 'bin', binaryName),
-        path.join(process.cwd(), 'packages', 'tui-engine', binaryName),
+        path.join(process.cwd(), 'src', 'tui', binaryName),
         path.join(process.cwd(), 'dist', 'bin', binaryName),
     ];
 
@@ -30,7 +30,7 @@ export function resolveGoBinaryPath(baseDir?: string): string | null {
         defaultCandidates.push(
             path.resolve(currentDir, '..', '..', 'bin', binaryName),
             path.resolve(currentDir, '..', '..', '..', 'bin', binaryName),
-            path.resolve(currentDir, '..', '..', 'packages', 'tui-engine', binaryName),
+            path.resolve(currentDir, '..', '..', 'src', 'tui', binaryName),
         );
     } catch {
         // Fallback if import.meta.url is not available

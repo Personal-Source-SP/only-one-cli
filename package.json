@@ -22,25 +22,22 @@
         "test": "npm run format && vitest run",
         "publish:npm": "npm run format && node scripts/publish.js",
         "publish:local": "npm run format && node scripts/publish.js --local",
-        "format": "prettier --write \"src/**/*.{ts,tsx}\" \"test/**/*.ts\"",
-        "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"test/**/*.ts\"",
+        "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+        "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
         "asset:bump": "tsx scripts/bump-asset.ts"
     },
     "dependencies": {
         "@iarna/toml": "^2.2.5",
         "@inquirer/prompts": "^7.10.1",
         "commander": "^14.0.2",
-        "ink": "^7.1.1",
         "js-yaml": "^4.1.0",
         "lodash": "^4.18.1",
-        "picocolors": "^1.1.1",
-        "react": "^19.2.8"
+        "picocolors": "^1.1.1"
     },
     "devDependencies": {
         "@types/js-yaml": "^4.0.9",
         "@types/lodash": "^4.17.24",
         "@types/node": "^24.10.1",
-        "@types/react": "^19.2.17",
         "prettier": "^3.8.3",
         "tsx": "^4.20.6",
         "typescript": "^5.9.3",
