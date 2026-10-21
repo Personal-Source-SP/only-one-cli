@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 type TabInfo struct {
@@ -95,6 +96,54 @@ func ListAgents() []AgentInfo {
 	}
 	_ = json.Unmarshal(out, &resp)
 	return resp.Result.Agents
+}
+
+func stripANSI(str string) string {
+	var b strings.Builder
+	inEscape := false
+	for i := 0; i < len(str); i++ {
+		if str[i] == 0x1b {
+			inEscape = true
+			continue
+		}
+		if inEscape {
+			if (str[i] >= 'A' && str[i] <= 'Z') || (str[i] >= 'a' && str[i] <= 'z') || str[i] == '~' {
+				inEscape = false
+			}
+			continue
+		}
+		b.WriteByte(str[i])
+	}
+	return b.String()
+}
+
+func CleanActionLine(raw string) string {
+	lines := strings.Split(raw, "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := strings.TrimSpace(lines[i])
+		if line == "" || strings.HasPrefix(line, ">") || strings.HasPrefix(line, "─") ||
+			strings.Contains(line, "for shortcuts") || strings.Contains(line, "Navigate") ||
+			strings.Contains(line, "to cancel") || strings.Contains(line, "Antigravity CLI") {
+			continue
+		}
+		clean := stripANSI(line)
+		clean = strings.TrimSpace(clean)
+		if clean != "" && len(clean) > 3 {
+			return clean
+		}
+	}
+	return ""
+}
+
+func GetAgentLastAction(paneID string) string {
+	if !IsSessionActive() || paneID == "" {
+		return ""
+	}
+	out, err := exec.Command("herdr", "agent", "read", paneID).Output()
+	if err != nil {
+		return ""
+	}
+	return CleanActionLine(string(out))
 }
 
 func DispatchPrompt(paneID, cliTool, promptText string) error {

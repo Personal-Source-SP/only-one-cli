@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 	"tui-engine/internal/config"
@@ -25,6 +26,16 @@ const (
 	ModeSettings
 )
 
+type ActiveTaskProgress struct {
+	TaskSlug  string
+	Phase     string
+	PaneID    string
+	StartTime time.Time
+	DoneTime  *time.Time
+	LastLog   string
+	IsActive  bool
+}
+
 type Model struct {
 	workspaceDir   string
 	tasks          []taskscanner.TaskModel
@@ -43,6 +54,8 @@ type Model struct {
 	availablePanes []string
 	paneNames      map[string]string
 	viewerCache    map[int][]string
+	activeTasks    map[string]*ActiveTaskProgress
+	spinnerIdx     int
 }
 
 func fetchPanes() ([]string, map[string]string) {
@@ -87,6 +100,7 @@ func New(workspaceDir string, initialTasks []taskscanner.TaskModel) Model {
 		availablePanes: panes,
 		paneNames:      names,
 		viewerCache:    make(map[int][]string),
+		activeTasks:    make(map[string]*ActiveTaskProgress),
 	}
 }
 
@@ -151,6 +165,13 @@ func (m *Model) dispatchCurrentTask(phase string) {
 	rel, _ := filepath.Rel(m.workspaceDir, docPath)
 	prompt := fmt.Sprintf("/only-one-%s %s", phase, filepath.ToSlash(rel))
 	_ = herdr.DispatchPrompt(route.Pane, route.CLI, prompt)
+	m.activeTasks[route.Pane] = &ActiveTaskProgress{
+		TaskSlug:  task.Slug,
+		Phase:     phase,
+		PaneID:    route.Pane,
+		StartTime: time.Now(),
+		IsActive:  true,
+	}
 	m.statusMsg = fmt.Sprintf("Đã dispatch %s tới pane [%s] bằng %s: %s", phase, m.getPaneDisplayName(route.Pane), route.CLI, prompt)
 }
 
@@ -219,6 +240,39 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.viewerCache = make(map[int][]string)
 	case tickMsg:
+		m.spinnerIdx++
+		if len(m.activeTasks) > 0 && herdr.IsSessionActive() {
+			agents := herdr.ListAgents()
+			agentStatusMap := make(map[string]string)
+			for _, a := range agents {
+				agentStatusMap[a.PaneID] = a.AgentStatus
+			}
+
+			needsRescan := false
+			for paneID, prog := range m.activeTasks {
+				if prog.IsActive {
+					st := agentStatusMap[paneID]
+					if st == "busy" {
+						if lastAction := herdr.GetAgentLastAction(paneID); lastAction != "" {
+							prog.LastLog = lastAction
+						}
+					} else if st == "idle" {
+						now := time.Now()
+						prog.IsActive = false
+						prog.DoneTime = &now
+						needsRescan = true
+					}
+				} else if prog.DoneTime != nil && time.Since(*prog.DoneTime) > 10*time.Second {
+					delete(m.activeTasks, paneID)
+				}
+			}
+			if needsRescan {
+				tasks, _ := taskscanner.ScanTasks(m.workspaceDir)
+				m.tasks = tasks
+				m.columns = taskscanner.GroupTasksByColumn(tasks)
+			}
+		}
+
 		tasks, _ := taskscanner.ScanTasks(m.workspaceDir)
 		if tasksDiffer(m.tasks, tasks) {
 			m.tasks = tasks
@@ -392,6 +446,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				route := m.appConfig.AgentRouting.Clean
 				prompt := "/only-one-clean"
 				err := herdr.DispatchPrompt(route.Pane, route.CLI, prompt)
+				m.activeTasks[route.Pane] = &ActiveTaskProgress{
+					TaskSlug:  "all-tasks",
+					Phase:     "clean",
+					PaneID:    route.Pane,
+					StartTime: time.Now(),
+					IsActive:  true,
+				}
 				if err != nil {
 					m.statusMsg = fmt.Sprintf("Lỗi dispatch clean: %v", err)
 				} else {
@@ -689,7 +750,7 @@ func (m Model) View() string {
 		if len(col.Tasks) == 0 {
 			content += lipgloss.NewStyle().Faint(true).Render("(Trống)")
 		} else {
-			maxCards := (colHeight - 4) / 5
+			maxCards := (colHeight - 4) / 4
 			if maxCards < 1 {
 				maxCards = 1
 			}
@@ -725,7 +786,14 @@ func (m Model) View() string {
 						BorderForeground(lipgloss.Color("#444444"))
 				}
 				headerText := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFFFFF")).Render(fmt.Sprintf("#%02d %s", tIdx+1, truncate(t.Slug, cardWidth-8)))
-				titleText := lipgloss.NewStyle().Foreground(lipgloss.Color("#AAAAAA")).Render(truncate(t.Title, cardWidth-4))
+				paneTag := ""
+				for _, prog := range m.activeTasks {
+					if prog.TaskSlug == t.Slug && prog.IsActive {
+						paneName := m.getPaneDisplayName(prog.PaneID)
+						paneTag = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FFFF")).Render("🏷️ [" + paneName + "]")
+						break
+					}
+				}
 				badges := ""
 				for _, doc := range []struct{ tag, id, color string }{
 					{"💡 [C]", "concept", "#00FFFF"},
@@ -741,6 +809,9 @@ func (m Model) View() string {
 					}
 				}
 				footerRow := strings.TrimSpace(badges)
+				if paneTag != "" {
+					footerRow = strings.TrimSpace(footerRow + " " + paneTag)
+				}
 				if t.CreatedAt != "" {
 					dateStr := lipgloss.NewStyle().Faint(true).Render(t.CreatedAt)
 					if footerRow != "" {
@@ -749,7 +820,7 @@ func (m Model) View() string {
 						footerRow = dateStr
 					}
 				}
-				cardContent := fmt.Sprintf("%s\n%s\n%s", headerText, titleText, footerRow)
+				cardContent := fmt.Sprintf("%s\n%s", headerText, footerRow)
 				content += cardStyle.Render(cardContent) + "\n"
 			}
 			if endIdx < len(col.Tasks) {
@@ -761,12 +832,53 @@ func (m Model) View() string {
 
 	boardLayout := lipgloss.JoinHorizontal(lipgloss.Top, cols...)
 
+	spinnerFrames := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+	progressLines := []string{}
+	var paneIDs []string
+	for pid := range m.activeTasks {
+		paneIDs = append(paneIDs, pid)
+	}
+	sort.Strings(paneIDs)
+	for _, pid := range paneIDs {
+		prog := m.activeTasks[pid]
+		elapsed := time.Since(prog.StartTime)
+		elapsedStr := fmt.Sprintf("%ds", int(elapsed.Seconds()))
+		if elapsed.Minutes() >= 1 {
+			elapsedStr = fmt.Sprintf("%dm%02ds", int(elapsed.Minutes()), int(elapsed.Seconds())%60)
+		}
+		paneName := m.getPaneDisplayName(prog.PaneID)
+		if prog.IsActive {
+			sp := spinnerFrames[m.spinnerIdx%len(spinnerFrames)]
+			action := prog.LastLog
+			if action == "" {
+				action = "Đang khởi tạo agent..."
+			}
+			spStyled := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FFFF")).Render(sp)
+			paneStyled := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFCC00")).Render("[" + paneName + "]")
+			line := fmt.Sprintf("%s %s  %s [%s]  ⏱ %s  │ %s",
+				spStyled, paneStyled, prog.TaskSlug, prog.Phase, elapsedStr, truncate(action, boxWidth-len(paneName)-len(prog.TaskSlug)-30))
+			progressLines = append(progressLines, line)
+		} else if prog.DoneTime != nil {
+			checkStyled := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FF66")).Render("✅")
+			paneStyled := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFCC00")).Render("[" + paneName + "]")
+			line := fmt.Sprintf("%s %s  %s [%s]  ⏱ %s  │ Hoàn tất thành công!",
+				checkStyled, paneStyled, prog.TaskSlug, prog.Phase, elapsedStr)
+			progressLines = append(progressLines, line)
+		}
+	}
+
+	if len(progressLines) == 0 {
+		progressLines = append(progressLines, lipgloss.NewStyle().Faint(true).Render("  (Hệ thống sẵn sàng - Không có tiến trình nào đang chạy)"))
+	}
+
+	progressTitle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FFFF")).Render("⚡ TIẾN TRÌNH")
+	progressContent := strings.Join(progressLines, "\n")
 	statusBar := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("#00FFFF")).
 		Padding(0, 1).
 		Width(boxWidth).
-		Render(fmt.Sprintf("⚡ TIẾN TRÌNH: %s", m.statusMsg))
+		Render(fmt.Sprintf("%s\n%s", progressTitle, progressContent))
 
 	shortcutsBar := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).

@@ -3,6 +3,7 @@ package board
 import (
 	"strings"
 	"testing"
+	"time"
 	"tui-engine/internal/taskscanner"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -187,5 +188,42 @@ func TestHeaderStreamlinedMetricsAndBadges(t *testing.T) {
 	}
 	if !strings.Contains(viewStr, "Quota (5h)") {
 		t.Errorf("expected header to contain 'Quota (5h)', view output:\n%s", viewStr)
+	}
+}
+
+func TestTaskCardStreamlinedTwoLines(t *testing.T) {
+	m := New(".", nil)
+	m.tasks = []taskscanner.TaskModel{
+		{
+			Slug:       "test-slug",
+			Title:      "Long Description That Should Not Appear On Card",
+			Status:     "concept",
+			FolderPath: ".",
+			CreatedAt:  "2026-10-21",
+		},
+	}
+	m.columns = taskscanner.GroupTasksByColumn(m.tasks)
+	viewStr := m.View()
+	if strings.Contains(viewStr, "Long Description That Should Not Appear On Card") {
+		t.Errorf("expected card to NOT contain task description title")
+	}
+}
+
+func TestMultiLineProgressRendering(t *testing.T) {
+	m := New(".", nil)
+	m.activeTasks["w4:p1"] = &ActiveTaskProgress{
+		TaskSlug:  "test-task",
+		Phase:     "plan",
+		PaneID:    "w4:p1",
+		StartTime: time.Now(),
+		IsActive:  true,
+		LastLog:   "● Running go test...",
+	}
+	viewStr := m.View()
+	if !strings.Contains(viewStr, "⚡ TIẾN TRÌNH") {
+		t.Errorf("expected view to contain '⚡ TIẾN TRÌNH'")
+	}
+	if !strings.Contains(viewStr, "test-task") {
+		t.Errorf("expected view to contain active task slug 'test-task'")
 	}
 }

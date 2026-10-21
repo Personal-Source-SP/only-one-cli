@@ -1,6 +1,6 @@
 ---
 domain: tui
-version: 1.3.0
+version: 1.4.0
 triggers:
   - "packages/tui-engine/**"
   - "src/tui/**"
@@ -53,3 +53,13 @@ triggers:
 - **MUST_DO**: Query external CLI telemetry (such as agent quotas or session lists) with asynchronous background execution, graceful timeout, and in-memory TTL caching.
 - **NEVER_DO**: Execute synchronous external CLI calls directly on the primary Bubble Tea render or tick thread.
 - **RATIONALE**: Slow external CLI tools or network latency freeze the terminal UI and drop user keyboard/mouse input frames.
+
+### TUI-010: Strip ANSI Escape Codes Before Formatting Terminal Status
+- **MUST_DO**: Clean and strip raw ANSI escape sequences (`\x1b\[...`) and cursor control codes from external terminal logs before rendering inside Lipgloss bordered boxes.
+- **NEVER_DO**: Inject raw terminal buffer streams directly into Lipgloss or Bubble Tea layout blocks.
+- **RATIONALE**: Raw ANSI codes distort Lipgloss width calculation, produce line wrap anomalies, and break box borders.
+
+### TUI-011: Dedicated Multi-Line Presentation for Concurrent Agent Processes
+- **MUST_DO**: Render concurrent background/worker agent jobs on dedicated discrete lines with individual spinners, elapsed durations, and cleaned action logs.
+- **NEVER_DO**: Overload concurrent progress updates into a single truncated string or overwrite previous active jobs.
+- **RATIONALE**: Preserves clear operator observability across multiple parallel dispatch panes simultaneously.
