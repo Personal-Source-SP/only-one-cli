@@ -1,6 +1,6 @@
 ---
 domain: stack
-version: 1.0.0
+version: 1.1.0
 triggers:
   - "src/types/**"
   - "src/**/*.service.ts"
@@ -23,9 +23,3 @@ triggers:
 - **MUST_DO**: Name all return types and complex payload parameters explicitly.
 - **NEVER_DO**: Return anonymous inline object types (e.g. `Promise<{ data: string; count: number } | null>`).
 - **RATIONALE**: Ensures clear contract boundaries and simplified unit test mocking.
-
-### STACK-004: Flat Next.js App Structure in Monorepo Subpackages
-- **MUST_DO**: Maintain Next.js app roots directly at the subpackage base (`src/ui/app`, `src/ui/components`) with direct `@/*` path aliasing.
-- **NEVER_DO**: Nest application roots inside redundant directory wrappers like `src/ui/dashboard/app`.
-- **RATIONALE**: Prevents convoluted relative import paths, duplicate tsconfig aliases, and packaging path mismatch.
-

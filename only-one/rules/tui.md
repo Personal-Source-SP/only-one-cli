@@ -1,7 +1,8 @@
 ---
 domain: tui
-version: 1.2.0
+version: 1.3.0
 triggers:
+  - "packages/tui-engine/**"
   - "src/tui/**"
   - "src/prompts/**"
 ---
@@ -43,4 +44,12 @@ triggers:
 - **NEVER_DO**: Delete or mutate task folder archives directly within the TUI process execution thread.
 - **RATIONALE**: Clean workflows require knowledge audit, rule distillation, and git synchronization handled safely by the clean workflow agent.
 
+### TUI-008: Native OS Syscalls Over Shell Spawning for Metrics
+- **MUST_DO**: Query system metrics (CPU, RAM, Uptime) via native OS APIs (e.g. Windows syscalls `GlobalMemoryStatusEx`) with lightweight platform fallback stubs in TUI event loops.
+- **NEVER_DO**: Spawn external shell processes (such as `powershell.exe` or `wmic`) inside high-frequency TUI tick loops to collect CPU or RAM stats.
+- **RATIONALE**: Heavy process creation overhead introduces CPU spikes, UI frame drops, and terminal redraw stutter.
 
+### TUI-009: Non-Blocking Cached Extraction for External CLI Metadata
+- **MUST_DO**: Query external CLI telemetry (such as agent quotas or session lists) with asynchronous background execution, graceful timeout, and in-memory TTL caching.
+- **NEVER_DO**: Execute synchronous external CLI calls directly on the primary Bubble Tea render or tick thread.
+- **RATIONALE**: Slow external CLI tools or network latency freeze the terminal UI and drop user keyboard/mouse input frames.
