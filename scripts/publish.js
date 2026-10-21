@@ -123,6 +123,11 @@ if (fs.existsSync(assetsDir)) {
   copyRecursive(assetsDir, path.join(packRoot, 'assets'));
 }
 
+const binDir = path.join(ROOT, 'bin');
+if (fs.existsSync(binDir)) {
+  copyRecursive(binDir, path.join(packRoot, 'bin'));
+}
+
 // Update package.json in packRoot
 const packPkgPath = path.join(packRoot, 'package.json');
 const packPkg = JSON.parse(fs.readFileSync(packPkgPath, 'utf8'));

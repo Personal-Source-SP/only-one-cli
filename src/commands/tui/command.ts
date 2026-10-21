@@ -8,6 +8,7 @@ import { launchGoTui, resolveGoBinaryPath } from '@/tui/bridge.js';
 
 export function createTuiCommand(deps: ProgramDeps): Command {
     return new Command('tui')
+        .alias('ui')
         .description('🖥️ Launch interactive Terminal User Interface (TUI) dashboard')
         .helpOption('-h, --help', 'display help for command')
         .addHelpText(

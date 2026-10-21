@@ -11,10 +11,12 @@
     },
     "files": [
         "dist",
-        "assets"
+        "assets",
+        "bin"
     ],
     "scripts": {
         "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node scripts/postbuild-paths.cjs && node -e \"if (process.platform !== 'win32') require('node:fs').chmodSync('dist/src/index.js', 0o755)\"",
+        "build:go": "node scripts/build-go.js",
         "dev": "tsx src/index.ts",
         "prepare": "npm run build",
         "test": "npm run format && vitest run",

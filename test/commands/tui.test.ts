@@ -11,5 +11,7 @@ describe('tui command integration', () => {
         });
 
         expect(program.commands.some((command) => command.name() === 'tui')).toBe(true);
+        const tuiCmd = program.commands.find((command) => command.name() === 'tui');
+        expect(tuiCmd?.aliases()).toContain('ui');
     });
 });
