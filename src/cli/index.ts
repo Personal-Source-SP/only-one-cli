@@ -13,7 +13,6 @@ import {
     createMcpCommand,
     createComboCommand,
     createTuiCommand,
-    createUiCommand,
     createPackageCommand,
     createGitCommand,
 } from '@/commands/index.js';
@@ -74,8 +73,7 @@ export function createProgram(deps: ProgramDeps) {
                 `  ${COLORS.cli.command('$ only-one extensions-vs')}                     # Sync and merge supported editor extensions\n` +
                 `  ${COLORS.cli.command('$ only-one doctor')}                            # Verify git and Node.js environment readiness\n` +
                 `  ${COLORS.cli.command('$ only-one update')}                            # Refresh installed agent skills/templates\n` +
-                `  ${COLORS.cli.command('$ only-one tui')}                               # Launch interactive Terminal UI dashboard\n` +
-                `  ${COLORS.cli.command('$ only-one ui')}                                # Launch Fullstack Next.js Desktop Dashboard\n\n` +
+                `  ${COLORS.cli.command('$ only-one tui')}                               # Launch interactive Terminal UI dashboard\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
                 `  - Run ${COLORS.cli.command('only-one <command> --help')} for detailed option descriptions on each command.`,
         );
@@ -95,7 +93,6 @@ export function createProgram(deps: ProgramDeps) {
     program.addCommand(createUpdateCommand(deps));
 
     program.addCommand(createTuiCommand(deps));
-    program.addCommand(createUiCommand(deps));
     program.addCommand(createDoctorCommand(deps));
     program.addCommand(createSettingVsCommand(deps));
     program.addCommand(createExtensionsVsCommand(deps));

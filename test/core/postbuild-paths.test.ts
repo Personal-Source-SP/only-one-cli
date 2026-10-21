@@ -30,9 +30,9 @@ describe('Postbuild Paths Transformer', () => {
     });
 
     it('thay thế chính xác dynamic import aliases gây lỗi ERR_MODULE_NOT_FOUND', () => {
-        const input = "const m = await import('@/ui/init/InitWizardApp.js');\nconst a = await import('@assets/packages/index.js');";
+        const input = "const m = await import('@/tui/init/InitWizardApp.js');\nconst a = await import('@assets/packages/index.js');";
         const output = transformPaths(input, '../../', '../../../assets/');
-        expect(output).toContain("import('../../ui/init/InitWizardApp.js')");
+        expect(output).toContain("import('../../tui/init/InitWizardApp.js')");
         expect(output).toContain("import('../../../assets/packages/index.js')");
         expect(output).not.toContain('@/');
         expect(output).not.toContain('@assets/');

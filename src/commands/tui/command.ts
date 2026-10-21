@@ -1,24 +1,28 @@
+import React from 'react';
+import { render } from 'ink';
 import { Command } from 'commander';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
+import { App } from '@/tui/App.js';
+import { launchGoTui, resolveGoBinaryPath } from '@/tui/bridge.js';
 
 export function createTuiCommand(deps: ProgramDeps): Command {
     return new Command('tui')
-        .description('🖥️ Launch Terminal UI (Đã chuyển đổi sang only-one ui)')
+        .description('🖥️ Launch interactive Terminal User Interface (TUI) dashboard')
         .helpOption('-h, --help', 'display help for command')
         .addHelpText(
             'after',
             `\n${COLORS.cli.header('Examples:')}\n` +
-                `  ${COLORS.cli.command('$ only-one ui')}                               # Chạy Dashboard hiện đại\n\n` +
+                `  ${COLORS.cli.command('$ only-one tui')}\n\n` +
                 `${COLORS.cli.header('Notes:')}\n` +
-                `  - ${COLORS.dim('Giao diện TUI cũ đã được chuyển đổi thành UI Dashboard hiện đại.')}`,
+                `  - ${COLORS.dim('Launches an interactive Ink-powered dashboard in terminal.')}`,
         )
         .action(async () => {
-            deps.stdout(
-                COLORS.cli.header('\nℹ️ Giao diện TUI terminal đã được chuyển đổi thành Dashboard hiện đại.\n') +
-                    COLORS.dim('   Vui lòng sử dụng lệnh: ') +
-                    COLORS.cli.command('only-one ui') +
-                    COLORS.dim(' để mở giao diện quản lý.\n'),
-            );
+            if (resolveGoBinaryPath()) {
+                await launchGoTui(process.cwd());
+                return;
+            }
+            const instance = render(React.createElement(App, { deps }));
+            await instance.waitUntilExit();
         });
 }

@@ -1,0 +1,15 @@
+export const THEME_COLORS = {
+    primary: 'cyan',
+    secondary: 'blue',
+    success: 'green',
+    warning: 'yellow',
+    error: 'red',
+    muted: 'gray',
+    highlight: 'magenta',
+    border: 'cyan',
+    borderInactive: 'gray',
+    categorySetup: 'yellow',
+    categorySync: 'cyan',
+    categorySystem: 'blue',
+    categoryDiagnostics: 'magenta',
+} as const;

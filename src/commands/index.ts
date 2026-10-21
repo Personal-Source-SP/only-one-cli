@@ -37,4 +37,3 @@ export { createGitCommand } from './git/index.js';
 export type * from './git/types.js';
 
 export { createTuiCommand } from './tui/index.js';
-export { createUiCommand } from './ui/index.js';
