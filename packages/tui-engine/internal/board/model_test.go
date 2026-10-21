@@ -178,3 +178,14 @@ func TestMouseWheelScrolling(t *testing.T) {
 		t.Errorf("expected viewerScroll 10 after wheel down, got %d", wheelDownM.(Model).viewerScroll)
 	}
 }
+
+func TestHeaderStreamlinedMetricsAndBadges(t *testing.T) {
+	m := New(".", nil)
+	viewStr := m.View()
+	if !strings.Contains(viewStr, "🏷️ Badges:") {
+		t.Errorf("expected header to contain '🏷️ Badges:', view output:\n%s", viewStr)
+	}
+	if !strings.Contains(viewStr, "Quota (5h)") {
+		t.Errorf("expected header to contain 'Quota (5h)', view output:\n%s", viewStr)
+	}
+}

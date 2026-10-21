@@ -20,6 +20,13 @@ type PaneInfo struct {
 	TabLabel    string `json:"-"`
 }
 
+type AgentInfo struct {
+	Agent       string `json:"agent"`
+	Name        string `json:"name"`
+	AgentStatus string `json:"agent_status"`
+	PaneID      string `json:"pane_id"`
+}
+
 func IsSessionActive() bool {
 	return os.Getenv("HERDR_ENV") == "1"
 }
@@ -71,6 +78,23 @@ func ListPanes() []PaneInfo {
 	}
 
 	return resp.Result.Panes
+}
+
+func ListAgents() []AgentInfo {
+	if !IsSessionActive() {
+		return nil
+	}
+	out, err := exec.Command("herdr", "agent", "list").Output()
+	if err != nil {
+		return nil
+	}
+	var resp struct {
+		Result struct {
+			Agents []AgentInfo `json:"agents"`
+		} `json:"result"`
+	}
+	_ = json.Unmarshal(out, &resp)
+	return resp.Result.Agents
 }
 
 func DispatchPrompt(paneID, cliTool, promptText string) error {

@@ -8,6 +8,8 @@ import (
 	"time"
 	"tui-engine/internal/config"
 	"tui-engine/internal/herdr"
+	"tui-engine/internal/quota"
+	"tui-engine/internal/sysmetrics"
 	"tui-engine/internal/taskscanner"
 
 	"github.com/charmbracelet/glamour"
@@ -611,18 +613,49 @@ func (m Model) View() string {
 		boxWidth = 80
 	}
 
+	sys := sysmetrics.GetSystemMetrics()
+	qStats := quota.GetAgentQuota()
+	agents := herdr.ListAgents()
+	busyAgents := 0
+	for _, a := range agents {
+		if a.AgentStatus == "busy" {
+			busyAgents++
+		}
+	}
+
+	q5Color := "#00FF66"
+	if qStats.Percent5h < 20 {
+		q5Color = "#FF5555"
+	} else if qStats.Percent5h < 50 {
+		q5Color = "#FFCC00"
+	}
+	qWColor := "#00FF66"
+	if qStats.PercentWeek < 20 {
+		qWColor = "#FF5555"
+	} else if qStats.PercentWeek < 50 {
+		qWColor = "#FFCC00"
+	}
+
+	q5Styled := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(q5Color)).Render(fmt.Sprintf("%d%% (%s)", qStats.Percent5h, qStats.ResetIn5h))
+	qWStyled := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(qWColor)).Render(fmt.Sprintf("%d%% (%s)", qStats.PercentWeek, qStats.ResetInWeek))
+
+	row1 := fmt.Sprintf("🚀 ONLY-ONE ⚡ WORKFLOW BOARD (Go Native Engine)    %s    ⚡ CPU: %.1f%%  💾 RAM: %d%%  ⏱ Uptime: %s",
+		herdrBadge, sys.CPUPercent, sys.RAMPercent, sys.UptimeStr)
+	row2 := fmt.Sprintf("🤖 Agents: %d (%d busy)  │  ⏱ Quota (5h): %s  │  📅 Quota (Tuần): %s",
+		len(agents), busyAgents, q5Styled, qWStyled)
+	row3 := fmt.Sprintf("🏷️ Badges: %s   %s   %s   %s",
+		lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FFFF")).Render("💡 [C] Concept"),
+		lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFCC00")).Render("📋 [P] Plan"),
+		lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF5555")).Render("🐛 [D] Debug"),
+		lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#55FF55")).Render("🔍 [R] Review"),
+	)
+
 	headerBox := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("#00FFFF")).
 		Padding(0, 1).
 		Width(boxWidth).
-		Render(fmt.Sprintf("🚀 ONLY-ONE ⚡ WORKFLOW BOARD (Go Native Engine)\nWorkspace: %s  %s  Total: %d Tasks\nBadges: %s  %s  %s  %s",
-			m.workspaceDir, herdrBadge, len(m.tasks),
-			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FFFF")).Render("[C] Concept"),
-			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFCC00")).Render("[P] Plan"),
-			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF5555")).Render("[D] Debug"),
-			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#55FF55")).Render("[R] Review"),
-		))
+		Render(fmt.Sprintf("%s\n%s\n%s", row1, row2, row3))
 
 	colWidth := (m.width - 8) / 4
 	if colWidth < 22 {
@@ -695,14 +728,14 @@ func (m Model) View() string {
 				titleText := lipgloss.NewStyle().Foreground(lipgloss.Color("#AAAAAA")).Render(truncate(t.Title, cardWidth-4))
 				badges := ""
 				for _, doc := range []struct{ tag, id, color string }{
-					{"C", "concept", "#00FFFF"},
-					{"P", "plan", "#FFCC00"},
-					{"D", "debug", "#FF5555"},
-					{"R", "review", "#55FF55"},
+					{"💡 [C]", "concept", "#00FFFF"},
+					{"📋 [P]", "plan", "#FFCC00"},
+					{"🐛 [D]", "debug", "#FF5555"},
+					{"🔍 [R]", "review", "#55FF55"},
 				} {
 					for _, d := range t.Docs {
 						if d == doc.id {
-							badges += lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(doc.color)).Render("[" + doc.tag + "]") + " "
+							badges += lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(doc.color)).Render(doc.tag) + " "
 							break
 						}
 					}
