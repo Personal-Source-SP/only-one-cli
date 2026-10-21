@@ -118,3 +118,63 @@ func TestSettingsPaneDisplayName(t *testing.T) {
 		t.Errorf("expected friendly pane name 'Friendly Worker' in settings view")
 	}
 }
+
+func TestGetPaneDisplayName(t *testing.T) {
+	m := New(".", nil)
+	m.paneNames = map[string]string{
+		"w4:p7": "pm",
+	}
+	if m.getPaneDisplayName("w4:p7") != "pm" {
+		t.Errorf("expected 'pm', got %s", m.getPaneDisplayName("w4:p7"))
+	}
+	if m.getPaneDisplayName("unknown") != "unknown" {
+		t.Errorf("expected 'unknown', got %s", m.getPaneDisplayName("unknown"))
+	}
+}
+
+func TestViewerNumericTabsAndScroll(t *testing.T) {
+	m := New(".", nil)
+	m.mode = ModeViewer
+	m.viewDocs = []taskscanner.TaskDoc{
+		{Name: "concept.md", Content: "# Concept\nLine 1\nLine 2"},
+		{Name: "plan.md", Content: "# Plan\nLine A\nLine B"},
+	}
+	newM, _ := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'2'}})
+	if newM.(Model).activeDocIdx != 1 {
+		t.Errorf("expected activeDocIdx 1 after key '2', got %d", newM.(Model).activeDocIdx)
+	}
+}
+
+func TestTasksDifferAndTick(t *testing.T) {
+	oldTasks := []taskscanner.TaskModel{
+		{Slug: "task-1", Status: "concept", Title: "Task 1"},
+	}
+	newTasks := []taskscanner.TaskModel{
+		{Slug: "task-1", Status: "plan", Title: "Task 1"},
+	}
+	if !tasksDiffer(oldTasks, newTasks) {
+		t.Errorf("expected tasksDiffer to be true when status changed")
+	}
+	if tasksDiffer(oldTasks, oldTasks) {
+		t.Errorf("expected tasksDiffer to be false for identical tasks")
+	}
+	m := New(".", oldTasks)
+	cmd := m.Init()
+	if cmd == nil {
+		t.Errorf("expected Init to return non-nil tickCmd")
+	}
+}
+
+func TestMouseWheelScrolling(t *testing.T) {
+	m := New(".", nil)
+	m.mode = ModeViewer
+	m.viewerScroll = 10
+	wheelUpM, _ := m.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+	if wheelUpM.(Model).viewerScroll != 7 {
+		t.Errorf("expected viewerScroll 7 after wheel up, got %d", wheelUpM.(Model).viewerScroll)
+	}
+	wheelDownM, _ := wheelUpM.Update(tea.MouseMsg{Button: tea.MouseButtonWheelDown})
+	if wheelDownM.(Model).viewerScroll != 10 {
+		t.Errorf("expected viewerScroll 10 after wheel down, got %d", wheelDownM.(Model).viewerScroll)
+	}
+}

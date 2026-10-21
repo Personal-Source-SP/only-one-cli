@@ -5,10 +5,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 	"tui-engine/internal/config"
 	"tui-engine/internal/herdr"
 	"tui-engine/internal/taskscanner"
 
+	"github.com/charmbracelet/glamour"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -38,6 +40,7 @@ type Model struct {
 	settingsIdx    int
 	availablePanes []string
 	paneNames      map[string]string
+	viewerCache    map[int][]string
 }
 
 func fetchPanes() ([]string, map[string]string) {
@@ -81,11 +84,72 @@ func New(workspaceDir string, initialTasks []taskscanner.TaskModel) Model {
 		settingsIdx:    0,
 		availablePanes: panes,
 		paneNames:      names,
+		viewerCache:    make(map[int][]string),
 	}
 }
 
+type tickMsg time.Time
+
+func tickCmd() tea.Cmd {
+	return tea.Tick(1*time.Second, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
+}
+
+func tasksDiffer(oldTasks, newTasks []taskscanner.TaskModel) bool {
+	if len(oldTasks) != len(newTasks) {
+		return true
+	}
+	for i := range oldTasks {
+		if oldTasks[i].Slug != newTasks[i].Slug ||
+			oldTasks[i].Status != newTasks[i].Status ||
+			oldTasks[i].Title != newTasks[i].Title ||
+			len(oldTasks[i].Docs) != len(newTasks[i].Docs) {
+			return true
+		}
+	}
+	return false
+}
+
 func (m Model) Init() tea.Cmd {
-	return nil
+	return tickCmd()
+}
+
+func (m Model) getPaneDisplayName(paneID string) string {
+	if name, ok := m.paneNames[paneID]; ok && name != "" {
+		return name
+	}
+	return paneID
+}
+
+func (m *Model) dispatchCurrentTask(phase string) {
+	currCol := m.columns[m.colIdx]
+	currIdx := m.taskIndices[m.colIdx]
+	if len(currCol.Tasks) == 0 || currIdx >= len(currCol.Tasks) {
+		return
+	}
+	task := currCol.Tasks[currIdx]
+	var docName string
+	var route config.PhaseRoute
+	switch phase {
+	case "plan":
+		docName = "plan.md"
+		route = m.appConfig.AgentRouting.Plan
+	case "apply":
+		docName = "plan.md"
+		route = m.appConfig.AgentRouting.Apply
+	case "debug":
+		docName = "debug.md"
+		route = m.appConfig.AgentRouting.Debug
+	}
+	docPath := filepath.Join(task.FolderPath, docName)
+	if _, err := os.Stat(docPath); os.IsNotExist(err) {
+		docPath = filepath.Join(task.FolderPath, "concept.md")
+	}
+	rel, _ := filepath.Rel(m.workspaceDir, docPath)
+	prompt := fmt.Sprintf("/only-one-%s %s", phase, filepath.ToSlash(rel))
+	_ = herdr.DispatchPrompt(route.Pane, route.CLI, prompt)
+	m.statusMsg = fmt.Sprintf("Đã dispatch %s tới pane [%s] bằng %s: %s", phase, m.getPaneDisplayName(route.Pane), route.CLI, prompt)
 }
 
 func (m *Model) getPhaseRoute(idx int) *config.PhaseRoute {
@@ -151,6 +215,23 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		m.viewerCache = make(map[int][]string)
+	case tickMsg:
+		tasks, _ := taskscanner.ScanTasks(m.workspaceDir)
+		if tasksDiffer(m.tasks, tasks) {
+			m.tasks = tasks
+			m.columns = taskscanner.GroupTasksByColumn(tasks)
+			for cIdx, col := range m.columns {
+				if m.taskIndices[cIdx] >= len(col.Tasks) {
+					if len(col.Tasks) > 0 {
+						m.taskIndices[cIdx] = len(col.Tasks) - 1
+					} else {
+						m.taskIndices[cIdx] = 0
+					}
+				}
+			}
+		}
+		return m, tickCmd()
 	case tea.KeyMsg:
 		key := msg.String()
 
@@ -159,6 +240,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch key {
 			case "esc", "q":
 				m.mode = ModeBoard
+				return m, nil
+			case "1", "2", "3", "4", "5", "6", "7", "8", "9":
+				idx := int(key[0] - '1')
+				if idx >= 0 && idx < len(m.viewDocs) {
+					m.activeDocIdx = idx
+					m.viewerScroll = 0
+				}
+				return m, nil
+			case "pgdown", "ctrl+d", "J":
+				m.viewerScroll += (m.height - 8) / 2
+				return m, nil
+			case "pgup", "ctrl+u", "K":
+				m.viewerScroll -= (m.height - 8) / 2
+				if m.viewerScroll < 0 {
+					m.viewerScroll = 0
+				}
+				return m, nil
+			case "g", "home":
+				m.viewerScroll = 0
+				return m, nil
+			case "G", "end":
+				m.viewerScroll = 999999
 				return m, nil
 			case "tab":
 				if len(m.viewDocs) > 0 {
@@ -179,6 +282,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			case "down", "j":
 				m.viewerScroll++
+				return m, nil
+			case "p":
+				m.dispatchCurrentTask("plan")
+				return m, nil
+			case "a":
+				m.dispatchCurrentTask("apply")
+				return m, nil
+			case "d":
+				m.dispatchCurrentTask("debug")
 				return m, nil
 			}
 
@@ -281,68 +393,52 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if err != nil {
 					m.statusMsg = fmt.Sprintf("Lỗi dispatch clean: %v", err)
 				} else {
-					m.statusMsg = fmt.Sprintf("Đã dispatch clean tới pane [%s] bằng %s: %s", route.Pane, route.CLI, prompt)
+					m.statusMsg = fmt.Sprintf("Đã dispatch clean tới pane [%s] bằng %s: %s", m.getPaneDisplayName(route.Pane), route.CLI, prompt)
 				}
 			case "p":
-				currCol := m.columns[m.colIdx]
-				currIdx := m.taskIndices[m.colIdx]
-				if len(currCol.Tasks) > 0 && currIdx < len(currCol.Tasks) {
-					task := currCol.Tasks[currIdx]
-					docPath := filepath.Join(task.FolderPath, "plan.md")
-					if _, err := os.Stat(docPath); os.IsNotExist(err) {
-						docPath = filepath.Join(task.FolderPath, "concept.md")
-					}
-					rel, _ := filepath.Rel(m.workspaceDir, docPath)
-					rel = filepath.ToSlash(rel)
-					prompt := fmt.Sprintf("/only-one-plan %s", rel)
-					route := m.appConfig.AgentRouting.Plan
-					_ = herdr.DispatchPrompt(route.Pane, route.CLI, prompt)
-					m.statusMsg = fmt.Sprintf("Đã dispatch plan tới pane [%s] bằng %s: %s", route.Pane, route.CLI, prompt)
-				}
+				m.dispatchCurrentTask("plan")
 			case "a":
-				currCol := m.columns[m.colIdx]
-				currIdx := m.taskIndices[m.colIdx]
-				if len(currCol.Tasks) > 0 && currIdx < len(currCol.Tasks) {
-					task := currCol.Tasks[currIdx]
-					docPath := filepath.Join(task.FolderPath, "plan.md")
-					if _, err := os.Stat(docPath); os.IsNotExist(err) {
-						docPath = filepath.Join(task.FolderPath, "debug.md")
-					}
-					rel, _ := filepath.Rel(m.workspaceDir, docPath)
-					rel = filepath.ToSlash(rel)
-					prompt := fmt.Sprintf("/only-one-apply %s", rel)
-					route := m.appConfig.AgentRouting.Apply
-					_ = herdr.DispatchPrompt(route.Pane, route.CLI, prompt)
-					m.statusMsg = fmt.Sprintf("Đã dispatch apply tới pane [%s] bằng %s: %s", route.Pane, route.CLI, prompt)
-				}
+				m.dispatchCurrentTask("apply")
 			case "d":
-				currCol := m.columns[m.colIdx]
-				currIdx := m.taskIndices[m.colIdx]
-				if len(currCol.Tasks) > 0 && currIdx < len(currCol.Tasks) {
-					task := currCol.Tasks[currIdx]
-					docPath := filepath.Join(task.FolderPath, "debug.md")
-					if _, err := os.Stat(docPath); os.IsNotExist(err) {
-						docPath = filepath.Join(task.FolderPath, "plan.md")
-					}
-					rel, _ := filepath.Rel(m.workspaceDir, docPath)
-					rel = filepath.ToSlash(rel)
-					prompt := fmt.Sprintf("/only-one-debug %s", rel)
-					route := m.appConfig.AgentRouting.Debug
-					_ = herdr.DispatchPrompt(route.Pane, route.CLI, prompt)
-					m.statusMsg = fmt.Sprintf("Đã dispatch debug tới pane [%s] bằng %s: %s", route.Pane, route.CLI, prompt)
-				}
+				m.dispatchCurrentTask("debug")
 			}
 		}
 
 	case tea.MouseMsg:
-		if m.mode == ModeBoard && msg.Button == tea.MouseButtonLeft && msg.Action == tea.MouseActionPress {
-			colWidth := (m.width - 6) / 4
-			if colWidth > 0 {
-				clickedCol := (msg.X - 2) / colWidth
-				if clickedCol >= 0 && clickedCol < 4 {
-					m.colIdx = clickedCol
+		switch msg.Button {
+		case tea.MouseButtonWheelUp:
+			if m.mode == ModeViewer {
+				m.viewerScroll -= 3
+				if m.viewerScroll < 0 {
+					m.viewerScroll = 0
+				}
+			} else if m.mode == ModeBoard {
+				if m.taskIndices[m.colIdx] > 0 {
+					m.taskIndices[m.colIdx]--
 				}
 			}
+			return m, nil
+		case tea.MouseButtonWheelDown:
+			if m.mode == ModeViewer {
+				m.viewerScroll += 3
+			} else if m.mode == ModeBoard {
+				colTasks := m.columns[m.colIdx].Tasks
+				if m.taskIndices[m.colIdx] < len(colTasks)-1 {
+					m.taskIndices[m.colIdx]++
+				}
+			}
+			return m, nil
+		case tea.MouseButtonLeft:
+			if m.mode == ModeBoard && msg.Action == tea.MouseActionPress {
+				colWidth := (m.width - 6) / 4
+				if colWidth > 0 {
+					clickedCol := (msg.X - 2) / colWidth
+					if clickedCol >= 0 && clickedCol < 4 {
+						m.colIdx = clickedCol
+					}
+				}
+			}
+			return m, nil
 		}
 	}
 	return m, nil
@@ -366,12 +462,23 @@ func (m Model) renderViewer() string {
 		} else {
 			style = style.Foreground(lipgloss.Color("#888888"))
 		}
-		tabBar += style.Render(fmt.Sprintf("[%s]", d.Name)) + " "
+		tabBar += style.Render(fmt.Sprintf("[%d: %s]", i+1, d.Name)) + " "
 	}
 
 	content := "(Tài liệu trống)"
+	totalLines := 0
+	percent := 0
 	if len(m.viewDocs) > 0 && m.activeDocIdx < len(m.viewDocs) {
-		lines := strings.Split(m.viewDocs[m.activeDocIdx].Content, "\n")
+		if m.viewerCache == nil {
+			m.viewerCache = make(map[int][]string)
+		}
+		lines, exists := m.viewerCache[m.activeDocIdx]
+		if !exists {
+			rendered := m.renderDocContent(m.viewDocs[m.activeDocIdx].Content, boxWidth-6)
+			lines = strings.Split(rendered, "\n")
+			m.viewerCache[m.activeDocIdx] = lines
+		}
+		totalLines = len(lines)
 		start := m.viewerScroll
 		if start >= len(lines) {
 			start = len(lines) - 1
@@ -384,6 +491,9 @@ func (m Model) renderViewer() string {
 			end = len(lines)
 		}
 		content = strings.Join(lines[start:end], "\n")
+		if totalLines > 0 {
+			percent = (start + 1) * 100 / totalLines
+		}
 	}
 
 	header := lipgloss.NewStyle().
@@ -406,7 +516,7 @@ func (m Model) renderViewer() string {
 		BorderForeground(lipgloss.Color("#555555")).
 		Padding(0, 1).
 		Width(boxWidth).
-		Render("[Tab] Đổi file  [↑/↓/j/k] Cuộn  [Esc/q] Quay lại bảng Kanban")
+		Render(fmt.Sprintf("[Tab/1-%d] Đổi file  [↑/↓/Lăn chuột/PgUp/PgDn] Cuộn  [p] Plan  [a] Apply  [d] Debug  [Esc/q] Đóng | Dòng %d/%d (%d%%)", len(m.viewDocs), m.viewerScroll+1, totalLines, percent))
 
 	return fmt.Sprintf("%s\n%s\n%s", header, body, footer)
 }
@@ -506,14 +616,20 @@ func (m Model) View() string {
 		BorderForeground(lipgloss.Color("#00FFFF")).
 		Padding(0, 1).
 		Width(boxWidth).
-		Render(fmt.Sprintf("🚀 ONLY-ONE ⚡ WORKFLOW BOARD (Go Native Engine)\nWorkspace: %s  %s  Total: %d Tasks", m.workspaceDir, herdrBadge, len(m.tasks)))
+		Render(fmt.Sprintf("🚀 ONLY-ONE ⚡ WORKFLOW BOARD (Go Native Engine)\nWorkspace: %s  %s  Total: %d Tasks\nBadges: %s  %s  %s  %s",
+			m.workspaceDir, herdrBadge, len(m.tasks),
+			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FFFF")).Render("[C] Concept"),
+			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFCC00")).Render("[P] Plan"),
+			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF5555")).Render("[D] Debug"),
+			lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#55FF55")).Render("[R] Review"),
+		))
 
 	colWidth := (m.width - 8) / 4
 	if colWidth < 22 {
 		colWidth = 22
 	}
 
-	colHeight := m.height - 10
+	colHeight := m.height - 13
 	if colHeight < 10 {
 		colHeight = 15
 	}
@@ -540,11 +656,28 @@ func (m Model) View() string {
 		if len(col.Tasks) == 0 {
 			content += lipgloss.NewStyle().Faint(true).Render("(Trống)")
 		} else {
+			maxCards := (colHeight - 4) / 5
+			if maxCards < 1 {
+				maxCards = 1
+			}
+			curTaskIdx := m.taskIndices[i]
+			startIdx := 0
+			if curTaskIdx >= maxCards {
+				startIdx = curTaskIdx - maxCards + 1
+			}
+			endIdx := startIdx + maxCards
+			if endIdx > len(col.Tasks) {
+				endIdx = len(col.Tasks)
+			}
+			if startIdx > 0 {
+				content += lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#00FFFF")).Render(fmt.Sprintf("  ▲ (+%d task phía trên)\n", startIdx))
+			}
 			cardWidth := colWidth - 4
 			if cardWidth < 18 {
 				cardWidth = 18
 			}
-			for tIdx, t := range col.Tasks {
+			for tIdx := startIdx; tIdx < endIdx; tIdx++ {
+				t := col.Tasks[tIdx]
 				cardStyle := lipgloss.NewStyle().
 					Border(lipgloss.RoundedBorder()).
 					Padding(0, 1).
@@ -586,20 +719,30 @@ func (m Model) View() string {
 				cardContent := fmt.Sprintf("%s\n%s\n%s", headerText, titleText, footerRow)
 				content += cardStyle.Render(cardContent) + "\n"
 			}
+			if endIdx < len(col.Tasks) {
+				content += lipgloss.NewStyle().Faint(true).Foreground(lipgloss.Color("#00FFFF")).Render(fmt.Sprintf("  ▼ (+%d task phía dưới)\n", len(col.Tasks)-endIdx))
+			}
 		}
 		cols[i] = colStyle.Render(content)
 	}
 
 	boardLayout := lipgloss.JoinHorizontal(lipgloss.Top, cols...)
 
-	footer := lipgloss.NewStyle().
+	statusBar := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#00FFFF")).
+		Padding(0, 1).
+		Width(boxWidth).
+		Render(fmt.Sprintf("⚡ TIẾN TRÌNH: %s", m.statusMsg))
+
+	shortcutsBar := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("#555555")).
 		Padding(0, 1).
 		Width(boxWidth).
-		Render(fmt.Sprintf("[←/→] Cột  [↑/↓] Task  [Space/m] Chuyển Cột  [Enter] Xem Doc  [p] Plan  [a] Apply  [d] Debug  [c] Clean  [s] Settings  [q] Thoát | ℹ %s", m.statusMsg))
+		Render("[←/→] Cột  [↑/↓] Task  [Space/m] Chuyển Cột  [Enter] Doc  [p] Plan  [a] Apply  [d] Debug  [c] Clean  [s] Settings  [q] Thoát")
 
-	return fmt.Sprintf("%s\n%s\n%s", headerBox, boardLayout, footer)
+	return fmt.Sprintf("%s\n%s\n%s\n%s", headerBox, boardLayout, statusBar, shortcutsBar)
 }
 
 func truncate(s string, maxLen int) string {
@@ -614,4 +757,30 @@ func truncate(s string, maxLen int) string {
 		return string(runes[:maxLen])
 	}
 	return s
+}
+
+func (m *Model) renderDocContent(content string, width int) string {
+	if width <= 20 {
+		width = 80
+	}
+	// Tiền xử lý khối Mermaid sang khung sơ đồ ASCII
+	processed := preprocessMermaidBlocks(content)
+	r, err := glamour.NewTermRenderer(
+		glamour.WithStandardStyle("dark"),
+		glamour.WithWordWrap(width),
+	)
+	if err == nil {
+		out, err := r.Render(processed)
+		if err == nil {
+			return out
+		}
+	}
+	return processed
+}
+
+func preprocessMermaidBlocks(content string) string {
+	if !strings.Contains(content, "```mermaid") {
+		return content
+	}
+	return strings.ReplaceAll(content, "```mermaid", "```yaml\n# 📊 SƠ ĐỒ ĐỒ THỊ (MERMAID)")
 }
