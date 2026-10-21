@@ -38,3 +38,9 @@ triggers:
 - **NEVER_DO**: Filter target panes only against active agent lists (`listHerdrAgents`) or unconditionally trigger split commands when a target pane is configured.
 - **RATIONALE**: Plain shell terminals (`pwsh`, `cmd`, `bash`) do not run an active agent until initialized, causing false negatives and duplicate terminal panes.
 
+### TUI-007: Dispatch Clean Workflows via Herdr Agent Routing
+- **MUST_DO**: Dispatch the `/only-one-clean` workflow command to the configured clean agent pane through Herdr process orchestration when triggering cleanup.
+- **NEVER_DO**: Delete or mutate task folder archives directly within the TUI process execution thread.
+- **RATIONALE**: Clean workflows require knowledge audit, rule distillation, and git synchronization handled safely by the clean workflow agent.
+
+

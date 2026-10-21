@@ -6,7 +6,7 @@ triggers:
   - "assets/**"
   - "src/core/assets/**"
   - "src/commands/update/**"
-archived_at: 2026-10-20T18:35:00+07:00
+archived_at: 2026-10-21T10:05:52+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -22,6 +22,8 @@ affected_modules:
   - assets/combos
   - assets/git
   - src/core/assets
+  - src/core/agent
+  - src/core/skill
   - src/core/skill/remote
   - src/commands/update
   - src/tui/init/services
@@ -35,6 +37,7 @@ affected_modules:
   2. **Phân mảnh Lockfile**: Trạng thái cài đặt bị lưu trữ phân tán ở `.only-one/installed.json` và `only-one/skills-lock.json` cho remote GitHub skills.
   3. **Rủi ro Lockfile Drift & Bypass CI**: Thiếu công cụ tăng phiên bản và chốt chặn CI khi thay đổi template asset.
   4. **Thành phần Bị Xóa & File Bị Mất**: File mồ côi tồn đọng trên đĩa khi asset bị gỡ bỏ upstream; hoặc khi người dùng vô tình xóa file vật lý thì không tự động khôi phục.
+  5. **Phân mảnh vị trí cài đặt Global Assets**: Global skills, workflows và rules trước đây lưu phân tán trong thư mục riêng của từng tool (`~/.gemini/config/`), gây khó khăn khi tích hợp chéo giữa các agent runners (Antigravity, Claude Code, Codex).
 - **Giá trị Cốt lõi (Core Value)**:
   - **100% Manifest Version Coverage**: Bổ sung `version: string` chuẩn hóa cơ số 10 (`X.Y.Z`) cho toàn bộ manifests trong `assets/`.
   - **Decimal Rollover Engine**: Triển khai thuật toán tăng phiên bản cơ số 10 (`0.0.1` -> `0.0.9` -> `0.1.0` -> `0.9.9` -> `1.0.0`).
@@ -43,7 +46,8 @@ affected_modules:
     - Đối soát version đã cài với upstream và cập nhật asset outdated.
     - Phát hiện file vật lý bị mất (`status: 'missing'`) và tự động khôi phục từ template gốc.
     - Khi dùng cờ `--prune`: dọn sạch file mồ côi (`status: 'removed'`) trên đĩa và trong lockfile.
-  - **Global Assets Architecture (`~/.only-one`)**: Hỗ trợ phân định phạm vi tài nguyên `scope: 'global' | 'project'`, cho phép cài đặt skills, workflows và rules dùng chung cho toàn bộ máy tính của nhà phát triển, đồng bộ qua CLI mà không làm ô nhiễm thư mục repo cục bộ.
+  - **Canonical Global Assets Standard (`~/.agents`)**: Chuẩn hóa toàn bộ đích đến cài đặt toàn cục về `~/.agents/{skills,workflows,rules}`, hợp nhất quản trị tài nguyên dùng chung.
+  - **Non-Destructive Manifest Bridge**: Cầu nối `manifest-bridge.ts` tự động đăng ký `~/.agents/skills` vào `~/.agents/skills.json` và đồng bộ bảo toàn vào `~/.gemini/config/skills.json` mà không làm mất cấu hình có sẵn của IDE.
   - **Combo Scope & Agent Compatibility Matrix**: Phân loại các bộ Combos theo phạm vi (`global` vs `project`) và độ tương thích với target agents (`antigravity`, `cursor`, `copilot`), kiểm soát qua schema validation nghiêm ngặt.
   - **Developer Tooling & Zero-Bypass CI Gate**: Cung cấp `scripts/bump-asset.ts` (`pnpm asset:bump <type> <id>`) và bài test `test/core/assets/version-gate.test.ts` chặn commit vi phạm.
 
@@ -89,6 +93,8 @@ flowchart TD
   - [`src/core/assets/types.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/types.ts): Khai báo `InstalledAssetRecord`, `RemoteSkillLockMeta`, `OnlyOneInstalledState`, `AssetUpdateStatus` (`up-to-date`, `outdated`, `missing`, `removed`).
   - [`src/core/assets/lockfile.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/lockfile.ts): Đọc/ghi và xóa record `only-one/installed.json` atomic (`removeInstalledAsset`).
   - [`src/core/skill/remote/lockfile.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/skill/remote/lockfile.ts): Adapter layer cho GitHub remote skills lưu vào `installed.json`.
+  - [`src/core/skill/manifest-bridge.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/skill/manifest-bridge.ts): Cầu nối đồng bộ non-destructive `skills.json` sang `~/.agents/` và `~/.gemini/config/`.
+  - [`src/core/agent/tools.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/agent/tools.ts): Phân giải đường dẫn tài nguyên toàn cục hướng về `~/.agents/`.
   - [`src/core/assets/sync.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/sync.ts): Engine kiểm tra file tồn tại trên đĩa, auto-restore file thiếu và prune asset mồ côi.
 - **Developer Tooling & CI Gate**:
   - [`src/core/assets/bump.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/bump.ts) & [`scripts/bump-asset.ts`](file:///d:/Sources/PERSONAL/only-one-cli/scripts/bump-asset.ts): Tự động bump version.

@@ -6,11 +6,18 @@ import (
 	"os/exec"
 )
 
+type TabInfo struct {
+	TabID string `json:"tab_id"`
+	Label string `json:"label"`
+}
+
 type PaneInfo struct {
 	PaneID      string `json:"pane_id"`
+	TabID       string `json:"tab_id"`
 	Agent       string `json:"agent"`
 	AgentStatus string `json:"agent_status"`
 	Title       string `json:"terminal_title_stripped"`
+	TabLabel    string `json:"-"`
 }
 
 func IsSessionActive() bool {
@@ -41,6 +48,28 @@ func ListPanes() []PaneInfo {
 		} `json:"result"`
 	}
 	_ = json.Unmarshal(out, &resp)
+
+	tabMap := make(map[string]string)
+	if tabOut, tabErr := exec.Command("herdr", "tab", "list").Output(); tabErr == nil {
+		var tabResp struct {
+			Result struct {
+				Tabs []TabInfo `json:"tabs"`
+			} `json:"result"`
+		}
+		if json.Unmarshal(tabOut, &tabResp) == nil {
+			for _, t := range tabResp.Result.Tabs {
+				tabMap[t.TabID] = t.Label
+			}
+		}
+	}
+
+	for i := range resp.Result.Panes {
+		p := &resp.Result.Panes[i]
+		if label, ok := tabMap[p.TabID]; ok && label != "" {
+			p.TabLabel = label
+		}
+	}
+
 	return resp.Result.Panes
 }
 

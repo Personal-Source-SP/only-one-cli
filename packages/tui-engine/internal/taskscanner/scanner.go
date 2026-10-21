@@ -1,18 +1,39 @@
 package taskscanner
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
 
+func parseDateString(val interface{}) string {
+	if val == nil {
+		return ""
+	}
+	if s, ok := val.(string); ok {
+		return s
+	}
+	if t, ok := val.(time.Time); ok {
+		return t.Format("2006-01-02")
+	}
+	s := fmt.Sprintf("%v", val)
+	if s == "<nil>" {
+		return ""
+	}
+	return s
+}
+
 type TaskModel struct {
-	Slug       string `json:"slug"`
-	FolderPath string `json:"folderPath"`
-	Status     string `json:"status"`
-	Title      string `json:"title"`
+	Slug       string   `json:"slug"`
+	FolderPath string   `json:"folderPath"`
+	Status     string   `json:"status"`
+	Title      string   `json:"title"`
+	CreatedAt  string   `json:"createdAt"`
+	Docs       []string `json:"docs"`
 }
 
 type TaskDoc struct {
@@ -51,6 +72,14 @@ func ScanTasks(workspaceDir string) ([]TaskModel, error) {
 		folder := filepath.Join(tasksRoot, e.Name())
 		status := "concept"
 		title := e.Name()
+		createdAt := ""
+
+		var docs []string
+		for _, docName := range []string{"concept.md", "plan.md", "debug.md", "review.md"} {
+			if _, err := os.Stat(filepath.Join(folder, docName)); err == nil {
+				docs = append(docs, strings.TrimSuffix(docName, ".md"))
+			}
+		}
 
 		for _, docName := range []string{"debug.md", "plan.md", "concept.md"} {
 			docPath := filepath.Join(folder, docName)
@@ -67,6 +96,11 @@ func ScanTasks(workspaceDir string) ([]TaskModel, error) {
 						status = "done"
 					}
 				}
+				if ca := parseDateString(fm["created_at"]); ca != "" {
+					createdAt = ca
+				} else if sa := parseDateString(fm["started_at"]); sa != "" {
+					createdAt = sa
+				}
 				lines := strings.Split(body, "\n")
 				for _, l := range lines {
 					trimmed := strings.TrimSpace(l)
@@ -79,11 +113,28 @@ func ScanTasks(workspaceDir string) ([]TaskModel, error) {
 			}
 		}
 
+		if createdAt == "" {
+			if raw, err := os.ReadFile(filepath.Join(folder, "concept.md")); err == nil {
+				fm, _ := ParseFrontmatter(string(raw))
+				if ca := parseDateString(fm["created_at"]); ca != "" {
+					createdAt = ca
+				} else if sa := parseDateString(fm["started_at"]); sa != "" {
+					createdAt = sa
+				}
+			}
+		}
+
+		if len(createdAt) >= 10 {
+			createdAt = createdAt[:10]
+		}
+
 		tasks = append(tasks, TaskModel{
 			Slug:       e.Name(),
 			FolderPath: folder,
 			Status:     status,
 			Title:      title,
+			CreatedAt:  createdAt,
+			Docs:       docs,
 		})
 	}
 	return tasks, nil

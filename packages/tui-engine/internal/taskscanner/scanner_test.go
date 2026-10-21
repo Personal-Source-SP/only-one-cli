@@ -87,3 +87,28 @@ func TestCleanCompletedTasks(t *testing.T) {
 		t.Errorf("expected task to be in archives at %s", archivedPath)
 	}
 }
+
+func TestScanTasksMetadata(t *testing.T) {
+	tmpDir, err := os.MkdirTemp("", "task-meta-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	taskDir := filepath.Join(tmpDir, "only-one", "tasks", "task-meta")
+	_ = os.MkdirAll(taskDir, 0755)
+	_ = os.WriteFile(filepath.Join(taskDir, "concept.md"), []byte("---\ncreated_at: 2026-10-21T09:40:00+07:00\nstatus: concept\n---\n# Meta Task"), 0644)
+	_ = os.WriteFile(filepath.Join(taskDir, "plan.md"), []byte("---\nstatus: planned\n---\n# Meta Plan"), 0644)
+
+	tasks, err := ScanTasks(tmpDir)
+	if err != nil || len(tasks) != 1 {
+		t.Fatalf("expected 1 task, got %d, err: %v", len(tasks), err)
+	}
+
+	if tasks[0].CreatedAt != "2026-10-21" {
+		t.Errorf("expected CreatedAt '2026-10-21', got %q", tasks[0].CreatedAt)
+	}
+	if len(tasks[0].Docs) != 2 {
+		t.Errorf("expected 2 docs, got %v", tasks[0].Docs)
+	}
+}

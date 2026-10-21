@@ -37,13 +37,35 @@ type Model struct {
 	appConfig      config.GlobalConfig
 	settingsIdx    int
 	availablePanes []string
+	paneNames      map[string]string
+}
+
+func fetchPanes() ([]string, map[string]string) {
+	panes := []string{"auto"}
+	names := map[string]string{"auto": "auto"}
+	for _, p := range herdr.ListPanes() {
+		panes = append(panes, p.PaneID)
+		displayName := strings.TrimSpace(p.TabLabel)
+		if displayName == "" {
+			t := strings.TrimSpace(p.Title)
+			lower := strings.ToLower(t)
+			if !strings.HasSuffix(lower, "cmd.exe") && !strings.HasSuffix(lower, "pwsh.exe") && !strings.HasSuffix(lower, "bash.exe") && !strings.HasSuffix(lower, "powershell.exe") {
+				displayName = t
+			}
+		}
+		if displayName == "" {
+			displayName = strings.TrimSpace(p.Agent)
+		}
+		if displayName == "" {
+			displayName = p.PaneID
+		}
+		names[p.PaneID] = displayName
+	}
+	return panes, names
 }
 
 func New(workspaceDir string, initialTasks []taskscanner.TaskModel) Model {
-	panes := []string{"auto"}
-	for _, p := range herdr.ListPanes() {
-		panes = append(panes, p.PaneID)
-	}
+	panes, names := fetchPanes()
 
 	return Model{
 		workspaceDir:   workspaceDir,
@@ -58,6 +80,7 @@ func New(workspaceDir string, initialTasks []taskscanner.TaskModel) Model {
 		appConfig:      config.LoadConfig(),
 		settingsIdx:    0,
 		availablePanes: panes,
+		paneNames:      names,
 	}
 }
 
@@ -250,20 +273,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "s":
 				m.mode = ModeSettings
 				m.settingsIdx = 0
-				panes := []string{"auto"}
-				for _, p := range herdr.ListPanes() {
-					panes = append(panes, p.PaneID)
-				}
-				m.availablePanes = panes
+				m.availablePanes, m.paneNames = fetchPanes()
 			case "c":
-				count, err := taskscanner.CleanCompletedTasks(m.workspaceDir)
+				route := m.appConfig.AgentRouting.Clean
+				prompt := "/only-one-clean"
+				err := herdr.DispatchPrompt(route.Pane, route.CLI, prompt)
 				if err != nil {
-					m.statusMsg = fmt.Sprintf("Lỗi dọn dẹp task: %v", err)
+					m.statusMsg = fmt.Sprintf("Lỗi dispatch clean: %v", err)
 				} else {
-					tasks, _ := taskscanner.ScanTasks(m.workspaceDir)
-					m.tasks = tasks
-					m.columns = taskscanner.GroupTasksByColumn(tasks)
-					m.statusMsg = fmt.Sprintf("Đã dọn dẹp %d task hoàn thành vào archives.", count)
+					m.statusMsg = fmt.Sprintf("Đã dispatch clean tới pane [%s] bằng %s: %s", route.Pane, route.CLI, prompt)
 				}
 			case "p":
 				currCol := m.columns[m.colIdx]
@@ -426,7 +444,11 @@ func (m Model) renderSettings() string {
 			indicator = "► "
 			style = style.Bold(true).Foreground(lipgloss.Color("#00FFFF")).Background(lipgloss.Color("#222222"))
 		}
-		row := fmt.Sprintf("%s%-35s  Target Pane: [%-8s]  CLI Tool: [%-8s]", indicator, p.name, p.route.Pane, p.route.CLI)
+		paneDisplay := m.paneNames[p.route.Pane]
+		if paneDisplay == "" {
+			paneDisplay = p.route.Pane
+		}
+		row := fmt.Sprintf("%s%-35s  Target Pane: [%-16s]  CLI Tool: [%-8s]", indicator, p.name, paneDisplay, p.route.CLI)
 		lines = append(lines, style.Render(row))
 	}
 
@@ -518,19 +540,50 @@ func (m Model) View() string {
 		if len(col.Tasks) == 0 {
 			content += lipgloss.NewStyle().Faint(true).Render("(Trống)")
 		} else {
+			cardWidth := colWidth - 4
+			if cardWidth < 18 {
+				cardWidth = 18
+			}
 			for tIdx, t := range col.Tasks {
-				cardStyle := lipgloss.NewStyle().Padding(0, 1).MarginBottom(1)
+				cardStyle := lipgloss.NewStyle().
+					Border(lipgloss.RoundedBorder()).
+					Padding(0, 1).
+					MarginBottom(1).
+					Width(cardWidth)
 				if i == m.colIdx && tIdx == m.taskIndices[i] {
 					cardStyle = cardStyle.
-						Border(lipgloss.NormalBorder(), false, false, false, true).
-						BorderForeground(lipgloss.Color("#FF007F")).
-						Background(lipgloss.Color("#222222"))
+						BorderForeground(lipgloss.Color("#00FFFF")).
+						Background(lipgloss.Color("#1A1A1A"))
 				} else {
 					cardStyle = cardStyle.
-						Border(lipgloss.NormalBorder(), false, false, false, true).
 						BorderForeground(lipgloss.Color("#444444"))
 				}
-				cardContent := fmt.Sprintf("%s\n%s", lipgloss.NewStyle().Bold(true).Render(t.Slug), lipgloss.NewStyle().Foreground(lipgloss.Color("#AAAAAA")).Render(t.Title))
+				headerText := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFFFFF")).Render(fmt.Sprintf("#%02d %s", tIdx+1, truncate(t.Slug, cardWidth-8)))
+				titleText := lipgloss.NewStyle().Foreground(lipgloss.Color("#AAAAAA")).Render(truncate(t.Title, cardWidth-4))
+				badges := ""
+				for _, doc := range []struct{ tag, id, color string }{
+					{"C", "concept", "#00FFFF"},
+					{"P", "plan", "#FFCC00"},
+					{"D", "debug", "#FF5555"},
+					{"R", "review", "#55FF55"},
+				} {
+					for _, d := range t.Docs {
+						if d == doc.id {
+							badges += lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(doc.color)).Render("[" + doc.tag + "]") + " "
+							break
+						}
+					}
+				}
+				footerRow := strings.TrimSpace(badges)
+				if t.CreatedAt != "" {
+					dateStr := lipgloss.NewStyle().Faint(true).Render(t.CreatedAt)
+					if footerRow != "" {
+						footerRow = fmt.Sprintf("%s %s", footerRow, dateStr)
+					} else {
+						footerRow = dateStr
+					}
+				}
+				cardContent := fmt.Sprintf("%s\n%s\n%s", headerText, titleText, footerRow)
 				content += cardStyle.Render(cardContent) + "\n"
 			}
 		}
@@ -547,4 +600,18 @@ func (m Model) View() string {
 		Render(fmt.Sprintf("[←/→] Cột  [↑/↓] Task  [Space/m] Chuyển Cột  [Enter] Xem Doc  [p] Plan  [a] Apply  [d] Debug  [c] Clean  [s] Settings  [q] Thoát | ℹ %s", m.statusMsg))
 
 	return fmt.Sprintf("%s\n%s\n%s", headerBox, boardLayout, footer)
+}
+
+func truncate(s string, maxLen int) string {
+	if maxLen <= 0 {
+		return ""
+	}
+	runes := []rune(s)
+	if len(runes) > maxLen {
+		if maxLen > 3 {
+			return string(runes[:maxLen-3]) + "..."
+		}
+		return string(runes[:maxLen])
+	}
+	return s
 }

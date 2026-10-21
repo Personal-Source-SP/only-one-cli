@@ -1,88 +1,85 @@
 ---
 id: tui-modernization
-title: Modernizing Only-One CLI Terminal User Interface (TUI), Herdr Dispatch & Init Wizard Architecture
+title: Modernizing Only-One CLI Terminal User Interface (TUI), Go Bubble Tea Kanban Engine & Init Wizard Architecture
 domain: tui
 triggers:
+  - "packages/tui-engine/**"
   - "src/tui/**"
-  - "src/core/init/**"
-  - "src/prompts/**"
-archived_at: 2026-10-20T22:06:00+07:00
+  - "src/commands/tui/**"
+archived_at: 2026-10-21T10:05:52+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
   - only-one/archives/asset-versioning-and-sync-systems.md
 affected_modules:
+  - packages/tui-engine
   - src/tui
-  - src/core/init
-  - test/tui
+  - src/commands/tui
+  - scripts/build-go.js
 ---
 
-# Archive: Modernizing Only-One CLI Terminal User Interface (TUI), Herdr Dispatch & Init Wizard Architecture
+# Archive: Modernizing Only-One CLI Terminal User Interface (TUI), Go Bubble Tea Kanban Engine & Init Wizard Architecture
 
 ## 1. Problem & Core Value
 - **Problem**:
-  - Giao diện TUI cũ phân mảnh, thiếu cơ chế theo dõi nhiệm vụ Kanban thời gian thực, điều phối Agent tĩnh gán cứng IDE/CLI gây xung đột tiến trình terminal, và lệnh init thiếu wizard trực quan.
-  - Cột Kanban cũ dùng trạng thái `review` gây ẩn task đột ngột thay vì hiển thị cột hoàn thành `done`.
-  - Herdr Process Manager thiếu phân biệt cấu hình giữa Target Pane và CLI Tool, hiển thị mã định danh nội bộ (`w3:p1`) thay vì tên tab có ý nghĩa (`Human-Readable Name`).
-  - Init Wizard ban đầu hiển thị danh sách đơn luồng thiếu phân loại danh mục, và gặp lỗi cảnh báo runtime "Detected unsettled top-level await" khi người dùng nhấn `Ctrl+C`.
-  - Bộ điều phối Herdr (`dispatchTaskViaHerdr` & `dispatchCleanViaHerdr`) chỉ truy vấn `listHerdrAgents` thay vì `listHerdrPanes`, dẫn đến việc coi các terminal shell thông thường (`pwsh`, `cmd`, `bash`) là chưa mở và liên tục tự động split terminal mới ngoài ý muốn.
+  - Legacy Ink-based React TUI suffered from terminal sizing quirks, performance latency during rapid re-renders, and lacked resilient full-screen terminal capabilities.
+  - Previous Kanban boards lacked real-time task file tracking, multi-document inspection, and in-place configuration adjustments.
+  - Herdr Process Manager integration previously exposed technical pane IDs (`w3:p1`) instead of human-readable pane titles, and lacked clean workflow dispatch routing.
+  - Task cards lacked visual hierarchy, document availability badges, and timestamp metadata.
 - **Value**:
-  - Xây dựng bảng Kanban 4 cột tinh gọn chính quy (`concept`, `plan`, `processing`, `done`), tự động phản chiếu thay đổi file trên đĩa qua bộ quét debounce và duy trì task `done` trực quan.
-  - Tích hợp trực tiếp với Herdr Process Manager: nạp danh sách agent thời gian thực, hiển thị nhãn tab người dùng (`enrichAgentsWithTabLabels`), tách bạch Target Pane và CLI Tool qua `normalizePhaseRoute`, và điều phối tuần tự (Pipeline Queue) an toàn.
-  - Cung cấp Interactive Init Wizard (`InitWizardApp`) dạng component Ink với kiến trúc Split-Pane 2 cột (`CategorySidebar` và `ResourceList`), quét trạng thái cài đặt thời gian thực và thoát an toàn không rò rỉ promise unhandled.
-  - Kiểm tra và tái sử dụng Target Pane triệt để: đối soát qua `listHerdrPanes()`, tự động kích hoạt agent trên shell có sẵn (`herdr agent start --pane`) và gửi prompt trực tiếp, loại bỏ hoàn toàn tình trạng split pane thừa.
+  - High-performance native Go Bubble Tea / Lipgloss TUI engine (`packages/tui-engine`) compiled into cross-platform binaries and spawned seamlessly via TypeScript bridge (`src/tui/bridge.ts`).
+  - Standardized 4-column Kanban board (`concept`, `plan`, `processing`, `done`) with AltScreen support, mouse scrolling, and keyboard navigation.
+  - Distinct rounded task card design featuring sequential numbering (`#01`), document badges (`[C] [P] [D] [R]`), and creation date metadata with robust fallback.
+  - Full-featured Markdown Viewer (`Enter`) with multi-document tabs, syntax highlighting, and smooth keyboard scrolling.
+  - Interactive Settings View (`s`) allowing live reconfiguration of 6-phase Agent Routing and Clean Policy, displaying human-friendly pane/agent names.
+  - Dedicated Clean Action (`c`) dispatching `/only-one-clean` to the configured clean agent pane via Herdr without local task corruption.
 
 ## 2. Key Architecture & Decisions
-- **4-Column Kanban Lifecycle**:
-  - Chuẩn hóa vòng đời task: `concept` $\rightarrow$ `plan` $\rightarrow$ `processing` $\rightarrow$ `done`.
-  - Task hoàn thành hiển thị tại cột `done`, chỉ được lưu trữ và gỡ bỏ khi chạy lệnh `/only-one-clean`.
-- **Herdr Runtime Agent Management & Decoupled Routing**:
-  - `enrichAgentsWithTabLabels`: Ánh xạ `tab_id` sang `label` thực tế từ Herdr, hiển thị dạng `${agent.name || agent.pane_id} (${agent.agent} - ${agent.pane_id})`.
-  - `normalizePhaseRoute`: Chuẩn hóa đối tượng `{ pane: string, cli: string }`, cho phép người dùng tùy chỉnh độc lập pane thực thi và binary agent (`agy`, `claude`).
-  - `dispatchTaskToHerdrAgents`: Hỗ trợ gán nhiều agent cho 1 task và thực thi tuần tự (Pipeline Queue) loại bỏ race condition sửa code.
-- **Target Pane Verification & In-Place Shell Promotion**:
-  - `dispatchTaskViaHerdr` và `dispatchCleanViaHerdr` kiểm tra `route.pane` bằng `listHerdrPanes()` thay vì chỉ kiểm tra agent đang chạy.
-  - Nếu pane mục tiêu đã tồn tại:
-    - Nếu đã có agent: Chờ agent nhàn rỗi (`waitHerdrAgent`) rồi gửi prompt trực tiếp (`herdr agent prompt <pane>`).
-    - Nếu là shell terminal: Gọi `herdr agent start <name> --kind <cli> --pane <pane>` trực tiếp trên pane đó, sau đó prompt mà không gọi `splitCommand`.
-  - Chỉ fallback sang split pane mới khi `route.pane === 'auto'` hoặc pane chưa được mở trong Herdr.
-- **Interactive Init Wizard App (Split-Pane Architecture)**:
-  - [CategorySidebar.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/components/CategorySidebar.tsx): Cột trái hiển thị 9 danh mục tài nguyên (`combos`, `skills`, `rules`, `packages`, `configs`, `mcps`, `git`, `vs`, `ignore`) kèm bộ đếm `[selected/total]`.
-  - [ResourceList.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/components/ResourceList.tsx): Cột phải hiển thị danh sách tài nguyên tương ứng danh mục đang chọn.
-  - [interactive-orchestrator.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/init/interactive-orchestrator.ts): Điều phối render với `{ exitOnCtrlC: false }` và giải quyết an toàn promise thông qua `waitUntilExit()`, triệt tiêu cảnh báo unsettled top-level await.
 
+### 2.1. Hybrid Architecture & Execution Bridge
 ```mermaid
 flowchart TD
-    User([Người dùng]) --> Board["BoardView (4 cột: concept, plan, processing, done)"]
-    Board --> Watcher["taskWatcher (Debounced file changes)"]
-    Board --> AgentModal["AgentSelectorModal (Tab label names & status)"]
-    AgentModal --> HerdrQueue["Sequential Pipeline Dispatcher (wait idle -> prompt)"]
-    HerdrQueue --> TargetCheck{"Target Pane có trong listHerdrPanes?"}
-    TargetCheck -->|Có: Đã có Agent| PromptDirect["Prompt trực tiếp pane"]
-    TargetCheck -->|Có: Shell thuần| StartOnPane["Start agent trên pane -> Prompt (Không split)"]
-    TargetCheck -->|Không / Auto| SplitPane["Split pane mới"]
-    User --> InitWizard["InitWizardApp (Split-Pane: CategorySidebar + ResourceList)"]
-    InitWizard --> Scanner["workspaceScanner (Lockfile + FS Detection)"]
+    CLI["only-one tui / init"] --> Bridge["src/tui/bridge.ts"]
+    Bridge --> Check{"Go Binary Present in bin/?"}
+    Check -->|No| Build["scripts/build-go.js (Cross-Compile)"]
+    Build --> Exec["Execute bin/only-one-ui (board / init)"]
+    Check -->|Yes| Exec
+    Exec --> GoEngine["packages/tui-engine (Bubble Tea & Lipgloss)"]
+    GoEngine --> Scanner["internal/taskscanner (Metadata & Badges)"]
+    GoEngine --> Config["internal/config (~/.only-one/config.json)"]
+    GoEngine --> Herdr["internal/herdr (Pane Inspection & Prompt Dispatch)"]
 ```
 
+### 2.2. Core Subsystems & Components
+1. **Go Kanban Board Model (`packages/tui-engine/internal/board/model.go`)**:
+   - Manages board navigation across 4 columns (`concept`, `plan`, `processing`, `done`).
+   - Renders rounded border cards with cyan focus highlights and document presence badges (`[C]` Concept, `[P]` Plan, `[D]` Debug, `[R]` Review).
+   - Implements multi-modal views: `ModeBoard`, `ModeViewer`, `ModeSettings`.
+2. **Metadata Task Scanner (`packages/tui-engine/internal/taskscanner/scanner.go`)**:
+   - Scans `only-one/tasks/` folders and extracts YAML frontmatter.
+   - Robustly handles both `string` and `time.Time` unmarshaled scalar types from `yaml.v3`.
+   - Inspects documentation file presence and calculates task status and creation dates.
+3. **Decoupled Herdr Routing & Clean Dispatch (`packages/tui-engine/internal/herdr/client.go`)**:
+   - Dispatches workflow commands to target panes using `herdr agent prompt <pane> "<command>"`.
+   - Queries `listHerdrPanes` to resolve friendly tab titles (`Worker 1`, `Auto Detect`) for the settings modal.
+   - Handles `c` shortcut to route `/only-one-clean` to `agentRouting.clean` pane.
+4. **Global Configuration Manager (`packages/tui-engine/internal/config/config.go`)**:
+   - Persists user preferences in `~/.only-one/config.json` adhering to 100% JSON schema parity with the Node.js CLI runtime.
+   - Configures default 6-phase routing (`concept`, `plan`, `apply`, `debug`, `review`, `clean`) and automated clean thresholds.
+5. **Cross-Compile Build Engine (`scripts/build-go.js`)**:
+   - Automatically builds the Go binary into `bin/only-one-ui.exe` (or `bin/only-one-ui`) on host platforms.
+
 ## 3. Scope & Key Changes
-- **Core TUI Components**:
-  - [BoardView.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/BoardView.tsx): Bảng Kanban 4 cột tinh gọn và tiến trình clean.
-  - [AgentSelectorModal.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/AgentSelectorModal.tsx): Modal chọn multi-agent hiển thị nhãn tên tab thân thiện.
-  - [SettingsView.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/SettingsView.tsx): Cấu hình 2 cột phân biệt Target Pane và CLI Tool cho từng phase.
-  - [Header.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/Header.tsx) & [Footer.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/components/Footer.tsx): Đồng bộ biểu tượng 4 cột `concept`, `plan`, `processing`, `done`.
-  - [CategorySidebar.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/components/CategorySidebar.tsx): Sidebar phân loại 9 nhóm assets.
-  - [InitWizardApp.tsx](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/init/InitWizardApp.tsx): Trình hướng dẫn thiết lập tương tác 2 cột.
-- **Core Orchestrator & Services**:
-  - [interactive-orchestrator.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/init/interactive-orchestrator.ts): Promise wrapper an toàn chống rò rỉ unsettled await trên SIGINT.
-  - [herdrService.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/services/herdrService.ts): `listHerdrAgents`, `listHerdrPanes`, `enrichAgentsWithTabLabels`, `normalizePhaseRoute`, `dispatchTaskViaHerdr`, `dispatchCleanViaHerdr`.
-  - [taskScanner.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/services/taskScanner.ts): Gom nhóm 4 cột chính quy `concept`, `plan`, `processing`, `done`.
-- **Unit Tests**:
-  - [test/tui/herdrService.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/herdrService.test.ts)
-  - [test/tui/herdrTargetPaneDispatch.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/herdrTargetPaneDispatch.test.ts)
-  - [test/tui/taskScanner.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/taskScanner.test.ts)
-  - [test/tui/cleanWorkflow.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/tui/cleanWorkflow.test.ts)
+- [packages/tui-engine/internal/board/model.go](file:///d:/Sources/PERSONAL/only-one-cli/packages/tui-engine/internal/board/model.go): Bubble Tea model, navigation, card rendering, and shortcuts.
+- [packages/tui-engine/internal/taskscanner/scanner.go](file:///d:/Sources/PERSONAL/only-one-cli/packages/tui-engine/internal/taskscanner/scanner.go): YAML frontmatter parser, badge scanner, and column grouping.
+- [packages/tui-engine/internal/config/config.go](file:///d:/Sources/PERSONAL/only-one-cli/packages/tui-engine/internal/config/config.go): Home-directory config JSON persistence.
+- [packages/tui-engine/internal/herdr/client.go](file:///d:/Sources/PERSONAL/only-one-cli/packages/tui-engine/internal/herdr/client.go): Herdr CLI and IPC integration for pane listing and prompt dispatch.
+- [src/tui/bridge.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/tui/bridge.ts): Node.js process spawner with stdio inheritance.
+- [scripts/build-go.js](file:///d:/Sources/PERSONAL/only-one-cli/scripts/build-go.js): Go compilation runner.
 
 ## 4. Verification Evidence & PR
-- **Test Status**: 100% Passed (72 passed test files, 290 unit tests passed).
+- **Test Status**: 100% Passed.
+  - `packages/tui-engine`: `go test ./...` passed all package unit tests (`board`, `config`, `herdr`, `taskscanner`).
+  - TypeScript Suite: `npm test` passed 72 test files (292 tests passed).
+  - Build & Style: `npm run format:check` and `npm run build` passed.
 - **Branch**: `main`

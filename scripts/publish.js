@@ -81,8 +81,9 @@ if (!localInstall && npmTag === 'latest') {
 }
 
 // Build
-info('Building TypeScript...');
+info('Building TypeScript and Go TUI Engine...');
 try {
+  execSync('npm run build:go', { stdio: 'inherit', cwd: ROOT });
   execSync('npm run build', { stdio: 'inherit', cwd: ROOT });
   ok('Build complete');
 } catch {

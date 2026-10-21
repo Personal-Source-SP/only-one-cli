@@ -5,7 +5,7 @@ domain: mcp
 triggers:
   - "assets/mcps/**"
   - "src/core/mcp/**"
-archived_at: 2026-09-04T14:05:00+07:00
+archived_at: 2026-10-21T10:05:52+07:00
 status: active
 references:
   - only-one/archives/asset-versioning-and-sync-systems.md
@@ -22,11 +22,11 @@ affected_modules:
 ## 1. Problem & Core Value (Bài toán & Giá trị Cốt lõi)
 - **Vấn đề (Problem)**:
   1. Thiếu MCP server chính thức cho trình duyệt web (Playwright Browser) phục vụ kiểm thử và tự động hóa. Khi chạy browser MCP không cô lập, việc dùng chung profile mặc định dễ gây lỗi xung đột khóa tiến trình `SingletonLock` với trình duyệt cá nhân của developer.
-  2. Sự hiện diện của server `memory` (@modelcontextprotocol/server-memory) trong danh mục built-in gây dư thừa, phân mảnh trạng thái context và không cần thiết trong quy trình làm việc hiện đại của only-one-cli.
+  2. Sự hiện diện của server `memory` (@modelcontextprotocol/server-memory) và các adapter timesheet cũ gây dư thừa, phân mảnh trạng thái context và không cần thiết trong quy trình làm việc hiện đại của only-one-cli.
 - **Giá trị Cốt lõi (Value)**:
-  - Chuẩn hóa danh mục 7 MCP servers built-in chính thức: `clockify`, `fetch`, `github`, `playwright-browser`, `postgres`, `tavily`, `zodinet-timesheet`.
+  - Chuẩn hóa danh mục 5 MCP servers built-in chính thức: `fetch`, `github`, `playwright-browser`, `postgres`, `tavily`.
   - Tích hợp `playwright-browser` chính thức từ Microsoft (`@playwright/mcp`) với cấu hình cờ `--user-data-dir` độc lập nhằm triệt tiêu xung đột profile lock.
-  - Loại bỏ dứt điểm `memory` server khỏi manifest, test suite, README và BACKLOG.
+  - Loại bỏ dứt điểm `memory` server và các adapter timesheet khỏi manifest, test suite, README và BACKLOG.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
 - **Cấu hình Độc Lập cho Browser Profile**:
@@ -37,7 +37,7 @@ affected_modules:
 - **Luồng Đồng Bộ & Kiểm Soát Phiên Bản**:
 ```mermaid
 flowchart LR
-    Manifest["assets/mcps/index.ts\n(7 Built-in Servers)"] --> Registry["src/core/mcp/registry.ts\nreadMcpManifests()"]
+    Manifest["assets/mcps/index.ts\n(5 Built-in Servers)"] --> Registry["src/core/mcp/registry.ts\nreadMcpManifests()"]
     Registry --> Sync["src/core/mcp/sync.ts\nsyncMcpGlobalConfig()"]
     Registry --> Gate["src/core/assets/gate.ts\nverifyAllAssetsHaveValidVersions()"]
     Sync --> IDEs["IDE Configs (Antigravity / Claude / Cursor / Codex)"]

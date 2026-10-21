@@ -38,3 +38,9 @@ triggers:
 - **MUST_DO**: Intercept `SIGINT` / `Ctrl+C` in asynchronous CLI wizard workflows and cleanly resolve or reject outstanding top-level promises before process exit.
 - **NEVER_DO**: Exit immediately via `process.exit()` while top-level async/await promises are pending in interactive wizards.
 - **RATIONALE**: Prevents Node.js runtime warning `Detected unsettled top-level await` and uncommitted state corruption.
+
+### CLI-007: Preserve Standalone Node Modules in Packaging
+- **MUST_DO**: Explicitly permit `node_modules` inside standalone build distributions (e.g. `.next/standalone`) during archive packaging and synchronize static runtime assets (`.next/static`).
+- **NEVER_DO**: Apply raw unfiltered directory exclusions (`child === 'node_modules'`) across recursive packaging routines.
+- **RATIONALE**: Standalone builds package isolated production dependencies in nested `node_modules`; omitting them causes fatal runtime `MODULE_NOT_FOUND` errors on execution.
+

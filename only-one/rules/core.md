@@ -28,3 +28,9 @@ triggers:
 - **MUST_DO**: Assign valid base-10 semver strings (`X.Y.Z`) to all manifests in `assets/` and increment on template change.
 - **NEVER_DO**: Leave asset manifests unversioned or bypass the version gate.
 - **RATIONALE**: Protects CI version gates and ensures reproducible environment setups.
+
+### CORE-005: Canonical Global Agent Home Standard
+- **MUST_DO**: Route all global assets to the canonical user root `~/.agents/{skills,workflows,rules}` and non-destructively bridge `skills.json` manifests across tool configurations.
+- **NEVER_DO**: Install global assets directly into legacy tool-specific directories without canonical `.agents` registry synchronization.
+- **RATIONALE**: Unifies global agent discovery across different AI runners (Antigravity, Claude, Codex) while preserving backward compatibility.
+

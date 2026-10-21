@@ -1,6 +1,7 @@
 package board
 
 import (
+	"strings"
 	"testing"
 	"tui-engine/internal/taskscanner"
 
@@ -93,5 +94,27 @@ func TestViewerModeToggle(t *testing.T) {
 	escM, _ := tabM.Update(tea.KeyMsg{Type: tea.KeyEsc})
 	if escM.(Model).mode != ModeBoard {
 		t.Errorf("expected ModeBoard after Esc, got %v", escM.(Model).mode)
+	}
+}
+
+func TestKeyCDispatchClean(t *testing.T) {
+	m := New(".", nil)
+	newM, _ := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'c'}})
+	boardM := newM.(Model)
+	if !strings.Contains(boardM.statusMsg, "dispatch clean") {
+		t.Errorf("expected dispatch clean status message, got: %s", boardM.statusMsg)
+	}
+}
+
+func TestSettingsPaneDisplayName(t *testing.T) {
+	m := New(".", nil)
+	m.appConfig.AgentRouting.Concept.Pane = "test-pane"
+	m.paneNames = map[string]string{
+		"test-pane": "Friendly Worker",
+	}
+	m.mode = ModeSettings
+	viewStr := m.View()
+	if !strings.Contains(viewStr, "Friendly Worker") {
+		t.Errorf("expected friendly pane name 'Friendly Worker' in settings view")
 	}
 }
