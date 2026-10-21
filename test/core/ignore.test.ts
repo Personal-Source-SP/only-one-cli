@@ -9,10 +9,10 @@ describe('resolveIgnoreTemplatePath', () => {
     it('resolves templates from package root when module runs under dist', async () => {
         const packageRoot = await mkdtemp(join(tmpdir(), 'only-one-ignore-'));
         const modulePath = join(packageRoot, 'dist', 'src', 'core', 'ignore', 'index.js');
-        const templatePath = join(packageRoot, 'assets', 'ignore', 'git.ignore');
+        const templatePath = join(packageRoot, 'assets', 'templates', 'ignore', 'git.ignore');
 
         await mkdir(join(packageRoot, 'dist', 'src', 'core', 'ignore'), { recursive: true });
-        await mkdir(join(packageRoot, 'assets', 'ignore'), { recursive: true });
+        await mkdir(join(packageRoot, 'assets', 'templates', 'ignore'), { recursive: true });
         await writeFile(join(packageRoot, 'package.json'), '{}', 'utf8');
         await writeFile(templatePath, '.agents\n', 'utf8');
 

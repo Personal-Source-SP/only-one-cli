@@ -18,7 +18,7 @@ const SDLC_SKILLS = [
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
 const packageRoot = resolvePackageRoot(import.meta.url);
-const skillsDir = join(packageRoot, 'assets/skills');
+const skillsDir = join(packageRoot, 'assets/agents/skills');
 const shippedLocalSkillNames = readdirSync(skillsDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && existsSync(join(skillsDir, entry.name, 'SKILL.md')))
     .map((entry) => entry.name)

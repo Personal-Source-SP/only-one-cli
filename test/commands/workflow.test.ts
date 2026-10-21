@@ -68,8 +68,8 @@ describe('Workflow Command Unit & Integration Tests (Deprecated & Forwarded)', (
     });
 
     it('ensures only-one-idea and only-one-plan do not retain conversational english coaching or english learning extraction', async () => {
-        const ideaContent = await fsReadFile(join(process.cwd(), 'assets/skills/only-one-idea/SKILL.md'), 'utf-8');
-        const planContent = await fsReadFile(join(process.cwd(), 'assets/skills/only-one-plan/SKILL.md'), 'utf-8');
+        const ideaContent = await fsReadFile(join(process.cwd(), 'assets/agents/skills/only-one-idea/SKILL.md'), 'utf-8');
+        const planContent = await fsReadFile(join(process.cwd(), 'assets/agents/skills/only-one-plan/SKILL.md'), 'utf-8');
 
         expect(ideaContent).not.toContain('conversational-english-coaching');
         expect(ideaContent).not.toContain('english-learning-extraction');

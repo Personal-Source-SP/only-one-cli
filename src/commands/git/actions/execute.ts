@@ -3,13 +3,13 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { GIT_MANIFESTS, GIT_SNIPPETS } from '@assets/git/index.js';
+import { GIT_MANIFESTS, GIT_SNIPPETS } from '@assets/devenv/shell/index.js';
 import { mergeManagedBlock } from '@/core/git/sync.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
 import type { GitCommandOptions } from '../types.js';
 
-const assetsGitDir = join(resolvePackageRoot(import.meta.url), 'assets/git');
+const assetsGitDir = join(resolvePackageRoot(import.meta.url), 'assets/devenv/shell');
 
 export const executeGitCommandStep = async (deps: ProgramDeps, targetArg?: string, options?: GitCommandOptions): Promise<void> => {
     const selectedProfile = options?.profile || (targetArg as 'bash' | 'zsh' | 'all') || 'all';

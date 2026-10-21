@@ -19,7 +19,7 @@ export interface InstallHooksResult {
 export async function installHooks(options: InstallHooksOptions): Promise<InstallHooksResult> {
     const { projectDir, isGlobal = false, tools = ['antigravity', 'claude'] } = options;
     const packageRoot = resolvePackageRoot(import.meta.url);
-    const srcHooksDir = join(packageRoot, 'assets', 'hooks');
+    const srcHooksDir = join(packageRoot, 'assets', 'agents', 'hooks');
 
     const baseDir = isGlobal ? join(homedir(), '.agents') : join(projectDir, '.agents');
     const targetHooksDir = join(baseDir, 'hooks');

@@ -12,7 +12,21 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"],
-            "@assets/*": ["./assets/*"]
+            "@assets/*": ["./assets/*"],
+            "@assets/skills/*": ["./assets/agents/skills/*"],
+            "@assets/rules/*": ["./assets/agents/rules/*"],
+            "@assets/mcps/*": ["./assets/agents/mcps/*"],
+            "@assets/packages/*": ["./assets/agents/packages/*"],
+            "@assets/combos/*": ["./assets/agents/combos/*"],
+            "@assets/hooks/*": ["./assets/agents/hooks/*"],
+            "@assets/vs/*": ["./assets/devenv/editor/*"],
+            "@assets/git/*": ["./assets/devenv/shell/*"],
+            "@assets/eslint-rules/*": ["./assets/devenv/linter/*"],
+            "@assets/configs/*": ["./assets/templates/configs/*"],
+            "@assets/ignore/*": ["./assets/templates/ignore/*"],
+            "@agents/*": ["./assets/agents/*"],
+            "@devenv/*": ["./assets/devenv/*"],
+            "@templates/*": ["./assets/templates/*"]
         }
     },
     "include": ["src/**/*.ts", "src/**/*.tsx", "assets/**/*.ts"],

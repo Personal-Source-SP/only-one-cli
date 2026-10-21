@@ -45,7 +45,7 @@ const execFileAsync = promisify(execFile);
 
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
-const configsDir = join(resolvePackageRoot(import.meta.url), 'assets/configs');
+const configsDir = join(resolvePackageRoot(import.meta.url), 'assets/templates/configs');
 
 export interface ExtendedComboManifest extends ComboManifest {
     id: string;

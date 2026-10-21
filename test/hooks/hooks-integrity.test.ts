@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 describe('Hooks Architecture Integrity', () => {
-    const hooksDir = join(process.cwd(), 'assets', 'hooks');
+    const hooksDir = join(process.cwd(), 'assets', 'agents', 'hooks');
 
     it('should contain block-heavy-scripts hook with correct blocking patterns', () => {
         const scriptPath = join(hooksDir, 'block-heavy-scripts.sh');

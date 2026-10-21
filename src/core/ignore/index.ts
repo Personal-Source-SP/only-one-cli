@@ -21,7 +21,7 @@ const TEMPLATE_NAMES: Record<IgnoreTarget, string> = {
 };
 
 export const resolveIgnoreTemplatePath = (metaUrl: string, target: IgnoreTarget): string =>
-    join(resolvePackageRoot(metaUrl), 'assets', 'ignore', TEMPLATE_NAMES[target]);
+    join(resolvePackageRoot(metaUrl), 'assets', 'templates', 'ignore', TEMPLATE_NAMES[target]);
 
 export const selectIgnoreTargets = async (deps: ProgramDeps): Promise<IgnoreTarget[]> => {
     if (!deps.prompts?.checkbox) return [];

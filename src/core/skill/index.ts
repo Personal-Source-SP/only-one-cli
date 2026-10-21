@@ -10,14 +10,14 @@ import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import { generateCommand } from '@/core/command-generation/generator.js';
 import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
-import { SKILLS } from '@assets/skills/index.js';
+import { SKILLS } from '@assets/agents/skills/index.js';
 import { fetchSkillContentFromGitHub } from './remote/github-fetcher.js';
 import { syncGlobalSkillsManifest } from './manifest-bridge.js';
 import { saveSkillToLockfile } from './remote/lockfile.js';
 import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import { installSkillViaSkillsCli } from './remote/skills-sh-installer.js';
 
-const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/skills');
+const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/agents/skills');
 
 export interface ExistingSkill {
     toolId: string;

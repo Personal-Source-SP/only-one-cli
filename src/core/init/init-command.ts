@@ -26,10 +26,10 @@ import { parseJsoncObject } from '@/core/vs/json.js';
 import { cursorMcpAdapter, antigravityMcpAdapter } from '@/core/mcp/adapters.js';
 import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
 import { checkExistingMcps } from '@/core/mcp/index.js';
-import { COMBOS } from '@assets/combos/index.js';
-import { PACKAGES } from '@assets/packages/index.js';
-import { CONFIGS } from '@assets/configs/index.js';
-import { SKILLS } from '@assets/skills/index.js';
+import { COMBOS } from '@assets/agents/combos/index.js';
+import { PACKAGES } from '@assets/agents/packages/index.js';
+import { CONFIGS } from '@assets/templates/configs/index.js';
+import { SKILLS } from '@assets/agents/skills/index.js';
 import type {
     InitCommandRequest,
     InitCommandResponse,
@@ -54,8 +54,8 @@ const readComboManifests = async (): Promise<(ComboManifest & { id: string })[]>
 
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
-const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/skills');
-const configsDir = join(resolvePackageRoot(import.meta.url), 'assets/configs');
+const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/agents/skills');
+const configsDir = join(resolvePackageRoot(import.meta.url), 'assets/templates/configs');
 
 const readPackageManifests = async (): Promise<PackageManifest[]> => {
     return PACKAGES;

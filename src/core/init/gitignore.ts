@@ -37,7 +37,7 @@ const findSectionEnd = (lines: string[], headerIndex: number): number => {
 /** Merge patterns from assets/ignore/git.ignore into a project's .gitignore. */
 export async function updateGitignore(projectDir: string): Promise<void> {
     const gitignorePath = join(projectDir, '.gitignore');
-    const templatePath = join(resolvePackageRoot(import.meta.url), 'assets', 'ignore', 'git.ignore');
+    const templatePath = join(resolvePackageRoot(import.meta.url), 'assets', 'templates', 'ignore', 'git.ignore');
     const template = await readFile(templatePath, 'utf8');
     const sections = parseSections(template);
     const original = existsSync(gitignorePath) ? await readFile(gitignorePath, 'utf8') : '';

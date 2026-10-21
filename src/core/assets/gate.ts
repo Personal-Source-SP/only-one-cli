@@ -1,11 +1,11 @@
 import { execSync } from 'node:child_process';
-import { RULES } from '../../../assets/rules/index.js';
-import { SKILLS } from '../../../assets/skills/index.js';
-import { MCPS } from '../../../assets/mcps/index.js';
-import { PACKAGES } from '../../../assets/packages/index.js';
-import { COMBOS } from '../../../assets/combos/index.js';
-import { GIT_MANIFESTS, GIT_SNIPPETS } from '../../../assets/git/index.js';
-import { VS_LIBRARY } from '../../../assets/vs/index.js';
+import { RULES } from '../../../assets/agents/rules/index.js';
+import { SKILLS } from '../../../assets/agents/skills/index.js';
+import { MCPS } from '../../../assets/agents/mcps/index.js';
+import { PACKAGES } from '../../../assets/agents/packages/index.js';
+import { COMBOS } from '../../../assets/agents/combos/index.js';
+import { GIT_MANIFESTS, GIT_SNIPPETS } from '../../../assets/devenv/shell/index.js';
+import { VS_LIBRARY } from '../../../assets/devenv/editor/index.js';
 import { compareDecimalVersions, isValidDecimalVersion } from './version.js';
 
 export interface AssetChangeViolation {
@@ -60,14 +60,14 @@ export function detectChangedAssetFiles(baseRef = 'origin/main'): string[] {
 export function mapChangedFileToAsset(filePath: string): { type: string; id: string } | null {
     const normalized = filePath.replace(/\\/g, '/');
 
-    // skills: assets/skills/skill-name/...
-    const skillMatch = normalized.match(/^assets\/skills\/([^/]+)\//);
+    // skills: assets/skills/... or assets/agents/skills/...
+    const skillMatch = normalized.match(/^assets\/(?:agents\/)?skills\/([^/]+)\//);
     if (skillMatch) {
         return { type: 'skills', id: skillMatch[1] };
     }
 
-    // rules: assets/rules/foo.md
-    const ruleMatch = normalized.match(/^assets\/rules\/([^/]+)\.md$/);
+    // rules: assets/rules/foo.md or assets/agents/rules/foo.md
+    const ruleMatch = normalized.match(/^assets\/(?:agents\/)?rules\/([^/]+)\.md$/);
     if (ruleMatch) {
         const filename = `${ruleMatch[1]}.md`;
         const matchedRule = RULES.find((r) => r.sourceFile === filename);

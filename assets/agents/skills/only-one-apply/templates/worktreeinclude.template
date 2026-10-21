@@ -1,0 +1,7 @@
+# Worktree Include Specification
+# Danh sách tệp và thư mục được đồng bộ vào Git Worktree mới
+.env
+.env.local
+.agents/
+only-one/
+tsconfig.json

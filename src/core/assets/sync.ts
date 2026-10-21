@@ -1,8 +1,8 @@
 import { join } from 'node:path';
 import { cp, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { SKILLS } from '../../../assets/skills/index.js';
-import { RULES } from '../../../assets/rules/index.js';
+import { SKILLS } from '../../../assets/agents/skills/index.js';
+import { RULES } from '../../../assets/agents/rules/index.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { compareDecimalVersions } from './version.js';
 import { readInstalledLockfile, recordInstalledAssetsBatch, removeInstalledAsset } from './lockfile.js';
@@ -146,7 +146,7 @@ export async function applyAssetUpdates(
             if (item.type === 'rules') {
                 const manifest = RULES.find((r) => r.id === item.id);
                 if (manifest) {
-                    const srcPath = join(packageRoot, 'assets/rules', manifest.sourceFile);
+                    const srcPath = join(packageRoot, 'assets/agents/rules', manifest.sourceFile);
                     if (existsSync(srcPath)) {
                         for (const ad of agentDirs) {
                             const targetDir = join(projectDir, ad, 'rules');
@@ -156,7 +156,7 @@ export async function applyAssetUpdates(
                     }
                 }
             } else if (item.type === 'skills') {
-                const srcPath = join(packageRoot, 'assets/skills', item.id);
+                const srcPath = join(packageRoot, 'assets/agents/skills', item.id);
                 if (existsSync(srcPath)) {
                     for (const ad of agentDirs) {
                         const targetDir = join(projectDir, ad, 'skills', item.id);

@@ -7,12 +7,12 @@ import { type AllowedTarget } from '@/core/target-selection/catalog.js';
 import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import { executePackageActions } from '@/core/init/package-installer.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
-import { RULES } from '@assets/rules/index.js';
+import { RULES } from '@assets/agents/rules/index.js';
 import type { RuleManifest } from '@assets/types.js';
 import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import { validateRuleDependenciesPreflight, buildDeduplicatedDependencyPlan } from './dependencies.js';
 
-const rulesAssetsDir = join(resolvePackageRoot(import.meta.url), 'assets/rules');
+const rulesAssetsDir = join(resolvePackageRoot(import.meta.url), 'assets/agents/rules');
 
 export interface ExistingRule {
     toolId: string;
@@ -98,7 +98,7 @@ export const installRules = async (
         const pkgResult = await executePackageActions({
             deps,
             projectDir,
-            packageManifests: (await import('@assets/packages/index.js')).PACKAGES,
+            packageManifests: (await import('@assets/agents/packages/index.js')).PACKAGES,
             selectedPackageIds: plan.packages,
             execFileAsync: request.execFileAsync,
         });

@@ -1,0 +1,18 @@
+# Development and project metadata
+.git/
+.github/
+.agents/
+.claude/
+.cursor/
+
+# Source and test files
+src/
+test/
+coverage/
+*.test.*
+*.spec.*
+
+# Local files
+.env
+.env.*
+*.log

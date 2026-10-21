@@ -17,12 +17,27 @@ describe('Assets Version Gate & Integrity Verification', () => {
             id: 'only-one-idea',
         });
 
+        expect(mapChangedFileToAsset('assets/agents/skills/only-one-idea/SKILL.md')).toEqual({
+            type: 'skills',
+            id: 'only-one-idea',
+        });
+
         expect(mapChangedFileToAsset('assets/skills/c4-diagrams/SKILL.md')).toEqual({
             type: 'skills',
             id: 'c4-diagrams',
         });
 
+        expect(mapChangedFileToAsset('assets/agents/skills/c4-diagrams/SKILL.md')).toEqual({
+            type: 'skills',
+            id: 'c4-diagrams',
+        });
+
         expect(mapChangedFileToAsset('assets/rules/01-context-and-tools.md')).toEqual({
+            type: 'rules',
+            id: 'context-and-tools',
+        });
+
+        expect(mapChangedFileToAsset('assets/agents/rules/01-context-and-tools.md')).toEqual({
             type: 'rules',
             id: 'context-and-tools',
         });

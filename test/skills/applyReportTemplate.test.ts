@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 import { lintSkill } from '@assets/skills/only-one-evolve/scripts/lint-skill.js';
 
 describe('only-one-apply Concise Report Template Invariants', () => {
-    const skillPath = path.resolve(process.cwd(), 'assets/skills/only-one-apply/SKILL.md');
+    const skillPath = path.resolve(process.cwd(), 'assets/agents/skills/only-one-apply/SKILL.md');
 
-    it('tồn tại file assets/skills/only-one-apply/SKILL.md', () => {
+    it('tồn tại file assets/agents/skills/only-one-apply/SKILL.md', () => {
         expect(fs.existsSync(skillPath)).toBe(true);
     });
 

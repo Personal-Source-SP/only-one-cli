@@ -8,10 +8,10 @@ import type { RunDoctorOptions } from '@/core/doctor/types.js';
 import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
 import { findVsEditor } from '@/core/vs/index.js';
 import { findMcpIdeAdapter } from '@/core/mcp/index.js';
-import { MCPS } from '../../../../assets/mcps/index.js';
-import { SKILLS } from '../../../../assets/skills/index.js';
-import { VS_LIBRARY } from '../../../../assets/vs/index.js';
-import { RULES } from '../../../../assets/rules/index.js';
+import { MCPS } from '@assets/mcps/index.js';
+import { SKILLS } from '@assets/skills/index.js';
+import { VS_LIBRARY } from '@assets/vs/index.js';
+import { RULES } from '@assets/rules/index.js';
 
 export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promise<CheckResult[]> => {
     const results: CheckResult[] = [];

@@ -1,0 +1,10 @@
+# AI project settings
+.agents/
+.claude/
+.cursor/
+
+# Only One
+only-one/
+
+# Git Worktrees
+.worktrees/
