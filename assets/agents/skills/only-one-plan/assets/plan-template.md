@@ -33,38 +33,38 @@ flowchart LR
 
 ## Section 2. File Changes
 
-### 1. `[MODIFY]` `path/to/file.ts`
-
-- **Status**: `[ ]`
-- **Task Type**: `code`
-- **Context**: <Current mechanism in one sentence>.
-- **Target Symbols / AST Seams**: `Class.methodName`.
-- **Invariants**: <Constraint that must not be broken in one sentence>.
-- **Depends On**: None.
-- **Fast Test Command**: `npm test path/to/file.test.ts`.
-
-> **Action**: <Brief one-sentence description of modification purpose>.
-
-```diff
-<unified diff>
-```
-
-### 2. `[NEW]` `path/to/file.test.ts`
+### 1. `[NEW]` `path/to/file.test.ts`
 
 - **Status**: `[ ]`
 - **Task Type**: `code`
 - **Context**: <Test suite purpose>.
 - **Target Symbols / AST Seams**: `describe('...')`.
 - **Invariants**: <Invariants>.
-- **Depends On**: `path/to/file.ts`.
+- **Depends On**: None.
 - **Fast Test Command**: `npm test path/to/file.test.ts`.
 
-> **Action**: <Add test cases for file.ts>.
+> **Action**: <Add test cases specifying target behavior>.
 
 **Test Matrix**
 - [ ] Happy Path: <Scenario>.
 - [ ] Boundary / Edge Cases: <Scenario>.
 - [ ] Failure / Error Handling: <Scenario>.
+
+```diff
+<unified diff>
+```
+
+### 2. `[MODIFY]` `path/to/file.ts`
+
+- **Status**: `[ ]`
+- **Task Type**: `code`
+- **Context**: <Current mechanism in one sentence>.
+- **Target Symbols / AST Seams**: `Class.methodName`.
+- **Invariants**: <Constraint that must not be broken in one sentence>.
+- **Depends On**: `path/to/file.test.ts`.
+- **Fast Test Command**: `npm test path/to/file.test.ts`.
+
+> **Action**: <Brief one-sentence description of modification purpose>.
 
 ```diff
 <unified diff>

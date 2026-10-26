@@ -175,20 +175,26 @@ For `review.md`:
 
 ---
 
-### Step 4 — Apply File Changes Sequentially (Zero Sub-agents Batch Coding)
+### Step 4 — Apply File Changes with Pragmatic TDD Workflow
 
-Main Agent directly applies each file diff in sequence adhering strictly to `Depends On` ordering without sub-agent overhead:
+Main Agent directly executes task blocks in sequence adhering strictly to `Depends On` ordering and Pragmatic TDD discipline:
 
-1. **Direct Sequential Application**:
-   - Mark task `Status` as `[/]` in `plan.md` or `debug.md`.
-   - Inspect target file imports and enforce Reuse-First Invariant.
-   - Normalize target file line endings to LF before performing string replacements on Windows.
-   - Apply code modification precisely via `replace_file_content` or `write_to_file`.
-   - Mark task `Status` as `[x]`.
-   - Proceed immediately to the next task block without pausing to run test commands.
-
-2. **Fast Continuous Workflow**:
-   - Continue applying all remaining task blocks until 100% of planned files are written to disk.
+1. **Test-First Application**:
+   - Đối với các task code có test đi kèm: luôn áp dụng task block test trước, sau đó áp dụng task block code logic.
+   - Chuẩn hóa line endings sang LF trước khi sửa file trên Windows.
+   - Đánh dấu trạng thái task đang xử lý là `Status: [/]`.
+2. **Execute Fast Test Command**:
+   - Chạy ngay lệnh `Fast Test Command` được chỉ định cho cặp task.
+   - Nếu test **PASS (Green)**: Đánh dấu `Status: [x]` cho cả task test và task code, chuyển sang task block tiếp theo.
+3. **Self-Healing Red Loop (Tối đa 3 lần thử)**:
+   - Nếu test **FAIL (Red)**:
+     - Dừng lại, đọc thông báo lỗi từ test runner (stack trace, assertion failure).
+     - Khu biệt nguyên nhân và điều chỉnh mã nguồn triển khai.
+     - Chạy lại `Fast Test Command`.
+     - Lặp lại tối đa 3 lần thử (Retry limit: 3).
+     - Nếu sau 3 lần thử vẫn thất bại: Dừng toàn bộ tiến trình, giữ nguyên trạng thái `Status: [/]`, và báo cáo chi tiết nguyên nhân lỗi cho PM để xin chỉ dẫn.
+4. **Non-code Tasks**:
+   - Đối với các task `non-code`: Áp dụng diff, kiểm tra syntax/lint nếu có, và đánh dấu `[x]` mà không kích hoạt test loop.
 
 ---
 

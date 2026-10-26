@@ -56,23 +56,23 @@ flowchart LR
     A --> B
 \`\`\`
 ## Section 2. File Changes
-### 1. [MODIFY] file.ts
+### 1. [NEW] file.test.ts
 - **Status**: [ ]
 - **Task Type**: code
 - **Depends On**: None
-- **Fast Test Command**: npm test file.test.ts
-\`\`\`diff
-+ line
-\`\`\`
-### 2. [NEW] file.test.ts
-- **Status**: [ ]
-- **Task Type**: code
-- **Depends On**: file.ts
 - **Fast Test Command**: npm test file.test.ts
 **Test Matrix**:
 - [ ] Happy Path
 - [ ] Boundary / Edge Cases
 - [ ] Failure / Error Handling
+\`\`\`diff
++ line
+\`\`\`
+### 2. [MODIFY] file.ts
+- **Status**: [ ]
+- **Task Type**: code
+- **Depends On**: file.test.ts
+- **Fast Test Command**: npm test file.test.ts
 \`\`\`diff
 + line
 \`\`\`
@@ -179,6 +179,48 @@ status: planned
         const res = validatePlan(invalidPlan);
         expect(res.valid).toBe(false);
         expect(res.errors.some((e) => e.includes('Non-code tasks must not target test files'))).toBe(true);
+    });
+
+    it('flags error when code task appears before its corresponding test task', () => {
+        const invalidOrderPlan = `---
+slug: test
+status: planned
+---
+# Plan
+## Section 1. Directory Structure Changes
+## Section 1.5. Story Board
+### Story 1: Feature [MODIFY]
+- **Before**: Old.
+- **After**: New.
+\`\`\`mermaid
+flowchart LR
+    A --> B
+\`\`\`
+## Section 2. File Changes
+### 1. [MODIFY] src/service.ts
+- **Status**: [ ]
+- **Task Type**: code
+- **Fast Test Command**: npm test src/service.test.ts
+\`\`\`diff
++ line
+\`\`\`
+### 2. [NEW] src/service.test.ts
+- **Status**: [ ]
+- **Task Type**: code
+- **Depends On**: None
+- **Fast Test Command**: npm test src/service.test.ts
+**Test Matrix**:
+- [ ] Happy Path
+- [ ] Boundary / Edge Cases
+- [ ] Failure / Error Handling
+\`\`\`diff
++ line
+\`\`\`
+## Section 3. Test Cases & Verification
+`;
+        const res = validatePlan(invalidOrderPlan);
+        expect(res.valid).toBe(false);
+        expect(res.errors.some((e) => e.includes('Pragmatic TDD violation'))).toBe(true);
     });
 
     it('parses plan tasks and partitions next wave', () => {

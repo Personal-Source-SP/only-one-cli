@@ -148,7 +148,7 @@ status: concept
 
 ## 3. Proposed Solution & Core Mechanism (Giải pháp đề xuất & Cơ chế cốt lõi)
 - **Core Mechanism**: <Giải pháp khái niệm và mô hình hoạt động; không viết mã nguồn, mã giả, chữ ký hàm hoặc đường dẫn file cụ thể>.
-- **Conceptual Flow / Domain Model**: <Bắt buộc có sơ đồ Mermaid hoặc ASCII biểu diễn luồng dữ liệu, chuyển đổi trạng thái hoặc tương tác hệ thống qua c4-diagrams; không viết văn xuôi đơn điệu>.
+- **Conceptual Flow / Domain Model**: <Bắt buộc có sơ đồ Mermaid hoặc ASCII biểu diễn luồng dữ liệu, chuyển đổi trạng thái hoặc tương tác hệ thống qua c4-diagrams; luôn bọc nhãn và tiêu đề subgraph trong dấu ngoặc kép ["..."] để tránh lỗi cú pháp; không viết văn xuôi đơn điệu>.
 - *(Optional)* **UI Wireframe**: <Giao diện wireframe ASCII nếu tính năng có UI>.
 
 ## 4. Critical Risks & Edge Cases (Rủi ro & Xử lý ngoại lệ)
@@ -176,6 +176,11 @@ status: concept
 - **Enforce Clear Technical Writing**: Write concise specifications in the user's preferred language (e.g., Vietnamese), preserving standard English technical terms.
 - **Enforce 80% ASD-STE100 Writing Standard**: Eliminate AI slop, restrict sentence length (instructions <= 20 words, descriptions <= 25 words), ban passive voice, and structure actions using Prerequisites -> Action -> Verification.
 - **Enforce Visual-First Domain Modeling**: Mandatory Mermaid/ASCII diagram in Section 3 for multi-step flows; never replace diagrams with monolithic narrative blocks.
+- **🛑 Strict Mermaid Syntax & Quotation Invariant**:
+  - Always wrap ALL node labels and subgraph titles in double quotes: `id["Text"]`, `subgraph Plan ["Plan Title"]`.
+  - NEVER write `[/text]` or `[\text]` because Mermaid interprets `[/` as TRAPSTART (trapezoid shape token), causing fatal parse errors.
+  - NEVER nest unescaped square brackets like `[x]` inside node labels; use `(x)` or simple words instead.
+  - NEVER use raw `<` or `>` characters inside labels (HTML tag conflict); use `≤`, `≥`, or text instead.
 - **Do not skip Phase 1 discovery**: Clarify problem and scope boundaries thoroughly before proposing solution options.
 - **Always explore and present at least 2 solution options with trade-offs** before finalizing the chosen strategy.
 - **Strict Concept Boundary**: Never include source code, pseudocode, unified diffs, symbol signatures, file paths, or file-level implementation instructions.

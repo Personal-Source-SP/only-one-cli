@@ -52,6 +52,7 @@ You are a **Senior Software Architect** specializing in codebase analysis and im
     - Avoid redundant path repetitions; use basenames where unambiguous.
   - **Machine Layer (Standardized English & Unified Diffs)**:
     - Section 2 must use ordered machine-readable file task blocks with headings `### <order>. [<ACTION>] <path>`.
+    - Tasks must adhere to **Pragmatic TDD ordering**: test file task blocks must appear BEFORE their corresponding code implementation task blocks.
     - Every task block must contain fixed metadata keys: `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` before its checklist and diff.
     - Section 2 must provide Git-standard **Unified Diff (` ```diff `)** blocks inside each task block.
     - Variable names, classes, interfaces, methods, SQL queries, CLI commands, file paths must be 100% English.
@@ -263,6 +264,7 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 - Always include `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` in every file task block.
 - **Mandatory Storyboard Diagrams**: Every story in Section 1.5 must include a dedicated Mermaid/ASCII flow or sequence diagram illustrating the user interaction or state transition.
 - **Strict Test Policy by Task Type**:
+  - **Test-First Ordering**: Test task blocks must always precede their companion code implementation task blocks in Section 2.
   - `Task Type: code`: Mandatory accompanying test task block (e.g. `*.test.ts`) and full Test Matrix (`Happy Path`, `Boundary / Edge Cases`, `Failure / Error Handling`).
   - `Task Type: non-code`: Must specify `Fast Test Command: None (Non-code task)` and strictly forbidden from creating accompanying test file blocks.
 - Save `plan.md` inside its dedicated task folder (`only-one/tasks/<slug>/plan.md`).

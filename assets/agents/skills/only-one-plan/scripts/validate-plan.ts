@@ -114,6 +114,19 @@ export function validatePlan(content: string): PlanValidationResult {
         if (!/```diff[\s\S]*?```/i.test(singleBlock)) errors.push(`Task ${idx + 1} (${filePath}): Missing Git Unified Diff block`);
     });
 
+    taskMatches.forEach((match, idx) => {
+        const filePath = match[2].trim();
+        if (testFileRegex.test(filePath)) {
+            const basePath = filePath.replace(/\.(test|spec)\./, '.').replace(/_test\./, '.');
+            const codeTaskIdx = taskMatches.findIndex((m) => m[2].trim() === basePath);
+            if (codeTaskIdx !== -1 && codeTaskIdx < idx) {
+                errors.push(
+                    `Task ${idx + 1} (${filePath}): Pragmatic TDD violation - test task must appear before code task '${basePath}' (Task ${codeTaskIdx + 1})`
+                );
+            }
+        }
+    });
+
     return {
         valid: errors.length === 0,
         taskCount,
