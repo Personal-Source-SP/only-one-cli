@@ -230,26 +230,17 @@ Main Agent directly applies each file diff in sequence adhering strictly to `Dep
    - Report MUST strictly follow this concise schema:
 
 ```markdown
-# 🏁 Hoàn thành tác vụ: `<slug>`
+# 🏁 Hoàn tất: `<slug>` (`status: done` / `fixed`)
 
-### 1. Cấu trúc source thay đổi
+### 1. Tệp thay đổi
 ```text
 src/
-├── [NEW]    path/to/newFile.ts
-└── [MODIFY] path/to/modFile.ts
+├── [NEW]    path/to/newFile.ts   # <Mô tả ngắn gọn>
+└── [MODIFY] path/to/modFile.ts   # <Mô tả ngắn gọn>
 ```
 
-### 2. Các công việc đã xử lý
-- <Tóm tắt công việc 1 đã thực hiện trong quá trình>.
-- <Tóm tắt công việc 2 đã thực hiện trong quá trình>.
-- <Tóm tắt công việc 3 đã thực hiện trong quá trình>.
-
-### 3. Nghiệm thu & Kiểm thử
-- **Trạng thái**: Hoàn tất (`status: done` / `fixed`).
-- **Kiểm thử**: `<Lệnh test>` -> `PASS (X test passed)`.
-
-### 4. Bước tiếp theo
-- `/only-one-review` | `/only-one-pr-git` | `/only-one-clean`
+### 2. Nghiệm thu & Kiểm thử
+- `<Lệnh test>` -> `PASS (X tests passed)`
 ```
 
 4. **Capture In-Task Friction Points & Opportunities (`improvements.md`)**:
