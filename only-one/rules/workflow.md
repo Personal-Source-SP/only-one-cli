@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.1.0
+version: 1.2.0
 triggers:
   - ".agents/workflows/**"
   - "assets/workflows/**"
@@ -48,4 +48,9 @@ triggers:
 - **MUST_DO**: Present the final completion report in chat using the 4 crisp sections (Source Structure Changes, Work Processed, Acceptance & Tests, Next Steps) with zero extra disk files (`walkthrough.md`).
 - **NEVER_DO**: Emit verbose per-file descriptions, raw unformatted diffs, or loose unstandardized chat summaries upon task completion.
 - **RATIONALE**: Standardizes scanning speed, keeps context token-efficient, and guarantees instantaneous reviewer comprehension.
+
+### WF-009: Dual-Engine Worktree Isolation & Rebase-First Guard
+- **MUST_DO**: Execute branch implementations in isolated git worktrees (`.worktrees/<slug>`) with junction-synchronized dependencies, and verify against upstream using a Rebase-First Guard before merge.
+- **NEVER_DO**: Perform multi-file destructive operations directly in the primary working tree without worktree isolation.
+- **RATIONALE**: Protects the main working tree from unverified mutations and prevents downstream branch divergence.
 

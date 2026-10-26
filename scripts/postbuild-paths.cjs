@@ -26,15 +26,44 @@ function replaceInDir(dir) {
                 needsWrite = true;
             }
 
-            if (content.includes("'@assets/") || content.includes('"@assets/')) {
+            const hasAssetsAlias =
+                content.includes('@assets/') ||
+                content.includes('@agents/') ||
+                content.includes('@devenv/') ||
+                content.includes('@templates/');
+
+            if (hasAssetsAlias) {
                 const relToAssets = relative(dir, join(distDir, 'assets'));
                 const prefixAssets = relToAssets.split(sep).join('/');
                 const prefix = prefixAssets.startsWith('.') ? prefixAssets + '/' : './' + prefixAssets + '/';
-                cleaned = cleaned
-                    .replaceAll(/from '@assets\//g, "from '" + prefix)
-                    .replaceAll(/from "@assets\//g, 'from "' + prefix)
-                    .replaceAll(/import\('@assets\//g, "import('" + prefix)
-                    .replaceAll(/import\("@assets\//g, 'import("' + prefix);
+
+                const domainMappings = [
+                    ['@assets/skills/', prefix + 'agents/skills/'],
+                    ['@assets/rules/', prefix + 'agents/rules/'],
+                    ['@assets/mcps/', prefix + 'agents/mcps/'],
+                    ['@assets/packages/', prefix + 'agents/packages/'],
+                    ['@assets/combos/', prefix + 'agents/combos/'],
+                    ['@assets/hooks/', prefix + 'agents/hooks/'],
+                    ['@assets/vs/', prefix + 'devenv/editor/'],
+                    ['@assets/git/', prefix + 'devenv/shell/'],
+                    ['@assets/configs/', prefix + 'templates/configs/'],
+                    ['@assets/ignore/', prefix + 'templates/ignore/'],
+                    ['@assets/agents/', prefix + 'agents/'],
+                    ['@assets/devenv/', prefix + 'devenv/'],
+                    ['@assets/templates/', prefix + 'templates/'],
+                    ['@agents/', prefix + 'agents/'],
+                    ['@devenv/', prefix + 'devenv/'],
+                    ['@templates/', prefix + 'templates/'],
+                    ['@assets/', prefix],
+                ];
+
+                for (const [alias, target] of domainMappings) {
+                    cleaned = cleaned
+                        .replaceAll("from '" + alias, "from '" + target)
+                        .replaceAll('from "' + alias, 'from "' + target)
+                        .replaceAll("import('" + alias, "import('" + target)
+                        .replaceAll('import("' + alias, 'import("' + target);
+                }
                 needsWrite = true;
             }
 

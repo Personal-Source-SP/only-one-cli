@@ -1,6 +1,6 @@
 ---
 domain: core
-version: 1.0.0
+version: 1.1.0
 triggers:
   - "*"
   - "only-one/archives/**"
@@ -33,4 +33,9 @@ triggers:
 - **MUST_DO**: Route all global assets to the canonical user root `~/.agents/{skills,workflows,rules}` and non-destructively bridge `skills.json` manifests across tool configurations.
 - **NEVER_DO**: Install global assets directly into legacy tool-specific directories without canonical `.agents` registry synchronization.
 - **RATIONALE**: Unifies global agent discovery across different AI runners (Antigravity, Claude, Codex) while preserving backward compatibility.
+
+### CORE-006: 3-Domain Asset Hierarchy Without Shims
+- **MUST_DO**: Categorize all assets strictly within the 3 standardized domains (`assets/agents/`, `assets/devenv/`, `assets/templates/`) and update all path mappings directly.
+- **NEVER_DO**: Retain legacy flat asset directories at the root of `assets/` or introduce temporary re-export facade shims.
+- **RATIONALE**: Eliminates structural ambiguity, prevents stale path fallbacks, and maintains clean separation between AI agents, development tooling, and shared templates.
 

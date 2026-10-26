@@ -1,6 +1,6 @@
 ---
 domain: cli
-version: 1.1.0
+version: 1.2.0
 triggers:
   - "src/commands/**"
   - "src/core/runtime/**"
@@ -43,4 +43,9 @@ triggers:
 - **MUST_DO**: Explicitly permit `node_modules` inside standalone build distributions (e.g. `.next/standalone`) during archive packaging and synchronize static runtime assets (`.next/static`).
 - **NEVER_DO**: Apply raw unfiltered directory exclusions (`child === 'node_modules'`) across recursive packaging routines.
 - **RATIONALE**: Standalone builds package isolated production dependencies in nested `node_modules`; omitting them causes fatal runtime `MODULE_NOT_FOUND` errors on execution.
+
+### CLI-008: Domain Subpath Mapping in Postbuild Asset Transformers
+- **MUST_DO**: Explicitly map alias domain subpaths (`@assets/ignore/` -> `templates/ignore/`, `@assets/skills/` -> `agents/skills/`, `@assets/rules/` -> `agents/rules/`) in postbuild ESM path transformer scripts.
+- **NEVER_DO**: Rely on generic flat alias prefix replacement that fails to mirror the domain directory structure in `dist/assets/`.
+- **RATIONALE**: Node.js ESM loader requires exact relative file paths to existing `.js` files; unmapped aliases cause fatal `ERR_MODULE_NOT_FOUND` crashes at runtime.
 

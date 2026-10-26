@@ -1,9 +1,9 @@
 ---
 domain: tui
-version: 1.4.0
+version: 1.5.0
 triggers:
-  - "packages/tui-engine/**"
   - "src/tui/**"
+  - "src/commands/tui/**"
   - "src/prompts/**"
 ---
 
@@ -63,3 +63,8 @@ triggers:
 - **MUST_DO**: Render concurrent background/worker agent jobs on dedicated discrete lines with individual spinners, elapsed durations, and cleaned action logs.
 - **NEVER_DO**: Overload concurrent progress updates into a single truncated string or overwrite previous active jobs.
 - **RATIONALE**: Preserves clear operator observability across multiple parallel dispatch panes simultaneously.
+
+### TUI-012: Native Go Bubble Tea Binary Bridge Execution
+- **MUST_DO**: Delegate all interactive terminal interfaces (Kanban board, resource init wizard) directly to the native Go Bubble Tea binary via `src/tui/bridge.ts`.
+- **NEVER_DO**: Re-introduce React Ink or Node-based terminal UI libraries as runtime dependencies or fallback renderers.
+- **RATIONALE**: React Ink introduces heavy Node.js runtime overhead, terminal flicker, and large dependency footprints; native Go Bubble Tea binaries deliver instant startup and zero event-loop blocking.

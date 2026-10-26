@@ -4,9 +4,10 @@ title: Kiến Trúc Hợp Nhất của Hệ Thống Workflows, SDLC Lanes, DAG S
 domain: workflow
 triggers:
   - ".agents/workflows/**"
-  - "assets/workflows/**"
+  - "assets/agents/workflows/**"
   - ".agents/skills/**"
-archived_at: 2026-10-20T22:06:00+07:00
+  - "assets/agents/skills/**"
+archived_at: 2026-10-26T21:30:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -15,10 +16,11 @@ references:
   - only-one/archives/mcp-registry-and-servers.md
   - only-one/archives/cli-tooling-and-cocoindex-purge.md
 affected_modules:
-  - assets/skills
-  - assets/workflows
-  - assets/combos
-  - assets/rules
+  - assets/agents/skills
+  - assets/agents/workflows
+  - assets/agents/combos
+  - assets/agents/rules
+  - assets/agents/skills/only-one-apply
   - .agents/workflows
   - .agents/skills
   - test/skills
@@ -74,8 +76,12 @@ affected_modules:
    - Phân tích trường `Depends On` để nhóm các task độc lập thành các Execution Waves.
    - Áp dụng **Disjoint File Invariant** ngăn chặn 2 Sub-agents sửa chung 1 file cùng lúc.
    - Parallel Dispatch với 3-4 Sub-agents chạy song song và Barrier Synchronization giữa các wave.
-10. **Chống Nịnh bợ & Tư duy Phản biện ([`sparring-partner`](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/sparring-partner/SKILL.md))**:
+10. **Chống Nịnh bợ & Tư duy Phản biện ([`sparring-partner`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/sparring-partner/SKILL.md))**:
    - Loại bỏ lời khen sáo rỗng (*Zero Sycophantic Fillers*), đánh giá rủi ro theo 5 trục kỹ thuật (Boundary conditions, Simplicity, Blast radius, Concurrency, Security) và đề xuất phương án thay thế tốt hơn trước khi đồng thuận.
+11. **Kiến Trúc Dual-Engine Worktree & Rebase-First Guard ([`only-one-apply`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-apply/SKILL.md))**:
+   - Hỗ trợ 2 chế độ thực thi: *Worktree Mode* (cô lập an toàn trên `.worktrees/<slug>` với junction symlinks liên kết `node_modules` và shared configs) và *In-Place Mode* (thực thi trực tiếp trên branch hiện tại).
+   - Tự động hóa điều phối vòng đời worktree qua `assets/agents/skills/only-one-apply/scripts/worktree-runner.ts` và mẫu cấu hình `templates/worktreeinclude.template`.
+   - Step 5b kích hoạt Rebase-First Guard tự động rebase lên upstream và chạy kiểm thử hồi quy trước khi merge thay đổi về nhánh chính.
 
 ---
 

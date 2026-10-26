@@ -1,12 +1,12 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { IGNORE_TEMPLATES, IgnoreTarget } from '@assets/ignore/index.js';
+import { IGNORE_TEMPLATES, IgnoreTarget } from '@assets/templates/ignore/index.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { updateGitignore } from '@/core/init/gitignore.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
-export { IgnoreTarget } from '@assets/ignore/index.js';
+export { IgnoreTarget } from '@assets/templates/ignore/index.js';
 
 export interface IgnoreWriteResult {
     added: number;
