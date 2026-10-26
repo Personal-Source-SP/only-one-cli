@@ -7,7 +7,7 @@ triggers:
   - "assets/agents/workflows/**"
   - ".agents/skills/**"
   - "assets/agents/skills/**"
-archived_at: 2026-10-26T21:30:00+07:00
+archived_at: 2026-10-27T00:03:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -82,6 +82,14 @@ affected_modules:
    - Hỗ trợ 2 chế độ thực thi: *Worktree Mode* (cô lập an toàn trên `.worktrees/<slug>` với junction symlinks liên kết `node_modules` và shared configs) và *In-Place Mode* (thực thi trực tiếp trên branch hiện tại).
    - Tự động hóa điều phối vòng đời worktree qua `assets/agents/skills/only-one-apply/scripts/worktree-runner.ts` và mẫu cấu hình `templates/worktreeinclude.template`.
    - Step 5b kích hoạt Rebase-First Guard tự động rebase lên upstream và chạy kiểm thử hồi quy trước khi merge thay đổi về nhánh chính.
+12. **Section 1.5 Story Board & Trực Quan Hóa Từng Câu Chuyện (Visual Story Board)**:
+   - Bắt buộc mỗi story trong `plan.md` phải có mục mô tả Before/After kèm theo một sơ đồ Mermaid biểu diễn sự khác biệt trạng thái hệ thống.
+13. **Chu Trình Pragmatic TDD & Self-Healing Red Loop (`only-one-plan` & `only-one-apply`)**:
+   - **Test-First Ordering**: Trong Section 2 của `plan.md`, các task block test (e.g. `*.test.ts`) bắt buộc phải xuất hiện trước task block triển khai code tương ứng. Linter `validate-plan.ts` tự động phát hiện vi phạm (`Pragmatic TDD violation`).
+   - **Fast Test per File**: `only-one-apply` thực thi theo cặp test-code, chạy ngay `Fast Test Command` sau khi sửa file.
+   - **Self-Healing Red Loop (Retry limit: 3)**: Khi test fail, hệ thống tự động phân tích stack trace và thử nghiệm chỉnh sửa tối đa 3 lần. Nếu sau 3 lần vẫn thất bại thì dừng lại và xin chỉ dẫn từ PM.
+14. **Lá Chắn Cú Pháp Mermaid (Mermaid Lexer Shield)**:
+   - Quote 100% nhãn node và subgraph, cấm dùng cú pháp trần `[/label]` để triệt tiêu lỗi token hình thang `TRAPSTART`. Thay thế ký tự `<` bằng `≤` để tránh lỗi parse unclosed HTML tag.
 
 ---
 

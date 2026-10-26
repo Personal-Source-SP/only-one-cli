@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.2.0
+version: 1.3.0
 triggers:
   - ".agents/workflows/**"
   - "assets/workflows/**"
@@ -53,4 +53,14 @@ triggers:
 - **MUST_DO**: Execute branch implementations in isolated git worktrees (`.worktrees/<slug>`) with junction-synchronized dependencies, and verify against upstream using a Rebase-First Guard before merge.
 - **NEVER_DO**: Perform multi-file destructive operations directly in the primary working tree without worktree isolation.
 - **RATIONALE**: Protects the main working tree from unverified mutations and prevents downstream branch divergence.
+
+### WF-010: Mermaid Subgraph and Node Lexer Shield
+- **MUST_DO**: Quote all node and subgraph labels in double quotes (e.g. `subgraph Phase ["Title"]`), escape special characters, and replace `<` with `≤`.
+- **NEVER_DO**: Use bare unquoted slashes after brackets (e.g. `[/only-one-idea]`) or unescaped angle brackets.
+- **RATIONALE**: Bare bracket slashes trigger Mermaid trapezoid `TRAPSTART` lexer errors, and unescaped angle brackets break SVG rendering as unclosed HTML tags.
+
+### WF-011: Pragmatic TDD Ordering Invariant
+- **MUST_DO**: Position test task blocks strictly BEFORE companion implementation code blocks in `plan.md` Section 2, and enforce test verification per file pair in `/only-one-apply` with a 3-retry self-healing ceiling.
+- **NEVER_DO**: Author code task blocks before their test blocks, or apply code changes without immediately executing companion fast test commands.
+- **RATIONALE**: Guarantees test-driven rigor, prevents false-green regression, and stops cascading syntax/logic errors early.
 
