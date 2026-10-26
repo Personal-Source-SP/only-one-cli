@@ -2,7 +2,8 @@
 task_slug: enhance-tui-task-display-and-routing
 created_at: 2026-10-21T02:52:00.000Z
 archived_at: 2026-10-21T10:05:52+07:00
-status: pending
+status: applied
+applied_at: 2026-10-26T14:50:55.761Z
 target_skills:
   - only-one-plan
 ---

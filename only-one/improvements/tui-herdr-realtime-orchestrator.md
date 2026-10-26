@@ -1,5 +1,6 @@
 ---
-status: pending
+status: applied
+applied_at: 2026-10-26T14:50:55.761Z
 archived_at: 2026-10-20T09:08:50.311Z
 task_slug: tui-herdr-realtime-orchestrator
 created_at: 2026-10-20T07:42:59.983Z

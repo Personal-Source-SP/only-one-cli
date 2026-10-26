@@ -2,7 +2,8 @@
 task_slug: init-tui-assets-sidebar
 created_at: 2026-10-20T09:35:43.282Z
 archived_at: 2026-10-20T18:35:00+07:00
-status: pending
+status: applied
+applied_at: 2026-10-26T14:50:55.761Z
 target_skills:
   - only-one-plan
 ---

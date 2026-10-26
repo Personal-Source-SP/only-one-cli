@@ -2,7 +2,8 @@
 task_slug: debug-archives-structure-inconsistency
 created_at: 2026-10-20T08:19:34.291Z
 archived_at: 2026-10-20T16:08:30+07:00
-status: pending
+status: applied
+applied_at: 2026-10-26T14:50:55.761Z
 target_skills:
   - only-one-apply
 ---

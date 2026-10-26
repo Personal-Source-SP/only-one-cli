@@ -24,15 +24,15 @@ This skill aggregates staged task improvement notes from `only-one/improvements/
 This skill bundles deterministic helper scripts to avoid manual token-heavy file parsing and ensure anti-bloat compliance:
 - **`scripts/aggregate.ts`**: Scans `only-one/improvements/`, parses frontmatter, deduplicates, and outputs structured JSON.
   ```bash
-  npx tsx assets/skills/only-one-evolve/scripts/aggregate.ts [<skill-name>]
+  npx tsx assets/agents/skills/only-one-evolve/scripts/aggregate.ts [<skill-name>]
   ```
 - **`scripts/lint-skill.ts`**: Audits `SKILL.md` for frontmatter integrity, ASD-STE100 sentence lengths, and token bloat.
   ```bash
-  npx tsx assets/skills/only-one-evolve/scripts/lint-skill.ts <path-to-skill>
+  npx tsx assets/agents/skills/only-one-evolve/scripts/lint-skill.ts <path-to-skill>
   ```
 - **`scripts/scaffold-linter-rule.ts`**: Tự động sinh mã ESLint AST rule khi phát hiện lỗi lặp lại có tính chất cú pháp.
   ```bash
-  npx tsx assets/skills/only-one-evolve/scripts/scaffold-linter-rule.ts <rule-slug> "<description>" <ASTNode>
+  npx tsx assets/agents/skills/only-one-evolve/scripts/scaffold-linter-rule.ts <rule-slug> "<description>" <ASTNode>
   ```
 
 ## Role
@@ -77,7 +77,7 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 
 1. Execute the bundled aggregation script via shell:
    ```bash
-   npx tsx assets/skills/only-one-evolve/scripts/aggregate.ts [skill-name]
+   npx tsx assets/agents/skills/only-one-evolve/scripts/aggregate.ts [skill-name]
    ```
 2. Inspect the JSON output:
    - If `totalPending` is 0: Report "No pending skill improvements found in only-one/improvements/." and stop.
@@ -103,8 +103,8 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 ### Step 3 — Draft Unified Diff & Human Approval Gate
 
 1. Locate the target `SKILL.md` file:
-   - Workspace asset: `assets/skills/<skill>/SKILL.md`.
-   - Global config: `C:\Users\ADMIN\.gemini\config\skills\<skill>\SKILL.md`.
+   - Workspace asset: `assets/agents/skills/<skill>/SKILL.md`.
+   - Global config: `C:\Users\ADMIN\.agents\skills\<skill>\SKILL.md` or `C:\Users\ADMIN\.gemini\config\skills\<skill>\SKILL.md`.
 2. Compose a clean, minimal Git-standard Unified Diff (` ```diff `) modifying the appropriate section (`Protocol` or `Guardrails`).
 3. Present the proposed changes clearly to the user:
    - Target skill name and file path.
@@ -124,7 +124,7 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
    - Increment the minor/patch version in `SKILL.md` frontmatter if applicable.
 2. Run the skill linter script to ensure zero bloat:
    ```bash
-   npx tsx assets/skills/only-one-evolve/scripts/lint-skill.ts <path-to-target-SKILL.md>
+   npx tsx assets/agents/skills/only-one-evolve/scripts/lint-skill.ts <path-to-target-SKILL.md>
    ```
    - If linter reports violations: Re-tighten prose and fix violations immediately.
 3. Update all processed improvement files in `only-one/improvements/`:

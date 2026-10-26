@@ -239,5 +239,8 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 - **🛑 Mandatory File-Centric Research & Compliance Gate**: Always identify target files first, then selectively load matching IDE framework skills and `only-one` rules/archives. Proposed diffs must comply 100% with loaded skills and rules.
 - **🛑 Strict Single-Document Invariant (Zero IDE Plan Artifacts)**: Only produce the canonical `only-one/tasks/<slug>/plan.md`. Never generate duplicate IDE internal plan files (e.g. `implementation_plan.md`).
 - **Enforce Reuse-First Invariant**: Always identify and declare reused existing utilities/helpers in Section 2; never propose reinventing existing functions.
+- **Enforce Serializer & Fallback Compatibility**: Handle both `time.Time` and `string` for timestamp fields, and plan document metadata fallback chains across stages.
+- **Validate UI Component Typings**: Verify layout properties against framework typings (e.g. Ink `Box` vs `Text`) before proposing JSX or TUI diffs.
+- **Synchronize Diff and Test Assertions**: Ensure regular expressions and validation logic match identically between implementation diffs and test assertions.
 - Always include `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` in every file task block.
 - Save `plan.md` inside its dedicated task folder (`only-one/tasks/<slug>/plan.md`).

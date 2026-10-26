@@ -182,6 +182,7 @@ Main Agent directly applies each file diff in sequence adhering strictly to `Dep
 1. **Direct Sequential Application**:
    - Mark task `Status` as `[/]` in `plan.md` or `debug.md`.
    - Inspect target file imports and enforce Reuse-First Invariant.
+   - Normalize target file line endings to LF before performing string replacements on Windows.
    - Apply code modification precisely via `replace_file_content` or `write_to_file`.
    - Mark task `Status` as `[x]`.
    - Proceed immediately to the next task block without pausing to run test commands.
@@ -195,6 +196,7 @@ Main Agent directly applies each file diff in sequence adhering strictly to `Dep
 
 1. Run the full repository test and lint commands:
    ```bash
+   npm run format:check
    npm test
    npm run lint
    ```
@@ -265,6 +267,8 @@ src/
 - **🛑 Strict Task Document Invariant (Zero walkthrough.md Creation)**: Each task folder must contain ONLY `concept.md`, `plan.md` (or `debug.md`), and optional `improvements.md`. Never generate a separate `walkthrough.md` file on disk. Present walkthrough results directly in the conversation response.
 - **🛑 Strict Tech Skill & Rule Adherence**: Applied code must strictly adhere to active language/tech skills and repository rules. Agent MUST NOT write arbitrary code based on personal assumptions.
 - **Enforce Reuse-First Verification**: Always inspect target file imports and utilize project shared utilities; never duplicate existing code.
+- **Normalize Line Endings**: Convert target file line endings to LF before applying edits when running on Windows.
+- **Verify Code Formatting**: Run repository format check before completing verification to prevent build and CI failures.
 - Prioritize parsing ordered Section 2 file task blocks identically for `plan.md` and `debug.md`.
 - Execute `Fast Test Command` per file before proceeding to the next.
 - Maintain Beyoncé Rule at all times.
