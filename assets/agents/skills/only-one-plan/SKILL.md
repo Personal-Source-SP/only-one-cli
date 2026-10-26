@@ -52,7 +52,7 @@ You are a **Senior Software Architect** specializing in codebase analysis and im
     - Avoid redundant path repetitions; use basenames where unambiguous.
   - **Machine Layer (Standardized English & Unified Diffs)**:
     - Section 2 must use ordered machine-readable file task blocks with headings `### <order>. [<ACTION>] <path>`.
-    - Every task block must contain fixed metadata keys: `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` before its checklist and diff.
+    - Every task block must contain fixed metadata keys: `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` before its checklist and diff.
     - Section 2 must provide Git-standard **Unified Diff (` ```diff `)** blocks inside each task block.
     - Variable names, classes, interfaces, methods, SQL queries, CLI commands, file paths must be 100% English.
 - Produce a single reviewable `plan.md` artifact at the designated independent task folder (`only-one/tasks/<slug>/plan.md`). Do not implement anything or modify project source code during this workflow.
@@ -152,7 +152,7 @@ branch: ~
 
 ---
 
-### Plan Output Structure (The 3 Core Sections - File-Centric & Diff-Centric)
+### Plan Output Structure (The Core Sections - File-Centric & Diff-Centric)
 
 ```markdown
 # Plan: <Implementation Plan Name>
@@ -169,6 +169,23 @@ src/modules/order/
     └── [MODIFY] StationsPage.tsx     # Controlled Select components & event handlers
 ```
 
+## Section 1.5. Story Board (User Journey & Feature Scenarios)
+Mô tả kịch bản hành vi kèm sơ đồ trực quan dưới mỗi story cho từng tính năng:
+
+### Story 1: Feature / Component Name [NEW|MODIFY|DELETE]
+- **User Story**: As a <role>, I want <goal> so that <benefit>.
+- **Before**: <Trạng thái hoặc hành vi trước khi có thay đổi>.
+- **After**: <Trạng thái hoặc hành vi sau khi có thay đổi>.
+- **Key Scenarios**:
+  - *Scenario 1 (Happy Path)*: ...
+  - *Scenario 2 (Boundary / Edge Cases)*: ...
+  - *Scenario 3 (Failure / Error Handling)*: ...
+
+```mermaid
+flowchart LR
+    A[Trạng thái Trước] -->|Hành động Người dùng| B[Trạng thái Sau]
+```
+
 ## Section 2. File Changes
 
 ### Architectural Interaction Diagram (Mandatory for >= 2 modules or async flows)
@@ -179,6 +196,7 @@ Each file is a machine-readable task block. Preserve the exact heading format an
 ### 1. `[MODIFY]` `path/to/file.ts`
 
 - **Status**: `[ ]`
+- **Task Type**: `code`
 - **Context**: <Bối cảnh hiện tại bằng tiếng Việt, tối đa 25 từ>.
 - **Target Symbols / AST Seams**: `Class.methodName`.
 - **Invariants**: <Ràng buộc bất biến bằng tiếng Việt, tối đa 25 từ>.
@@ -242,5 +260,9 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 - **Enforce Serializer & Fallback Compatibility**: Handle both `time.Time` and `string` for timestamp fields, and plan document metadata fallback chains across stages.
 - **Validate UI Component Typings**: Verify layout properties against framework typings (e.g. Ink `Box` vs `Text`) before proposing JSX or TUI diffs.
 - **Synchronize Diff and Test Assertions**: Ensure regular expressions and validation logic match identically between implementation diffs and test assertions.
-- Always include `Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` in every file task block.
+- Always include `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` in every file task block.
+- **Mandatory Storyboard Diagrams**: Every story in Section 1.5 must include a dedicated Mermaid/ASCII flow or sequence diagram illustrating the user interaction or state transition.
+- **Strict Test Policy by Task Type**:
+  - `Task Type: code`: Mandatory accompanying test task block (e.g. `*.test.ts`) and full Test Matrix (`Happy Path`, `Boundary / Edge Cases`, `Failure / Error Handling`).
+  - `Task Type: non-code`: Must specify `Fast Test Command: None (Non-code task)` and strictly forbidden from creating accompanying test file blocks.
 - Save `plan.md` inside its dedicated task folder (`only-one/tasks/<slug>/plan.md`).
