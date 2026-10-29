@@ -51,4 +51,19 @@ describe('Hook Installer Module', () => {
         expect(claudeConfig).toContain('.claude/hooks/block-heavy-scripts.sh');
         expect(claudeConfig).not.toContain('.agents/hooks/');
     });
+
+    it('installs hook scripts into .gemini/config/hooks when isGlobal is true', async () => {
+        const res = await installHooks({
+            projectDir: testDir,
+            homeDir: testDir,
+            isGlobal: true,
+            tools: ['antigravity'],
+        });
+
+        expect(existsSync(join(testDir, '.gemini', 'config', 'hooks', 'block-heavy-scripts.sh'))).toBe(true);
+        expect(existsSync(join(testDir, '.gemini', 'config', 'hooks.json'))).toBe(true);
+        const configContent = readFileSync(join(testDir, '.gemini', 'config', 'hooks.json'), 'utf-8');
+        expect(configContent).toContain('~/.gemini/config/hooks/block-heavy-scripts.sh');
+        expect(existsSync(join(testDir, '.gemini', 'hooks'))).toBe(false);
+    });
 });

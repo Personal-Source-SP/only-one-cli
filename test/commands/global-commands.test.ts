@@ -62,7 +62,7 @@ describe('Global Commands Integration (--global flag)', () => {
 
         const skillDest = join(tempHome, '.gemini/config/skills/c4-diagrams/SKILL.md');
         expect(existsSync(skillDest)).toBe(true);
-        expect(existsSync(join(tempHome, '.gemini/config/skills.json'))).toBe(true);
+        expect(existsSync(join(tempHome, '.gemini/config/skills.json'))).toBe(false);
         expect(existsSync(join(tempHome, '.agents'))).toBe(false);
 
         const lockPath = resolveInstalledLockfilePath(tempHome, true);
@@ -124,7 +124,7 @@ describe('Global Commands Integration (--global flag)', () => {
 
         const wfDest = join(tempHome, '.gemini/config/workflows/only-one-pr-git.md');
         expect(existsSync(wfDest)).toBe(true);
-        expect(existsSync(join(tempHome, '.gemini/hooks/block-heavy-scripts.sh'))).toBe(true);
+        expect(existsSync(join(tempHome, '.gemini/config/hooks/block-heavy-scripts.sh'))).toBe(true);
         expect(existsSync(join(tempHome, '.gemini/config/hooks.json'))).toBe(true);
         expect(existsSync(join(tempHome, '.agents'))).toBe(false);
 

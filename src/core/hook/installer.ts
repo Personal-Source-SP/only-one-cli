@@ -7,6 +7,7 @@ import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 export interface InstallHooksOptions {
     projectDir: string;
     isGlobal?: boolean;
+    homeDir?: string;
     tools?: string[];
 }
 
@@ -17,7 +18,7 @@ export interface InstallHooksResult {
 }
 
 export async function installHooks(options: InstallHooksOptions): Promise<InstallHooksResult> {
-    const { projectDir, isGlobal = false, tools = ['antigravity', 'claude'] } = options;
+    const { projectDir, isGlobal = false, homeDir = homedir(), tools = ['antigravity', 'claude'] } = options;
     const packageRoot = resolvePackageRoot(import.meta.url);
     const srcHooksDir = join(packageRoot, 'assets', 'agents', 'hooks');
 
@@ -41,16 +42,16 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
 
     // 1. Antigravity hooks & config
     if (tools.includes('antigravity')) {
-        const agyHooksDir = isGlobal ? join(homedir(), '.gemini', 'hooks') : join(projectDir, '.gemini', 'hooks');
+        const agyHooksDir = isGlobal ? join(homeDir, '.gemini', 'config', 'hooks') : join(projectDir, '.gemini', 'hooks');
         await copyScriptsTo(agyHooksDir);
         primaryHooksDir = agyHooksDir;
 
         const srcJson = join(srcHooksDir, 'hooks.json');
-        const destJson = isGlobal ? join(homedir(), '.gemini', 'config', 'hooks.json') : join(projectDir, '.gemini', 'hooks.json');
+        const destJson = isGlobal ? join(homeDir, '.gemini', 'config', 'hooks.json') : join(projectDir, '.gemini', 'hooks.json');
         if (existsSync(srcJson)) {
             await mkdir(dirname(destJson), { recursive: true });
             const rawContent = await readFile(srcJson, 'utf-8');
-            const commandPrefix = isGlobal ? '~/.gemini/hooks/' : '.gemini/hooks/';
+            const commandPrefix = isGlobal ? '~/.gemini/config/hooks/' : '.gemini/hooks/';
             const customized = rawContent.replaceAll('.agents/hooks/', commandPrefix);
             await writeFile(destJson, customized, 'utf-8');
             configsCreated.push(destJson);
@@ -59,12 +60,12 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
 
     // 2. Claude Code hooks & config
     if (tools.includes('claude')) {
-        const claudeHooksDir = isGlobal ? join(homedir(), '.claude', 'hooks') : join(projectDir, '.claude', 'hooks');
+        const claudeHooksDir = isGlobal ? join(homeDir, '.claude', 'hooks') : join(projectDir, '.claude', 'hooks');
         await copyScriptsTo(claudeHooksDir);
         if (!primaryHooksDir) primaryHooksDir = claudeHooksDir;
 
         const srcClaude = join(srcHooksDir, 'claude-settings.json');
-        const destClaude = isGlobal ? join(homedir(), '.claude', 'settings.json') : join(projectDir, '.claude', 'settings.json');
+        const destClaude = isGlobal ? join(homeDir, '.claude', 'settings.json') : join(projectDir, '.claude', 'settings.json');
         if (existsSync(srcClaude)) {
             await mkdir(dirname(destClaude), { recursive: true });
             const rawContent = await readFile(srcClaude, 'utf-8');

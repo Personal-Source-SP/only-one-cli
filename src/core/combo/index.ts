@@ -632,6 +632,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
         try {
             const hookRes = await installHooks({
                 projectDir,
+                homeDir,
                 isGlobal,
                 tools: selectedTools.map((t) => t.value),
             });
