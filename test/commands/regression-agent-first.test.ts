@@ -7,14 +7,22 @@ import { createRuleCommand } from '@/commands/rule/command.js';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+const testProjectDir = join(process.cwd(), 'tmp/regression-agent-first-test');
+
+vi.mock('node:os', async () => {
+    const actual = await vi.importActual<typeof import('node:os')>('node:os');
+    return {
+        ...actual,
+        homedir: () => testProjectDir,
+    };
+});
+
 vi.mock('node:child_process', () => ({
     execFile: vi.fn((file, args, options, callback) => {
         const cb = typeof options === 'function' ? options : callback;
         cb?.(null, { stdout: '', stderr: '' });
     }),
 }));
-
-const testProjectDir = join(process.cwd(), 'tmp/regression-agent-first-test');
 
 describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5.3)', () => {
     it('skill command prompts agent target first, then skills with checked defaults', async () => {
@@ -95,7 +103,7 @@ describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5
         await mkdir(testProjectDir, { recursive: true });
 
         const cmd = createComboCommand(deps as ProgramDeps);
-        await cmd.parseAsync(['node', 'test', testProjectDir]);
+        await cmd.parseAsync(['node', 'test', '--global']);
 
         expect(checkboxCalls.length).toBeGreaterThanOrEqual(2);
         expect(checkboxCalls[0].message).toContain('Select target IDEs/Tools');

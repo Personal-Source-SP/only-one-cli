@@ -1,9 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mkdtemp, rm, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createProgram } from '@src/index.js';
+
+let tempHome: string;
+
+vi.mock('node:os', async () => {
+    const actual = await vi.importActual<typeof import('node:os')>('node:os');
+    return {
+        ...actual,
+        homedir: () => tempHome,
+    };
+});
 
 vi.mock('node:child_process', () => ({
     execFile: vi.fn((file, args, options, callback) => {
@@ -17,6 +27,7 @@ vi.mock('node:child_process', () => ({
 describe('combo command', () => {
     it('applies a predefined combo setup successfully', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'combo-test-'));
+        tempHome = cwd;
         const writes: string[] = [];
 
         try {
@@ -32,7 +43,7 @@ describe('combo command', () => {
                 },
             });
 
-            await program.parseAsync(['combo', cwd, 'backend-flow', '--tool', 'cursor'], { from: 'user' });
+            await program.parseAsync(['combo', 'backend-flow', '--global', '--tool', 'cursor'], { from: 'user' });
 
             const output = writes.join('\n');
             expect(output).toContain('Processing combo:');
@@ -40,7 +51,7 @@ describe('combo command', () => {
             expect(output).toContain("COMBO 'BACKEND FLOW SETUP' REPORT");
 
             // Verify skill copy
-            const skillPath = join(cwd, '.cursor', 'skills', 'only-one-nestjs-development');
+            const skillPath = join(tempHome, '.agents', 'skills', 'only-one-nestjs-development');
             expect(existsSync(skillPath)).toBe(true);
         } finally {
             await rm(cwd, { recursive: true, force: true });
@@ -49,11 +60,12 @@ describe('combo command', () => {
 
     it('leaves existing combo components unchecked for overwrite by default', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'combo-overwrite-test-'));
+        tempHome = cwd;
         const prompts: Array<{ message: string; choices: Array<{ checked?: boolean }> }> = [];
 
         try {
-            await mkdir(join(cwd, '.cursor', 'skills', 'only-one-nestjs-development'), { recursive: true });
-            await writeFile(join(cwd, '.cursor', 'skills', 'only-one-nestjs-development', 'SKILL.md'), 'existing: true\n');
+            await mkdir(join(tempHome, '.agents', 'skills', 'only-one-nestjs-development'), { recursive: true });
+            await writeFile(join(tempHome, '.agents', 'skills', 'only-one-nestjs-development', 'SKILL.md'), 'existing: true\n');
             const program = createProgram({
                 cwd,
                 env: {},
@@ -67,7 +79,7 @@ describe('combo command', () => {
                 },
             });
 
-            await program.parseAsync(['combo', cwd, 'backend-flow', '--tool', 'cursor'], { from: 'user' });
+            await program.parseAsync(['combo', 'backend-flow', '--global', '--tool', 'cursor'], { from: 'user' });
 
             const overwritePrompt = prompts.find((prompt) => prompt.message.includes('already exist'));
             expect(overwritePrompt?.choices.length).toBeGreaterThan(0);
@@ -79,6 +91,7 @@ describe('combo command', () => {
 
     it('applies frontend flow rules and workflows instead of silently ignoring them', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'combo-frontend-test-'));
+        tempHome = cwd;
         const writes: string[] = [];
 
         try {
@@ -91,11 +104,10 @@ describe('combo command', () => {
                 prompts: { checkbox: vi.fn().mockResolvedValue(['cursor']) },
             });
 
-            await program.parseAsync(['combo', cwd, 'frontend-flow', '--tool', 'cursor'], { from: 'user' });
+            await program.parseAsync(['combo', 'frontend-flow', '--global', '--tool', 'cursor'], { from: 'user' });
 
-            expect(existsSync(join(cwd, '.cursor', 'rules', '02-next-architecture-stack.md'))).toBe(true);
-
-            expect(existsSync(join(cwd, '.cursor', 'skills', 'only-one-nextjs-development', 'SKILL.md'))).toBe(true);
+            expect(existsSync(join(tempHome, '.agents', 'rules', '02-next-architecture-stack.md'))).toBe(true);
+            expect(existsSync(join(tempHome, '.agents', 'skills', 'only-one-nextjs-development', 'SKILL.md'))).toBe(true);
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Skills:');
             expect(writes.join('\n')).toContain('Initializing UI/UX Pro Max CLI...');
@@ -104,8 +116,10 @@ describe('combo command', () => {
             await rm(cwd, { recursive: true, force: true });
         }
     });
+
     it('shows combo id, name, and description without dependency details', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'combo-details-test-'));
+        tempHome = cwd;
         let comboChoices: Array<{ name: string; checked?: boolean }> = [];
 
         try {
@@ -122,17 +136,17 @@ describe('combo command', () => {
                 },
             });
 
-            await program.parseAsync(['combo', cwd, '--tool', 'cursor'], { from: 'user' });
+            await program.parseAsync(['combo', '--global', '--tool', 'cursor'], { from: 'user' });
 
             const frontend = comboChoices.find((choice) => choice.name.includes('frontend-flow'));
-            expect(frontend?.name).toContain('frontend-flow — Frontend Flow Setup [Project]');
+            expect(frontend?.name).toContain('frontend-flow — Frontend Flow Setup [Global]');
             expect(frontend?.checked).toBe(true);
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }
     });
 
-    it('rejects installing project-only combo in global mode', async () => {
+    it('rejects installing global-only combo in project mode', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'combo-scope-err-'));
         try {
             const program = createProgram({
@@ -142,9 +156,9 @@ describe('combo command', () => {
                 stdout: () => undefined,
             });
 
-            await expect(
-                program.parseAsync(['combo', cwd, 'frontend-flow', '--global', '--tool', 'cursor'], { from: 'user' }),
-            ).rejects.toThrow("Combo 'Frontend Flow Setup' is scoped for 'project' only");
+            await expect(program.parseAsync(['combo', cwd, 'frontend-flow', '--tool', 'cursor'], { from: 'user' })).rejects.toThrow(
+                "Combo 'Frontend Flow Setup' is scoped for 'global' only and cannot be installed in local project mode.",
+            );
         } finally {
             await rm(cwd, { recursive: true, force: true });
         }

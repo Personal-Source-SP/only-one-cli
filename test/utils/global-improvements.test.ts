@@ -2,11 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import {
-    getGlobalImprovementsDir,
-    isOnlyOneTargetSkill,
-    resolveRepoIdentifierSync,
-} from '../../src/utils/global-improvements.js';
+import { getGlobalImprovementsDir, isOnlyOneTargetSkill, resolveRepoIdentifierSync } from '../../src/utils/global-improvements.js';
 import { aggregateImprovements } from '../../assets/agents/skills/only-one-evolve/scripts/aggregate.js';
 
 describe('global-improvements utility', () => {
@@ -67,7 +63,7 @@ target_skills:
 Context info
 ## 3. Desired Skill Guardrail
 - Suggestion 1
-`
+`,
                 );
 
                 writeFileSync(
@@ -84,7 +80,7 @@ target_skills:
 Context info
 ## 3. Desired Skill Guardrail
 - Suggestion 2
-`
+`,
                 );
 
                 const res = aggregateImprovements(tempDir);
