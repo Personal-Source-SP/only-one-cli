@@ -6,7 +6,7 @@ triggers:
   - "src/tui/**"
   - "src/commands/tui/**"
   - "scripts/build-go.js"
-archived_at: 2026-10-26T21:30:00+07:00
+archived_at: 2026-10-30T01:06:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md

@@ -3,16 +3,16 @@ id: refactor-dev-skills-standards
 title: Nâng Cấp & Chuẩn Hóa Toàn Diện Bộ Skills Frontend (Next.js) & Backend (NestJS)
 domain: skills
 triggers:
-  - "assets/skills/**"
+  - "assets/agents/skills/**"
   - "only-one/rules/**"
-archived_at: 2026-10-19T19:18:00+07:00
+archived_at: 2026-10-30T01:06:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
 affected_modules:
-  - assets/skills/only-one-nextjs-development
-  - assets/skills/only-one-nestjs-development
-  - assets/skills/index.ts
+  - assets/agents/skills/only-one-nextjs-development
+  - assets/agents/skills/only-one-nestjs-development
+  - assets/agents/skills/index.ts
   - only-one/rules.md
 ---
 
@@ -38,15 +38,15 @@ affected_modules:
 - **Tích hợp Registry `skills.sh`**: Chuyển đổi cơ chế cài đặt kỹ năng từ git clone trực tiếp sang CLI chuẩn `skills.sh` (`npx -y skills add <skill>`), đảm bảo tuân thủ cấu trúc kỹ năng Antigravity/Agent chuẩn và tích hợp metadata mượt mà vào `installed.json`.
 
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
-- [page-architecture.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nextjs-development/references/page-architecture.md): Cập nhật cây thư mục và quy tắc `constants/`.
-- [component-architecture.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nextjs-development/references/component-architecture.md): Thêm quy chuẩn `type <ComponentName>Props`.
-- [types-and-contracts.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nextjs-development/references/types-and-contracts.md): Bổ sung quy tắc cấm anonymous inline `{}` và quy định đặt type trong `types/`.
-- [service-architecture.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nestjs-development/references/service-architecture.md): Cấm anonymous return type và cấm declare type trong `.service.ts`.
-- [ui-ux-guidelines.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nextjs-development/references/ui-ux-guidelines.md): Siết chặt 3-tier cascade & Anti-Raw-HTML.
-- [only-one-nextjs-development/SKILL.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nextjs-development/SKILL.md) & [only-one-nestjs-development/SKILL.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/only-one-nestjs-development/SKILL.md): Bổ sung Mandatory Skill Reading Gate.
-- [assets/skills/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/skills/index.ts): Nâng version manifest lên `0.0.2`.
+- [page-architecture.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-nextjs-development/references/page-architecture.md): Cập nhật cây thư mục và quy tắc `constants/`.
+- [component-architecture.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-nextjs-development/references/component-architecture.md): Thêm quy chuẩn `type <ComponentName>Props`.
+- [types-and-contracts.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-nextjs-development/references/types-and-contracts.md): Bổ sung quy tắc cấm anonymous inline `{}` và quy định đặt type trong `types/`.
+- [service-architecture.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-nestjs-development/references/service-architecture.md): Cấm anonymous return type và cấm declare type trong `.service.ts`.
+- [ui-ux-guidelines.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-nextjs-development/references/ui-ux-guidelines.md): Siết chặt 3-tier cascade & Anti-Raw-HTML.
+- [only-one-nextjs-development/SKILL.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-nextjs-development/SKILL.md) & [only-one-nestjs-development/SKILL.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-nestjs-development/SKILL.md): Bổ sung Mandatory Skill Reading Gate.
+- [assets/agents/skills/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/index.ts): Nâng version manifest lên `0.0.2`.
 - [only-one/rules.md](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules.md): Bổ sung các quy tắc âm bản `[ALWAYS]` và `[NEVER]`.
 
 ## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu & PR)
-- **Trạng thái Test**: `npm test` PASS 55/55 test files (230 tests passed, 0 failures). `npm run build` PASS.
+- **Trạng thái Test**: `npm test` PASS (tất cả test suites passed). `npm run build` PASS.
 - **Branch**: `main`

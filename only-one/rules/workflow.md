@@ -2,8 +2,8 @@
 domain: workflow
 version: 1.3.0
 triggers:
-  - ".agents/workflows/**"
-  - "assets/workflows/**"
+  - ".agents/skills/only-one-*/**"
+  - "assets/agents/skills/only-one-*/**"
   - "only-one/tasks/**"
 ---
 
@@ -60,7 +60,17 @@ triggers:
 - **RATIONALE**: Bare bracket slashes trigger Mermaid trapezoid `TRAPSTART` lexer errors, and unescaped angle brackets break SVG rendering as unclosed HTML tags.
 
 ### WF-011: Pragmatic TDD Ordering Invariant
-- **MUST_DO**: Position test task blocks strictly BEFORE companion implementation code blocks in `plan.md` Section 2, and enforce test verification per file pair in `/only-one-apply` with a 3-retry self-healing ceiling.
+- **MUST_DO**: Position test task blocks strictly BEFORE companion implementation code blocks in Section 4 (`File Changes`), and enforce test verification per file pair in `/only-one-apply` with a 3-retry self-healing ceiling.
 - **NEVER_DO**: Author code task blocks before their test blocks, or apply code changes without immediately executing companion fast test commands.
 - **RATIONALE**: Guarantees test-driven rigor, prevents false-green regression, and stops cascading syntax/logic errors early.
+
+### WF-012: Unified 4-Section Artifact Structure for Plan and Debug
+- **MUST_DO**: Standardize `plan.md` and `debug.md` to 4 consecutive sections: Section 1 (Directory Structure & Diagnosis), Section 2 (Story Board & Reproduction Scenarios), Section 3 (Test Cases & Verification Matrix), Section 4 (File Changes & Git Diffs).
+- **NEVER_DO**: Use fragmented section numbering (such as `Section 1.5`) or embed per-block `Fast Test Command` lines in Section 4 task blocks.
+- **RATIONALE**: Ensures identical machine-parseable contracts across both feature planning and defect remediation workflows.
+
+### WF-013: Centralized Improvement Staging for Skill Evolution
+- **MUST_DO**: Stage skill improvement proposals targeting `only-one-*` in user-level central storage (`~/.only-one/improvements/<repo>/<slug>.md`) during `/only-one-clean`.
+- **NEVER_DO**: Leave skill improvements trapped in local repository folders where `/only-one-evolve` cannot access them across projects.
+- **RATIONALE**: Enables cross-project skill evolution and continuous refinement of developer agent tools.
 

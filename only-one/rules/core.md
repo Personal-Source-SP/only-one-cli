@@ -29,10 +29,10 @@ triggers:
 - **NEVER_DO**: Leave asset manifests unversioned or bypass the version gate.
 - **RATIONALE**: Protects CI version gates and ensures reproducible environment setups.
 
-### CORE-005: Canonical Global Agent Home Standard
-- **MUST_DO**: Route all global assets to the canonical user root `~/.agents/{skills,workflows,rules}` and non-destructively bridge `skills.json` manifests across tool configurations.
-- **NEVER_DO**: Install global assets directly into legacy tool-specific directories without canonical `.agents` registry synchronization.
-- **RATIONALE**: Unifies global agent discovery across different AI runners (Antigravity, Claude, Codex) while preserving backward compatibility.
+### CORE-005: Multi-IDE Target Resolution Over Hardcoded Agent Directory
+- **MUST_DO**: Resolve global assets and hooks dynamically to each target IDE's native configuration directory (`~/.gemini/config/` and `~/.gemini/hooks/` for Antigravity, `~/.claude/` for Claude, `~/.cursor/` for Cursor) based on `AI_TOOLS` metadata.
+- **NEVER_DO**: Hardcode `.agents` as a universal global target or force all IDEs to share a single root.
+- **RATIONALE**: Ensures each AI runner discovers its installed skills, rules, and hooks natively without cross-tool path conflicts or orphaned dependencies.
 
 ### CORE-006: 3-Domain Asset Hierarchy Without Shims
 - **MUST_DO**: Categorize all assets strictly within the 3 standardized domains (`assets/agents/`, `assets/devenv/`, `assets/templates/`) and update all path mappings directly.

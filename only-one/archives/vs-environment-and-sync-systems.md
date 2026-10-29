@@ -5,8 +5,8 @@ domain: vs
 triggers:
   - "src/core/vs/**"
   - "src/commands/extensions-vs/**"
-  - "assets/vs/**"
-archived_at: 2026-09-09T20:30:00+07:00
+  - "assets/devenv/editor/**"
+archived_at: 2026-10-30T01:06:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -14,7 +14,7 @@ references:
 affected_modules:
   - src/core/vs
   - src/commands/extensions-vs
-  - assets/vs
+  - assets/devenv/editor
   - test/core/vs
   - test/commands/vs
 ---
@@ -23,7 +23,7 @@ affected_modules:
 
 ## 1. Problem & Core Value (Bài toán & Giá trị Cốt lõi)
 - **Vấn đề (Problem)**:
-  1. Thiếu tính đồng nhất giữa cấu hình asset library (`assets/vs/index.ts`) và môi trường Antigravity IDE thực tế (thiếu extension `anysphere.cursorpyright`, setting `python.languageServer` bị tắt).
+  1. Thiếu tính đồng nhất giữa cấu hình asset library (`assets/devenv/editor/index.ts`) và môi trường Antigravity IDE thực tế (thiếu extension `anysphere.cursorpyright`, setting `python.languageServer` bị tắt).
   2. Lệnh `only-one extensions-vs` chỉ hỗ trợ một chiều (cài thêm), không thể tự động dọn dẹp các extension thừa đã cài trên Editor nhưng không còn nằm trong Manifest (`--prune`).
   3. Lỗi crash `spawn ENOENT` trên Windows khi thực thi các lệnh CLI của editor dạng `.cmd`/`.bat` (như `antigravity-ide.cmd`, `code.cmd`, `cursor.cmd`).
   4. Lỗi rollback transaction bị đứt gãy và che giấu lỗi cài đặt gốc (*Error Masking*) khi gặp các extension độc quyền không tồn tại trên Marketplace.
@@ -40,7 +40,7 @@ affected_modules:
 flowchart TD
     Host["Developer Environment (Win32 / Darwin)"] --> Cmd["only-one setting-vs / extensions-vs [--prune]"]
     Cmd --> Loader["Library Loader (loadVsLibraryManifest)"]
-    Loader --> Manifest["assets/vs/index.ts (VS_LIBRARY v0.0.3)"]
+    Loader --> Manifest["assets/devenv/editor/index.ts (VS_LIBRARY v0.0.3)"]
     Cmd --> Resolver["resolveVsEditorCommand (Fail-Fast Probe)"]
     Resolver --> Runner["NodeVsProcessRunner (Platform-Aware Shell)"]
     Cmd --> Diff["Diff Installed vs Manifest (Target vs Orphaned)"]
@@ -56,7 +56,7 @@ flowchart TD
 5. **Resilient Rollback & Error Preservation**: `VsSyncTransaction.rollback()` tự động bỏ qua các lỗi lành tính (như extension đã không còn tồn tại) để dọn dẹp triệt để journal/backup files, đồng thời bảo toàn exception nguyên bản của bước install.
 
 ## 3. Scope & Key Modules (Phạm vi & Các Module Chính)
-- **Asset Manifest**: [`assets/vs/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/vs/index.ts) (Cấu hình chuẩn 36 extensions và 41 settings keys, version `0.0.3`).
+- **Asset Manifest**: [`assets/devenv/editor/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/devenv/editor/index.ts) (Cấu hình chuẩn 36 extensions và 41 settings keys, version `0.0.3`).
 - **CLI Commands & Step Actions**:
   - [`src/commands/extensions-vs/command.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/commands/extensions-vs/command.ts) (Đăng ký option `--prune`).
   - [`src/commands/extensions-vs/actions/step-5-execute-and-report.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/commands/extensions-vs/actions/step-5-execute-and-report.ts) (Báo cáo tóm tắt cả installed và pruned extensions).
@@ -72,7 +72,7 @@ flowchart TD
   - [`test/commands/vs/vs-commands.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/commands/vs/vs-commands.test.ts) (8 tests kiểm thử CLI command).
 
 ## 4. Verification Evidence & PR (Bằng chứng Nghiệm thu & PR)
-- **Test Status**: 100% Passed (24/24 unit tests trong domain VS Sync, 230/230 toàn bộ repository).
+- **Test Status**: 100% Passed (24/24 unit tests trong domain VS Sync, toàn bộ repository passed).
 - **Build Status**: TypeScript compilation & Prettier formatting passed.
 - **Live Verification**: Kiểm thử thành công `only-one extensions-vs --prune` và cập nhật manifest theo Antigravity IDE.
 - **Branch**: `main`

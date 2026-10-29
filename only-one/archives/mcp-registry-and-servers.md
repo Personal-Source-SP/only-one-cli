@@ -3,14 +3,14 @@ id: mcp-registry-and-servers
 title: Kiến Trúc MCP Registry, Tích Hợp Playwright Browser & Chuẩn Hóa Danh Mục Built-in
 domain: mcp
 triggers:
-  - "assets/mcps/**"
+  - "assets/agents/mcps/**"
   - "src/core/mcp/**"
-archived_at: 2026-10-21T10:05:52+07:00
+archived_at: 2026-10-30T01:06:00+07:00
 status: active
 references:
   - only-one/archives/asset-versioning-and-sync-systems.md
 affected_modules:
-  - assets/mcps/index.ts
+  - assets/agents/mcps/index.ts
   - src/core/mcp
   - test/core/mcp/registry.test.ts
   - README.md
@@ -32,19 +32,19 @@ affected_modules:
 - **Cấu hình Độc Lập cho Browser Profile**:
   - Manifest `playwright-browser` sử dụng `--user-data-dir=/Users/Tester/Library/Application Support/Google/Chrome/Default` (hoặc tương đương) đảm bảo phiên duyệt web chạy trong môi trường hoàn toàn cô lập.
 - **Single Source of Truth**:
-  - Toàn bộ danh mục MCP được khai báo duy nhất tại [assets/mcps/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/mcps/index.ts).
+  - Toàn bộ danh mục MCP được khai báo duy nhất tại [assets/agents/mcps/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/mcps/index.ts).
   - Tự động đồng bộ sang cấu hình các IDE thông qua `syncMcpGlobalConfig()` (hỗ trợ Antigravity IDE, Claude Desktop, Cursor, Codex).
 - **Luồng Đồng Bộ & Kiểm Soát Phiên Bản**:
 ```mermaid
 flowchart LR
-    Manifest["assets/mcps/index.ts\n(5 Built-in Servers)"] --> Registry["src/core/mcp/registry.ts\nreadMcpManifests()"]
+    Manifest["assets/agents/mcps/index.ts\n(5 Built-in Servers)"] --> Registry["src/core/mcp/registry.ts\nreadMcpManifests()"]
     Registry --> Sync["src/core/mcp/sync.ts\nsyncMcpGlobalConfig()"]
     Registry --> Gate["src/core/assets/gate.ts\nverifyAllAssetsHaveValidVersions()"]
     Sync --> IDEs["IDE Configs (Antigravity / Claude / Cursor / Codex)"]
 ```
 
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
-- [assets/mcps/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/mcps/index.ts):
+- [assets/agents/mcps/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/mcps/index.ts):
   - Thêm entry `playwright-browser` (`@playwright/mcp`) với cờ `--user-data-dir`.
   - Xoá bỏ hoàn toàn entry `memory`.
 - [test/core/mcp/registry.test.ts](file:///d:/Sources/PERSONAL/only-one-cli/test/core/mcp/registry.test.ts):
@@ -54,5 +54,5 @@ flowchart LR
 
 ## 4. Verification Evidence (Bằng chứng Nghiệm thu)
 - `npm test test/core/mcp/registry.test.ts`: 3/3 tests passed.
-- `npm test`: 55 test files passed, 224 unit tests passed.
+- `npm test`: All tests passed.
 - `npm run format:check`: 100% Prettier compliant.
