@@ -25,7 +25,7 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
     const targetHooksDir = join(baseDir, 'hooks');
     await mkdir(targetHooksDir, { recursive: true });
 
-    const hookScripts = ['block-heavy-scripts.sh', 'no-secrets.sh', 'format-on-edit.sh', 'test-gate.sh', 'protect-configs.sh'];
+    const hookScripts = ['block-heavy-scripts.sh', 'no-secrets.sh', 'format-on-edit.sh', 'protect-configs.sh'];
 
     const installedFiles: string[] = [];
     for (const script of hookScripts) {

@@ -29,15 +29,6 @@ describe('Hooks Architecture Integrity', () => {
         expect(content).toContain('prettier');
     });
 
-    it('should contain test-gate hook enforcing exit 2 on failure', () => {
-        const scriptPath = join(hooksDir, 'test-gate.sh');
-        expect(existsSync(scriptPath)).toBe(true);
-        const content = readFileSync(scriptPath, 'utf8');
-        expect(content).toContain('npm test');
-        expect(content).toContain('exit 2');
-        expect(content).toContain('stop_hook_active');
-    });
-
     it('should contain protect-configs hook guarding critical configuration files', () => {
         const scriptPath = join(hooksDir, 'protect-configs.sh');
         expect(existsSync(scriptPath)).toBe(true);

@@ -22,7 +22,7 @@ describe('Hook Installer Module', () => {
         });
 
         expect(res.installedFiles.length).toBeGreaterThan(0);
-        expect(existsSync(join(testDir, '.agents', 'hooks', 'test-gate.sh'))).toBe(true);
+        expect(existsSync(join(testDir, '.agents', 'hooks', 'block-heavy-scripts.sh'))).toBe(true);
         expect(existsSync(join(testDir, '.agents', 'hooks.json'))).toBe(true);
         expect(existsSync(join(testDir, '.claude', 'settings.json'))).toBe(true);
     });

@@ -76,7 +76,6 @@ export const COMBOS: ComboManifest[] = [
             'block-heavy-scripts',
             'no-secrets',
             'format-on-edit',
-            'test-gate',
             'protect-configs',
         ],
     },

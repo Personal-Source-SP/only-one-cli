@@ -19,11 +19,6 @@
         "matcher": "write_to_file|replace_file_content|Write|Edit",
         "command": ".agents/hooks/format-on-edit.sh"
       }
-    ],
-    "Stop": [
-      {
-        "command": ".agents/hooks/test-gate.sh"
-      }
     ]
   }
 }

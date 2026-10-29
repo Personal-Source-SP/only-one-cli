@@ -141,7 +141,7 @@ reproduction_test: <Command or test path>
 
 # Debug: <Defect / Issue Name>
 
-## Section 1. Diagnosis
+## Section 1. Diagnosis & Directory Structure Changes
 
 ### Symptom
 - **Actual**: <Observed behavior or stack trace>.
@@ -176,13 +176,6 @@ sequenceDiagram
     TargetModule--xBrokenBoundary: Contract violated / unexpected failure state
 ```
 
-### Section 1.5. Defect User Story & Reproduction Scenarios
-- **User Story**: Là người dùng, tôi gặp sự cố <lỗi> khi <hành động>.
-- **Actual Defect Scenario**: Kịch bản tái hiện hành vi sai lệch hiện tại.
-- **Expected Acceptance Scenario**: Kịch bản hành vi chính xác sau khi sửa lỗi.
-
-## Section 2. File Changes
-
 ### Directory Structure Changes
 Visual ASCII tree diagram showing regression test files and source files to modify:
 
@@ -192,14 +185,45 @@ src/path/to/module/
 └── [MODIFY] target.service.ts                     # Root-cause fix patch
 ```
 
+## Section 2. Defect User Story & Reproduction Scenarios
+
+### Story 1: Defect / Regression Name [BUGFIX]
+- **User Story**: Là người dùng, tôi gặp sự cố <lỗi> khi <hành động>.
+- **Actual Defect Scenario**: Kịch bản tái hiện hành vi sai lệch hiện tại.
+  - *Test trường hợp: Kiểm tra tái hiện lỗi (TC-01)*
+  - *Serving Files*:
+    - `[TEST]` `path/to/test.spec.ts`
+    - `[MODIFY]` `path/to/target.ts`
+- **Expected Acceptance Scenario**: Kịch bản hành vi chính xác sau khi sửa lỗi.
+  - *Test trường hợp: Kiểm tra hành vi đúng sau sửa bản vá (TC-02)*
+  - *Serving Files*:
+    - `[MODIFY]` `path/to/target.ts`
+
+## Section 3. Test Cases & Verification Matrix
+
+### 3.1. Defect & Invariant Traceability Matrix
+| Tiêu chí Lỗi / Invariant | Mô tả Tái hiện / Ràng buộc | Test Cases / Tasks Đáp ứng | Trạng thái |
+| :--- | :--- | :--- | :---: |
+| **`DEF-1`** | <Mô tả lỗi> | `TC-01`, Task 1 | 🟢 100% Phủ |
+
+### 3.2. Test Case Specification Matrix
+| Test ID | Defect Ref | Story / Module | Tên Test Case (`it / test`) | Điều kiện / Dữ liệu đầu vào | Kết quả kỳ vọng (Assertions) | Loại test | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
+| `TC-01` | `DEF-1` | Story 1 | `it('reproduces defect')` | <Input / Trigger> | <Expected Red -> Green> | Unit | `[ ]` |
+
+### Automated Test Execution Commands
+- `<Specific test execution commands>`
+
+## Section 4. File Changes
+
 ### 1. `[MODIFY]` `path/to/test.spec.ts`
 
 - **Status**: `[ ]`
+- **Task Type**: `code`
 - **Context**: <Current failure mechanism in one sentence>.
 - **Target Symbols / AST Seams**: `describe('reproduction')`.
 - **Invariants**: <Regression constraint in one sentence>.
 - **Depends On**: None.
-- **Fast Test Command**: `npm test path/to/test.spec.ts`.
 
 > **Action**: Add a deterministic Red reproduction and regression guard.
 
@@ -221,11 +245,11 @@ src/path/to/module/
 ### 2. `[MODIFY]` `path/to/target.ts`
 
 - **Status**: `[ ]`
+- **Task Type**: `code`
 - **Context**: <Current mechanism causing the defect>.
 - **Target Symbols / AST Seams**: `TargetClass.targetMethod`.
 - **Invariants**: <Must-not-break behavior>.
 - **Depends On**: Task 1.
-- **Fast Test Command**: `npm test path/to/test.spec.ts`.
 
 > **Action**: Apply the surgical root-cause fix.
 
@@ -273,7 +297,7 @@ Report `debug.md` path, Symptom, Mechanical Root Cause, Proposed Fix, changed fi
 - **Enforce 80% ASD-STE100 Writing Specification**: Sentence length <= 20 words for instructions, <= 25 words for context, eliminate passive voice, and structure fixes as Prerequisites -> Action -> Verification.
 - **Enforce Mandatory Failure Trace Diagram**: Always include a Mermaid sequence or divergence diagram in Section 1 Diagnosis to prove the broken mechanical boundary visually.
 - **Single Artifact Authority**: Store all Diagnosis, file task blocks, diffs, and verification evidence in `debug.md`.
-- **Machine-Readable Task Block Contract**: One Section 2 block equals one changed file; preserve exact heading format and mandatory metadata labels.
+- **Machine-Readable Task Block Contract**: One Section 4 block equals one changed file; preserve exact heading format and mandatory metadata labels (DO NOT include Fast Test Command; tests are centralized in Section 3).
 - Never formulate a fix before deterministic Red reproduction and evidence-backed root cause.
 - Never perform unrelated refactoring.
 - Always include an automated regression test.
