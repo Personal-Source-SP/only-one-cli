@@ -2,6 +2,7 @@ export * from './cli-formatter.js';
 export * from './command-references.js';
 export * from './csv.js';
 export * from './git-project-name.js';
+export * from './global-improvements.js';
 export * from './json.js';
 export * from './platform.js';
 export * from './repo-name.js';

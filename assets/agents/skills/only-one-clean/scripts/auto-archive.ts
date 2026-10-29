@@ -1,5 +1,7 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { execSync } from 'node:child_process';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { basename, dirname, join, resolve } from 'node:path';
 import yaml from 'js-yaml';
 
 export interface ArchiveTaskSummary {
@@ -11,7 +13,8 @@ export interface ArchiveTaskSummary {
 export function runAutoArchive(baseDir = process.cwd(), dryRun = false): ArchiveTaskSummary[] {
     const tasksDir = join(baseDir, 'only-one/tasks');
     const archivesDir = join(baseDir, 'only-one/archives');
-    const improvementsDir = join(baseDir, 'only-one/improvements');
+    const repoName = resolveRepoIdentifier(baseDir);
+    const globalImprovementsDir = join(homedir(), '.only-one', 'improvements', repoName);
     const results: ArchiveTaskSummary[] = [];
 
     if (!existsSync(tasksDir)) return results;
@@ -53,14 +56,25 @@ export function runAutoArchive(baseDir = process.cwd(), dryRun = false): Archive
         let staged = false;
         const improvementFile = join(taskPath, 'improvements.md');
         if (existsSync(improvementFile)) {
-            mkdirSync(improvementsDir, { recursive: true });
-            const targetFile = join(improvementsDir, `${slug}.md`);
             const imprContent = readFileSync(improvementFile, 'utf8');
-            const tagged = imprContent
-                .replace(/^status:\s*.*$/m, '')
-                .replace(/^---/, `---\nstatus: pending\narchived_at: ${new Date().toISOString()}`);
-            writeFileSync(targetFile, tagged, 'utf8');
-            staged = true;
+            const imprFmMatch = imprContent.match(/^---\s*[\r\n]+([\s\S]*?)[\r\n]+---/);
+            let imprFm: any = {};
+            if (imprFmMatch) {
+                try {
+                    imprFm = yaml.load(imprFmMatch[1]) || {};
+                } catch {}
+            }
+            const targetSkills: string[] = Array.isArray(imprFm?.target_skills) ? imprFm.target_skills : [];
+            const isOnlyOne = targetSkills.some((s) => typeof s === 'string' && s.trim().startsWith('only-one-'));
+            if (isOnlyOne) {
+                mkdirSync(globalImprovementsDir, { recursive: true });
+                const targetFile = join(globalImprovementsDir, `${slug}.md`);
+                const tagged = imprContent
+                    .replace(/^status:\s*.*$/m, '')
+                    .replace(/^---/, `---\nstatus: pending\narchived_at: ${new Date().toISOString()}`);
+                writeFileSync(targetFile, tagged, 'utf8');
+                staged = true;
+            }
         }
 
         // 2. Generate archive from template if available
@@ -107,4 +121,21 @@ if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename
     const dryRun = process.argv.includes('--dry-run');
     const results = runAutoArchive(process.cwd(), dryRun);
     console.log(JSON.stringify(results, null, 2));
+}
+
+function resolveRepoIdentifier(baseDir: string): string {
+    try {
+        const out = execSync('git config --get remote.origin.url', {
+            cwd: baseDir,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+            timeout: 2000,
+        }).trim();
+        if (out) {
+            const last = out.split(/[\\/]/).filter(Boolean).at(-1) || '';
+            const clean = last.replace(/\.git$/i, '');
+            if (clean) return clean;
+        }
+    } catch {}
+    return basename(baseDir) || 'unknown-repo';
 }

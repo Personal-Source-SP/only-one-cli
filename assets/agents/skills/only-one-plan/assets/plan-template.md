@@ -16,7 +16,7 @@ branch: ~
 <visual tree of files to be added, modified, or deleted>
 ```
 
-## Section 1.5. Story Board (User Journey & Feature Scenarios)
+## Section 2. Story Board (User Journey & Feature Scenarios)
 
 ### Story 1: Feature / Component Name [NEW|MODIFY|DELETE]
 - **User Story**: As a <role>, I want <goal> so that <benefit>.
@@ -24,14 +24,34 @@ branch: ~
 - **After**: <Behavior or state after change in one sentence>.
 - **Key Scenarios**:
   - *Scenario 1 (Happy Path)*: ...
+    - *Serving Files*:
+      - `[TEST]` `path/to/test.spec.ts`
+      - `[MODIFY]` `path/to/file.ts`
   - *Scenario 2 (Edge Case / Failure)*: ...
+    - *Serving Files*:
+      - `[MODIFY]` `path/to/error-handler.ts`
 
 ```mermaid
 flowchart LR
     A[Before State] -->|User Action| B[After State]
 ```
 
-## Section 2. File Changes
+## Section 3. Test Cases & Verification Matrix
+
+### 3.1. Concept Coverage & Traceability Matrix
+| Tiêu chí Concept | Mô tả Nghiệm thu | Test Cases / Tasks Đáp ứng | Trạng thái |
+| :--- | :--- | :--- | :---: |
+| **`AC-1`** | <Acceptance Criteria 1> | `TC-01`, Task 1 | 🟢 100% Phủ |
+
+### 3.2. Test Case Specification Matrix
+| Test ID | Concept Ref | Story / Module | Tên Test Case (`it / test`) | Điều kiện / Dữ liệu đầu vào | Kết quả kỳ vọng (Assertions) | Loại test | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
+| `TC-01` | `AC-1` | Story 1 (Happy) | `it('...')` | <Input / Precondition> | <Expected Assertion> | Unit | `[ ]` |
+
+### Automated Test Execution Commands
+- `<Test execution commands for full suite or specific modules>`
+
+## Section 4. File Changes
 
 ### 1. `[NEW]` `path/to/file.test.ts`
 
@@ -41,7 +61,6 @@ flowchart LR
 - **Target Symbols / AST Seams**: `describe('...')`.
 - **Invariants**: <Invariants>.
 - **Depends On**: None.
-- **Fast Test Command**: `npm test path/to/file.test.ts`.
 
 > **Action**: <Add test cases specifying target behavior>.
 
@@ -62,7 +81,6 @@ flowchart LR
 - **Target Symbols / AST Seams**: `Class.methodName`.
 - **Invariants**: <Constraint that must not be broken in one sentence>.
 - **Depends On**: `path/to/file.test.ts`.
-- **Fast Test Command**: `npm test path/to/file.test.ts`.
 
 > **Action**: <Brief one-sentence description of modification purpose>.
 
@@ -78,14 +96,9 @@ flowchart LR
 - **Target Symbols / AST Seams**: <Section header>.
 - **Invariants**: <Invariants>.
 - **Depends On**: None.
-- **Fast Test Command**: `None (Non-code task)`.
 
 > **Action**: <Update documentation content>.
 
 ```diff
 <unified diff>
 ```
-
-## Section 3. Test Cases & Verification
-- **Automated Tests**:
-- **Manual Checks**:

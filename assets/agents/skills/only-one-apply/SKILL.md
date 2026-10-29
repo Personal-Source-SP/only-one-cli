@@ -58,7 +58,7 @@ You are a **Senior Software Engineer**. Your core responsibilities:
 - Fast-path ingest ordered **Section 2 File Changes** task blocks from `plan.md`, `debug.md`, and `review.md`.
 - Implement changes one file at a time from each task block's unified diff, respecting `Depends On` ordering.
 - Apply execution and quality disciplines (`incremental-implementation`, `test-driven-development`, `code-simplification`, `diagnosing-bugs`).
-- Run the targeted `Fast Test Command` immediately after modifying each file to maintain rapid feedback loops.
+- Run the targeted test command from Section 3 Test Matrix immediately after modifying each code/test task pair.
 - Record verification evidence directly into Section 3 of `plan.md` or the existing verification section of `debug.md`, then report a concise walkthrough summary in chat.
 
 ## Purpose
@@ -183,14 +183,14 @@ Main Agent directly executes task blocks in sequence adhering strictly to `Depen
    - Đối với các task code có test đi kèm: luôn áp dụng task block test trước, sau đó áp dụng task block code logic.
    - Chuẩn hóa line endings sang LF trước khi sửa file trên Windows.
    - Đánh dấu trạng thái task đang xử lý là `Status: [/]`.
-2. **Execute Fast Test Command**:
-   - Chạy ngay lệnh `Fast Test Command` được chỉ định cho cặp task.
+2. **Execute Section 3 Test Command**:
+   - Chạy lệnh kiểm thử tương ứng được chỉ định trong Section 3 cho module/file đang thực thi.
    - Nếu test **PASS (Green)**: Đánh dấu `Status: [x]` cho cả task test và task code, chuyển sang task block tiếp theo.
 3. **Self-Healing Red Loop (Tối đa 3 lần thử)**:
    - Nếu test **FAIL (Red)**:
      - Dừng lại, đọc thông báo lỗi từ test runner (stack trace, assertion failure).
      - Khu biệt nguyên nhân và điều chỉnh mã nguồn triển khai.
-     - Chạy lại `Fast Test Command`.
+     - Chạy lại lệnh kiểm thử từ Section 3.
      - Lặp lại tối đa 3 lần thử (Retry limit: 3).
      - Nếu sau 3 lần thử vẫn thất bại: Dừng toàn bộ tiến trình, giữ nguyên trạng thái `Status: [/]`, và báo cáo chi tiết nguyên nhân lỗi cho PM để xin chỉ dẫn.
 4. **Non-code Tasks**:
@@ -238,15 +238,21 @@ Main Agent directly executes task blocks in sequence adhering strictly to `Depen
 ```markdown
 # 🏁 Hoàn tất: `<slug>` (`status: done` / `fixed`)
 
-### 1. Tệp thay đổi
+### 1. Cấu trúc source thay đổi
 ```text
 src/
 ├── [NEW]    path/to/newFile.ts   # <Mô tả ngắn gọn>
 └── [MODIFY] path/to/modFile.ts   # <Mô tả ngắn gọn>
 ```
 
-### 2. Nghiệm thu & Kiểm thử
+### 2. Các công việc đã xử lý
+- <Tóm tắt ngắn gọn các task block đã thực thi>.
+
+### 3. Nghiệm thu & Kiểm thử
 - `<Lệnh test>` -> `PASS (X tests passed)`
+
+### 4. Bước tiếp theo
+- `/only-one-clean` | `/only-one-pr-git`
 ```
 
 4. **Capture In-Task Friction Points & Opportunities (`improvements.md`)**:
@@ -256,6 +262,8 @@ src/
        npx tsx assets/skills/only-one-apply/scripts/record-improvement.ts <slug> <target-skill> "<deficiency>" "<root-cause>"
        ```
    - If execution completed 100% cleanly without friction or user corrections, omit this file.
+   - **Test Matrix Verification Gate**: Đối soát từng `Test ID` trong Section 3 của plan.md, chạy test suite xác nhận pass và cập nhật `[x]` vào bảng trước khi hoàn tất.
+   - **Friction Check Gate**: Chủ động hỏi người dùng xem có bài học hoặc điểm ma sát nào cần ghi nhận để cải tiến kỹ năng only-one-* trước khi đóng tác vụ.
 
 ---
 

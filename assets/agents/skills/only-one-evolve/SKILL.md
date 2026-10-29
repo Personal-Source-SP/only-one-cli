@@ -75,9 +75,9 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 
 ### Step 1 — Deterministic Aggregation of Pending Improvements
 
-1. Execute the bundled aggregation script via shell:
+1. Execute the bundled aggregation script scanning across all repo folders in `~/.only-one/improvements/`:
    ```bash
-   npx tsx assets/agents/skills/only-one-evolve/scripts/aggregate.ts [skill-name]
+   npx tsx assets/agents/skills/only-one-evolve/scripts/aggregate.ts all
    ```
 2. Inspect the JSON output:
    - If `totalPending` is 0: Report "No pending skill improvements found in only-one/improvements/." and stop.

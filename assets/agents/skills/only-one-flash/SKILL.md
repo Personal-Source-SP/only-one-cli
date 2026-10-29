@@ -89,6 +89,9 @@ Before emitting the Flash Plan, read and activate `i-have-adhd`; keep it active 
 ```markdown
 ⚡ **Flash Plan**:
 
+- **User Story & Scenario**:
+  - <Kịch bản hành vi người dùng mong muốn trước và sau thay đổi>
+
 - **Description**:
   - <Summary of primary solution / objective>
   - <Technical mechanism or key considerations if multiple points>

@@ -125,10 +125,10 @@ Activate and apply these skills throughout the clean workflow:
        4. **Stage Task Improvements for Skill Evolution**:
           - Check if `only-one/tasks/<slug>/improvements.md` exists.
           - If found:
-            - Create directory `only-one/improvements/` if it does not exist.
-            - Copy/move file to `only-one/improvements/<slug>.md`.
+            - Resolve current repo name via Git remote origin (fallback to directory basename).
+            - If target_skills contains `only-one-*`, stage to `~/.only-one/improvements/<repo-name>/<slug>.md`.
             - Ensure YAML frontmatter contains `task_slug: <slug>`, `archived_at: <ISO-8601>`, and `status: pending`.
-            - Log: `[CLEAN] Staged task improvements at only-one/improvements/<slug>.md. Run /only-one-evolve to apply.`
+            - Log: `[CLEAN] Staged task improvements at ~/.only-one/improvements/<repo-name>/<slug>.md. Run /only-one-evolve to apply.`
        5. **Purge Raw Task Directory**:
           - Confirm that `only-one/archives/<slug>.md` has been successfully created.
           - Remove the raw task directory:

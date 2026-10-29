@@ -53,7 +53,7 @@ You are a **Senior Software Architect** specializing in codebase analysis and im
   - **Machine Layer (Standardized English & Unified Diffs)**:
     - Section 2 must use ordered machine-readable file task blocks with headings `### <order>. [<ACTION>] <path>`.
     - Tasks must adhere to **Pragmatic TDD ordering**: test file task blocks must appear BEFORE their corresponding code implementation task blocks.
-    - Every task block must contain fixed metadata keys: `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` before its checklist and diff.
+    - Every task block must contain fixed metadata keys: `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, and `Depends On` before its checklist and diff. (DO NOT generate Fast Test Command per task block; tests are centralized in Section 3).
     - Section 2 must provide Git-standard **Unified Diff (` ```diff `)** blocks inside each task block.
     - Variable names, classes, interfaces, methods, SQL queries, CLI commands, file paths must be 100% English.
 - Produce a single reviewable `plan.md` artifact at the designated independent task folder (`only-one/tasks/<slug>/plan.md`). Do not implement anything or modify project source code during this workflow.
@@ -170,7 +170,7 @@ src/modules/order/
     └── [MODIFY] StationsPage.tsx     # Controlled Select components & event handlers
 ```
 
-## Section 1.5. Story Board (User Journey & Feature Scenarios)
+## Section 2. Story Board (User Journey & Feature Scenarios)
 Mô tả kịch bản hành vi kèm sơ đồ trực quan dưới mỗi story cho từng tính năng:
 
 ### Story 1: Feature / Component Name [NEW|MODIFY|DELETE]
@@ -187,7 +187,13 @@ flowchart LR
     A[Trạng thái Trước] -->|Hành động Người dùng| B[Trạng thái Sau]
 ```
 
-## Section 2. File Changes
+## Section 3. Test Cases & Verification Matrix
+
+### 3.1. Concept Coverage & Traceability Matrix (Đối soát Tiêu chí Concept)
+### 3.2. Test Case Specification Matrix (Ma trận Test Case Chi tiết)
+### Automated Test Execution Commands (Lệnh Kiểm thử Tự động Tập trung)
+
+## Section 4. File Changes
 
 ### Architectural Interaction Diagram (Mandatory for >= 2 modules or async flows)
 When planned changes impact >= 2 modules or involve asynchronous pipelines, provide a Mermaid or ASCII C4/Sequence diagram visualizing call flows and boundaries before the task block list.
@@ -202,7 +208,6 @@ Each file is a machine-readable task block. Preserve the exact heading format an
 - **Target Symbols / AST Seams**: `Class.methodName`.
 - **Invariants**: <Ràng buộc bất biến bằng tiếng Việt, tối đa 25 từ>.
 - **Depends On**: None.
-- **Fast Test Command**: `npm test path/to/file.test.ts`.
 
 > **Action**: <Hành động cụ thể bằng tiếng Việt, tối đa 20 từ>.
 
@@ -249,22 +254,22 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 
 - **🛑 Mandatory Primary Language Invariant (Vietnamese / User Preferred Language)**:
   - All narrative explanations, section descriptions, `Context`, `Action`, `Invariants`, Ponytail checklist items, `Decision`, `Rejected alternative`, and manual test steps MUST be written in the user's primary language (e.g., Tiếng Việt).
-  - ONLY code symbols, variables, interfaces, git diff blocks, CLI commands, file paths, and fixed metadata key names (`Status`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, `Fast Test Command`) remain in English.
-- **Enforce File-Centric & Diff-Centric Architecture**: Present every Section 2 task block with fixed metadata labels and a Git-standard Unified Diff (` ```diff `).
+  - ONLY code symbols, variables, interfaces, git diff blocks, CLI commands, file paths, and fixed metadata key names (`Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`) remain in English.
+- **Enforce File-Centric & Diff-Centric Architecture**: Present every Section 4 task block with fixed metadata labels and a Git-standard Unified Diff (` ```diff `).
 - **Enforce 80% ASD-STE100 & Karpathy Surgical Discipline**: Restrict task block instructions to <= 20 words, context to <= 25 words, prohibit passive voice, eliminate prose filler, and ensure strict surgical code changes.
-- **Enforce Mandatory Multi-Module Visual Diagrams**: When changes touch >= 2 modules or async pipelines, provide a Mermaid/ASCII interaction diagram at the top of Section 2 before file blocks.
+- **Enforce Mandatory Multi-Module Visual Diagrams**: When changes touch >= 2 modules or async pipelines, provide a Mermaid/ASCII interaction diagram at the top of Section 4 before file blocks.
 - **🛑 Anti-Current-State-Duplication**: Never recreate Current State or high-level solution narratives in `plan.md`; `concept.md` is their authoritative Single Source of Truth when present.
-- **🛑 Machine-Readable Task Block Contract**: One Section 2 block equals one changed file. Preserve exact heading format and mandatory metadata labels.
+- **🛑 Machine-Readable Task Block Contract**: One Section 4 block equals one changed file. Preserve exact heading format and mandatory metadata labels.
 - **🛑 Mandatory File-Centric Research & Compliance Gate**: Always identify target files first, then selectively load matching IDE framework skills and `only-one` rules/archives. Proposed diffs must comply 100% with loaded skills and rules.
 - **🛑 Strict Single-Document Invariant (Zero IDE Plan Artifacts)**: Only produce the canonical `only-one/tasks/<slug>/plan.md`. Never generate duplicate IDE internal plan files (e.g. `implementation_plan.md`).
-- **Enforce Reuse-First Invariant**: Always identify and declare reused existing utilities/helpers in Section 2; never propose reinventing existing functions.
+- **Enforce Reuse-First Invariant**: Always identify and declare reused existing utilities/helpers in Section 4; never propose reinventing existing functions.
 - **Enforce Serializer & Fallback Compatibility**: Handle both `time.Time` and `string` for timestamp fields, and plan document metadata fallback chains across stages.
 - **Validate UI Component Typings**: Verify layout properties against framework typings (e.g. Ink `Box` vs `Text`) before proposing JSX or TUI diffs.
 - **Synchronize Diff and Test Assertions**: Ensure regular expressions and validation logic match identically between implementation diffs and test assertions.
-- Always include `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, `Depends On`, and `Fast Test Command` in every file task block.
-- **Mandatory Storyboard Diagrams**: Every story in Section 1.5 must include a dedicated Mermaid/ASCII flow or sequence diagram illustrating the user interaction or state transition.
+- Always include `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, and `Depends On` in every file task block. DO NOT include `Fast Test Command`.
+- **Mandatory Storyboard Diagrams**: Every story in Section 2 must include a dedicated Mermaid/ASCII flow or sequence diagram illustrating the user interaction or state transition.
 - **Strict Test Policy by Task Type**:
-  - **Test-First Ordering**: Test task blocks must always precede their companion code implementation task blocks in Section 2.
+  - **Test-First Ordering**: Test task blocks must always precede their companion code implementation task blocks in Section 4.
   - `Task Type: code`: Mandatory accompanying test task block (e.g. `*.test.ts`) and full Test Matrix (`Happy Path`, `Boundary / Edge Cases`, `Failure / Error Handling`).
-  - `Task Type: non-code`: Must specify `Fast Test Command: None (Non-code task)` and strictly forbidden from creating accompanying test file blocks.
+  - `Task Type: non-code`: Strictly forbidden from creating accompanying test file blocks.
 - Save `plan.md` inside its dedicated task folder (`only-one/tasks/<slug>/plan.md`).

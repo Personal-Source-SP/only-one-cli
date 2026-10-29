@@ -17,8 +17,7 @@ status: concept
 ### Goal (Target Technical Outcomes)
 - **Core Goal**: <Primary technical outcome required>.
 - **Acceptance Criteria**:
-  - <Item 1>.
-  - <Item 2>.
+  - <Core functional criteria & Happy path rules>.
 
 ## 2. Scope Boundaries
 - **In-Scope**: <Mandatory features and behaviors to implement>.
@@ -26,6 +25,20 @@ status: concept
 
 ## 3. Proposed Solution & Core Mechanism
 - **Core Mechanism**: <Conceptual solution and operating model; no low-level code>.
+- **Conceptual Flow / Domain Model**:
+```mermaid
+flowchart TD
+    A["Before State / Action"] --> B["Processing / Decision Seam"]
+    B --> C["Target Result"]
+```
+- **UI Wireframe (Mandatory for features with UI)**:
+```text
++-----------------------------------------------------------+
+| [Header / Title]                                          |
++-----------------------------------------------------------+
+```
 
-## 4. Critical Risks & Edge Cases
-- <Technical risks, edge cases, or rollback strategies>.
+## 4. Critical Risks & Edge Cases (Phân tích Rủi ro & Cơ chế Phòng vệ)
+- **Rủi ro 1: <Tên rủi ro kỹ thuật hoặc ngoại lệ>**
+  - *Mặt tiêu cực / Nguy cơ*: <Hậu quả kỹ thuật xấu nhất có thể xảy ra>.
+  - *Cơ chế phòng vệ*: <Giải pháp kỹ thuật cụ thể để triệt tiêu hoặc khoanh vùng nguy cơ>.

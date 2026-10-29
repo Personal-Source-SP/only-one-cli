@@ -176,6 +176,11 @@ sequenceDiagram
     TargetModule--xBrokenBoundary: Contract violated / unexpected failure state
 ```
 
+### Section 1.5. Defect User Story & Reproduction Scenarios
+- **User Story**: Là người dùng, tôi gặp sự cố <lỗi> khi <hành động>.
+- **Actual Defect Scenario**: Kịch bản tái hiện hành vi sai lệch hiện tại.
+- **Expected Acceptance Scenario**: Kịch bản hành vi chính xác sau khi sửa lỗi.
+
 ## Section 2. File Changes
 
 ### Directory Structure Changes

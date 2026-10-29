@@ -26,25 +26,26 @@ export function validatePlan(content: string): PlanValidationResult {
         }
     }
 
-    const s1Index = content.indexOf('## Section 1. Directory Structure Changes');
-    const s15Index = content.indexOf('## Section 1.5. Story Board');
-    const s2Index = content.indexOf('## Section 2. File Changes');
-    const s3Index = content.lastIndexOf('## Section 3. Test Cases & Verification');
+    const s1Index = content.search(/## Section 1\.\s*Directory Structure/i);
+    const sStoryIndex = content.search(/## Section (?:1\.5|2)\.\s*Story Board/i);
+    const sFileIndex = content.search(/## Section (?:2|3|4)\.\s*File Changes/i);
+    const sTestIndex = content.search(/## Section (?:3|4)\.\s*Test Cases/i);
 
     if (s1Index === -1) {
         errors.push('Missing ## Section 1. Directory Structure Changes');
     }
-    if (s15Index === -1) {
+    if (sStoryIndex === -1) {
         errors.push('Missing ## Section 1.5. Story Board');
-    } else if (s2Index !== -1 && s2Index > s15Index) {
-        const s15Content = content.slice(s15Index, s2Index);
-        const storyMatches = [...s15Content.matchAll(/^### Story \d+:?[^\r\n]+/gm)];
+    } else {
+        const nextHeadingIndex = Math.min(...[sFileIndex, sTestIndex].filter((idx) => idx > sStoryIndex));
+        const sStoryContent = nextHeadingIndex !== Infinity ? content.slice(sStoryIndex, nextHeadingIndex) : content.slice(sStoryIndex);
+        const storyMatches = [...sStoryContent.matchAll(/^### Story \d+:?[^\r\n]+/gm)];
         if (storyMatches.length === 0) {
-            warnings.push('Section 1.5 Story Board contains zero story scenarios');
+            warnings.push('Story Board contains zero story scenarios');
         } else {
             storyMatches.forEach((sMatch, sIdx) => {
                 const sHeader = sMatch[0];
-                const sContent = s15Content.slice(sMatch.index);
+                const sContent = sStoryContent.slice(sMatch.index);
                 const nextStory = sContent.slice(sHeader.length).search(/^### Story \d+:/m);
                 const singleStory = nextStory !== -1 ? sContent.slice(0, sHeader.length + nextStory) : sContent;
                 if (!/```(mermaid|text)/i.test(singleStory)) {
@@ -53,20 +54,27 @@ export function validatePlan(content: string): PlanValidationResult {
             });
         }
     }
-    if (s2Index === -1) {
-        errors.push('Missing ## Section 2. File Changes');
+    if (sFileIndex === -1) {
+        errors.push('Missing ## Section 4 (or 2/3). File Changes');
     }
-    if (s3Index === -1) {
-        errors.push('Missing ## Section 3. Test Cases & Verification');
+    if (sTestIndex === -1) {
+        errors.push('Missing ## Section 3 (or 4). Test Cases & Verification Matrix');
+    } else {
+        const sTestContent = sFileIndex > sTestIndex ? content.slice(sTestIndex, sFileIndex) : content.slice(sTestIndex);
+        if (!/\|\s*Test ID\s*\|/i.test(sTestContent)) {
+            warnings.push('Test Matrix: Missing Test Case Specification Table (| Test ID |)');
+        }
     }
 
-    const s2Content = s2Index !== -1 && s3Index !== -1 && s3Index > s2Index ? content.slice(s2Index, s3Index) : '';
+    const sFileContent = sFileIndex !== -1
+        ? (sTestIndex > sFileIndex ? content.slice(sFileIndex, sTestIndex) : content.slice(sFileIndex))
+        : '';
     const taskBlockRegex = /^### \d+\.\s*`?\[(NEW|MODIFY|DELETE|RENAME)\]`?\s*`?([^`\r\n]+)`?/gm;
-    const taskMatches = [...s2Content.matchAll(taskBlockRegex)];
+    const taskMatches = [...sFileContent.matchAll(taskBlockRegex)];
     const taskCount = taskMatches.length;
 
     if (taskCount === 0) {
-        errors.push('Section 2 contains zero machine-readable file task blocks');
+        errors.push('File Changes section contains zero machine-readable file task blocks');
     }
 
     const testFileRegex = /(\.test\.|\.spec\.|_test\.)/;
@@ -74,8 +82,8 @@ export function validatePlan(content: string): PlanValidationResult {
     taskMatches.forEach((match, idx) => {
         const filePath = match[2].trim();
         const startIdx = match.index!;
-        const endIdx = idx + 1 < taskMatches.length ? taskMatches[idx + 1].index! : s2Content.length;
-        const singleBlock = s2Content.slice(startIdx, endIdx);
+        const endIdx = idx + 1 < taskMatches.length ? taskMatches[idx + 1].index! : sFileContent.length;
+        const singleBlock = sFileContent.slice(startIdx, endIdx);
 
         if (!/-\s*\*\*Status\*\*:/i.test(singleBlock)) warnings.push(`Task ${idx + 1} (${filePath}): Missing Status`);
         if (!/-\s*\*\*Depends On\*\*:/i.test(singleBlock)) warnings.push(`Task ${idx + 1} (${filePath}): Missing Depends On`);
@@ -85,32 +93,13 @@ export function validatePlan(content: string): PlanValidationResult {
             errors.push(`Task ${idx + 1} (${filePath}): Missing or invalid Task Type (must be 'code' or 'non-code')`);
         } else {
             const taskType = taskTypeMatch[1].toLowerCase();
-            const fastTestMatch = singleBlock.match(/-\s*\*\*Fast Test Command\*\*:\s*`?([^`\r\n]+)`?/i);
-            const fastTestCmd = fastTestMatch ? fastTestMatch[1].trim() : '';
-
-            if (taskType === 'code') {
-                if (!fastTestCmd || /^none/i.test(fastTestCmd)) {
-                    errors.push(`Task ${idx + 1} (${filePath}): Code tasks must specify an executable Fast Test Command`);
-                }
-                if (testFileRegex.test(filePath)) {
-                    const hasHappyPath = /Happy Path/i.test(singleBlock);
-                    const hasEdgeCases = /(Boundary|Edge Cases)/i.test(singleBlock);
-                    const hasErrorHandling = /(Failure|Error Handling)/i.test(singleBlock);
-                    if (!hasHappyPath || !hasEdgeCases || !hasErrorHandling) {
-                        warnings.push(`Task ${idx + 1} (${filePath}): Test file should declare full Test Matrix (Happy Path, Boundary/Edge Cases, Failure/Error Handling)`);
-                    }
-                }
-            } else if (taskType === 'non-code') {
+            if (taskType === 'non-code') {
                 if (testFileRegex.test(filePath)) {
                     errors.push(`Task ${idx + 1} (${filePath}): Non-code tasks must not target test files`);
-                }
-                if (fastTestCmd && !/^none/i.test(fastTestCmd)) {
-                    errors.push(`Task ${idx + 1} (${filePath}): Non-code tasks must set Fast Test Command to 'None (Non-code task)'`);
                 }
             }
         }
 
-        if (!/-\s*\*\*Fast Test Command\*\*:/i.test(singleBlock)) warnings.push(`Task ${idx + 1} (${filePath}): Missing Fast Test Command`);
         if (!/```diff[\s\S]*?```/i.test(singleBlock)) errors.push(`Task ${idx + 1} (${filePath}): Missing Git Unified Diff block`);
     });
 

@@ -149,10 +149,10 @@ status: concept
 ## 3. Proposed Solution & Core Mechanism (Giải pháp đề xuất & Cơ chế cốt lõi)
 - **Core Mechanism**: <Giải pháp khái niệm và mô hình hoạt động; không viết mã nguồn, mã giả, chữ ký hàm hoặc đường dẫn file cụ thể>.
 - **Conceptual Flow / Domain Model**: <Bắt buộc có sơ đồ Mermaid hoặc ASCII biểu diễn luồng dữ liệu, chuyển đổi trạng thái hoặc tương tác hệ thống qua c4-diagrams; luôn bọc nhãn và tiêu đề subgraph trong dấu ngoặc kép ["..."] để tránh lỗi cú pháp; không viết văn xuôi đơn điệu>.
-- *(Optional)* **UI Wireframe**: <Giao diện wireframe ASCII nếu tính năng có UI>.
+- **UI Wireframe (Mandatory for features with UI)**: <Bắt buộc vẽ khung giao diện ASCII (+---+) minh hoạ bố cục và trạng thái tương tác; cấm thay thế bằng văn bản kể lể>.
 
-## 4. Critical Risks & Edge Cases (Rủi ro & Xử lý ngoại lệ)
-- <Các rủi ro kỹ thuật, race condition, timeout hoặc chiến lược rollback nếu áp dụng>.
+## 4. Critical Risks & Edge Cases (Phân tích Rủi ro & Cơ chế Phòng vệ)
+- Tách bạch triệt để với Mục 1: Mục 1 chỉ nêu quy tắc thành công (Happy Path); Mục 4 nêu rõ Mặt tiêu cực / Nguy cơ kèm Cơ chế phòng vệ tương ứng.
 ```
 
 2. **Handoff & Hard Stop (🛑 Mandatory Terminal Gate)**:
@@ -163,7 +163,7 @@ status: concept
      To research codebase and draft an implementation plan, run:
      /only-one-plan only-one/tasks/<slug>
      ```
-   - 🛑 **STOP IMMEDIATELY**: Do NOT modify any source code, tests, configs, skills, or other workflows in the project. Do NOT automatically trigger `/only-one-plan` or `/only-one-apply`. The turn strictly terminates here.
+   - 🛑 **STOP IMMEDIATELY**: Do NOT modify source code, tests, or configs. Do NOT run `/only-one-plan`. Stop here.
 
 ---
 
@@ -178,9 +178,14 @@ status: concept
 - **Enforce Visual-First Domain Modeling**: Mandatory Mermaid/ASCII diagram in Section 3 for multi-step flows; never replace diagrams with monolithic narrative blocks.
 - **🛑 Strict Mermaid Syntax & Quotation Invariant**:
   - Always wrap ALL node labels and subgraph titles in double quotes: `id["Text"]`, `subgraph Plan ["Plan Title"]`.
+  - Subgraph IDs must be alphanumeric without spaces: `subgraph CoreEngine ["Engine Title"]`.
+  - Wrap edge labels containing special characters in double quotes: `|"edge label"|`.
+  - Wrap cylinder node labels in double quotes: `db[("Database")]`.
+  - Never use raw `&` in node labels; write `and` or `và`.
   - NEVER write `[/text]` or `[\text]` because Mermaid interprets `[/` as TRAPSTART (trapezoid shape token), causing fatal parse errors.
   - NEVER nest unescaped square brackets like `[x]` inside node labels; use `(x)` or simple words instead.
   - NEVER use raw `<` or `>` characters inside labels (HTML tag conflict); use `≤`, `≥`, or text instead.
+- **🛑 Mandatory ASCII UI Wireframe**: For UI features, always place an ASCII wireframe below Mermaid flowcharts.
 - **Do not skip Phase 1 discovery**: Clarify problem and scope boundaries thoroughly before proposing solution options.
 - **Always explore and present at least 2 solution options with trade-offs** before finalizing the chosen strategy.
 - **Strict Concept Boundary**: Never include source code, pseudocode, unified diffs, symbol signatures, file paths, or file-level implementation instructions.
