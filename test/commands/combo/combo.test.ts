@@ -51,7 +51,7 @@ describe('combo command', () => {
             expect(output).toContain("COMBO 'BACKEND FLOW SETUP' REPORT");
 
             // Verify skill copy
-            const skillPath = join(tempHome, '.agents', 'skills', 'only-one-nestjs-development');
+            const skillPath = join(tempHome, '.cursor', 'skills', 'only-one-nestjs-development');
             expect(existsSync(skillPath)).toBe(true);
         } finally {
             await rm(cwd, { recursive: true, force: true });
@@ -64,8 +64,8 @@ describe('combo command', () => {
         const prompts: Array<{ message: string; choices: Array<{ checked?: boolean }> }> = [];
 
         try {
-            await mkdir(join(tempHome, '.agents', 'skills', 'only-one-nestjs-development'), { recursive: true });
-            await writeFile(join(tempHome, '.agents', 'skills', 'only-one-nestjs-development', 'SKILL.md'), 'existing: true\n');
+            await mkdir(join(tempHome, '.cursor', 'skills', 'only-one-nestjs-development'), { recursive: true });
+            await writeFile(join(tempHome, '.cursor', 'skills', 'only-one-nestjs-development', 'SKILL.md'), 'existing: true\n');
             const program = createProgram({
                 cwd,
                 env: {},
@@ -106,8 +106,8 @@ describe('combo command', () => {
 
             await program.parseAsync(['combo', 'frontend-flow', '--global', '--tool', 'cursor'], { from: 'user' });
 
-            expect(existsSync(join(tempHome, '.agents', 'rules', '02-next-architecture-stack.md'))).toBe(true);
-            expect(existsSync(join(tempHome, '.agents', 'skills', 'only-one-nextjs-development', 'SKILL.md'))).toBe(true);
+            expect(existsSync(join(tempHome, '.cursor', 'rules', '02-next-architecture-stack.md'))).toBe(true);
+            expect(existsSync(join(tempHome, '.cursor', 'skills', 'only-one-nextjs-development', 'SKILL.md'))).toBe(true);
             expect(writes.join('\n')).toContain('Rules:');
             expect(writes.join('\n')).toContain('Skills:');
             expect(writes.join('\n')).toContain('Initializing UI/UX Pro Max CLI...');

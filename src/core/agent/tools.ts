@@ -17,13 +17,9 @@ export function resolveToolDestinationPaths(
     targetDir: string,
     isGlobal = false,
 ): string {
-    if (!isGlobal) {
-        if (assetType === 'skills') return join(targetDir, tool.skillsDir || '.agents', 'skills');
-        if (assetType === 'workflows') return join(targetDir, tool.skillsDir || '.agents', 'workflows');
-        return join(targetDir, tool.rulesDir || (tool.skillsDir ? join(tool.skillsDir, 'rules') : '.agents/rules'));
-    }
-
-    return join(targetDir, '.agents', assetType);
+    if (assetType === 'skills') return join(targetDir, tool.skillsDir || '.agents', 'skills');
+    if (assetType === 'workflows') return join(targetDir, tool.skillsDir || '.agents', 'workflows');
+    return join(targetDir, tool.rulesDir || (tool.skillsDir ? join(tool.skillsDir, 'rules') : '.agents/rules'));
 }
 
 export const AI_TOOLS: AgentToolOption[] = [

@@ -149,4 +149,19 @@ describe('Global Commands Integration (--global flag)', () => {
         expect(output).toContain('Tracked Asset Status');
         expect(output).toContain('only-one-idea');
     });
+
+    it('installs skills globally into specific IDE directory when --tool cursor is specified', async () => {
+        const logs: string[] = [];
+        const deps: Partial<ProgramDeps> = {
+            stdout: (msg) => logs.push(msg),
+            cwd: tempHome,
+        };
+
+        const cmd = createSkillCommand(deps as ProgramDeps);
+        await cmd.parseAsync(['node', 'test', tempHome, 'c4-diagrams', '--tool', 'cursor', '--global']);
+
+        const skillDest = join(tempHome, '.cursor/skills/c4-diagrams/SKILL.md');
+        expect(existsSync(skillDest)).toBe(true);
+        expect(existsSync(join(tempHome, '.gitignore'))).toBe(false);
+    });
 });
