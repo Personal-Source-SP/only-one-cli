@@ -7,6 +7,8 @@ export type AgentToolOption = {
     name: string;
     skillsDir?: string;
     rulesDir?: string;
+    globalSkillsDir?: string;
+    globalRulesDir?: string;
     successLabel?: string;
     value: string;
 };
@@ -17,9 +19,14 @@ export function resolveToolDestinationPaths(
     targetDir: string,
     isGlobal = false,
 ): string {
-    if (assetType === 'skills') return join(targetDir, tool.skillsDir || '.agents', 'skills');
-    if (assetType === 'workflows') return join(targetDir, tool.skillsDir || '.agents', 'workflows');
-    return join(targetDir, tool.rulesDir || (tool.skillsDir ? join(tool.skillsDir, 'rules') : '.agents/rules'));
+    const effectiveSkillsDir = isGlobal && tool.globalSkillsDir ? tool.globalSkillsDir : tool.skillsDir || '.agents';
+    const effectiveRulesDir =
+        isGlobal && tool.globalRulesDir
+            ? tool.globalRulesDir
+            : tool.rulesDir || (tool.skillsDir ? join(tool.skillsDir, 'rules') : '.agents/rules');
+    if (assetType === 'skills') return join(targetDir, effectiveSkillsDir, 'skills');
+    if (assetType === 'workflows') return join(targetDir, effectiveSkillsDir, 'workflows');
+    return join(targetDir, effectiveRulesDir);
 }
 
 export const AI_TOOLS: AgentToolOption[] = [
@@ -29,6 +36,8 @@ export const AI_TOOLS: AgentToolOption[] = [
         name: 'Antigravity',
         skillsDir: '.agents',
         rulesDir: '.agents/rules',
+        globalSkillsDir: '.gemini/config',
+        globalRulesDir: '.gemini/config/rules',
         successLabel: 'Antigravity',
         value: 'antigravity',
     },

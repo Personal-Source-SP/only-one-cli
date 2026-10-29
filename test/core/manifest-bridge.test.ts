@@ -47,13 +47,17 @@ describe('Skills Manifest Bridge', () => {
         expect(data.entries).toEqual([{ path: '/custom/path' }, { path: '~/.agents/skills' }]);
     });
 
-    it('syncs both ~/.agents and ~/.gemini/config manifests', async () => {
+    it('syncs ~/.gemini/config manifest and only syncs ~/.agents if directory exists', async () => {
         await syncGlobalSkillsManifest(tempDir);
 
         const agentsManifest = join(tempDir, '.agents', 'skills.json');
         const geminiManifest = join(tempDir, '.gemini', 'config', 'skills.json');
 
-        expect(existsSync(agentsManifest)).toBe(true);
+        expect(existsSync(agentsManifest)).toBe(false);
         expect(existsSync(geminiManifest)).toBe(true);
+
+        await mkdir(join(tempDir, '.agents'), { recursive: true });
+        await syncGlobalSkillsManifest(tempDir);
+        expect(existsSync(agentsManifest)).toBe(true);
     });
 });

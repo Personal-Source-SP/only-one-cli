@@ -101,7 +101,7 @@ export const executeAndReportComboStep = async (
         deps.stdout('\nHooks:');
         for (const h of results.hooks) {
             const statusColor = h.status === 'success' ? COLORS.success : COLORS.error;
-            deps.stdout(`  - ${COLORS.secondary(h.name)} in ${COLORS.primary('.agents/hooks')}: ${statusColor(h.status)}`);
+            deps.stdout(`  - ${COLORS.secondary(h.name)} in ${COLORS.primary('hooks')}: ${statusColor(h.status)}`);
         }
     }
 

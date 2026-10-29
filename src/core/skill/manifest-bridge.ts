@@ -42,6 +42,8 @@ export async function syncGlobalSkillsManifest(homeDir: string): Promise<void> {
     const agentsManifestPath = join(homeDir, '.agents', 'skills.json');
     const geminiManifestPath = join(homeDir, '.gemini', 'config', 'skills.json');
 
-    await mergeSkillsManifest(agentsManifestPath);
+    if (existsSync(join(homeDir, '.agents'))) {
+        await mergeSkillsManifest(agentsManifestPath);
+    }
     await mergeSkillsManifest(geminiManifestPath);
 }

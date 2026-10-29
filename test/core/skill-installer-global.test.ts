@@ -7,16 +7,16 @@ import { AI_TOOLS } from '@src/core/agent/tools.js';
 import { getExternalSkillPath } from '@src/core/skill/remote/skills-sh-installer.js';
 
 describe('global skill destination sync', () => {
-    it('strictly resolves global destination to canonical .agents/skills', async () => {
+    it('resolves global destination to .gemini/config/skills for Antigravity', async () => {
         const tempDir = await mkdtemp(join(tmpdir(), 'global-skill-test-'));
         const antigravity = AI_TOOLS.find((t) => t.value === 'antigravity')!;
 
         try {
-            await mkdir(join(tempDir, '.agents', 'skills', 'test-skill'), { recursive: true });
-            await writeFile(join(tempDir, '.agents', 'skills', 'test-skill', 'SKILL.md'), '# Test Skill');
+            await mkdir(join(tempDir, '.gemini', 'config', 'skills', 'test-skill'), { recursive: true });
+            await writeFile(join(tempDir, '.gemini', 'config', 'skills', 'test-skill', 'SKILL.md'), '# Test Skill');
 
             const path = getExternalSkillPath(tempDir, antigravity, 'test-skill', true);
-            expect(path).toBe(join(tempDir, '.agents', 'skills', 'test-skill', 'SKILL.md'));
+            expect(path).toBe(join(tempDir, '.gemini', 'config', 'skills', 'test-skill', 'SKILL.md'));
             expect(existsSync(path!)).toBe(true);
         } finally {
             await rm(tempDir, { recursive: true, force: true });

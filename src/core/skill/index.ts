@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { mkdir, cp, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
@@ -160,7 +160,10 @@ export const installSkills = async (request: {
                     if (commandAdapter) {
                         const generated = generateCommand(commandContent, commandAdapter);
                         const relativePath = normalizeStructureCommandPath(generated.path, commandId);
-                        const commandPath = join(projectDir, relativePath);
+                        const commandPath =
+                            isGlobal && tool.globalSkillsDir
+                                ? join(resolveToolDestinationPaths(tool, 'workflows', projectDir, isGlobal), basename(relativePath))
+                                : join(projectDir, relativePath);
                         await mkdir(dirname(commandPath), { recursive: true });
                         await writeFile(commandPath, generated.content, 'utf-8');
                     }

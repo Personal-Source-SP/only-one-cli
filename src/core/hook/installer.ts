@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { cp, mkdir } from 'node:fs/promises';
+import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
@@ -21,49 +21,69 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
     const packageRoot = resolvePackageRoot(import.meta.url);
     const srcHooksDir = join(packageRoot, 'assets', 'agents', 'hooks');
 
-    const baseDir = isGlobal ? join(homedir(), '.agents') : join(projectDir, '.agents');
-    const targetHooksDir = join(baseDir, 'hooks');
-    await mkdir(targetHooksDir, { recursive: true });
-
     const hookScripts = ['block-heavy-scripts.sh', 'no-secrets.sh', 'format-on-edit.sh', 'protect-configs.sh'];
 
     const installedFiles: string[] = [];
-    for (const script of hookScripts) {
-        const srcPath = join(srcHooksDir, script);
-        const destPath = join(targetHooksDir, script);
-        if (existsSync(srcPath)) {
-            await cp(srcPath, destPath, { force: true });
-            installedFiles.push(destPath);
-        }
-    }
-
     const configsCreated: string[] = [];
+    let primaryHooksDir = '';
 
-    // 1. Antigravity .agents/hooks.json
+    const copyScriptsTo = async (destDir: string) => {
+        await mkdir(destDir, { recursive: true });
+        for (const script of hookScripts) {
+            const srcPath = join(srcHooksDir, script);
+            const destPath = join(destDir, script);
+            if (existsSync(srcPath)) {
+                await cp(srcPath, destPath, { force: true });
+                installedFiles.push(destPath);
+            }
+        }
+    };
+
+    // 1. Antigravity hooks & config
     if (tools.includes('antigravity')) {
+        const agyHooksDir = isGlobal ? join(homedir(), '.gemini', 'hooks') : join(projectDir, '.gemini', 'hooks');
+        await copyScriptsTo(agyHooksDir);
+        primaryHooksDir = agyHooksDir;
+
         const srcJson = join(srcHooksDir, 'hooks.json');
-        const destJson = isGlobal ? join(homedir(), '.gemini', 'config', 'hooks.json') : join(baseDir, 'hooks.json');
+        const destJson = isGlobal ? join(homedir(), '.gemini', 'config', 'hooks.json') : join(projectDir, '.gemini', 'hooks.json');
         if (existsSync(srcJson)) {
             await mkdir(dirname(destJson), { recursive: true });
-            await cp(srcJson, destJson, { force: true });
+            const rawContent = await readFile(srcJson, 'utf-8');
+            const commandPrefix = isGlobal ? '~/.gemini/hooks/' : '.gemini/hooks/';
+            const customized = rawContent.replaceAll('.agents/hooks/', commandPrefix);
+            await writeFile(destJson, customized, 'utf-8');
             configsCreated.push(destJson);
         }
     }
 
-    // 2. Claude Code .claude/settings.json
+    // 2. Claude Code hooks & config
     if (tools.includes('claude')) {
+        const claudeHooksDir = isGlobal ? join(homedir(), '.claude', 'hooks') : join(projectDir, '.claude', 'hooks');
+        await copyScriptsTo(claudeHooksDir);
+        if (!primaryHooksDir) primaryHooksDir = claudeHooksDir;
+
         const srcClaude = join(srcHooksDir, 'claude-settings.json');
         const destClaude = isGlobal ? join(homedir(), '.claude', 'settings.json') : join(projectDir, '.claude', 'settings.json');
         if (existsSync(srcClaude)) {
             await mkdir(dirname(destClaude), { recursive: true });
-            await cp(srcClaude, destClaude, { force: true });
+            const rawContent = await readFile(srcClaude, 'utf-8');
+            let customized = rawContent;
+            if (isGlobal) {
+                customized = customized
+                    .replaceAll('$CLAUDE_PROJECT_DIR/.agents/hooks/', '~/.claude/hooks/')
+                    .replaceAll('.agents/hooks/', '~/.claude/hooks/');
+            } else {
+                customized = customized.replaceAll('.agents/hooks/', '.claude/hooks/');
+            }
+            await writeFile(destClaude, customized, 'utf-8');
             configsCreated.push(destClaude);
         }
     }
 
     return {
         installedFiles,
-        agentsHooksDir: targetHooksDir,
+        agentsHooksDir: primaryHooksDir,
         configsCreated,
     };
 }
