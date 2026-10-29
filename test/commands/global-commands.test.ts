@@ -122,8 +122,8 @@ describe('Global Commands Integration (--global flag)', () => {
         const cmd = createComboCommand(deps as ProgramDeps);
         await cmd.parseAsync(['node', 'test', tempHome, 'only-one-flow', '--tool', 'antigravity', '--global']);
 
-        const wfDest = join(tempHome, '.gemini/config/workflows/only-one-pr-git.md');
-        expect(existsSync(wfDest)).toBe(true);
+        expect(existsSync(join(tempHome, '.gemini/config/skills/only-one-pr-git/SKILL.md'))).toBe(true);
+        expect(existsSync(join(tempHome, '.gemini/config/workflows'))).toBe(false);
         expect(existsSync(join(tempHome, '.gemini/config/hooks/block-heavy-scripts.sh'))).toBe(true);
         expect(existsSync(join(tempHome, '.gemini/config/hooks.json'))).toBe(true);
         expect(existsSync(join(tempHome, '.agents'))).toBe(false);

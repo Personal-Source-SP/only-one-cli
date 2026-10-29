@@ -1,14 +1,10 @@
 import { existsSync } from 'node:fs';
 import { mkdir, cp, writeFile } from 'node:fs/promises';
-import { basename, dirname, join } from 'node:path';
+import { dirname, join } from 'node:path';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import type { ProgramDeps } from '@/cli/deps.js';
 import { updateGitignore } from '@/core/init/gitignore.js';
-import { buildPrGitCommandContent } from '@/core/templates/agent-workflows.js';
-import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
-import { generateCommand } from '@/core/command-generation/generator.js';
-import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { SKILLS } from '@assets/agents/skills/index.js';
 import { fetchSkillContentFromGitHub } from './remote/github-fetcher.js';
@@ -146,27 +142,6 @@ export const installSkills = async (request: {
                     await cp(srcPath, destPath, { recursive: true, force: true });
                 } else {
                     throw new Error(`Skill source not found for '${skillName}'`);
-                }
-
-                let commandContent = null;
-                let commandId = '';
-                if (skillName === 'only-one-pr-git') {
-                    commandContent = buildPrGitCommandContent();
-                    commandId = 'only-one-pr-git';
-                }
-
-                if (commandContent && commandId) {
-                    const commandAdapter = CommandAdapterRegistry.get(tool.value);
-                    if (commandAdapter) {
-                        const generated = generateCommand(commandContent, commandAdapter);
-                        const relativePath = normalizeStructureCommandPath(generated.path, commandId);
-                        const commandPath =
-                            isGlobal && tool.globalSkillsDir
-                                ? join(resolveToolDestinationPaths(tool, 'workflows', projectDir, isGlobal), basename(relativePath))
-                                : join(projectDir, relativePath);
-                        await mkdir(dirname(commandPath), { recursive: true });
-                        await writeFile(commandPath, generated.content, 'utf-8');
-                    }
                 }
 
                 results.push({
