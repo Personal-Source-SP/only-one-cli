@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { cp, rm } from 'node:fs/promises';
+import { cp, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
@@ -84,6 +84,14 @@ export async function installSkillViaSkillsCli(params: {
     }
 
     if (isGlobal) {
+        const globalAgentsDir = join(projectDir, '.agents');
+        if (existsSync(globalAgentsDir)) {
+            const skillsDir = join(globalAgentsDir, 'skills');
+            const remainingSkills = existsSync(skillsDir) ? await readdir(skillsDir) : [];
+            if (remainingSkills.length === 0) {
+                await rm(globalAgentsDir, { recursive: true, force: true });
+            }
+        }
         await syncGlobalSkillsManifest(projectDir);
     }
 }
