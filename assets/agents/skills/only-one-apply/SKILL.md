@@ -29,11 +29,11 @@ This skill executes an approved plan, debug document, or review finding set with
 
 - **`scripts/plan-status.ts`**: Fast deterministic task parser and DAG execution wave calculator.
   ```bash
-  npx tsx assets/skills/only-one-apply/scripts/plan-status.ts <path-to-plan.md>
+  npx tsx assets/agents/skills/only-one-apply/scripts/plan-status.ts <path-to-plan.md>
   ```
 - **`scripts/record-improvement.ts`**: Appends in-task friction notes deterministically.
   ```bash
-  npx tsx assets/skills/only-one-apply/scripts/record-improvement.ts <slug> <skill> <deficiency> <cause>
+  npx tsx assets/agents/skills/only-one-apply/scripts/record-improvement.ts <slug> <skill> <deficiency> <cause>
   ```
 - **`scripts/worktree-runner.ts`**: Điều phối vòng đời worktree, junction và rebase git an toàn.
   ```bash
@@ -233,37 +233,44 @@ Main Agent directly executes task blocks in sequence adhering strictly to `Depen
    - Output a concise, high-signal walkthrough report directly in chat.
    - 🛑 **Strict Vietnamese Language Requirement**: Explanatory text MUST be in concise Vietnamese. Keep symbols, paths, and commands in English.
    - 🛑 **Strict No-Extra-File Invariant**: Never create a separate `walkthrough.md` file on disk.
-   - Report MUST strictly follow this concise schema:
+   - 🛑 **Strict Anti-Bloat Output Invariant**: Never emit ASCII directory trees or repeat task block descriptions verbatim.
+   - Report MUST strictly follow this Collapsible Hybrid schema:
 
 ```markdown
 # 🏁 Hoàn tất: `<slug>` (`status: done` / `fixed`)
 
-### 1. Cấu trúc source thay đổi
-```text
-src/
-├── [NEW]    path/to/newFile.ts   # <Mô tả ngắn gọn>
-└── [MODIFY] path/to/modFile.ts   # <Mô tả ngắn gọn>
-```
+- **Trạng thái**: `DONE` ✅ (X files changed, Y tests passed)
+- **Điểm mấu chốt**: <1-2 câu tóm tắt giá trị kỹ thuật đã hoàn thành>
 
-### 2. Các công việc đã xử lý
-- <Tóm tắt ngắn gọn các task block đã thực thi>.
+<details>
+<summary>📂 Chi tiết tệp tin thay đổi (Click để mở rộng)</summary>
 
-### 3. Nghiệm thu & Kiểm thử
-- `<Lệnh test>` -> `PASS (X tests passed)`
+- `[NEW]`    path/to/new-file.ts
+- `[MODIFY]` path/to/mod-file.ts
+</details>
 
-### 4. Bước tiếp theo
-- `/only-one-clean` | `/only-one-pr-git`
+<details>
+<summary>🧪 Chi tiết kiểm thử (Click để mở rộng)</summary>
+
+- `<Lệnh test 1>`: X passed
+- `<Lệnh test 2>`: Clean
+</details>
+
+---
+💬 **Cổng cải tiến (only-one-evolve)**:
+Bạn có gặp khó khăn hay điểm ma sát nào cần ghi nhận để cải tiến kỹ năng không?
 ```
 
 4. **Capture In-Task Friction Points & Opportunities (`improvements.md`)**:
-   - If test failures, lint retries, or user corrective prompts occurred during task execution:
+   - 🛑 **Interactive Friction Check Gate**: Prompt user directly with the question from the report schema above.
+   - If user reports friction or if test retries occurred during execution:
      - Execute:
        ```bash
-       npx tsx assets/skills/only-one-apply/scripts/record-improvement.ts <slug> <target-skill> "<deficiency>" "<root-cause>"
+       npx tsx assets/agents/skills/only-one-apply/scripts/record-improvement.ts <slug> <target-skill> "<deficiency>" "<root-cause>"
        ```
-   - If execution completed 100% cleanly without friction or user corrections, omit this file.
+   - If user confirms no friction occurred, omit `improvements.md` entirely.
    - **Test Matrix Verification Gate**: Đối soát từng `Test ID` trong Section 3 của plan.md, chạy test suite xác nhận pass và cập nhật `[x]` vào bảng trước khi hoàn tất.
-   - **Friction Check Gate**: Chủ động hỏi người dùng xem có bài học hoặc điểm ma sát nào cần ghi nhận để cải tiến kỹ năng only-one-* trước khi đóng tác vụ.
+   - **Evolution Link Invariant**: Staged improvements will be consumed by `/only-one-clean` and applied by `/only-one-evolve`.
 
 ---
 
@@ -277,3 +284,4 @@ src/
 - Prioritize parsing ordered Section 2 file task blocks identically for `plan.md` and `debug.md`.
 - Execute `Fast Test Command` per file before proceeding to the next.
 - Maintain Beyoncé Rule at all times.
+- **Strict Anti-Bloat Report Invariant**: Report must use Collapsible Hybrid schema with zero ASCII trees and no Next Steps section.

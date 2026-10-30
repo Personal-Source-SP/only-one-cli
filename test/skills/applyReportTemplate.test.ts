@@ -14,17 +14,19 @@ describe('only-one-apply Concise Report Template Invariants', () => {
     it('chứa mẫu báo cáo tinh gọn bằng tiếng Việt', () => {
         const content = fs.readFileSync(skillPath, 'utf8');
 
-        // 1. Cấu trúc source thay đổi
-        expect(content).toContain('1. Cấu trúc source thay đổi');
+        // Khối tổng quan và chi tiết thu gọn
+        expect(content).toContain('<summary>📂 Chi tiết tệp tin thay đổi (Click để mở rộng)</summary>');
+        expect(content).toContain('<summary>🧪 Chi tiết kiểm thử (Click để mở rộng)</summary>');
+        expect(content).toContain('💬 **Cổng cải tiến (only-one-evolve)**:');
 
-        // 2. Các công việc đã xử lý
-        expect(content).toContain('2. Các công việc đã xử lý');
+        // Loại bỏ hoàn toàn các mục dài dòng cũ và Bước tiếp theo
+        expect(content).not.toContain('### 1. Cấu trúc source thay đổi');
+        expect(content).not.toContain('### 2. Các công việc đã xử lý');
+        expect(content).not.toContain('### 4. Bước tiếp theo');
 
-        // 3. Nghiệm thu & Kiểm thử
-        expect(content).toContain('3. Nghiệm thu & Kiểm thử');
-
-        // 4. Bước tiếp theo
-        expect(content).toContain('4. Bước tiếp theo');
+        // Đường dẫn script chính xác
+        expect(content).toContain('assets/agents/skills/only-one-apply/scripts/record-improvement.ts');
+        expect(content).toContain('assets/agents/skills/only-one-apply/scripts/plan-status.ts');
     });
 
     it('đáp ứng tiêu chuẩn độ dài câu ASD-STE100 qua lintSkill', () => {
