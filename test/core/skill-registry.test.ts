@@ -1,7 +1,8 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+
 import { SKILLS } from '@assets/skills/index.js';
+import { describe, expect, it } from 'vitest';
 
 const SDLC_SKILLS = [
     'only-one-idea',
@@ -27,6 +28,7 @@ const shippedLocalSkillNames = readdirSync(skillsDir, { withFileTypes: true })
 const readFrontmatterName = (skillName: string): string | undefined => {
     const content = readFileSync(join(skillsDir, skillName, 'SKILL.md'), 'utf8');
     const match = content.match(/^---\s*[\s\S]*?^name:\s*(.+?)\s*$[\s\S]*?^---$/m);
+
     return match?.[1];
 };
 
@@ -115,6 +117,7 @@ describe('skill registry integrity', () => {
 
     it('enforces Agent Skills specification format on all local skills', () => {
         const localSkills = SKILLS.filter((s) => s.sourceType === 'local');
+
         for (const skill of localSkills) {
             const skillPath = join(skillsDir, skill.name, 'SKILL.md');
             expect(existsSync(skillPath), `Skill '${skill.name}' must have SKILL.md`).toBe(true);

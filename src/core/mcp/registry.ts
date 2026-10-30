@@ -1,9 +1,12 @@
 import { existsSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
 import { MCPS } from '@assets/mcps/index.js';
-import type { McpManifest, McpManifestWarning, McpServerConfig, ReadMcpManifestsResponse } from './types.js';
+
 import { isRecord } from '@/utils/index.js';
+
+import type { McpManifest, McpManifestWarning, McpServerConfig, ReadMcpManifestsResponse } from './types.js';
 
 const isStringArray = (value: unknown): value is string[] => Array.isArray(value) && value.every((entry) => typeof entry === 'string');
 
@@ -36,6 +39,7 @@ export const validateMcpServerConfig = (id: string, value: unknown): McpServerCo
     };
 
     const nonEmptySecrets = getCredentialKeys(server).filter((key) => server.env?.[key]);
+
     if (nonEmptySecrets.length) {
         throw new Error(`MCP '${id}' env placeholders must be empty: ${nonEmptySecrets.join(', ')}`);
     }
@@ -59,6 +63,7 @@ export const readMcpManifests = async (directory?: string): Promise<ReadMcpManif
                     if (seen.has(id)) {
                         throw new Error(`Duplicate MCP id '${id}'`);
                     }
+
                     const parsed = JSON.parse(await readFile(path, 'utf-8')) as unknown;
                     const server = validateMcpServerConfig(id, parsed);
                     manifests.push({ id, server });

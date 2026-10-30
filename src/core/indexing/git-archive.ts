@@ -1,8 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { statSync, unlinkSync } from 'node:fs';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
+import { statSync, unlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const MAX_ARCHIVE_SIZE = 100 * 1024 * 1024; // 100MB
 
@@ -21,6 +21,7 @@ export function createArchive(repoPath: string): ArchiveResult {
     });
 
     const sizeBytes = statSync(zipPath).size;
+
     return { zipPath, sizeBytes };
 }
 

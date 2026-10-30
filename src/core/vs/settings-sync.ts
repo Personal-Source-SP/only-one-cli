@@ -1,11 +1,13 @@
 import { dirname } from 'node:path';
+
+import { findVsEditor } from './editors.js';
 import { mergeSettings, parseJsoncObject, stringifySettings } from './json.js';
 import { loadVsLibraryManifest } from './library.js';
 import { PercentProgressReporter } from './progress.js';
 import { nodeVsFileSystem, NodeVsProcessRunner } from './runtime.js';
 import { resolveVsJournalPath, VsSyncTransaction } from './transaction.js';
-import { findVsEditor } from './editors.js';
-import { VsPlatform, type VsEditorId, type VsFileSystem, type VsProcessRunner } from './types.js';
+import type { VsPlatform } from './types.js';
+import { type VsEditorId, type VsFileSystem, type VsProcessRunner } from './types.js';
 
 export interface ExistingVsSettingCheck {
     editorId: VsEditorId;
@@ -41,14 +43,17 @@ export interface VsSettingsSyncResponse {
 
 export const flattenSettings = (obj: Record<string, unknown>, prefix = ''): Record<string, unknown> => {
     const result: Record<string, unknown> = {};
+
     for (const [key, value] of Object.entries(obj)) {
         const fullKey = prefix ? `${prefix}.${key}` : key;
+
         if (value && typeof value === 'object' && !Array.isArray(value)) {
             Object.assign(result, flattenSettings(value as Record<string, unknown>, fullKey));
         } else {
             result[fullKey] = value;
         }
     }
+
     return result;
 };
 
@@ -62,13 +67,17 @@ export const filterSettingsByKeyList = (settingsObj: Record<string, unknown>, al
 
         const parts = key.split('.');
         let current = result;
+
         for (let i = 0; i < parts.length - 1; i += 1) {
             const part = parts[i];
+
             if (!current[part] || typeof current[part] !== 'object') {
                 current[part] = {};
             }
+
             current = current[part] as Record<string, unknown>;
         }
+
         current[parts[parts.length - 1]] = value;
     }
 
@@ -90,10 +99,12 @@ export const checkExistingVsSettings = async (options: {
 
     for (const editorId of options.editorIds) {
         const editor = findVsEditor(editorId);
+
         if (!editor) continue;
 
         const targetPath = editor.resolveSettingsPath(options.homeDir, options.platform);
         let target: Record<string, unknown> = {};
+
         try {
             target = parseJsoncObject(await fs.readFile(targetPath));
         } catch {
@@ -126,6 +137,7 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
     await transaction.recoverIfNeeded();
     const manifest = await loadVsLibraryManifest(fs, request.libraryDir);
     const editors = request.editorIds.map((id) => findVsEditor(id));
+
     if (editors.some((editor) => !editor)) throw new Error('Unsupported editor selected');
 
     progress.start(request.editorIds.length + 2, 'validate settings sync');
@@ -134,6 +146,7 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
         await transaction.rollback();
         process.exit(130);
     };
+
     process.once('SIGINT', handleSignal);
     process.once('SIGTERM', handleSignal);
     progress.step('backup ready');
@@ -143,14 +156,17 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
     try {
         for (const editor of editors) {
             if (!editor) continue;
+
             const targetPath = editor.resolveSettingsPath(request.homeDir, request.platform);
             await fs.mkdir(dirname(targetPath));
             let target: Record<string, unknown> = {};
+
             try {
                 target = parseJsoncObject(await fs.readFile(targetPath));
             } catch {
                 target = {};
             }
+
             await transaction.backupFile(targetPath);
 
             const allowedKeys = request.settingKeysPerEditor?.[editor.id] ?? request.settingKeys;
@@ -169,6 +185,7 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
                     newKeys[key] = newValue;
                 } else {
                     const oldValue = oldFlat[key];
+
                     if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
                         changedKeys[key] = { old: oldValue, new: newValue };
                     }
@@ -184,15 +201,18 @@ export const syncVsSettings = async (request: VsSettingsSyncRequest): Promise<Vs
             await transaction.atomicWrite(targetPath, stringifySettings(nextSettings));
             progress.step(`${editor.name} settings synced`);
         }
+
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
         await transaction.commit();
         progress.step('settings committed');
+
         return { changed: editors.length, results };
     } catch (error) {
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
         await transaction.rollback();
+
         throw error;
     }
 };

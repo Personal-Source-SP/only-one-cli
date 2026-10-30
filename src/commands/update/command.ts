@@ -1,9 +1,12 @@
 import { homedir } from 'node:os';
+
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import type { UpdateCommandOptions } from './types.js';
+
 import { resolveProjectStep, updateArtifactsStep } from './actions/index.js';
+import type { UpdateCommandOptions } from './types.js';
 
 export function createUpdateCommand(deps: ProgramDeps): Command {
     return new Command('update')

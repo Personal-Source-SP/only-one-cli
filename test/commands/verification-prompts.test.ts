@@ -1,11 +1,13 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { ProgramDeps } from '@/cli/deps.js';
-import { createSkillCommand } from '@/commands/skill/command.js';
-import { createMcpCommand } from '@/commands/mcp/command.ts';
-import { createComboCommand } from '@/commands/combo/command.ts';
-import { createRuleCommand } from '@/commands/rule/command.ts';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
+import { describe, expect, it, vi } from 'vitest';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import { createComboCommand } from '@/commands/combo/command.ts';
+import { createMcpCommand } from '@/commands/mcp/command.ts';
+import { createRuleCommand } from '@/commands/rule/command.ts';
+import { createSkillCommand } from '@/commands/skill/command.js';
 
 const testProjectDir = join(process.cwd(), 'tmp/verification-prompts-test');
 

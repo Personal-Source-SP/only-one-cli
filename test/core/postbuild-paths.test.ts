@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 function transformPaths(content: string, relPrefix: string, relAssetsPrefix: string): string {
     let cleaned = content;
+
     if (content.includes("'@/") || content.includes('"@/')) {
         cleaned = cleaned
             .replaceAll(/from '@\//g, "from '" + relPrefix)
@@ -9,6 +10,7 @@ function transformPaths(content: string, relPrefix: string, relAssetsPrefix: str
             .replaceAll(/import\('@\//g, "import('" + relPrefix)
             .replaceAll(/import\("@\//g, 'import("' + relPrefix);
     }
+
     const hasAssetsAlias =
         content.includes('@assets/') || content.includes('@agents/') || content.includes('@devenv/') || content.includes('@templates/');
 
@@ -41,6 +43,7 @@ function transformPaths(content: string, relPrefix: string, relAssetsPrefix: str
                 .replaceAll('import("' + alias, 'import("' + target);
         }
     }
+
     return cleaned;
 }
 

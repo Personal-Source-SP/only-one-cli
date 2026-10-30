@@ -1,4 +1,5 @@
 import type { ProgramDeps } from '@/cli/deps.js';
+
 import type { CheckResult, DoctorReport, SampleCommand } from './checks.js';
 export type DoctorMode = 'docker' | 'local';
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { resolveGoBinaryPath } from '../../src/tui/bridge.js';
 
 describe('Go Binary Bridge', () => {

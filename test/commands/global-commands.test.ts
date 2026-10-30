@@ -1,21 +1,24 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { existsSync } from 'node:fs';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import type { ProgramDeps } from '@/cli/deps.js';
-import { createSkillCommand } from '@/commands/skill/command.js';
-import { createWorkflowCommand } from '@/commands/workflow/command.js';
-import { createRuleCommand } from '@/commands/rule/command.js';
 import { createComboCommand } from '@/commands/combo/command.js';
+import { createRuleCommand } from '@/commands/rule/command.js';
+import { createSkillCommand } from '@/commands/skill/command.js';
 import { createUpdateCommand } from '@/commands/update/command.js';
-import { readInstalledLockfile, resolveInstalledLockfilePath } from '@/core/assets/lockfile.js';
+import { createWorkflowCommand } from '@/commands/workflow/command.js';
 import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
+import { readInstalledLockfile, resolveInstalledLockfilePath } from '@/core/assets/lockfile.js';
 
 let tempHome: string;
 
 vi.mock('node:os', async () => {
     const actual = await vi.importActual<typeof import('node:os')>('node:os');
+
     return {
         ...actual,
         homedir: () => tempHome,
@@ -26,6 +29,7 @@ vi.mock('@/core/skill/remote/skills-sh-installer.js', async () => {
     const actual = await vi.importActual<typeof import('@/core/skill/remote/skills-sh-installer.js')>(
         '@/core/skill/remote/skills-sh-installer.js',
     );
+
     return {
         ...actual,
         installSkillViaSkillsCli: vi.fn(async ({ projectDir, skillName, selectedTools, isGlobal }: any) => {

@@ -3,6 +3,7 @@ import { flattenSettings, loadVsLibraryManifest } from '@/core/vs/index.js';
 
 export const loadVsSettingManifestsStep = async (_deps: ProgramDeps): Promise<Record<string, unknown>> => {
     const manifest = await loadVsLibraryManifest();
+
     return manifest.settings;
 };
 

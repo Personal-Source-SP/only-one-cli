@@ -1,9 +1,11 @@
+import { existsSync } from 'node:fs';
+import { mkdir as mkdirP, readFile as fsReadFile, rm as rmP } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { createWorkflowCommand } from '@/commands/workflow/command.js';
-import { existsSync } from 'node:fs';
-import { mkdir as mkdirP, rm as rmP, readFile as fsReadFile } from 'node:fs/promises';
-import { join } from 'node:path';
 
 const testProjectDir = join(process.cwd(), 'tmp/workflow-command-test');
 
@@ -18,8 +20,11 @@ describe('Workflow Command Unit & Integration Tests (Deprecated & Forwarded)', (
             prompts: {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
+
                     if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
+
                     if (opts.message.includes('skills to add')) return ['only-one-idea'];
+
                     return [];
                 },
             },
@@ -48,6 +53,7 @@ describe('Workflow Command Unit & Integration Tests (Deprecated & Forwarded)', (
             prompts: {
                 checkbox: async (opts) => {
                     if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
+
                     return [];
                 },
             },

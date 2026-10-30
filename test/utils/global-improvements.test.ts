@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { getGlobalImprovementsDir, isOnlyOneTargetSkill, resolveRepoIdentifierSync } from '../../src/utils/global-improvements.js';
+
+import { describe, expect, it } from 'vitest';
+
 import { aggregateImprovements } from '../../assets/agents/skills/only-one-evolve/scripts/aggregate.js';
+import { getGlobalImprovementsDir, isOnlyOneTargetSkill, resolveRepoIdentifierSync } from '../../src/utils/global-improvements.js';
 
 describe('global-improvements utility', () => {
     describe('getGlobalImprovementsDir', () => {
@@ -43,6 +45,7 @@ describe('global-improvements utility', () => {
     describe('aggregateImprovements multi-repo scanning', () => {
         it('scans recursively across repo subfolders', () => {
             const tempDir = mkdtempSync(join(tmpdir(), 'agg-test-'));
+
             try {
                 const repoA = join(tempDir, 'repo-a');
                 const repoB = join(tempDir, 'repo-b');
@@ -94,6 +97,7 @@ Context info
 
         it('skips corrupted or invalid YAML files gracefully', () => {
             const tempDir = mkdtempSync(join(tmpdir(), 'agg-corrupt-'));
+
             try {
                 const repo = join(tempDir, 'repo-corrupt');
                 mkdirSync(repo, { recursive: true });

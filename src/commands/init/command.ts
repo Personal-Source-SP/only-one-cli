@@ -1,8 +1,10 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import type { InitCommandOptions } from './types.js';
+
 import { executeInitStep, executeInitSubcommandStep, runInitMcpStep } from './actions/index.js';
+import type { InitCommandOptions } from './types.js';
 
 export function createInitCommand(deps: ProgramDeps): Command {
     const cmd = new Command('init')

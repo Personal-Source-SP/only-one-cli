@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { input, confirm, select, checkbox } from '@inquirer/prompts';
+
+import { checkbox, confirm, input, select } from '@inquirer/prompts';
+
 import { createProgram } from './cli/index.js';
 
-export { createProgram } from './cli/index.js';
 export type { ProgramDeps, PromptDeps } from './cli/deps.js';
+export { createProgram } from './cli/index.js';
 
 export function isCliEntrypoint(moduleUrl: string, argvPath = process.argv[1]) {
     if (!argvPath) return false;
@@ -42,6 +44,7 @@ if (isCliEntrypoint(import.meta.url) || process.env.ONLY_ONE_CLI_BYPASS_ENTRYPOI
         if (error && (error.name === 'ExitPromptError' || error.message?.includes('User force closed the prompt with SIGINT'))) {
             process.exit(0);
         }
+
         throw error;
     }
 }

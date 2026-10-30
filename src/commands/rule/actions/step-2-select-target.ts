@@ -1,6 +1,7 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { AllowedTarget } from '@/core/target-selection/catalog.js';
 import { selectSingleAllowedRuleTarget } from '@/core/target-selection/index.js';
+
 import type { RuleCommandOptions } from '../types.js';
 
 export const selectRuleTargetStep = async (

@@ -1,5 +1,6 @@
 import { PACKAGES } from '@assets/packages/index.js';
 import type { PackageManifest } from '@assets/types.js';
+
 import { isPackageInstalled } from '../combo/index.js';
 import type { ItemOrigin, PlannedItem } from '../init/plan-types.js';
 
@@ -17,6 +18,7 @@ export async function planPackages(options: PlanPackageOptions): Promise<Planned
 
     for (const pkgId of selectedPackageIds) {
         const manifest = packageManifests.find((m) => m.id === pkgId);
+
         if (!manifest) continue;
 
         const installed =

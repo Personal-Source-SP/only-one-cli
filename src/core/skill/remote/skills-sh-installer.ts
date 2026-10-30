@@ -1,9 +1,11 @@
+import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { cp, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import { execFile } from 'node:child_process';
-import { resolveToolDestinationPaths, type AgentToolOption } from '@/core/agent/tools.js';
+
+import { type AgentToolOption, resolveToolDestinationPaths } from '@/core/agent/tools.js';
+
 import { syncGlobalSkillsManifest } from '../manifest-bridge.js';
 
 const execFileAsync = promisify(execFile);
@@ -28,8 +30,10 @@ export const getExternalSkillPath = (
 ): string | undefined => {
     if (isGlobal) {
         const globalPath = resolveToolDestinationPaths(tool, 'skills', projectDir, true);
+
         return join(globalPath, skillName, 'SKILL.md');
     }
+
     return tool.skillsDir ? join(projectDir, tool.skillsDir, 'skills', skillName, 'SKILL.md') : undefined;
 };
 
@@ -43,6 +47,7 @@ export async function installSkillViaSkillsCli(params: {
 }): Promise<void> {
     const { projectDir, source, skillName, selectedTools, cliVersion = '^1.0.0', isGlobal = false } = params;
     const unsupported = selectedTools.filter((tool) => !SKILLS_CLI_TARGETS[tool.value]);
+
     if (unsupported.length > 0) {
         throw new Error(`skills CLI does not support target(s): ${unsupported.map((tool) => tool.value).join(', ')}`);
     }
@@ -52,6 +57,7 @@ export async function installSkillViaSkillsCli(params: {
     const packageSpec = cleanVersion ? `skills@${cleanVersion}` : 'skills';
 
     const args = ['-y', packageSpec, 'add', source, '--skill', skillName, '--agent', ...agents, '--yes', '--copy'];
+
     if (isGlobal) {
         args.push('-g');
     }
@@ -69,6 +75,7 @@ export async function installSkillViaSkillsCli(params: {
 
         if (targetSkillPath !== localSkillPath && existsSync(localSkillPath)) {
             await cp(localSkillPath, targetSkillPath, { recursive: true, force: true });
+
             if (isGlobal) {
                 await rm(localSkillPath, { recursive: true, force: true });
             }
@@ -77,21 +84,26 @@ export async function installSkillViaSkillsCli(params: {
 
     const missing = selectedTools.filter((tool) => {
         const path = getExternalSkillPath(projectDir, tool, skillName, isGlobal);
+
         return !path || !existsSync(path);
     });
+
     if (missing.length > 0) {
         throw new Error(`External skill '${skillName}' missing after install for: ${missing.map((tool) => tool.value).join(', ')}`);
     }
 
     if (isGlobal) {
         const globalAgentsDir = join(projectDir, '.agents');
+
         if (existsSync(globalAgentsDir)) {
             const skillsDir = join(globalAgentsDir, 'skills');
             const remainingSkills = existsSync(skillsDir) ? await readdir(skillsDir) : [];
+
             if (remainingSkills.length === 0) {
                 await rm(globalAgentsDir, { recursive: true, force: true });
             }
         }
+
         await syncGlobalSkillsManifest(projectDir);
     }
 }

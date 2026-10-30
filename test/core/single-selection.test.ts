@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { selectSingleTarget, selectSingleAllowedAgentTarget } from '@/core/target-selection/single-selection.js';
+
+import { selectSingleAllowedAgentTarget, selectSingleTarget } from '@/core/target-selection/single-selection.js';
 
 describe('single target selection', () => {
     it('selects target via prompts.select', async () => {

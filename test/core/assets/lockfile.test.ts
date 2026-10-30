@@ -1,14 +1,16 @@
-import { describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
+
+import { describe, expect, it } from 'vitest';
+
 import {
+    ONLY_ONE_LOCKFILE_NAME,
     readInstalledLockfile,
     recordInstalledAssetsBatch,
     removeInstalledAsset,
     resolveInstalledLockfilePath,
-    ONLY_ONE_LOCKFILE_NAME,
 } from '@/core/assets/lockfile.js';
 
 describe('Assets Lockfile Management', () => {
@@ -24,6 +26,7 @@ describe('Assets Lockfile Management', () => {
 
     it('records global assets into .only-one/installed.json without touching local only-one dir', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-global-'));
+
         try {
             await recordInstalledAssetsBatch(cwd, [{ type: 'skills', id: 'c4-diagrams', version: '0.0.1' }], true);
 
@@ -40,6 +43,7 @@ describe('Assets Lockfile Management', () => {
 
     it('returns an empty state when lockfile does not exist', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-'));
+
         try {
             const state = await readInstalledLockfile(cwd);
             expect(state.schemaVersion).toBe(1);
@@ -51,6 +55,7 @@ describe('Assets Lockfile Management', () => {
 
     it('records installed assets and updates lockfile atomically in only-one/installed.json', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-'));
+
         try {
             await recordInstalledAssetsBatch(cwd, [
                 { type: 'rules', id: 'next-architecture-stack', version: '0.0.1' },
@@ -80,6 +85,7 @@ describe('Assets Lockfile Management', () => {
 
     it('auto-migrates legacy installed.workflows to installed.skills', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-legacy-'));
+
         try {
             const lockPath = resolveInstalledLockfilePath(cwd);
             await mkdir(dirname(lockPath), { recursive: true });
@@ -104,6 +110,7 @@ describe('Assets Lockfile Management', () => {
 
     it('removes an installed asset from lockfile', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'asset-lock-'));
+
         try {
             await recordInstalledAssetsBatch(cwd, [{ type: 'rules', id: 'next-architecture-stack', version: '0.0.1' }]);
 

@@ -1,6 +1,7 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import { checkExistingVsExtensions, type ExistingVsExtensionCheck, type VsEditorId } from '@/core/vs/index.js';
 import { parseCsv } from '@/utils/index.js';
+
 import type { ExtensionsVsCommandOptions } from '../types.js';
 
 export interface SelectExtensionsResult {
@@ -32,6 +33,7 @@ export const selectExtensionsStep = async (
                 const someExist = editorChecks.some((c) => c.exists);
 
                 let name = ext;
+
                 if (allExist) {
                     name = `${ext} (already exists)`;
                 } else if (someExist) {
@@ -52,6 +54,7 @@ export const selectExtensionsStep = async (
             });
             choices.sort((a, b) => {
                 if (a.allExist !== b.allExist) return Number(a.allExist) - Number(b.allExist);
+
                 return Number(a.someExist) - Number(b.someExist);
             });
 

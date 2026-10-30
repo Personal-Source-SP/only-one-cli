@@ -1,4 +1,5 @@
 import { isAbsolute, join } from 'node:path';
+
 import type { CommandContent, GeneratedCommand, ToolCommandAdapter } from './types.js';
 
 export const resolveCommandWritePath = (projectDir: string, adapterPath: string): string =>

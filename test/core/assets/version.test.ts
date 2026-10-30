@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { bumpDecimalVersion, compareDecimalVersions, isValidDecimalVersion, DEFAULT_ASSET_VERSION } from '@/core/assets/version.js';
+
+import { bumpDecimalVersion, compareDecimalVersions, DEFAULT_ASSET_VERSION, isValidDecimalVersion } from '@/core/assets/version.js';
 
 describe('Decimal Rollover Versioning Engine', () => {
     describe('isValidDecimalVersion', () => {

@@ -1,6 +1,7 @@
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
 import { COMBOS } from '@assets/combos/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
 import { MCPS } from '@assets/mcps/index.js';
@@ -8,7 +9,7 @@ import { PACKAGES } from '@assets/packages/index.js';
 import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { describe, expect, it } from 'vitest';
-import { checkExistingSkills } from '@/core/skill/index.js';
+
 import {
     buildComboDependencyPlan,
     isComboAgentMatch,
@@ -16,6 +17,7 @@ import {
     summarizeComboInstallation,
     validateComboManifestReferences,
 } from '@/core/combo/index.js';
+import { checkExistingSkills } from '@/core/skill/index.js';
 
 describe('combo manifest preflight', () => {
     const registries = {
@@ -137,6 +139,7 @@ describe('prebuilt combo completeness', () => {
     ])('$comboId resolves complete stack mapping', ({ comboId, technologySkill, architectureRule, stackMcps, forbiddenSkill }) => {
         const combo = COMBOS.find(({ id }) => id === comboId);
         expect(combo).toBeDefined();
+
         if (!combo) return;
 
         const plan = buildComboDependencyPlan(combo, productionRegistries);
@@ -145,6 +148,7 @@ describe('prebuilt combo completeness', () => {
         expect(new Set(plan.skills).size).toBe(plan.skills.length);
         expect(new Set(plan.workflows).size).toBe(plan.workflows.length);
         expect(new Set(plan.mcps).size).toBe(plan.mcps.length);
+
         if (forbiddenSkill) expect(plan.skills).not.toContain(forbiddenSkill);
 
         for (const ruleId of plan.rules) {
@@ -157,6 +161,7 @@ describe('prebuilt combo completeness', () => {
     it('only-one-flow resolves all 10 SDLC skills, thinking skills, and 5 core MCP tools', () => {
         const combo = COMBOS.find(({ id }) => id === 'only-one-flow');
         expect(combo).toBeDefined();
+
         if (!combo) return;
 
         const plan = buildComboDependencyPlan(combo, productionRegistries);

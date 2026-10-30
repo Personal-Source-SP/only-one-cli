@@ -1,9 +1,11 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { reportDoctorResultsStep, runDoctorChecksStep } from './actions/index.js';
 import type { DoctorCommandOptions } from '@/core/doctor/types.js';
-import { selectSingleAllowedVsSettingsTarget, getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
+import { getAllowedVsSettingsTargets, selectSingleAllowedVsSettingsTarget } from '@/core/target-selection/index.js';
+
+import { reportDoctorResultsStep, runDoctorChecksStep } from './actions/index.js';
 
 export function createDoctorCommand(deps: ProgramDeps): Command {
     return new Command('doctor')

@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
 import { AI_TOOLS } from '@src/core/agent/tools.js';
 import { getExternalSkillPath } from '@src/core/skill/remote/skills-sh-installer.js';
+import { describe, expect, it } from 'vitest';
 
 describe('global skill destination sync', () => {
     it('resolves global destination to .gemini/config/skills for Antigravity', async () => {

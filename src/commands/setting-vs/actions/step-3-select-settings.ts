@@ -1,7 +1,9 @@
 import { homedir } from 'node:os';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { checkExistingVsSettings, type ExistingVsSettingCheck, type VsEditorId } from '@/core/vs/index.js';
 import { parseCsv, resolveVsPlatform } from '@/utils/index.js';
+
 import type { SettingVsCommandOptions } from '../types.js';
 
 export interface SelectSettingsResult {
@@ -40,6 +42,7 @@ export const selectSettingsStep = async (
                     );
 
                     let name = key;
+
                     if (allExistAndMatch) {
                         name = `${key} (already up to date)`;
                     } else if (someExistWithDiff) {

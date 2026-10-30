@@ -1,10 +1,11 @@
+import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { cp, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { resolveToolDestinationPaths, type AgentToolOption } from '@/core/agent/tools.js';
+import { fileURLToPath } from 'node:url';
+
+import { type AgentToolOption, resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
 
 export interface WorkflowInstallResult {
@@ -14,10 +15,12 @@ export interface WorkflowInstallResult {
     status: 'success' | 'skipped' | 'failed';
     error?: string;
 }
-import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
-import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
-import { installHooks } from '@/core/hook/installer.js';
-import type { ProgramDeps } from '@/cli/deps.js';
+import { COMBOS } from '@assets/combos/index.js';
+import { CONFIGS } from '@assets/configs/index.js';
+import { MCPS } from '@assets/mcps/index.js';
+import { PACKAGES } from '@assets/packages/index.js';
+import { RULES } from '@assets/rules/index.js';
+import { SKILLS } from '@assets/skills/index.js';
 import type {
     ComboManifest,
     ConfigManifest,
@@ -27,19 +30,18 @@ import type {
     SkillManifest,
     WorkflowManifest,
 } from '@assets/types.js';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
+import { installHooks } from '@/core/hook/installer.js';
+import { checkExistingMcps, readMcpManifests, syncMcpGlobalConfig } from '@/core/mcp/index.js';
 import { checkExistingSkills, installSkills, type SkillInstallResult } from '@/core/skill/index.js';
-import { checkExistingMcps, syncMcpGlobalConfig, readMcpManifests } from '@/core/mcp/index.js';
-import { COMBOS } from '@assets/combos/index.js';
-import { PACKAGES } from '@assets/packages/index.js';
-import { CONFIGS } from '@assets/configs/index.js';
-import { RULES } from '@assets/rules/index.js';
-import { SKILLS } from '@assets/skills/index.js';
-import { MCPS } from '@assets/mcps/index.js';
 import {
-    SKILLS_CLI_TARGETS,
     getExternalSkillPath as externalSkillPath,
     installSkillViaSkillsCli,
+    SKILLS_CLI_TARGETS,
 } from '@/core/skill/remote/skills-sh-installer.js';
+import { ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -54,13 +56,17 @@ export interface ExtendedComboManifest extends ComboManifest {
 
 export const isComboScopeMatch = (combo: ComboManifest, isGlobal: boolean): boolean => {
     const scope = combo.scope ?? 'both';
+
     if (scope === 'both') return true;
+
     return isGlobal ? scope === 'global' : scope === 'project';
 };
 
 export const isComboAgentMatch = (combo: ComboManifest, targetTools: AgentToolOption[]): boolean => {
     const agents = combo.supportedAgents ?? ['*'];
+
     if (agents.includes('*') || targetTools.length === 0) return true;
+
     return targetTools.some((tool) => agents.includes(tool.value));
 };
 
@@ -81,8 +87,11 @@ export type ComboInstallationStatus = 'installed' | 'missing' | 'partial';
 
 export const summarizeComboInstallation = (components: ExistingComboComponent[]): ComboInstallationStatus => {
     const applicable = components.filter((component) => component.status !== 'not-applicable');
+
     if (applicable.length === 0 || applicable.every((component) => component.status === 'installed')) return 'installed';
+
     if (applicable.every((component) => component.status === 'missing')) return 'missing';
+
     return 'partial';
 };
 
@@ -146,6 +155,7 @@ export const validateComboManifestReferences = (combos: ComboManifest[], registr
 
         for (const workflowName of combo.workflows || []) {
             const workflow = registries.workflows.find((item) => item.name === workflowName);
+
             for (const mcpId of workflow?.requiredMcps || []) {
                 if (!registries.mcps.some((mcp) => mcp.id === mcpId)) {
                     throw new Error(`Combo '${combo.id}' workflow '${workflowName}' references unknown mcps ID '${mcpId}'`);
@@ -160,6 +170,7 @@ export const validateComboManifestReferences = (combos: ComboManifest[], registr
                 ['skills', rule?.requiredSkills, new Set(registries.skills.map((item) => item.name))],
                 ['mcps', rule?.requiredMcps, new Set(registries.mcps.map((item) => item.id))],
             ];
+
             for (const [field, ids, catalog] of dependencies) {
                 for (const id of ids || []) {
                     if (!catalog.has(id)) throw new Error(`Combo '${combo.id}' rule '${ruleId}' references unknown ${field} ID '${id}'`);
@@ -175,14 +186,17 @@ export const buildComboDependencyPlan = (
 ): ComboDependencyPlan => {
     const ruleDependencies = (combo.rules || []).flatMap((id) => {
         const rule = registries.rules.find((item) => item.id === id);
+
         return rule ? [rule] : [];
     });
     const workflowDependencies = (combo.workflows || []).flatMap((name) => {
         const workflow = registries.workflows.find((item) => item.name === name);
+
         return workflow ? [workflow] : [];
     });
     const skillDependencies = (combo.skills || []).flatMap((name) => {
         const skill = registries.skills.find((item) => item.name === name);
+
         return skill ? [skill] : [];
     });
 
@@ -207,6 +221,7 @@ export const buildComboDependencyPlan = (
 
 export const readComboManifests = async (): Promise<ExtendedComboManifest[]> => {
     validateComboManifestReferences(COMBOS, comboRegistries());
+
     return COMBOS;
 };
 
@@ -217,8 +232,11 @@ export const readPackageManifests = async (): Promise<PackageManifest[]> => {
 export const isPackageInstalled = async (name: string, scope: 'global' | 'local', projectDir: string): Promise<boolean> => {
     try {
         const args = ['list', name, '--depth=0'];
+
         if (scope === 'global') args.push('-g');
+
         await execFileAsync('npm', args, { cwd: projectDir, shell: true });
+
         return true;
     } catch {
         return false;
@@ -227,12 +245,16 @@ export const isPackageInstalled = async (name: string, scope: 'global' | 'local'
 
 export const npmInstall = async (name: string, scope: 'global' | 'local', projectDir: string): Promise<boolean> => {
     const args = ['install', name];
+
     if (scope === 'global') args.push('-g');
+
     try {
         await execFileAsync('npm', args, { cwd: projectDir, timeout: 120000, shell: true });
+
         return true;
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
+
         throw new Error(`npm install failed for ${name}: ${message}`);
     }
 };
@@ -291,23 +313,29 @@ export const checkExistingComboComponents = async (params: {
     // 1. Packages
     if (plan.packages.length) {
         const pkgManifests = await readPackageManifests();
+
         for (const pkgName of plan.packages) {
             const pkg = pkgManifests.find((manifest) => manifest.id === pkgName);
+
             if (!pkg) continue;
+
             const isExternalSkill = pkg.installer.kind === 'skills';
             const scope = pkg.installer.kind === 'npm' ? (pkg.installer.scope ?? 'global') : undefined;
             let exists: boolean;
+
             if (pkg.installer.kind === 'skills') {
                 const skillName = pkg.installer.skillName;
                 exists =
                     selectedTools.length > 0 &&
                     selectedTools.every((tool) => {
                         const path = externalSkillPath(projectDir, tool, skillName, isGlobal);
+
                         return Boolean(path && existsSync(path));
                     });
             } else {
                 exists = await isPackageInstalled(pkg.installer.packageName, scope!, projectDir);
             }
+
             results.push({
                 type: 'package',
                 id: `package:${pkgName}`,
@@ -339,6 +367,7 @@ export const checkExistingComboComponents = async (params: {
 
     if (plan.skills.length > 0 && selectedTools.length > 0) {
         const skillChecks = await checkExistingSkills(projectDir, selectedTools, plan.skills, isGlobal);
+
         for (const check of skillChecks) {
             results.push({
                 type: 'skill',
@@ -359,6 +388,7 @@ export const checkExistingComboComponents = async (params: {
             .map((tool) => ALLOWED_TARGETS.find((target) => target.id === tool.value))
             .filter((target): target is (typeof ALLOWED_TARGETS)[number] => Boolean(target?.agent?.rulesDir));
         const ruleChecks = await checkExistingRules(projectDir, ruleTargets, combo.rules, RULES, isGlobal);
+
         for (const check of ruleChecks) {
             results.push({
                 type: 'rule',
@@ -375,6 +405,7 @@ export const checkExistingComboComponents = async (params: {
 
     // 6. MCPs (Explicit + Inferred from skills)
     const mcps = new Set<string>(plan.mcps);
+
     if (plan.skills.includes('only-one-pr-git')) mcps.add('github');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
@@ -382,6 +413,7 @@ export const checkExistingComboComponents = async (params: {
             .map((tool) => tool.value)
             .filter((value) => value === 'cursor' || value === 'antigravity');
         const unsupportedTools = selectedTools.filter((tool) => !supportedIdeIds.includes(tool.value));
+
         for (const tool of unsupportedTools) {
             for (const mcpId of mcps) {
                 results.push({
@@ -396,8 +428,10 @@ export const checkExistingComboComponents = async (params: {
                 });
             }
         }
+
         if (supportedIdeIds.length > 0) {
             const mcpChecks = await checkExistingMcps(homeDir, platform, supportedIdeIds, Array.from(mcps));
+
             for (const check of mcpChecks) {
                 results.push({
                     type: 'mcp',
@@ -456,18 +490,21 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
 
             const pkgManifests = await readPackageManifests();
             const pkg = pkgManifests.find((m) => m.id === pkgName);
+
             if (!pkg) {
                 results.packages.push({ name: pkgName, status: 'failed', error: 'Package manifest not found' });
                 continue;
             }
 
             deps.stdout(`  Installing ${pkg.installer.kind === 'skills' ? 'external skill' : 'package'} ${pkgName}...`);
+
             try {
                 if (pkg.installer.kind === 'npm') {
                     await npmInstall(pkg.installer.packageName, pkg.installer.scope ?? 'global', projectDir);
                 } else {
                     await installExternalSkill(pkg.installer, selectedTools, projectDir, isGlobal);
                 }
+
                 results.packages.push({ name: pkgName, status: 'success' });
             } catch (err: any) {
                 results.packages.push({
@@ -480,11 +517,15 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
 
         // Initialize UI/UX Pro Max whenever its package is available, including an existing global installation.
         const uiuxResult = results.packages.find((pkg) => pkg.name === 'ui-ux-pro-max-cli');
+
         if (uiuxResult && uiuxResult.status !== 'failed' && selectedTools.length > 0) {
             deps.stdout('\nInitializing UI/UX Pro Max CLI...');
+
             for (const tool of selectedTools) {
                 const aiTarget = UIPRO_AI_TARGETS[tool.value];
+
                 if (!aiTarget) continue;
+
                 try {
                     deps.stdout(`  Running: npx ui-ux-pro-max-cli init --ai ${aiTarget} --force`);
                     await execFileAsync('npx', ['ui-ux-pro-max-cli', 'init', '--ai', aiTarget, '--force'], {
@@ -499,6 +540,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
 
                     if (targetSkillsDir !== defaultAgentSkillsDir && existsSync(defaultAgentSkillsDir)) {
                         const entries = await readdir(defaultAgentSkillsDir, { withFileTypes: true });
+
                         for (const entry of entries) {
                             if (entry.isDirectory()) {
                                 const srcDir = join(defaultAgentSkillsDir, entry.name);
@@ -527,6 +569,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
         const ruleTargets = selectedTools
             .map((tool) => ALLOWED_TARGETS.find((target) => target.id === tool.value))
             .filter((target): target is (typeof ALLOWED_TARGETS)[number] => Boolean(target?.agent?.rulesDir));
+
         if (ruleTargets.length > 0) {
             const ruleResult = await installRules({
                 deps,
@@ -570,12 +613,15 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
                 }
 
                 const configEntry = CONFIGS[configName];
+
                 if (configEntry?.files) {
                     let success = true;
                     let errorMsg = '';
+
                     for (const fileEntry of configEntry.files) {
                         const srcPath = join(configsDir, fileEntry.src);
                         const destPath = join(projectDir, fileEntry.dest);
+
                         if (existsSync(srcPath)) {
                             try {
                                 await cp(srcPath, destPath, { recursive: true, force: true });
@@ -585,6 +631,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
                             }
                         }
                     }
+
                     results.configs.push({
                         name: configName,
                         status: success ? 'success' : 'failed',
@@ -599,10 +646,12 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
 
     // 7. MCPs
     const mcps = new Set<string>(plan.mcps);
+
     if (plan.skills.includes('only-one-pr-git')) mcps.add('github');
 
     if (mcps.size > 0 && selectedTools.length > 0) {
         const mcpIdeIds = selectedTools.map((t) => t.value).filter((val) => val === 'cursor' || val === 'antigravity');
+
         if (mcpIdeIds.length > 0) {
             const { manifests } = await readMcpManifests();
             const selectedManifests = manifests.filter((m) => mcps.has(m.id));

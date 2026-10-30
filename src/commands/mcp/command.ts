@@ -1,6 +1,7 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
-import type { McpCommandOptions } from './types.js';
+
 import {
     confirmMcpOverwriteStep,
     executeAndReportMcpStep,
@@ -8,6 +9,7 @@ import {
     selectMcpsStep,
     selectMcpTargetStep,
 } from './actions/index.js';
+import type { McpCommandOptions } from './types.js';
 
 export function createMcpCommand(deps: ProgramDeps): Command {
     const cmd = new Command('mcp')
@@ -24,6 +26,7 @@ export function createMcpCommand(deps: ProgramDeps): Command {
 
             if (!selectedMcpIds?.length) {
                 deps.stdout('No MCP servers selected. Exiting.');
+
                 return;
             }
 

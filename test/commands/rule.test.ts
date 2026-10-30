@@ -1,13 +1,15 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { ProgramDeps } from '@/cli/deps.js';
-import { AllowedToolId } from '@/constants/allowed-tools.js';
-import { createRuleCommand } from '@/commands/rule/command.js';
-import { installRules } from '@/core/rule/index.js';
-import { RULES } from '@assets/rules/index.js';
-import { getAllowedRuleTargets } from '@/core/target-selection/catalog.js';
-import { mkdir, readFile, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { mkdir, readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
+
+import { RULES } from '@assets/rules/index.js';
+import { describe, expect, it, vi } from 'vitest';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import { createRuleCommand } from '@/commands/rule/command.js';
+import { AllowedToolId } from '@/constants/allowed-tools.js';
+import { installRules } from '@/core/rule/index.js';
+import { getAllowedRuleTargets } from '@/core/target-selection/catalog.js';
 
 const testProjectDir = join(process.cwd(), 'tmp/rule-command-test');
 

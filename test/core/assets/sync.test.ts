@@ -1,11 +1,13 @@
-import { describe, expect, it } from 'vitest';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
-import { inspectAssetUpdates, applyAssetUpdates, pruneAssetUpdates } from '@/core/assets/sync.js';
+
 import { SKILLS } from '@assets/skills/index.js';
+import { describe, expect, it } from 'vitest';
+
+import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
+import { applyAssetUpdates, inspectAssetUpdates, pruneAssetUpdates } from '@/core/assets/sync.js';
 
 describe('Asset Synchronization & Reconciliation', () => {
     it('identifies up-to-date and outdated assets in target project', async () => {
@@ -44,6 +46,7 @@ describe('Asset Synchronization & Reconciliation', () => {
 
     it('applies asset updates and persists latest version to lockfile', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'sync-test-'));
+
         try {
             await mkdir(join(cwd, '.agents/skills/only-one-idea'), { recursive: true });
             await writeFile(join(cwd, '.agents/skills/only-one-idea/SKILL.md'), '# idea');
@@ -96,6 +99,7 @@ describe('Asset Synchronization & Reconciliation', () => {
 
     it('identifies removed assets and prunes them from disk and lockfile', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'sync-test-removed-'));
+
         try {
             // Create mock file for obsolete skill
             const orphanSkillDir = join(cwd, '.agents/skills/obsolete-skill');

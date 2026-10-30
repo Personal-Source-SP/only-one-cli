@@ -9,6 +9,7 @@ export function isValidDecimalVersion(version: string): boolean {
     if (!version || typeof version !== 'string') {
         return false;
     }
+
     return DECIMAL_VERSION_REGEX.test(version.trim());
 }
 
@@ -23,6 +24,7 @@ export function bumpDecimalVersion(currentVersion: string): string {
 
     const trimmed = currentVersion.trim();
     const match = trimmed.match(DECIMAL_VERSION_REGEX);
+
     if (!match) {
         throw new Error(`Invalid decimal version format: "${currentVersion}". Expected "X.Y.Z" (e.g. 0.0.1).`);
     }
@@ -32,9 +34,11 @@ export function bumpDecimalVersion(currentVersion: string): string {
     let patch = Number.parseInt(match[3], 10);
 
     patch += 1;
+
     if (patch > 9) {
         patch = 0;
         minor += 1;
+
         if (minor > 9) {
             minor = 0;
             major += 1;
@@ -63,7 +67,10 @@ export function compareDecimalVersions(v1: string, v2: string): number {
     const [maj2, min2, pat2] = [Number(m2[1]), Number(m2[2]), Number(m2[3])];
 
     if (maj1 !== maj2) return maj1 > maj2 ? 1 : -1;
+
     if (min1 !== min2) return min1 > min2 ? 1 : -1;
+
     if (pat1 !== pat2) return pat1 > pat2 ? 1 : -1;
+
     return 0;
 }

@@ -1,9 +1,10 @@
 import { loadConfig, persistConfigAgentTools } from '@/core/config/index.js';
-import { extractGeneratedByVersion } from '@/core/structure/status.js';
 import { readCliVersion } from '@/core/runtime/read-cli-version.js';
+import { extractGeneratedByVersion } from '@/core/structure/status.js';
+
 import { installAgentArtifacts, type InstallAgentArtifactsResult } from './install.js';
-import { resolveStructureSkillPath } from './skill-presence.js';
 import { getAgentToolDisplayName } from './prompt-setup.js';
+import { resolveStructureSkillPath } from './skill-presence.js';
 
 export type UpdateAgentArtifactsRequest = {
     force?: boolean;
@@ -40,6 +41,7 @@ export const updateAgentArtifacts = async (request: UpdateAgentArtifactsRequest)
         for (const toolId of agentTools) {
             const skillPath = resolveStructureSkillPath(request.projectDir, toolId);
             const installedVersion = extractGeneratedByVersion(skillPath);
+
             if (!installedVersion || installedVersion !== cliVersion) {
                 needsUpdate = true;
                 break;
@@ -49,6 +51,7 @@ export const updateAgentArtifacts = async (request: UpdateAgentArtifactsRequest)
 
     if (!needsUpdate) {
         const structure = await installAgentArtifacts(request.projectDir, { cliVersion, force: false, tools: agentTools });
+
         return {
             agentTools,
             cliVersion,
@@ -74,19 +77,24 @@ export const updateAgentArtifacts = async (request: UpdateAgentArtifactsRequest)
 
 export const formatUpdateHumanLines = (result: UpdateAgentArtifactsResponse): string[] => {
     const lines = [result.message, `  CLI version: ${result.cliVersion}`];
+
     if (!result.agentTools.length) {
         return lines;
     }
+
     if (result.updated) {
         for (const entry of result.structure.tools) {
             const label = getAgentToolDisplayName(entry.toolId);
+
             if (entry.skill.installed) {
                 lines.push(`  ${label} skill: ${entry.skill.path}`);
             }
+
             if (entry.command?.installed) {
                 lines.push(`  ${label} command: ${entry.command.path}`);
             }
         }
     }
+
     return lines;
 };

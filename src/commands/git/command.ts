@@ -1,8 +1,10 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import type { GitCommandOptions } from './types.js';
+
 import { executeGitCommandStep } from './actions/execute.js';
+import type { GitCommandOptions } from './types.js';
 
 export function createGitCommand(deps: ProgramDeps): Command {
     return new Command('git')

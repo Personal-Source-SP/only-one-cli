@@ -1,11 +1,12 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import { loadConfig } from '@/core/config/index.js';
-import { getMissingStructureTools, hasStructureAgentSkills, hasStructureSkillForTool } from './skill-presence.js';
-import { AgentSkillSetupError, formatAgentSkillSetupError, getAgentToolDisplayName, promptAgentSkillSetup } from './prompt-setup.js';
-import { isPromptInteractive } from './interactive.js';
-import { resolveToolsArg, ResolveToolsArgError } from './resolve-tools.js';
-import { getToolsWithSkillsDir } from './tools.js';
 import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
+
+import { isPromptInteractive } from './interactive.js';
+import { AgentSkillSetupError, formatAgentSkillSetupError, getAgentToolDisplayName, promptAgentSkillSetup } from './prompt-setup.js';
+import { resolveToolsArg, ResolveToolsArgError } from './resolve-tools.js';
+import { getMissingStructureTools, hasStructureAgentSkills, hasStructureSkillForTool } from './skill-presence.js';
+import { getToolsWithSkillsDir } from './tools.js';
 
 export type EnsureStructureAgentSkillsRequest = {
     force?: boolean;
@@ -45,6 +46,7 @@ export const ensureStructureAgentSkills = async (
                 skillName,
                 commandId,
             });
+
             return { agentTools: setup.tools, ok: true, setupRan: setup.installRan };
         } catch (error) {
             return { exitCode: 1, message: formatAgentSkillSetupError(error), ok: false };
@@ -60,15 +62,18 @@ export const ensureStructureAgentSkills = async (
     }
 
     const missing = getMissingTools(checkTools);
+
     if (!missing.length) {
         const activeTools = configured.length
             ? configured
             : checkTools.filter((toolId) => hasStructureSkillForTool(request.projectDir, toolId, skillName, commandId));
+
         return { agentTools: activeTools, ok: true, setupRan: false };
     }
 
     if (!isPromptInteractive(deps)) {
         const names = (missing.length ? missing : checkTools).map(getAgentToolDisplayName).join(', ');
+
         return {
             exitCode: 1,
             message: `Structure agent skills missing for: ${names}. Run interactively or pass --tools to install.`,
@@ -98,6 +103,7 @@ export const ensureStructureAgentSkills = async (
         }
 
         const stillMissing = getMissingTools(setup.tools);
+
         if (stillMissing.length) {
             return {
                 exitCode: 1,
@@ -111,6 +117,7 @@ export const ensureStructureAgentSkills = async (
         if (error instanceof AgentSkillSetupError || error instanceof ResolveToolsArgError) {
             return { exitCode: 1, message: formatAgentSkillSetupError(error), ok: false };
         }
+
         throw error;
     }
 };

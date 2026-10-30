@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { detectActiveAgentToolId } from '@src/core/agent/detect-active-agent.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 describe('detectActiveAgentToolId', () => {
     afterEach(() => {

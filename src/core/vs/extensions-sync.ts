@@ -1,8 +1,8 @@
+import { findVsEditor } from './editors.js';
 import { loadVsLibraryManifest, normalizeExtensionIds } from './library.js';
 import { PercentProgressReporter } from './progress.js';
 import { nodeVsFileSystem, NodeVsProcessRunner } from './runtime.js';
 import { resolveVsJournalPath, VsSyncTransaction } from './transaction.js';
-import { findVsEditor } from './editors.js';
 import type { VsEditorDescriptor, VsEditorId, VsFileSystem, VsProcessResult, VsProcessRunner } from './types.js';
 
 export interface ExistingVsExtensionCheck {
@@ -39,10 +39,12 @@ export interface VsExtensionsSyncResponse {
 export const resolveVsEditorCommand = async (runner: VsProcessRunner, editor: VsEditorDescriptor): Promise<string> => {
     for (const candidate of editor.commandCandidates) {
         const check = await runner.run(candidate, ['--version']);
+
         if (check.code === 0) {
             return candidate;
         }
     }
+
     throw new Error(
         `Executable for "${editor.name}" not found in PATH (${editor.commandCandidates.join(', ')}). Please verify that ${editor.name} is installed and available in PATH.`,
     );
@@ -50,7 +52,9 @@ export const resolveVsEditorCommand = async (runner: VsProcessRunner, editor: Vs
 
 export const getVsInstalledExtensions = async (runner: VsProcessRunner, command: string): Promise<string[]> => {
     const result = await runner.run(command, ['--list-extensions']);
+
     if (result.code !== 0) throw new Error(result.stderr || `Failed to list extensions with ${command}`);
+
     return normalizeExtensionIds(result.stdout.split(/\r?\n/));
 };
 
@@ -64,14 +68,18 @@ export const checkExistingVsExtensions = async (options: {
 
     for (const editorId of options.editorIds) {
         const editor = findVsEditor(editorId);
+
         if (!editor) continue;
+
         const command = await resolveVsEditorCommand(runner, editor);
         let installedList: string[] = [];
+
         try {
             installedList = await getVsInstalledExtensions(runner, command);
         } catch {
             installedList = [];
         }
+
         const installedSet = new Set(installedList.map((id) => id.toLowerCase()));
 
         for (const extensionId of options.extensionIds) {
@@ -93,6 +101,7 @@ const extractProcessErrorMessage = (result: VsProcessResult, fallback: string): 
         .map((line) => line.trim())
         .filter((line) => line && !line.includes('extensionManagementService depends on antigravityAnalytics'))
         .join('\n');
+
     return raw || fallback;
 };
 
@@ -104,11 +113,14 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
     await transaction.recoverIfNeeded();
     const manifest = await loadVsLibraryManifest(fs, request.libraryDir);
     const editors = request.editorIds.map((id) => findVsEditor(id));
+
     if (editors.some((editor) => !editor)) throw new Error('Unsupported editor selected');
 
     const plans: Array<{ command: string; editorName: string; extensionIds: string[]; pruneExtensionIds: string[] }> = [];
+
     for (const editor of editors) {
         if (!editor) continue;
+
         const command = await resolveVsEditorCommand(runner, editor);
         const targetExtensions = request.extensionIdsPerEditor?.[editor.id] ?? request.extensionIds ?? manifest.extensions;
         const targetSet = new Set(targetExtensions.map((id) => id.toLowerCase()));
@@ -144,6 +156,7 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
         await transaction.rollback();
         process.exit(130);
     };
+
     process.once('SIGINT', handleSignal);
     process.once('SIGTERM', handleSignal);
     progress.step('backup ready');
@@ -155,44 +168,55 @@ export const syncVsExtensions = async (request: VsExtensionsSyncRequest): Promis
         for (const plan of plans) {
             const installedExtensions: string[] = [];
             const prunedExtensions: string[] = [];
+
             for (const extensionId of plan.extensionIds) {
                 const result = await runner.run(plan.command, ['--install-extension', extensionId]);
+
                 if (result.code !== 0) {
                     throw new Error(extractProcessErrorMessage(result, `Failed to install ${extensionId}`));
                 }
+
                 await transaction.recordInstalledExtension(plan.command, extensionId);
                 installedCount += 1;
                 installedExtensions.push(extensionId);
                 progress.step(`${plan.editorName}: ${extensionId}`);
             }
+
             for (const extensionId of plan.pruneExtensionIds) {
                 const result = await runner.run(plan.command, ['--uninstall-extension', extensionId]);
+
                 if (result.code !== 0) {
                     throw new Error(extractProcessErrorMessage(result, `Failed to uninstall ${extensionId}`));
                 }
+
                 prunedCount += 1;
                 prunedExtensions.push(extensionId);
                 progress.step(`${plan.editorName} (pruned): ${extensionId}`);
             }
+
             results.push({
                 editorName: plan.editorName,
                 installedExtensions,
                 prunedExtensions,
             });
         }
+
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
         await transaction.commit();
         progress.step('extensions committed');
+
         return { installed: installedCount, pruned: prunedCount, results };
     } catch (error) {
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
+
         try {
             await transaction.rollback();
         } catch {
             // Preserve original install error as the primary thrown exception
         }
+
         throw error;
     }
 };

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { hasQueryBodyError, printSearchResults, printStructuralError } from '@src/core/output/index.js';
+import { describe, expect, it } from 'vitest';
 
 describe('query output formatters', () => {
     it('prints search results with project name and language', () => {

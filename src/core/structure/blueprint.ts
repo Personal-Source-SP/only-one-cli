@@ -1,4 +1,5 @@
 import { basename, relative } from 'node:path';
+
 import { resolveStructureBlueprintPath, resolveStructureStructuralsDir, type StructurePathIdentity } from './paths.js';
 
 export {

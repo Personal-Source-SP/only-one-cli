@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import type { PlannedItem } from '@/core/init/plan-types.js';
 import { deduplicatePlannedItems, renderFinalReport, renderPreExecutionSummary } from '@/core/init/plan-utils.js';
 

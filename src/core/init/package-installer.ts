@@ -1,4 +1,5 @@
 import type { ProgramDeps } from '@/cli/deps.js';
+
 import type { PackageManifest } from './types.js';
 
 export interface PackageActionResult {
@@ -44,18 +45,23 @@ export const executePackageActions = async (
             deps.stdout(`  - Skipped ${pkg.id} (already installed)`);
             continue;
         }
+
         if (pkg.installer.kind === 'skills') {
             actionRequired.push(pkg.id);
             deps.stdout(`  - ${pkg.id} requires combo target selection for external skill installation`);
             continue;
         }
+
         const { packageName, scope = 'global' } = pkg.installer;
         deps.stdout(`  Installing ${pkg.id}...`);
         const args = ['install', packageName];
+
         if (scope === 'global') args.push('-g');
+
         if (overwriteList && overwriteList.includes(pkg.id)) {
             args.push('--force');
         }
+
         try {
             await runExecFile('npm', args, { cwd: projectDir, timeout: 120000, shell: true });
             installed.push(pkg.id);

@@ -1,6 +1,7 @@
 /** Ported from open-spec-source command-generation/adapters/pi.ts */
 
 import { join } from 'node:path';
+
 import type { CommandContent, ToolCommandAdapter } from '@/core/command-generation/types.js';
 import { transformToHyphenCommands } from '@/utils/command-references.js';
 
@@ -21,11 +22,14 @@ function injectPiArgs(body: string): string {
 function escapeYamlValue(value: string): string {
     // Check if value needs quoting (contains special YAML characters or starts/ends with whitespace)
     const needsQuoting = /[:\n\r#{}[\],&*!|>'"%@`]|^\s|\s$/.test(value);
+
     if (needsQuoting) {
         // Use double quotes and escape internal double quotes and backslashes
         const escaped = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+
         return `"${escaped}"`;
     }
+
     return value;
 }
 
@@ -47,12 +51,15 @@ export const piCommandAdapter: ToolCommandAdapter = {
 
     getInvokeLabel(commandId: string): string {
         const filePath = this.getFilePath(commandId);
+
         if (filePath.startsWith('/') || /^[A-Za-z]:\\/.test(filePath)) {
             return filePath;
         }
+
         if (this.toolId === 'cursor') {
             return `/${commandId}`;
         }
+
         return filePath.replace(/\/opsx\//g, '/').replace(new RegExp(`opsx-${commandId}`, 'g'), commandId);
     },
 

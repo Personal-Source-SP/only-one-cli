@@ -1,4 +1,5 @@
 import { homedir } from 'node:os';
+
 import type { ItemOrigin, PlannedItem } from '@/core/init/plan-types.js';
 import { checkExistingMcps } from '@/core/mcp/index.js';
 import { checkExistingSkills } from '@/core/skill/index.js';

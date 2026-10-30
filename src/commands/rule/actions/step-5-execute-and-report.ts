@@ -1,6 +1,6 @@
 import type { ProgramDeps } from '@/cli/deps.js';
-import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { installRules } from '@/core/rule/index.js';
 import type { AllowedTarget } from '@/core/target-selection/catalog.js';
 
@@ -36,6 +36,7 @@ export const executeAndReportRulesStep = async (
 
     if (successes.length > 0) {
         deps.stdout(COLORS.success('\n✓ Successfully Installed:'));
+
         for (const r of successes) {
             deps.stdout(`  - ${COLORS.secondary(r.ruleId)} -> ${COLORS.primary(r.toolName)}`);
         }
@@ -43,6 +44,7 @@ export const executeAndReportRulesStep = async (
 
     if (notReady.length > 0) {
         deps.stdout(COLORS.warning('\n! Installed (Action Required / Pending Dependencies):'));
+
         for (const r of notReady) {
             deps.stdout(`  - ${COLORS.secondary(r.ruleId)} -> ${COLORS.primary(r.toolName)}: ${r.details || 'Pending action'}`);
         }
@@ -50,6 +52,7 @@ export const executeAndReportRulesStep = async (
 
     if (overwrites.length > 0) {
         deps.stdout(COLORS.success('\n✓ Overwritten:'));
+
         for (const r of overwrites) {
             deps.stdout(`  - ${COLORS.secondary(r.ruleId)} -> ${COLORS.primary(r.toolName)} [Overwritten]`);
         }
@@ -57,6 +60,7 @@ export const executeAndReportRulesStep = async (
 
     if (skips.length > 0) {
         deps.stdout(COLORS.dim('\n- Skipped:'));
+
         for (const r of skips) {
             deps.stdout(`  - ${COLORS.secondary(r.ruleId)} in ${COLORS.primary(r.toolName)}`);
         }
@@ -64,6 +68,7 @@ export const executeAndReportRulesStep = async (
 
     if (failures.length > 0) {
         deps.stdout(COLORS.error('\n✗ Failed:'));
+
         for (const r of failures) {
             deps.stdout(`  - ${COLORS.secondary(r.ruleId)} in ${COLORS.primary(r.toolName)}: ${COLORS.error(r.error || '')}`);
         }

@@ -1,9 +1,11 @@
+import { stdin as input } from 'node:process';
+
 import { confirm as confirmPrompt } from '@inquirer/prompts';
 import isEmpty from 'lodash/isEmpty.js';
-import { stdin as input } from 'node:process';
+
 import { buildDoctorReport, runIndexingChecks } from './checks.js';
-import { installMissingDependencies } from './install.js';
 import { printInstallResults } from './format.js';
+import { installMissingDependencies } from './install.js';
 import type { DoctorInstallFlowResponse, DoctorInstallMissingRequest } from './types.js';
 
 function canPrompt(request: DoctorInstallMissingRequest): boolean {
@@ -38,6 +40,7 @@ export async function maybeInstallMissing(request: DoctorInstallMissingRequest):
     if (!options.json) printInstallResults({ results: installResults, write: deps.stdout });
 
     const indexingChecks = await runIndexingChecks(mode);
+
     return {
         installResults,
         report: buildDoctorReport(mode, modeSource, indexingChecks),

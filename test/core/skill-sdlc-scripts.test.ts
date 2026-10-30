@@ -1,11 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { parsePlanTasks } from '@assets/skills/only-one-apply/scripts/plan-status.js';
+import { validateDebugDoc } from '@assets/skills/only-one-debug/scripts/validate-debug.js';
 import { aggregateImprovements } from '@assets/skills/only-one-evolve/scripts/aggregate.js';
 import { lintSkill } from '@assets/skills/only-one-evolve/scripts/lint-skill.js';
-import { validatePlan } from '@assets/skills/only-one-plan/scripts/validate-plan.js';
-import { parsePlanTasks } from '@assets/skills/only-one-apply/scripts/plan-status.js';
 import { validateFlashDiff } from '@assets/skills/only-one-flash/scripts/validate-flash-diff.js';
-import { validateDebugDoc } from '@assets/skills/only-one-debug/scripts/validate-debug.js';
+import { validatePlan } from '@assets/skills/only-one-plan/scripts/validate-plan.js';
 import { validateReviewDoc } from '@assets/skills/only-one-review/scripts/validate-review.js';
+import { describe, expect, it } from 'vitest';
 
 describe('Deterministic SDLC Skills Scripts', () => {
     it('lints valid SKILL.md and flags ASD-STE100 long sentences', () => {

@@ -1,10 +1,11 @@
+import { MCPS } from '@assets/mcps/index.js';
+import { PACKAGES } from '@assets/packages/index.js';
+import { RULES } from '@assets/rules/index.js';
+import { SKILLS } from '@assets/skills/index.js';
+import type { PackageManifest, RuleManifest } from '@assets/types.js';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { AllowedToolId } from '@/constants/allowed-tools.js';
-import { PACKAGES } from '@assets/packages/index.js';
-import { MCPS } from '@assets/mcps/index.js';
-import { SKILLS } from '@assets/skills/index.js';
-import { RULES } from '@assets/rules/index.js';
-import type { PackageManifest, RuleManifest } from '@assets/types.js';
 
 export interface PreflightValidationResult {
     valid: boolean;
@@ -34,6 +35,7 @@ export const validateRuleDependenciesPreflight = (
 
     for (const ruleId of selectedRuleIds) {
         const rule = ruleManifests.find((r) => r.id === ruleId);
+
         if (!rule) {
             errors.push(`Unknown rule ID '${ruleId}'`);
             continue;
@@ -51,6 +53,7 @@ export const validateRuleDependenciesPreflight = (
         // Validate package dependencies
         for (const pkgId of rule.requiredPackages || []) {
             const pkg = packageManifests.find((p) => p.id === pkgId);
+
             if (!pkg) {
                 errors.push(`Rule '${ruleId}' references unknown package dependency '${pkgId}'`);
             }
@@ -59,6 +62,7 @@ export const validateRuleDependenciesPreflight = (
         // Validate MCP dependencies
         for (const mcpId of rule.requiredMcps || []) {
             const mcp = mcpManifests.find((m) => m.id === mcpId);
+
             if (!mcp) {
                 errors.push(`Rule '${ruleId}' references unknown MCP dependency '${mcpId}'`);
             }
@@ -67,6 +71,7 @@ export const validateRuleDependenciesPreflight = (
         // Validate Skill dependencies
         for (const skillName of rule.requiredSkills || []) {
             const skill = skillManifests.find((s) => s.name === skillName);
+
             if (!skill) {
                 errors.push(`Rule '${ruleId}' references unknown Skill dependency '${skillName}'`);
             }
@@ -86,6 +91,7 @@ export const buildDeduplicatedDependencyPlan = (selectedRuleIds: string[], ruleM
 
     for (const ruleId of selectedRuleIds) {
         const rule = ruleManifests.find((r) => r.id === ruleId);
+
         if (!rule) continue;
 
         (rule.requiredPackages || []).forEach((p) => packages.add(p));

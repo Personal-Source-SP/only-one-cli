@@ -1,8 +1,10 @@
 import forEach from 'lodash/forEach.js';
 import isEmpty from 'lodash/isEmpty.js';
-import max from 'lodash/max.js';
 import map from 'lodash/map.js';
+import max from 'lodash/max.js';
+
 import { localConfigDisplayPath } from '@/core/config/index.js';
+
 import type { SampleCommand } from './checks.js';
 import type { DoctorPrintInstallResultsRequest, DoctorPrintReportRequest } from './types.js';
 
@@ -28,6 +30,7 @@ export function printDoctorReport(request: DoctorPrintReportRequest): void {
         forEach(report.missing, (name) => {
             write(`  - ${name}`);
         });
+
         if (!isEmpty(report.remediation)) {
             write('');
             write('Remediation:');
@@ -35,7 +38,9 @@ export function printDoctorReport(request: DoctorPrintReportRequest): void {
                 write(`  - ${step}`);
             });
         }
+
         printSampleCommands(sampleCommands, write);
+
         return;
     }
 
@@ -50,6 +55,7 @@ export function printDoctorReport(request: DoctorPrintReportRequest): void {
         forEach(report.missing, (name) => {
             write(`  - ${name}`);
         });
+
         if (!isEmpty(report.remediation)) {
             write('');
             write('Remediation:');
@@ -66,6 +72,7 @@ export function printDoctorReport(request: DoctorPrintReportRequest): void {
     forEach(configChecks, (check) => {
         const icon = check.ok ? '✓' : '✗';
         write(`${icon} ${check.name}: ${check.detail}`);
+
         if (!check.ok && check.remediation) {
             write(`    → ${check.remediation}`);
         }
@@ -76,6 +83,7 @@ export function printDoctorReport(request: DoctorPrintReportRequest): void {
     forEach(envChecks, (check) => {
         const icon = check.ok ? '✓' : '✗';
         write(`${icon} ${check.name}: ${check.detail}`);
+
         if (!check.ok && check.remediation) {
             write(`    → ${check.remediation}`);
         }
@@ -86,6 +94,7 @@ export function printDoctorReport(request: DoctorPrintReportRequest): void {
 
 export function printInstallResults(request: DoctorPrintInstallResultsRequest): void {
     const { results, write } = request;
+
     if (isEmpty(results)) return;
 
     write('');

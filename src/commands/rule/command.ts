@@ -1,9 +1,11 @@
 import { homedir } from 'node:os';
+
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import { parseCsv } from '@/utils/index.js';
-import type { RuleCommandOptions } from './types.js';
+
 import {
     confirmRuleOverwriteStep,
     executeAndReportRulesStep,
@@ -11,6 +13,7 @@ import {
     selectRulesStep,
     selectRuleTargetStep,
 } from './actions/index.js';
+import type { RuleCommandOptions } from './types.js';
 
 export function createRuleCommand(deps: ProgramDeps): Command {
     const cmd = new Command('rule')
@@ -23,6 +26,7 @@ export function createRuleCommand(deps: ProgramDeps): Command {
         .action(async (pathArg: string | undefined, idsArg: string | undefined, options: RuleCommandOptions) => {
             const targetDir = options.global ? homedir() : pathArg;
             const { projectDir, rules } = loadRuleManifestsStep(deps, targetDir);
+
             if (!rules?.length) {
                 return;
             }
@@ -43,6 +47,7 @@ export function createRuleCommand(deps: ProgramDeps): Command {
 
             if (!selectedRuleIds?.length) {
                 deps.stdout('No rules selected. Exiting.');
+
                 return;
             }
 

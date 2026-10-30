@@ -39,7 +39,9 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
             if (!searchText.trim()) {
                 return choices;
             }
+
             const term = searchText.toLowerCase();
+
             return choices.filter((c) => c.name.toLowerCase().includes(term) || c.value.toLowerCase().includes(term));
         }, [searchText, choices]);
 
@@ -54,18 +56,23 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
             if (isEnterKey(key)) {
                 if (validate) {
                     const result = validate(selectedValues);
+
                     if (result !== true) {
                         setError(typeof result === 'string' ? result : 'Invalid');
+
                         return;
                     }
                 }
+
                 setStatus('done');
                 done(selectedValues);
+
                 return;
             }
 
             if (key.name === 'space') {
                 const choice = filteredChoices[cursor];
+
                 if (choice) {
                     if (selectedSet.has(choice.value)) {
                         setSelectedValues(selectedValues.filter((v) => v !== choice.value));
@@ -73,6 +80,7 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
                         setSelectedValues([...selectedValues, choice.value]);
                     }
                 }
+
                 return;
             }
 
@@ -83,15 +91,19 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
                     setSearchText(searchText.slice(0, -1));
                     setCursor(0);
                 }
+
                 return;
             }
 
             if (isUpKey(key)) {
                 setCursor(Math.max(0, cursor - 1));
+
                 return;
             }
+
             if (isDownKey(key)) {
                 setCursor(Math.min(filteredChoices.length - 1, cursor + 1));
+
                 return;
             }
 
@@ -103,6 +115,7 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
 
         if (status === 'done') {
             const names = selectedValues.map((v) => choiceMap.get(v)?.name ?? v).join(', ');
+
             return `${prefix} ${message} ${COLORS.success(names || '(none)')}`;
         }
 
@@ -141,11 +154,13 @@ async function createSearchableMultiSelect(): Promise<(config: Config) => Promis
         if (error) {
             lines.push(`  ${COLORS.error(error)}`);
         }
+
         return lines.join('\n');
     });
 }
 
 export const searchableMultiSelect = async (config: Config): Promise<string[]> => {
     const prompt = await createSearchableMultiSelect();
+
     return prompt(config);
 };

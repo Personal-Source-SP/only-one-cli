@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, mkdir, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
 import { discoverRepos, matchesExclude } from '@src/core/indexing/repo-discovery.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 describe('discoverRepos', () => {
     let scanRoot: string;

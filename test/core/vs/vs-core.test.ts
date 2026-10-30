@@ -1,11 +1,12 @@
 import { dirname, join } from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
-import { VsEditorId, VsPlatform, mergeSettings, normalizeExtensionIds, parseVsEditorIds, vsEditors } from '@src/core/vs/index.js';
-import { PercentProgressReporter } from '@src/core/vs/progress.js';
+
 import { resolveVsEditorCommand, syncVsExtensions } from '@src/core/vs/extensions-sync.js';
+import { mergeSettings, normalizeExtensionIds, parseVsEditorIds, VsEditorId, vsEditors, VsPlatform } from '@src/core/vs/index.js';
+import { PercentProgressReporter } from '@src/core/vs/progress.js';
 import { syncVsSettings } from '@src/core/vs/settings-sync.js';
 import { resolveVsJournalPath, VsSyncTransaction } from '@src/core/vs/transaction.js';
 import type { VsFileSystem, VsProcessResult, VsProcessRunner } from '@src/core/vs/types.js';
+import { describe, expect, it, vi } from 'vitest';
 
 const missingFile = (): Error => Object.assign(new Error('missing'), { code: 'ENOENT' });
 
@@ -15,7 +16,9 @@ class MemoryFs implements VsFileSystem {
 
     public async copyFile(source: string, target: string): Promise<void> {
         const content = this.files.get(source);
+
         if (content === undefined) throw missingFile();
+
         this.files.set(target, content);
     }
 
@@ -25,18 +28,23 @@ class MemoryFs implements VsFileSystem {
 
     public async readFile(path: string): Promise<string> {
         const content = this.files.get(path);
+
         if (content === undefined) throw missingFile();
+
         return content;
     }
 
     public async removeEmptyDir(path: string): Promise<void> {
         if ([...this.files.keys()].some((file) => file.startsWith(`${path}/`))) throw new Error('ENOTEMPTY');
+
         this.dirs.delete(path);
     }
 
     public async rename(source: string, target: string): Promise<void> {
         const content = this.files.get(source);
+
         if (content === undefined) throw missingFile();
+
         this.files.set(target, content);
         this.files.delete(source);
     }
@@ -47,6 +55,7 @@ class MemoryFs implements VsFileSystem {
 
     public async stat(path: string): Promise<{ isFile: () => boolean }> {
         if (!this.files.has(path)) throw missingFile();
+
         return { isFile: () => true };
     }
 
@@ -65,10 +74,13 @@ class MemoryRunner implements VsProcessRunner {
 
     public async run(command: string, args: string[]): Promise<VsProcessResult> {
         this.calls.push({ args, command });
+
         if (args[0] === '--list-extensions') return { code: 0, stderr: '', stdout: this.listStdout };
+
         if ((args[0] === '--install-extension' || args[0] === '--uninstall-extension') && args[1] === this.failInstallId) {
             return { code: 1, stderr: 'install failed', stdout: '' };
         }
+
         return { code: 0, stderr: '', stdout: '' };
     }
 }
@@ -159,8 +171,11 @@ describe('VS core sync helpers', () => {
         fs.files.set(vscodePath, JSON.stringify({ editor: { fontSize: 12, tabSize: 2 }, keep: true }));
         const rename = vi.spyOn(fs, 'rename').mockImplementation(async (source, target) => {
             if (target.includes('Antigravity')) throw new Error('write failed');
+
             const content = fs.files.get(source);
+
             if (content === undefined) throw missingFile();
+
             fs.files.set(target, content);
             fs.files.delete(source);
         });
@@ -278,6 +293,7 @@ describe('VS core sync helpers', () => {
         const runner: VsProcessRunner = {
             run: async (command) => {
                 if (command === 'antigravity') return { code: 0, stderr: '', stdout: '1.0.0' };
+
                 return { code: 127, stderr: 'not found', stdout: '' };
             },
         };
@@ -292,6 +308,7 @@ describe('VS core sync helpers', () => {
         const runner: VsProcessRunner = {
             run: async (_command, args) => {
                 if (args[0] === '--list-extensions') return { code: 0, stderr: '', stdout: '' };
+
                 if (args[0] === '--install-extension' && args[1] === 'fail.ext') {
                     return {
                         code: 1,
@@ -299,6 +316,7 @@ describe('VS core sync helpers', () => {
                         stdout: 'Failed Installing Extensions: fail.ext',
                     };
                 }
+
                 if (args[0] === '--uninstall-extension') {
                     return {
                         code: 1,
@@ -306,6 +324,7 @@ describe('VS core sync helpers', () => {
                         stdout: '',
                     };
                 }
+
                 return { code: 0, stderr: '', stdout: '' };
             },
         };

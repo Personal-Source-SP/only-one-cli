@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { existsSync } from 'node:fs';
+
 import { createProgram } from '@src/index.js';
+import { describe, expect, it, vi } from 'vitest';
 
 describe.skip('init-source command', () => {
     it('clones selected source files to local directory with checkbox unchecked by default', async () => {
@@ -18,6 +19,7 @@ describe.skip('init-source command', () => {
                         json: async () => [{ id: 'p123', organization: 'myorg', project: 'myrepo', name: 'myorg/myrepo' }],
                     };
                 }
+
                 if (url.endsWith('/projects/p123/source/files')) {
                     return {
                         ok: true,
@@ -28,9 +30,11 @@ describe.skip('init-source command', () => {
                         }),
                     };
                 }
+
                 if (url.includes('/projects/p123/source/file-content')) {
                     const parsedUrl = new URL(url);
                     const path = parsedUrl.searchParams.get('path');
+
                     return {
                         ok: true,
                         json: async () => ({
@@ -40,6 +44,7 @@ describe.skip('init-source command', () => {
                         }),
                     };
                 }
+
                 return { ok: true, json: async () => ({}) };
             });
 
@@ -96,6 +101,7 @@ describe.skip('init-source command', () => {
                         json: async () => [{ id: 'p123', organization: 'myorg', project: 'myrepo', name: 'myorg/myrepo' }],
                     };
                 }
+
                 if (url.endsWith('/projects/p123/source/files')) {
                     return {
                         ok: true,
@@ -106,9 +112,11 @@ describe.skip('init-source command', () => {
                         }),
                     };
                 }
+
                 if (url.includes('/projects/p123/source/file-content')) {
                     const parsedUrl = new URL(url);
                     const path = parsedUrl.searchParams.get('path');
+
                     return {
                         ok: true,
                         json: async () => ({
@@ -118,6 +126,7 @@ describe.skip('init-source command', () => {
                         }),
                     };
                 }
+
                 return { ok: true, json: async () => ({}) };
             });
 
@@ -161,6 +170,7 @@ describe.skip('init-source command', () => {
                         json: async () => [{ id: 'p123', organization: 'myorg', project: 'myrepo', name: 'myorg/myrepo' }],
                     };
                 }
+
                 if (url.endsWith('/projects/p123/source/files')) {
                     return {
                         ok: true,
@@ -171,9 +181,11 @@ describe.skip('init-source command', () => {
                         }),
                     };
                 }
+
                 if (url.includes('/projects/p123/source/file-content')) {
                     const parsedUrl = new URL(url);
                     const path = parsedUrl.searchParams.get('path');
+
                     return {
                         ok: true,
                         json: async () => ({
@@ -183,6 +195,7 @@ describe.skip('init-source command', () => {
                         }),
                     };
                 }
+
                 return { ok: true, json: async () => ({}) };
             });
 

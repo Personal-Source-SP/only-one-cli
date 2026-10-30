@@ -1,5 +1,6 @@
 import { readdirSync } from 'node:fs';
-import { join, relative, basename, dirname } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
+
 import type { BulkConfig } from '@/core/config/index.js';
 
 export interface DiscoveredRepo {
@@ -27,6 +28,7 @@ export function discoverRepos(options: DiscoverOptions): DiscoveredRepo[] {
 
     // Check if scanRoot itself is a git repo
     let isRootGit = false;
+
     try {
         const entries = readdirSync(options.scanRoot, { withFileTypes: true });
         isRootGit = entries.some((e) => e.isDirectory() && e.name === '.git');
@@ -36,10 +38,12 @@ export function discoverRepos(options: DiscoverOptions): DiscoveredRepo[] {
 
     if (isRootGit) {
         repos.push(buildRepoEntry(options.scanRoot, options));
+
         return repos;
     }
 
     walk(options.scanRoot, 1, options.maxDepth, repos, options);
+
     return repos;
 }
 
@@ -47,6 +51,7 @@ function walk(dir: string, depth: number, maxDepth: number, repos: DiscoveredRep
     if (depth > maxDepth) return;
 
     let entries;
+
     try {
         entries = readdirSync(dir, { withFileTypes: true });
     } catch {
@@ -55,8 +60,10 @@ function walk(dir: string, depth: number, maxDepth: number, repos: DiscoveredRep
 
     for (const entry of entries) {
         if (!entry.isDirectory()) continue;
+
         if (entry.name === '.git') {
             repos.push(buildRepoEntry(dir, options));
+
             return; // Don't descend into this repo's subdirs
         }
     }
@@ -64,7 +71,9 @@ function walk(dir: string, depth: number, maxDepth: number, repos: DiscoveredRep
     // No .git here, descend into subdirs
     for (const entry of entries) {
         if (!entry.isDirectory()) continue;
+
         if (entry.name === 'node_modules' || entry.name === '.git') continue;
+
         walk(join(dir, entry.name), depth + 1, maxDepth, repos, options);
     }
 }
@@ -92,20 +101,25 @@ function buildRepoEntry(repoPath: string, options: DiscoverOptions): DiscoveredR
 
 function buildTags(parentSegment: string, globalTags?: string[], repoTags?: string[]): string[] {
     const tagsSet = new Set<string>();
+
     if (parentSegment) {
         tagsSet.add(`group:${parentSegment}`);
     }
+
     globalTags?.forEach((t) => tagsSet.add(t));
     repoTags?.forEach((t) => tagsSet.add(t));
+
     return Array.from(tagsSet);
 }
 
 export function matchesExclude(relPath: string, patterns: string[]): boolean {
     const normalizedPath = relPath.replace(/\\/g, '/');
+
     return patterns.some((pattern) => {
         const normalizedPattern = pattern.replace(/\\/g, '/');
         const regexStr = '^' + normalizedPattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$';
         const regex = new RegExp(regexStr);
+
         return regex.test(normalizedPath) || regex.test(basename(normalizedPath));
     });
 }

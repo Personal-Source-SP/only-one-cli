@@ -1,1 +1,1 @@
-export { parseJsoncObject, mergeSettings, stringifySettings, stripJsonComments } from '@/utils/index.js';
+export { mergeSettings, parseJsoncObject, stringifySettings, stripJsonComments } from '@/utils/index.js';

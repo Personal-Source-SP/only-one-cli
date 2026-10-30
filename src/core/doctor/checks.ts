@@ -1,21 +1,24 @@
-import yaml from 'js-yaml';
 import { execFileSync } from 'node:child_process';
 import { access, readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+
+import yaml from 'js-yaml';
+
 import type { Fetcher } from '@/core/client/index.js';
 import {
     hasLocalConfig,
+    type IndexModeSource,
     loadConfig,
     localConfigDisplayPath,
-    resolveIndexMode,
     type OnlyOneConfig,
-    type IndexModeSource,
+    resolveIndexMode,
 } from '@/core/config/index.js';
-import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint } from '@/core/runtime/credentials.js';
-import { resolveLocalConfigPathForProject } from '@/core/prebuilt/index-output.js';
-import type { DoctorMode } from './types.js';
 import { getDockerServerVersion, isDockerDaemonRunning } from '@/core/indexing/docker-runtime.js';
+import { resolveLocalConfigPathForProject } from '@/core/prebuilt/index-output.js';
+import { formatApiKeyConfigHint, HYBRID_API_KEY_ENV } from '@/core/runtime/credentials.js';
+
+import type { DoctorMode } from './types.js';
 
 export interface RunIndexingChecksOptions {
     autoStartContainers?: boolean;
@@ -47,6 +50,7 @@ export async function checkGit(): Promise<CheckResult> {
             encoding: 'utf-8',
         }).trim();
         const ver = version.replace(/^git version\s*/, '');
+
         return { name: 'git', ok: true, detail: ver, required: true };
     } catch {
         return { name: 'git', ok: false, detail: 'not found', required: true };
@@ -56,6 +60,7 @@ export async function checkGit(): Promise<CheckResult> {
 export async function checkNode(): Promise<CheckResult> {
     const version = process.version;
     const major = parseInt(version.slice(1), 10);
+
     return {
         name: 'node',
         ok: major >= 18,
@@ -136,6 +141,7 @@ export async function checkServer(serverUrl: string, fetcher: Fetcher, options: 
 async function fileExists(path: string): Promise<boolean> {
     try {
         await access(path);
+
         return true;
     } catch {
         return false;
@@ -144,6 +150,7 @@ async function fileExists(path: string): Promise<boolean> {
 
 export async function checkLocalConfig(cwd: string): Promise<CheckResult> {
     const path = resolveLocalConfigPathForProject(cwd);
+
     if (!path) {
         return {
             name: 'local config',
@@ -152,9 +159,11 @@ export async function checkLocalConfig(cwd: string): Promise<CheckResult> {
             required: false,
         };
     }
+
     try {
         const raw = await readFile(path, 'utf-8');
         yaml.load(raw);
+
         return { name: 'local config', ok: true, detail: 'valid', required: true };
     } catch (err: any) {
         return {
@@ -168,6 +177,7 @@ export async function checkLocalConfig(cwd: string): Promise<CheckResult> {
 
 export async function checkGlobalConfig(): Promise<CheckResult> {
     const path = join(homedir(), '.onlyonecli', 'config.yaml');
+
     if (!(await fileExists(path))) {
         return {
             name: 'global config',
@@ -176,9 +186,11 @@ export async function checkGlobalConfig(): Promise<CheckResult> {
             required: false,
         };
     }
+
     try {
         const raw = await readFile(path, 'utf-8');
         yaml.load(raw);
+
         return { name: 'global config', ok: true, detail: 'valid', required: true };
     } catch (err: any) {
         return {
@@ -194,6 +206,7 @@ function maskApiKey(key: string): string {
     if (key.length <= 4) {
         return '****';
     }
+
     return `${key.slice(0, 2)}...${key.slice(-2)}`;
 }
 
@@ -236,6 +249,7 @@ export async function checkDocker(mode: DoctorMode): Promise<CheckResult> {
     }
 
     const version = getDockerServerVersion();
+
     return {
         name: 'docker',
         ok: true,
@@ -262,6 +276,7 @@ export async function assertIndexingReadiness(cwd: string, modeOverride?: string
         const remediation = report.remediation.length
             ? `\nRemediation:\n${report.remediation.map((step) => `  - ${step}`).join('\n')}`
             : '';
+
         throw new Error(`Indexing prerequisites are not ready (status: ${report.status}). Run only-one doctor.${remediation}`);
     }
 
@@ -360,6 +375,7 @@ export async function checkSkillsFreshness(projectDir: string = process.cwd()): 
                 remediation: `Run 'only-one skill update' to update skills to latest upstream versions`,
             };
         }
+
         return {
             name: 'skills-freshness',
             ok: true,

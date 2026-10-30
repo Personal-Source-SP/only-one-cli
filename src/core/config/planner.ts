@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+
 import type { ItemOrigin, PlannedItem } from '@/core/init/plan-types.js';
 
 export interface PlanConfigOptions {
@@ -18,6 +19,7 @@ export async function planConfigs(options: PlanConfigOptions): Promise<PlannedIt
 
     for (const name of selectedConfigNames) {
         const mapping = configFilesMap[name.toLowerCase()];
+
         if (!mapping) continue;
 
         const destPath = join(projectDir, mapping.dest);

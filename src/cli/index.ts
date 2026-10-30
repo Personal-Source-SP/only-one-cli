@@ -1,23 +1,24 @@
 import { Command, Help } from 'commander';
 import pc from 'picocolors';
+
 import {
+    createComboCommand,
     createDoctorCommand,
     createExtensionsVsCommand,
+    createGitCommand,
     createInitCommand,
-    createStructureGenerateCommand,
-    createUpdateCommand,
+    createMcpCommand,
+    createPackageCommand,
+    createRuleCommand,
     createSettingVsCommand,
     createSkillCommand,
-    createWorkflowCommand,
-    createRuleCommand,
-    createMcpCommand,
-    createComboCommand,
+    createStructureGenerateCommand,
     createTuiCommand,
-    createPackageCommand,
-    createGitCommand,
+    createUpdateCommand,
+    createWorkflowCommand,
 } from '@/commands/index.js';
-
 import { COLORS, VERSION } from '@/constants/index.js';
+
 import type { ProgramDeps } from './deps.js';
 
 export function createProgram(deps: ProgramDeps) {
@@ -35,6 +36,7 @@ export function createProgram(deps: ProgramDeps) {
             argumentDescription: (arg) => COLORS.cli.description(arg.description),
             formatHelp: (c, helper) => {
                 const rawHelp = Help.prototype.formatHelp.call(helper, c, helper);
+
                 return rawHelp
                     .replace(/^Usage:/m, COLORS.cli.header('Usage:'))
                     .replace(/^Options:/m, COLORS.cli.header('Options:'))
@@ -45,6 +47,7 @@ export function createProgram(deps: ProgramDeps) {
                     .replace(/^Notes:/m, COLORS.cli.header('Notes:'));
             },
         });
+
         for (const sub of cmd.commands) {
             configureCommandHelp(sub);
         }

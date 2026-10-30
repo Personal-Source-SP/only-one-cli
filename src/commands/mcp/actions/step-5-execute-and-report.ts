@@ -1,7 +1,8 @@
 import { homedir } from 'node:os';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { syncMcpGlobalConfig, type McpManifest } from '@/core/mcp/index.js';
+import { type McpManifest, syncMcpGlobalConfig } from '@/core/mcp/index.js';
 
 export const executeAndReportMcpStep = async (
     deps: ProgramDeps,
@@ -28,8 +29,10 @@ export const executeAndReportMcpStep = async (
 
     for (const result of response.results) {
         deps.stdout(`\n${COLORS.primary(result.ideName)} (${COLORS.dim(result.configPath)}):`);
+
         for (const entry of result.results) {
             const keys = entry.credentialKeys.length ? `; fill manually: ${entry.credentialKeys.join(', ')}` : '';
+
             if (entry.status === 'skipped') {
                 deps.stdout(`  - ${COLORS.secondary(entry.id)}: ${COLORS.dim('skipped (kept existing)')}`);
             } else if (entry.status === 'overwritten') {
@@ -39,5 +42,6 @@ export const executeAndReportMcpStep = async (
             }
         }
     }
+
     deps.stdout('\n==================================================\n');
 };

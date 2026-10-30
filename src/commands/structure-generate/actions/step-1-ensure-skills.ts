@@ -1,6 +1,7 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import { ensureStructureAgentSkills } from '@/core/agent/ensure-skills.js';
 import { persistConfigAgentTools } from '@/core/config/index.js';
+
 import type { StructureGenerateCommandOptions } from '../types.js';
 
 export const ensureStructureSkillsStep = async (
@@ -22,6 +23,7 @@ export const ensureStructureSkillsStep = async (
     if (!gate.ok) {
         deps.stderr?.(gate.message) ?? deps.stdout(gate.message);
         process.exitCode = gate.exitCode;
+
         return { ok: false, message: gate.message };
     }
 

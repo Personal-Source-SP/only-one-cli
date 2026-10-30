@@ -15,11 +15,13 @@
         "bin"
     ],
     "scripts": {
-        "build": "npm run format:check && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node scripts/postbuild-paths.cjs && node -e \"if (process.platform !== 'win32') require('node:fs').chmodSync('dist/src/index.js', 0o755)\"",
+        "build": "npm run format:check && npm run lint && node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json && node scripts/postbuild-paths.cjs && node -e \"if (process.platform !== 'win32') require('node:fs').chmodSync('dist/src/index.js', 0o755)\"",
         "build:go": "node scripts/build-go.js",
         "dev": "tsx src/index.ts",
         "prepare": "npm run build",
         "test": "npm run format && vitest run",
+        "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+        "lint:fix": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix",
         "publish:npm": "npm run format && node scripts/publish.js",
         "publish:local": "npm run format && node scripts/publish.js --local",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -35,12 +37,17 @@
         "picocolors": "^1.1.1"
     },
     "devDependencies": {
+        "@eslint/js": "^9.20.0",
         "@types/js-yaml": "^4.0.9",
         "@types/lodash": "^4.17.24",
         "@types/node": "^24.10.1",
+        "eslint": "^9.20.0",
+        "eslint-config-prettier": "^10.0.1",
+        "eslint-plugin-simple-import-sort": "^12.1.1",
         "prettier": "^3.8.3",
         "tsx": "^4.20.6",
         "typescript": "^5.9.3",
+        "typescript-eslint": "^8.24.0",
         "vitest": "^4.0.14"
     }
 }

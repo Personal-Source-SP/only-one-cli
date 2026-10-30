@@ -1,13 +1,15 @@
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
+
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
-import { selectIgnoreTargets } from '@/core/ignore/index.js';
-import { selectSingleAllowedAgentTarget } from '@/core/target-selection/index.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
+import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import { installSkills } from '@/core/skill/index.js';
 import { readSkillsLockfile } from '@/core/skill/remote/lockfile.js';
-import type { SkillCommandOptions } from './types.js';
+import { selectSingleAllowedAgentTarget } from '@/core/target-selection/index.js';
+
 import {
     confirmSkillOverwriteStep,
     executeAndReportSkillsStep,
@@ -16,6 +18,7 @@ import {
     selectSkillsStep,
     selectSkillTargetStep,
 } from './actions/index.js';
+import type { SkillCommandOptions } from './types.js';
 
 export function createSkillCommand(deps: ProgramDeps): Command {
     const cmd = new Command('skill')
@@ -33,10 +36,12 @@ export function createSkillCommand(deps: ProgramDeps): Command {
 
                 if (options.outdated) {
                     await reportOutdatedSkillsStep(deps, projectDir);
+
                     return;
                 }
 
                 const { availableSkills } = loadSkillManifestsStep(deps, options.global ? homedir() : pathArg);
+
                 if (!availableSkills?.length) {
                     return;
                 }
@@ -55,6 +60,7 @@ export function createSkillCommand(deps: ProgramDeps): Command {
 
                 if (!selectedSkills?.length) {
                     deps.stdout('No skills selected. Exiting.');
+
                     return;
                 }
 
@@ -92,6 +98,7 @@ export function createSkillCommand(deps: ProgramDeps): Command {
 
             if (skillNamesToUpdate.length === 0) {
                 deps.stdout('No skills found in lockfile to update.');
+
                 return;
             }
 

@@ -1,11 +1,13 @@
-import { describe, expect, it, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { createUpdateCommand } from '@/commands/update/command.js';
-import { recordInstalledAssetsBatch, readInstalledLockfile } from '@/core/assets/lockfile.js';
+import { readInstalledLockfile, recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 
 describe('Update Command Integration Tests', () => {
     let testProjectDir: string;

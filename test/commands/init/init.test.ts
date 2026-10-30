@@ -1,8 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
 import { createProgram } from '@src/index.js';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@src/prompts/searchable-multi-select.js', () => ({
     searchableMultiSelect: vi.fn().mockResolvedValue([]),
@@ -16,6 +17,7 @@ vi.mock('@inquirer/prompts', () => ({
 vi.mock('node:child_process', () => ({
     execFile: vi.fn((file, args, options, callback) => {
         const cb = typeof options === 'function' ? options : callback;
+
         if (cb) {
             cb(null, { stdout: '', stderr: '' });
         }
@@ -275,7 +277,9 @@ describe('init command', () => {
         try {
             const mockCheckbox = vi.fn().mockImplementation(async (opts: any) => {
                 if (opts?.message?.includes('Select MCP servers')) return ['github', 'postgres'];
+
                 if (opts?.message?.includes('Select IDEs')) return ['cursor'];
+
                 return ['github', 'postgres'];
             });
             const program = createProgram({

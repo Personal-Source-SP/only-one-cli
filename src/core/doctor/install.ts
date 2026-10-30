@@ -1,6 +1,7 @@
 import filter from 'lodash/filter.js';
 import isEmpty from 'lodash/isEmpty.js';
 import map from 'lodash/map.js';
+
 import type { CheckResult } from './checks.js';
 import type { DoctorBuildInstallScriptRequest, DoctorInstallDependenciesRequest, DoctorMode, InstallResult } from './types.js';
 
@@ -40,13 +41,16 @@ export async function runMissingInstalls(_mode: DoctorMode, missing: string[]): 
 
 export async function installMissingDependencies(request: DoctorInstallDependenciesRequest): Promise<InstallResult[]> {
     const { mode, missing, options = {} } = request;
+
     if (isEmpty(missing)) return [];
 
     if (!options.skipConfirm) {
         const confirm = options.confirm;
+
         if (!confirm) throw new Error('confirm callback is required when skipConfirm is false');
 
         const proceed = await confirm(`Install missing dependencies (${missing.join(', ')})? This may require network access.`);
+
         if (!proceed) {
             return missing.map((dependency) => ({
                 ok: false,

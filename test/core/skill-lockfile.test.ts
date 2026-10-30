@@ -1,18 +1,20 @@
-import { describe, expect, it } from 'vitest';
 import { existsSync } from 'node:fs';
-import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { describe, expect, it } from 'vitest';
+
+import { readInstalledLockfile } from '@/core/assets/lockfile.js';
 import {
+    ONLY_ONE_DIR_NAME,
+    readSkillsLockfile,
+    removeSkillFromLockfile,
     resolveSkillsLockfilePath,
     resolveSkillsLockfilePathForProject,
-    readSkillsLockfile,
     saveSkillToLockfile,
-    removeSkillFromLockfile,
-    ONLY_ONE_DIR_NAME,
     SKILLS_LOCKFILE_NAME,
 } from '@/core/skill/remote/lockfile.js';
-import { readInstalledLockfile } from '@/core/assets/lockfile.js';
 
 describe('skills lockfile resolution and management (Unified in installed.json)', () => {
     it('resolves default lockfile path to only-one/installed.json', () => {
@@ -22,6 +24,7 @@ describe('skills lockfile resolution and management (Unified in installed.json)'
 
     it('returns empty lockfile when no lockfile exists', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'lockfile-test-'));
+
         try {
             const lock = await readSkillsLockfile(cwd);
             expect(lock).toEqual({ version: 1, skills: {} });
@@ -32,6 +35,7 @@ describe('skills lockfile resolution and management (Unified in installed.json)'
 
     it('saves remote skill into only-one/installed.json and preserves single file footprint', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'lockfile-test-'));
+
         try {
             await saveSkillToLockfile(cwd, 'test-skill', {
                 name: 'test-skill',
@@ -65,6 +69,7 @@ describe('skills lockfile resolution and management (Unified in installed.json)'
 
     it('supports transparent fallback when only legacy skills-lock.json exists', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'lockfile-test-'));
+
         try {
             const preferredDir = join(cwd, 'only-one');
             await mkdir(preferredDir, { recursive: true });
@@ -98,6 +103,7 @@ describe('skills lockfile resolution and management (Unified in installed.json)'
 
     it('removes skill from lockfile in only-one/installed.json', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'lockfile-test-'));
+
         try {
             await saveSkillToLockfile(cwd, 'skill-1', {
                 name: 'skill-1',

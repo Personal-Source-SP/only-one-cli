@@ -19,6 +19,7 @@ export const runInitMcpStep = async (deps: ProgramDeps, names?: string, options?
 
     if (!selectedMcpIds?.length) {
         deps.stdout('No MCP servers selected. Exiting.');
+
         return;
     }
 

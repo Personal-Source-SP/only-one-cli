@@ -1,9 +1,11 @@
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
 import { SKILLS } from '@assets/skills/index.js';
+
+import { computeSha256, fetchSkillContentFromGitHub } from './github-fetcher.js';
 import { readSkillsLockfile } from './lockfile.js';
-import { fetchSkillContentFromGitHub, computeSha256 } from './github-fetcher.js';
 import type { SkillStatusReport } from './types.js';
 
 export async function checkSkillFreshness(projectDir: string, skillName: string): Promise<SkillStatusReport> {
@@ -58,6 +60,7 @@ export async function checkSkillFreshness(projectDir: string, skillName: string)
         if (isInstalled) {
             const localContent = await readFile(agentSkillPath, 'utf-8');
             const localFileHash = computeSha256(localContent);
+
             if (currentHash && localFileHash !== currentHash && localFileHash !== remoteHash) {
                 return {
                     skillName,
@@ -102,8 +105,10 @@ export async function checkAllSkillsFreshness(projectDir: string): Promise<Skill
     const allSkillNames = Array.from(new Set([...lockSkills, ...SKILLS.filter((s) => s.sourceType === 'github').map((s) => s.name)]));
 
     const reports: SkillStatusReport[] = [];
+
     for (const name of allSkillNames) {
         reports.push(await checkSkillFreshness(projectDir, name));
     }
+
     return reports;
 }

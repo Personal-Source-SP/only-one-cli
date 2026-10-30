@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
+
 import type { VsFileSystem, VsProcessRunner, VsProgressReporter } from './types.js';
 
 export interface VsTransactionFile {
@@ -37,12 +38,16 @@ export class VsSyncTransaction {
         } catch {
             return;
         }
+
         const content = await this.fs.readFile(this.journalPath);
         const journal = JSON.parse(content) as VsTransactionJournal;
+
         if (journal.completed) {
             await this.fs.rm(this.journalPath);
+
             return;
         }
+
         this.journal = journal;
         await this.rollback();
     }
@@ -55,11 +60,13 @@ export class VsSyncTransaction {
     public async backupFile(targetPath: string): Promise<void> {
         const targetHash = createHash('sha256').update(targetPath).digest('hex');
         const backupPath = `${this.journalPath}.${targetHash}.bak`;
+
         try {
             await this.fs.copyFile(targetPath, backupPath);
         } catch {
             await this.fs.writeFile(backupPath, '');
         }
+
         this.journal.files.push({ backupPath, targetPath });
         await this.persist();
     }
@@ -80,7 +87,9 @@ export class VsSyncTransaction {
         this.journal.completed = true;
         await this.persist();
         await this.fs.rm(this.journalPath);
+
         for (const file of this.journal.files) await this.fs.rm(file.backupPath);
+
         try {
             await this.fs.removeEmptyDir(dirname(this.journalPath));
         } catch {
@@ -90,8 +99,10 @@ export class VsSyncTransaction {
 
     public async rollback(): Promise<void> {
         let rollbackError: Error | undefined;
+
         for (const file of [...this.journal.files].reverse()) {
             this.progress.rollback(file.targetPath);
+
             try {
                 await this.fs.mkdir(dirname(file.targetPath));
                 await this.fs.copyFile(file.backupPath, file.targetPath);
@@ -99,12 +110,15 @@ export class VsSyncTransaction {
                 rollbackError ??= error instanceof Error ? error : new Error(String(error));
             }
         }
+
         for (const extension of [...this.journal.extensions].reverse()) {
             this.progress.rollback(extension.extensionId);
+
             try {
                 const result = await this.runner.run(extension.command, ['--uninstall-extension', extension.extensionId]);
                 const output = `${result.stderr}\n${result.stdout}`.toLowerCase();
                 const isAlreadyNotInstalled = output.includes('not installed') || output.includes('is not installed');
+
                 if (result.code !== 0 && !isAlreadyNotInstalled) {
                     rollbackError ??= new Error(result.stderr || `Failed to uninstall ${extension.extensionId}`);
                 }
@@ -112,9 +126,11 @@ export class VsSyncTransaction {
                 rollbackError ??= error instanceof Error ? error : new Error(String(error));
             }
         }
+
         if (rollbackError) throw rollbackError;
 
         await this.fs.rm(this.journalPath);
+
         for (const file of this.journal.files) await this.fs.rm(file.backupPath);
     }
 

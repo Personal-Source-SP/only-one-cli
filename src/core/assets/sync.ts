@@ -1,12 +1,14 @@
-import { join } from 'node:path';
-import { cp, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { SKILLS } from '../../../assets/agents/skills/index.js';
-import { RULES } from '../../../assets/agents/rules/index.js';
+import { cp, mkdir, rm } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
-import { compareDecimalVersions } from './version.js';
+
+import { RULES } from '../../../assets/agents/rules/index.js';
+import { SKILLS } from '../../../assets/agents/skills/index.js';
 import { readInstalledLockfile, recordInstalledAssetsBatch, removeInstalledAsset } from './lockfile.js';
 import type { AssetInspectionItem, AssetType } from './types.js';
+import { compareDecimalVersions } from './version.js';
 
 export interface AssetSyncResult {
     inspected: AssetInspectionItem[];
@@ -34,17 +36,21 @@ function getTargetAgentDirs(projectDir: string, isGlobal = false): string[] {
     if (isGlobal) {
         return ['.agents'];
     }
+
     const existing = AGENT_DIRS.filter((ad) => existsSync(join(projectDir, ad)));
+
     return existing.length > 0 ? existing : ['.agents'];
 }
 
 function checkSkillExists(projectDir: string, id: string, isGlobal = false): boolean {
     const dirs = getTargetAgentDirs(projectDir, isGlobal);
+
     return dirs.some((ad) => existsSync(join(projectDir, ad, 'skills', id, 'SKILL.md')));
 }
 
 function checkRuleExists(projectDir: string, sourceFile: string, isGlobal = false): boolean {
     const dirs = getTargetAgentDirs(projectDir, isGlobal);
+
     return dirs.some((ad) => existsSync(join(projectDir, ad, 'rules', sourceFile)));
 }
 
@@ -57,8 +63,10 @@ export async function inspectAssetUpdates(projectDir: string, isGlobal = false):
 
     // Inspect Skills
     const installedSkills = lockfile.installed.skills || {};
+
     for (const [skillName, record] of Object.entries(installedSkills)) {
         const manifest = SKILLS.find((s) => s.name === skillName);
+
         if (!manifest) {
             inspected.push({
                 type: 'skills',
@@ -86,8 +94,10 @@ export async function inspectAssetUpdates(projectDir: string, isGlobal = false):
 
     // Inspect Rules
     const installedRules = lockfile.installed.rules || {};
+
     for (const [ruleId, record] of Object.entries(installedRules)) {
         const manifest = RULES.find((r) => r.id === ruleId);
+
         if (!manifest) {
             inspected.push({
                 type: 'rules',
@@ -145,8 +155,10 @@ export async function applyAssetUpdates(
         try {
             if (item.type === 'rules') {
                 const manifest = RULES.find((r) => r.id === item.id);
+
                 if (manifest) {
                     const srcPath = join(packageRoot, 'assets/agents/rules', manifest.sourceFile);
+
                     if (existsSync(srcPath)) {
                         for (const ad of agentDirs) {
                             const targetDir = join(projectDir, ad, 'rules');
@@ -157,6 +169,7 @@ export async function applyAssetUpdates(
                 }
             } else if (item.type === 'skills') {
                 const srcPath = join(packageRoot, 'assets/agents/skills', item.id);
+
                 if (existsSync(srcPath)) {
                     for (const ad of agentDirs) {
                         const targetDir = join(projectDir, ad, 'skills', item.id);
@@ -217,15 +230,18 @@ export async function pruneAssetUpdates(
     for (const item of itemsToPrune) {
         try {
             const deletedPaths: string[] = [];
+
             for (const ad of agentDirs) {
                 if (item.type === 'skills') {
                     const dirPath = join(projectDir, ad, 'skills', item.id);
+
                     if (existsSync(dirPath)) {
                         await rm(dirPath, { recursive: true, force: true });
                         deletedPaths.push(join(ad, 'skills', item.id));
                     }
                 } else if (item.type === 'rules') {
                     const filePath = join(projectDir, ad, 'rules', `${item.id}.md`);
+
                     if (existsSync(filePath)) {
                         await rm(filePath, { force: true });
                         deletedPaths.push(join(ad, 'rules', `${item.id}.md`));

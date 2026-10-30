@@ -1,12 +1,15 @@
-import { describe, expect, it } from 'vitest';
-import { planMcps, planSkills } from '@/core/agent/service-planners.js';
-import { mkdtemp, rm, mkdir } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { describe, expect, it } from 'vitest';
+
+import { planMcps, planSkills } from '@/core/agent/service-planners.js';
 
 describe('Agent Planners (Tasks 3.1 - 3.7)', () => {
     it('plans MCPs without side effects and classifies state per IDE target', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'mcp-plan-test-'));
+
         try {
             const items = await planMcps({
                 targetIdeIds: ['cursor', 'antigravity'],
@@ -24,6 +27,7 @@ describe('Agent Planners (Tasks 3.1 - 3.7)', () => {
 
     it('plans skills and classifies state per IDE target', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'skill-plan-test-'));
+
         try {
             await mkdir(join(cwd, '.cursor'), { recursive: true });
 

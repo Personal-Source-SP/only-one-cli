@@ -1,7 +1,7 @@
-import type { OnlyOneConfig } from '@/core/config/index.js';
-import { persistConfigProjectId } from '@/core/config/index.js';
 import type { HybridApiClient } from '@/core/client/index.js';
 import type { BackendProject, CreateProjectInput } from '@/core/client/types.js';
+import type { OnlyOneConfig } from '@/core/config/index.js';
+import { persistConfigProjectId } from '@/core/config/index.js';
 import { isUuidV4 } from '@/utils/uuid.js';
 
 export interface FindProjectByIdentityRequest {
@@ -40,11 +40,13 @@ const normalizeIdentityPart = (value: string): string => value.trim().toLowerCas
 export const findProjectByIdentity = async (request: FindProjectByIdentityRequest): Promise<BackendProject | null> => {
     const organization = request.organization.trim();
     const project = request.project.trim();
+
     if (!organization || !project) {
         return null;
     }
 
     const projects = (await request.client.listProjects()) as BackendProject[];
+
     if (!Array.isArray(projects)) {
         return null;
     }
@@ -65,23 +67,28 @@ export const resolveBackendProjectId = async (request: ResolveBackendProjectIdRe
     const { client, config, cwd, override, persistLookup = true } = request;
 
     const explicitOverride = override?.trim();
+
     if (explicitOverride) {
         return { projectId: explicitOverride };
     }
 
     const cachedProjectId = config.project_id?.trim();
+
     if (cachedProjectId) {
         return { projectId: cachedProjectId };
     }
 
     const organization = config.organization?.trim();
     const projectSlug = config.project?.trim();
+
     if (organization && projectSlug && !isUuidV4(projectSlug)) {
         const found = await findProjectByIdentity({ client, organization, project: projectSlug });
+
         if (found?.id) {
             if (persistLookup && cwd) {
                 await persistConfigProjectId(cwd, found.id);
             }
+
             return { projectId: found.id };
         }
 
@@ -118,6 +125,7 @@ export const syncBackendProjectOnInit = async (request: SyncBackendProjectOnInit
     if (!hasApiKey) {
         stdout('Warning: API credentials not configured; skipped backend project registration.');
         stdout('  Query commands require a backend project. Configure credentials and run init again.');
+
         return;
     }
 

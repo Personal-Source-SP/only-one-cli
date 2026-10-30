@@ -15,12 +15,14 @@ export const selectSkillsStep = async (
     const allExistingSkills = await checkExistingSkills(projectDir, targetTools, availableSkills, isGlobal);
 
     let selectedSkills = parseCsv(namesArg);
+
     if (!selectedSkills?.length) {
         if (!deps.prompts?.checkbox) {
             throw new Error('Skill selection is required in non-interactive mode. Pass skill names positionally.');
         } else {
             const choices = availableSkills.map((name) => {
                 const isExisting = allExistingSkills.some((s) => s.skillName === name && s.exists);
+
                 return {
                     name: isExisting ? `${name} (already exists)` : name,
                     value: name,

@@ -1,12 +1,14 @@
-import { describe, expect, it } from 'vitest';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { hasStructureAgentSkills, getMissingStructureTools } from '@src/core/agent/skill-presence.js';
+
+import { getMissingStructureTools, hasStructureAgentSkills } from '@src/core/agent/skill-presence.js';
+import { describe, expect, it } from 'vitest';
 
 describe('skill-presence', () => {
     it('detects missing cursor skill', async () => {
         const projectDir = await mkdtemp(join(tmpdir(), 'hybrid-skill-presence-'));
+
         try {
             expect(hasStructureAgentSkills(projectDir, ['cursor'])).toBe(false);
             expect(getMissingStructureTools(projectDir, ['cursor'])).toEqual(['cursor']);
@@ -17,6 +19,7 @@ describe('skill-presence', () => {
 
     it('detects present cursor skill and command', async () => {
         const projectDir = await mkdtemp(join(tmpdir(), 'hybrid-skill-presence-ok-'));
+
         try {
             await mkdir(join(projectDir, '.cursor', 'skills', 'only-one-structure-generate'), { recursive: true });
             await mkdir(join(projectDir, '.cursor', 'commands'), { recursive: true });

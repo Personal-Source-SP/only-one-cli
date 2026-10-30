@@ -1,9 +1,11 @@
 import { homedir } from 'node:os';
+
 import type { ProgramDeps } from '@/cli/deps.js';
-import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
-import { installCombo, type ExtendedComboManifest } from '@/core/combo/index.js';
+import { type ExtendedComboManifest, installCombo } from '@/core/combo/index.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
+
 import type { ComboCommandOptions } from '../types.js';
 
 export const executeAndReportComboStep = async (
@@ -33,6 +35,7 @@ export const executeAndReportComboStep = async (
 
     if (results.packages?.length) {
         deps.stdout('\nPackages:');
+
         for (const p of results.packages) {
             const statusColor = p.status === 'success' ? COLORS.success : p.status === 'skipped' ? COLORS.dim : COLORS.error;
             deps.stdout(`  - ${COLORS.secondary(p.name)}: ${statusColor(p.status)}${p.error ? ` (${p.error})` : ''}`);
@@ -41,6 +44,7 @@ export const executeAndReportComboStep = async (
 
     if (results.rules.length) {
         deps.stdout('\nRules:');
+
         for (const rule of results.rules) {
             const statusColor =
                 rule.status === 'success' || rule.status === 'overwritten'
@@ -58,6 +62,7 @@ export const executeAndReportComboStep = async (
 
     if (results.configs?.length) {
         deps.stdout('\nConfigs:');
+
         for (const c of results.configs) {
             const statusColor = c.status === 'success' ? COLORS.success : c.status === 'skipped' ? COLORS.dim : COLORS.error;
             deps.stdout(`  - ${COLORS.secondary(c.name)}: ${statusColor(c.status)}${c.error ? ` (${c.error})` : ''}`);
@@ -66,6 +71,7 @@ export const executeAndReportComboStep = async (
 
     if (results.skills?.length) {
         deps.stdout('\nSkills:');
+
         for (const s of results.skills) {
             const toolName = targetTools.find((t) => t.value === s.toolId)?.name || s.toolId;
             const statusColor =
@@ -78,6 +84,7 @@ export const executeAndReportComboStep = async (
 
     if (results.workflows.length) {
         deps.stdout('\nWorkflows:');
+
         for (const workflow of results.workflows) {
             const statusColor = workflow.status === 'success' ? COLORS.success : workflow.status === 'skipped' ? COLORS.dim : COLORS.error;
             deps.stdout(
@@ -88,6 +95,7 @@ export const executeAndReportComboStep = async (
 
     if (results.mcps?.length) {
         deps.stdout('\nMCP Configurations:');
+
         for (const m of results.mcps) {
             const ideName = m.ideId === 'cursor' ? 'Cursor' : m.ideId === 'antigravity' ? 'Antigravity' : m.ideId;
             const statusColor = m.status === 'success' ? COLORS.success : m.status === 'skipped' ? COLORS.dim : COLORS.error;
@@ -99,6 +107,7 @@ export const executeAndReportComboStep = async (
 
     if (results.hooks?.length) {
         deps.stdout('\nHooks:');
+
         for (const h of results.hooks) {
             const statusColor = h.status === 'success' ? COLORS.success : COLORS.error;
             deps.stdout(`  - ${COLORS.secondary(h.name)} in ${COLORS.primary('hooks')}: ${statusColor(h.status)}`);

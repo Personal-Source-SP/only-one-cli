@@ -1,17 +1,19 @@
-import { existsSync } from 'node:fs';
-import { access, readFile, readdir } from 'node:fs/promises';
-import { join } from 'node:path';
-import { homedir } from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { checkGit, checkNode, type CheckResult } from '@/core/doctor/checks.js';
-import type { RunDoctorOptions } from '@/core/doctor/types.js';
-import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
-import { findVsEditor } from '@/core/vs/index.js';
-import { findMcpIdeAdapter } from '@/core/mcp/index.js';
+import { existsSync } from 'node:fs';
+import { access, readdir, readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+
 import { MCPS } from '@assets/mcps/index.js';
+import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
 import { VS_LIBRARY } from '@assets/vs/index.js';
-import { RULES } from '@assets/rules/index.js';
+
+import { checkGit, checkNode, type CheckResult } from '@/core/doctor/checks.js';
+import type { RunDoctorOptions } from '@/core/doctor/types.js';
+import { findMcpIdeAdapter } from '@/core/mcp/index.js';
+import { getAllowedVsSettingsTargets } from '@/core/target-selection/index.js';
+import { findVsEditor } from '@/core/vs/index.js';
 
 export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promise<CheckResult[]> => {
     const results: CheckResult[] = [];
@@ -102,6 +104,7 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
         // 3. Setting Editor
         if (editorDescriptor) {
             const settingsPath = editorDescriptor.resolveSettingsPath(homedir(), process.platform as any);
+
             try {
                 await access(settingsPath);
                 results.push({
@@ -126,6 +129,7 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
         // 7. Extensions: Check individually against VS_LIBRARY.extensions
         if (editorDescriptor && editorDescriptor.commandCandidates.length) {
             let installedExts: string[] = [];
+
             for (const cmd of editorDescriptor.commandCandidates) {
                 try {
                     const extOutput = execFileSync(cmd, ['--list-extensions'], { encoding: 'utf-8' });
@@ -162,6 +166,7 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
     if (mcpAdapter) {
         try {
             const globalMcpPath = mcpAdapter.getConfigPath(homedir(), process.platform);
+
             if (existsSync(globalMcpPath)) {
                 const parsed = mcpAdapter.codec.parse(await readFile(globalMcpPath, 'utf-8'), globalMcpPath);
                 mcpServersObj = mcpAdapter.getMcpServers(parsed);
@@ -199,6 +204,7 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
     for (const skill of SKILLS) {
         const skillPath = join(cwd, '.agents', 'skills', skill.name, 'SKILL.md');
         let exists = false;
+
         try {
             await access(skillPath);
             exists = true;
@@ -239,6 +245,7 @@ export const runDoctorChecksStep = async (options: RunDoctorOptions = {}): Promi
     for (const ruleManifest of RULES) {
         const rulePath = join(cwd, '.agents', 'rules', ruleManifest.sourceFile);
         let exists = false;
+
         try {
             await access(rulePath);
             exists = true;

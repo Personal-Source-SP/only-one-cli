@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+
 import { jsonCodec, tomlCodec } from './codecs.js';
 import type { McpIdeAdapter } from './types.js';
 
@@ -13,6 +14,7 @@ import { isRecord } from '@/utils/index.js';
 
 const getObject = (config: Record<string, unknown>, key: string): Record<string, unknown> => {
     const value = config[key];
+
     return isRecord(value) ? value : {};
 };
 
@@ -51,6 +53,7 @@ export const cursorMcpAdapter: McpIdeAdapter = {
     name: 'Cursor',
     getConfigPath(homeDir, platform) {
         if (platform !== 'darwin' && platform !== 'win32') throw new Error(`Cursor MCP global config is unsupported on ${platform}`);
+
         return join(homeDir, '.cursor', 'mcp.json');
     },
     getMcpServers: getRootMcpServers,

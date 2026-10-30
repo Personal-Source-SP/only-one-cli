@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
+
 import type { ProgramDeps } from '@/cli/deps.js';
-import { createInitCommand } from '@/commands/init/command.ts';
 import { createComboCommand } from '@/commands/combo/command.ts';
+import { createInitCommand } from '@/commands/init/command.ts';
 import { createMcpCommand } from '@/commands/mcp/command.ts';
 import { createRuleCommand } from '@/commands/rule/command.ts';
 import { createSkillCommand } from '@/commands/skill/command.ts';

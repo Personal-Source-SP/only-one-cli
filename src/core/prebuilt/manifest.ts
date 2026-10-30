@@ -1,9 +1,10 @@
-import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { promisify } from 'node:util';
+
 import { listStructureRelativePaths } from '@/core/structure/paths.js';
 
 const execFileAsync = promisify(execFile);
@@ -23,11 +24,14 @@ const ARTIFACT_DIRS = [] as const;
 
 export async function countFiles(dir: string): Promise<number> {
     if (!existsSync(dir)) return 0;
+
     let count = 0;
     const entries = await readdir(dir, { withFileTypes: true, recursive: true });
+
     for (const entry of entries) {
         if (entry.isFile()) count++;
     }
+
     return count;
 }
 
@@ -37,6 +41,7 @@ export async function getCommitSha(dir: string): Promise<string> {
             cwd: dir,
             timeout: 5000,
         });
+
         return stdout.trim();
     } catch {
         return 'unknown';
@@ -51,8 +56,10 @@ async function collectFiles(root: string): Promise<string[]> {
     const files: string[] = [];
     const walk = async (dir: string): Promise<void> => {
         const entries = await readdir(dir, { withFileTypes: true });
+
         for (const entry of entries) {
             const fullPath = join(dir, entry.name);
+
             if (entry.isDirectory()) {
                 await walk(fullPath);
             } else if (entry.isFile()) {
@@ -60,7 +67,9 @@ async function collectFiles(root: string): Promise<string[]> {
             }
         }
     };
+
     await walk(root);
+
     return files.sort();
 }
 
@@ -71,6 +80,7 @@ export async function computeArtifactChecksum(outputDir: string): Promise<string
 
     for (const root of roots.sort()) {
         const files = await collectFiles(root);
+
         for (const filePath of files) {
             const rel = relative(outputDir, filePath);
             const content = await readFile(filePath);
@@ -100,6 +110,7 @@ export async function buildManifestData(projectDir: string, outputDir: string, p
 
 export async function readManifestFile(manifestPath: string): Promise<Record<string, unknown>> {
     const raw = await readFile(manifestPath, 'utf-8');
+
     return JSON.parse(raw) as Record<string, unknown>;
 }
 
@@ -117,10 +128,12 @@ export const extractUploadIndexVersionId = (response: unknown): string | null =>
 
     const payload = response as Record<string, unknown>;
     const indexVersionId = payload.indexVersionId;
+
     if (typeof indexVersionId !== 'string') {
         return null;
     }
 
     const normalized = indexVersionId.trim();
+
     return normalized.length ? normalized : null;
 };

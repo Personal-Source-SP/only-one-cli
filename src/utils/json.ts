@@ -12,8 +12,11 @@ export const stripJsonComments = (input: string): string => {
         if (inString) {
             output += current;
             escaped = current === '\\' && !escaped;
+
             if (current === '"' && !escaped) inString = false;
+
             if (current !== '\\') escaped = false;
+
             continue;
         }
 
@@ -25,13 +28,16 @@ export const stripJsonComments = (input: string): string => {
 
         if (current === '/' && next === '/') {
             while (index < input.length && input[index] !== '\n') index += 1;
+
             output += '\n';
             continue;
         }
 
         if (current === '/' && next === '*') {
             index += 2;
+
             while (index < input.length && !(input[index] === '*' && input[index + 1] === '/')) index += 1;
+
             index += 1;
             continue;
         }
@@ -45,7 +51,9 @@ export const stripJsonComments = (input: string): string => {
 export const parseJsoncObject = (content: string): Record<string, unknown> => {
     const stripped = stripJsonComments(content).replace(/,(\s*[}\]])/g, '$1');
     const parsed = JSON.parse(stripped) as unknown;
+
     if (!isRecord(parsed)) throw new Error('Expected JSON object');
+
     return parsed;
 };
 

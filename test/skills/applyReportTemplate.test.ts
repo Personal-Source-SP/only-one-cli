@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+
 import { lintSkill } from '@assets/skills/only-one-evolve/scripts/lint-skill.js';
+import { describe, expect, it } from 'vitest';
 
 describe('only-one-apply Concise Report Template Invariants', () => {
     const skillPath = path.resolve(process.cwd(), 'assets/agents/skills/only-one-apply/SKILL.md');

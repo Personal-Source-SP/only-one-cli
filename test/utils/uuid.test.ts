@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { isUuidV4 } from '@src/utils/uuid.js';
+import { describe, expect, it } from 'vitest';
 
 describe('isUuidV4', () => {
     it('accepts lowercase uuid v4 values', () => {

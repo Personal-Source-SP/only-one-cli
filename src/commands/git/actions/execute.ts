@@ -1,12 +1,15 @@
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
+import { join } from 'node:path';
+
+import { GIT_MANIFESTS, GIT_SNIPPETS } from '@assets/devenv/shell/index.js';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import { GIT_MANIFESTS, GIT_SNIPPETS } from '@assets/devenv/shell/index.js';
 import { mergeManagedBlock } from '@/core/git/sync.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
+
 import type { GitCommandOptions } from '../types.js';
 
 const assetsGitDir = join(resolvePackageRoot(import.meta.url), 'assets/devenv/shell');
@@ -39,6 +42,7 @@ export const executeGitCommandStep = async (deps: ProgramDeps, targetArg?: strin
 
     if (!selectedSnippetIds.length) {
         deps.stdout(COLORS.dim('\nNo snippet modules selected. Exiting without changes.'));
+
         return;
     }
 
@@ -50,17 +54,21 @@ export const executeGitCommandStep = async (deps: ProgramDeps, targetArg?: strin
     if (selectedProfile === 'bash' || selectedProfile === 'all') {
         manifestsToSync.push(GIT_MANIFESTS.gitbash);
     }
+
     if ((selectedProfile === 'zsh' || selectedProfile === 'all') && process.platform === 'darwin') {
         manifestsToSync.push(GIT_MANIFESTS.zsh);
     }
 
     // Build combined snippets text
     const snippetContents: string[] = [];
+
     for (const snippetId of selectedSnippetIds) {
         const snippet = GIT_SNIPPETS.find((s) => s.id === snippetId);
+
         if (!snippet) continue;
 
         const snippetPath = join(assetsGitDir, snippet.file);
+
         if (existsSync(snippetPath)) {
             snippetContents.push(readFileSync(snippetPath, 'utf8').trim());
         }
@@ -70,6 +78,7 @@ export const executeGitCommandStep = async (deps: ProgramDeps, targetArg?: strin
 
     for (const manifest of manifestsToSync) {
         deps.stdout(`\nProcessing ${COLORS.cli.command(manifest.name)}...`);
+
         for (const fileEntry of manifest.files) {
             const srcPath = join(assetsGitDir, fileEntry.src);
             const destPath = join(home, fileEntry.dest);

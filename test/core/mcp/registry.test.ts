@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
 import { MCPS } from '@assets/mcps/index.js';
+import { describe, expect, it } from 'vitest';
+
 import { readMcpManifests } from '@/core/mcp/registry.js';
 
 describe('MCP Registry & Predefined Manifests', () => {

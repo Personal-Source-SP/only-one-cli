@@ -1,7 +1,9 @@
-import { ALLOWED_TOOL_IDS, AllowedToolCapability, AllowedToolId, type AllowedTargetDescriptor } from '@/constants/index.js';
-import { AI_TOOLS, type AgentToolOption } from '../agent/tools.js';
+import { ALLOWED_TOOL_IDS, type AllowedTargetDescriptor, AllowedToolCapability, AllowedToolId } from '@/constants/index.js';
+
+import { type AgentToolOption, AI_TOOLS } from '../agent/tools.js';
 import { findMcpIdeAdapter, type McpIdeAdapter } from '../mcp/index.js';
-import { findVsEditor, VsEditorId, type VsEditorDescriptor } from '../vs/index.js';
+import type { VsEditorId } from '../vs/index.js';
+import { findVsEditor, type VsEditorDescriptor } from '../vs/index.js';
 
 export type AllowedTarget = AllowedTargetDescriptor & {
     agent?: AgentToolOption;
@@ -15,6 +17,7 @@ const vsCapabilities = [...capabilities, AllowedToolCapability.VsExtensions, All
 export const ALLOWED_TARGETS: readonly AllowedTarget[] = ALLOWED_TOOL_IDS.map((id) => {
     const isRuleCapable = id === AllowedToolId.Antigravity || id === AllowedToolId.Claude || id === AllowedToolId.Cursor;
     const baseCaps = isRuleCapable ? [...capabilities, AllowedToolCapability.Rules] : [...capabilities];
+
     return {
         id,
         capabilities:
@@ -41,12 +44,15 @@ export const assertAllowedTargetBackings = (targets: readonly AllowedTarget[] = 
         if (target.capabilities.includes(AllowedToolCapability.AgentArtifacts) && !target.agent) {
             throw new Error(`Missing agent backing for allowed target '${target.id}'`);
         }
+
         if (target.capabilities.includes(AllowedToolCapability.Mcp) && !target.mcp) {
             throw new Error(`Missing MCP backing for allowed target '${target.id}'`);
         }
+
         if (target.capabilities.includes(AllowedToolCapability.VsSettings) && !target.vs) {
             throw new Error(`Missing VS settings backing for allowed target '${target.id}'`);
         }
+
         if (target.capabilities.includes(AllowedToolCapability.VsExtensions) && !target.vs) {
             throw new Error(`Missing VS extensions backing for allowed target '${target.id}'`);
         }

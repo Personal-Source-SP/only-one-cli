@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 export const mergeManagedBlock = (existingContent: string, newContent: string, tag = 'ONLY-ONE-GIT'): string => {
     const startTag = `# >>> ${tag} >>>`;
@@ -8,6 +8,7 @@ export const mergeManagedBlock = (existingContent: string, newContent: string, t
 
     if (existingContent.includes(startTag)) {
         const regex = new RegExp(`${startTag}[\\s\\S]*?${endTag}`, 'g');
+
         return existingContent.replace(regex, block);
     }
 

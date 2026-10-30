@@ -26,6 +26,7 @@ export const mergeMcpServers = (
 
         if (hasExisting) {
             const isConfirmed = ideId && overwriteList && overwriteList.includes(`${ideId}:${manifest.id}`);
+
             if (!isConfirmed) {
                 results.push({ credentialKeys: getMcpCredentialKeys(manifest), id: manifest.id, status: 'skipped' });
                 continue;

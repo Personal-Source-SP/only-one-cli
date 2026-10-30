@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { createSkillCommand } from '@/commands/skill/command.js';
 

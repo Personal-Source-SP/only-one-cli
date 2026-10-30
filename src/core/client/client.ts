@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
+
 import { BaseApiClient } from './baseApi.js';
 import type {
     BackendProject,
@@ -14,15 +15,15 @@ import type {
     LatestIndexMetadata,
     ListIndexesOptions,
     ListJobsOptions,
+    ProjectStructureInfo,
     RemoteIndexInput,
     SearchOptions,
     SearchResponse,
+    SourceFileContentResponse,
+    SourceFileListResponse,
     TriggerJobInput,
     UploadPrebuiltIndexInput,
     UploadZipInput,
-    ProjectStructureInfo,
-    SourceFileContentResponse,
-    SourceFileListResponse,
 } from './types.js';
 
 export class HybridApiClient extends BaseApiClient {
@@ -32,9 +33,11 @@ export class HybridApiClient extends BaseApiClient {
 
     async listProjects(status = 'all') {
         const params = new URLSearchParams();
+
         if (status !== 'all') {
             params.set('status', status);
         }
+
         const query = params.toString();
 
         const payload = await this.requestJson(`/api/v1/projects${query ? `?${query}` : ''}`, {
@@ -98,9 +101,11 @@ export class HybridApiClient extends BaseApiClient {
 
     async listSourceFiles(projectId: string, token?: string): Promise<SourceFileListResponse> {
         const headers = this.formatHeaders();
+
         if (token) {
             headers['X-Git-Token'] = token;
         }
+
         return this.requestJson<SourceFileListResponse>(`/api/v1/projects/${encodeURIComponent(projectId)}/source/files`, {
             method: 'GET',
             headers,
@@ -114,13 +119,17 @@ export class HybridApiClient extends BaseApiClient {
         token?: string,
     ): Promise<SourceFileContentResponse> {
         const headers = this.formatHeaders();
+
         if (token) {
             headers['X-Git-Token'] = token;
         }
+
         const queryParams = new URLSearchParams({ path });
+
         if (opts.ref) {
             queryParams.set('ref', opts.ref);
         }
+
         return this.requestJson<SourceFileContentResponse>(
             `/api/v1/projects/${encodeURIComponent(projectId)}/source/file-content?${queryParams.toString()}`,
             {
@@ -132,6 +141,7 @@ export class HybridApiClient extends BaseApiClient {
 
     async listJobs(options: ListJobsOptions = {}) {
         const query = options.projectId ? `?projectId=${encodeURIComponent(options.projectId)}` : '';
+
         return this.requestJson(`/api/v1/jobs${query}`, {
             method: 'GET',
             headers: this.formatHeaders(),
@@ -150,6 +160,7 @@ export class HybridApiClient extends BaseApiClient {
             method: 'GET',
             headers: this.formatHeaders(),
         });
+
         return this.parseSseLines(raw);
     }
 
@@ -181,6 +192,7 @@ export class HybridApiClient extends BaseApiClient {
     async uploadZip(input: UploadZipInput) {
         const body = new FormData();
         body.set('name', input.name);
+
         if (input.tags?.length) body.set('tags', input.tags.join(','));
 
         const archive = await readFile(input.zipPath);
@@ -196,10 +208,15 @@ export class HybridApiClient extends BaseApiClient {
     async uploadPrebuiltIndex(input: UploadPrebuiltIndexInput) {
         const body = new FormData();
         body.set('name', input.name);
+
         if (input.tags?.length) body.set('tags', input.tags.join(','));
+
         if (input.fileCount !== undefined) body.set('fileCount', String(input.fileCount));
+
         if (input.organization) body.set('organization', input.organization);
+
         if (input.projectSlug) body.set('projectSlug', input.projectSlug);
+
         if (input.projectId) body.set('projectId', input.projectId);
 
         const bundle = await readFile(input.bundlePath);
@@ -221,8 +238,11 @@ export class HybridApiClient extends BaseApiClient {
 
     async listProjectIndexes(projectId: string, options: Pick<ListIndexesOptions, 'limit' | 'tag'> = {}) {
         const params = new URLSearchParams();
+
         if (options.tag) params.set('tag', options.tag);
+
         if (options.limit !== undefined) params.set('limit', String(options.limit));
+
         const query = params.toString();
 
         const payload = await this.requestJson(`/api/v1/projects/${encodeURIComponent(projectId)}/indexes${query ? `?${query}` : ''}`, {
@@ -243,9 +263,13 @@ export class HybridApiClient extends BaseApiClient {
 
     async listIndexes(options: ListIndexesOptions = {}) {
         const params = new URLSearchParams();
+
         if (options.projectId) params.set('project', options.projectId);
+
         if (options.tag) params.set('tag', options.tag);
+
         if (options.limit !== undefined) params.set('limit', String(options.limit));
+
         const query = params.toString();
 
         const payload = await this.requestJson(`/api/v1/indexes${query ? `?${query}` : ''}`, {
@@ -276,6 +300,7 @@ export class HybridApiClient extends BaseApiClient {
         if (options.tags?.length) {
             payload.tags = options.tags;
         }
+
         if (options.includeStructural) {
             payload.includeStructural = true;
         }

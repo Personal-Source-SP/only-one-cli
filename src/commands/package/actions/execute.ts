@@ -1,7 +1,8 @@
-import type { ProgramDeps } from '@/cli/deps.js';
-import { executePackageActions } from '@/core/init/package-installer.js';
 import type { PackageManifest } from '@assets/types.js';
+
+import type { ProgramDeps } from '@/cli/deps.js';
 import { isPackageInstalled } from '@/core/combo/index.js';
+import { executePackageActions } from '@/core/init/package-installer.js';
 
 export const executePackagesStep = async (
     deps: ProgramDeps,
@@ -14,9 +15,12 @@ export const executePackagesStep = async (
     const packageStatuses = await Promise.all(
         selectedPackageIds.map(async (id) => {
             const pkg = packageManifests.find((m) => m.id === id);
+
             if (!pkg || pkg.installer.kind !== 'npm') return { id, installed: false };
+
             const scope = pkg.installer.scope ?? 'global';
             const installed = await isPackageInstalled(pkg.installer.packageName, scope, projectDir);
+
             return { id, installed };
         }),
     );
@@ -30,6 +34,7 @@ export const executePackagesStep = async (
         if (installedIds.includes(id)) {
             return overwriteList.includes(id);
         }
+
         return true;
     });
 
@@ -52,6 +57,7 @@ export const executePackagesStep = async (
 
     if (result.installedPackages.length > 0) {
         deps.stdout('\n✓ Successfully Installed (New/Reinstalled):');
+
         for (const pkgId of result.installedPackages) {
             deps.stdout(`  - ${pkgId}`);
         }
@@ -59,6 +65,7 @@ export const executePackagesStep = async (
 
     if (skippedPackages.length > 0) {
         deps.stdout('\n⚠ Skipped (Already Installed):');
+
         for (const pkgId of skippedPackages) {
             deps.stdout(`  - ${pkgId}`);
         }
@@ -66,6 +73,7 @@ export const executePackagesStep = async (
 
     if (result.summary.failed.length > 0) {
         deps.stdout('\n✗ Failed to Install:');
+
         for (const pkgId of result.summary.failed) {
             deps.stdout(`  - ${pkgId}`);
         }

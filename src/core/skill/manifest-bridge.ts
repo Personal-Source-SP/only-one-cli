@@ -20,6 +20,7 @@ export async function mergeSkillsManifest(filePath: string): Promise<void> {
         try {
             const content = await readFile(filePath, 'utf-8');
             const parsed = JSON.parse(content);
+
             if (parsed && Array.isArray(parsed.entries)) {
                 manifest = parsed;
             }
@@ -31,6 +32,7 @@ export async function mergeSkillsManifest(filePath: string): Promise<void> {
     }
 
     const hasEntry = manifest.entries.some((e) => e.path === CANONICAL_SKILL_PATH || e.path === '~/.agents/skills/');
+
     if (!hasEntry) {
         manifest.entries.push({ path: CANONICAL_SKILL_PATH });
     }

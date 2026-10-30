@@ -1,4 +1,5 @@
 import { homedir } from 'node:os';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { checkExistingComboComponents, type ExtendedComboManifest } from '@/core/combo/index.js';

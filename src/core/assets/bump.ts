@@ -1,6 +1,8 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+
 import { bumpDecimalVersion, DEFAULT_ASSET_VERSION } from './version.js';
 
 export interface BumpAssetResult {
@@ -33,16 +35,19 @@ export function normalizeAssetType(typeInput: string): string {
     };
 
     const matched = map[lower];
+
     if (!matched) {
         throw new Error(
             `Unknown asset type: "${typeInput}". Supported types: workflows, skills, rules, mcps, packages, combos, git, vs, configs.`,
         );
     }
+
     return matched;
 }
 
 export function resolveAssetManifestFilePath(normalizedType: string, customRoot?: string): string {
     const root = customRoot || resolvePackageRoot(import.meta.url);
+
     return join(root, 'assets', normalizedType, 'index.ts');
 }
 
@@ -64,13 +69,16 @@ export async function bumpAssetManifestVersion(
     if (assetType === 'vs') {
         const vsRegex = /version:\s*'([^']+)'/;
         const match = content.match(vsRegex);
+
         if (!match) {
             throw new Error(`Could not find version declaration in ${filePath}`);
         }
+
         const oldVersion = match[1];
         const newVersion = bumpDecimalVersion(oldVersion);
         const updated = content.replace(vsRegex, `version: '${newVersion}'`);
         await writeFile(filePath, updated, 'utf-8');
+
         return { assetType, id: 'vs_library', oldVersion, newVersion, filePath };
     }
 
@@ -80,6 +88,7 @@ export async function bumpAssetManifestVersion(
     const blockRegex = new RegExp(`({[^{}]*?(?:name|id):\\s*['"]${escapeRegex(id)}['"][^{}]*?})`, 's');
 
     const match = content.match(blockRegex);
+
     if (!match) {
         throw new Error(`Asset "${id}" not found in manifest file: ${filePath}. Please verify the asset name/id.`);
     }

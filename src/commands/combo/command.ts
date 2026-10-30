@@ -1,10 +1,12 @@
 import { homedir } from 'node:os';
+
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
-import { selectIgnoreTargets } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import { isComboScopeMatch } from '@/core/combo/index.js';
-import type { ComboCommandOptions } from './types.js';
+import { selectIgnoreTargets } from '@/core/ignore/index.js';
+
 import {
     confirmComboOverwriteStep,
     executeAndReportComboStep,
@@ -12,6 +14,7 @@ import {
     selectCombosStep,
     selectComboTargetStep,
 } from './actions/index.js';
+import type { ComboCommandOptions } from './types.js';
 
 export function createComboCommand(deps: ProgramDeps): Command {
     const cmd = new Command('combo')
@@ -25,6 +28,7 @@ export function createComboCommand(deps: ProgramDeps): Command {
         .action(async (pathArg: string | undefined, namesArg: string | undefined, options: ComboCommandOptions) => {
             const targetDir = options.global ? homedir() : pathArg;
             const { projectDir, availableCombos } = await loadComboManifestsStep(deps, targetDir);
+
             if (!availableCombos?.length) {
                 return;
             }
@@ -43,6 +47,7 @@ export function createComboCommand(deps: ProgramDeps): Command {
 
             if (!selectedComboNames?.length) {
                 deps.stdout('No combos selected. Exiting.');
+
                 return;
             }
 
@@ -52,12 +57,14 @@ export function createComboCommand(deps: ProgramDeps): Command {
                 const combo = availableCombos.find(
                     (c) => c.id.toLowerCase() === comboName.toLowerCase() || c.name.toLowerCase() === comboName.toLowerCase(),
                 );
+
                 if (!combo) {
                     throw new Error(`Combo '${comboName}' not found in assets/combos`);
                 }
 
                 if (!isComboScopeMatch(combo, Boolean(options.global))) {
                     const targetScope = options.global ? 'global' : 'local project';
+
                     throw new Error(
                         `Combo '${combo.name}' is scoped for '${combo.scope}' only and cannot be installed in ${targetScope} mode.`,
                     );

@@ -1,8 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { ProgramDeps } from '@/cli/deps.js';
-import { createPackageCommand } from '@/commands/package/command.js';
 import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
+
+import { describe, expect, it, vi } from 'vitest';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import { createPackageCommand } from '@/commands/package/command.js';
 
 const testProjectDir = join(process.cwd(), 'tmp/package-command-test');
 
@@ -18,9 +20,11 @@ describe('Package Command Unit & Integration Tests', () => {
             prompts: {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
+
                     if (opts.message.includes('Select packages to install')) {
                         return ['ui-ux-pro-max-cli'];
                     }
+
                     return [];
                 },
                 confirm: async () => true,

@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
+
 import { resolveLegacyBlueprintPath } from './paths.js';
 
 export const STRUCTURE_SECTION_HEADINGS = [
@@ -54,5 +55,6 @@ export const extractGeneratedByVersion = (skillPath: string): string | null => {
 
     const content = readFileSync(skillPath, 'utf-8');
     const match = content.match(/generatedBy:\s*"([^"]+)"/);
+
     return match?.[1] ?? null;
 };

@@ -1,9 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
-import { planPackages } from '@/core/package/planner.js';
-import { planConfigs } from '@/core/config/planner.js';
-import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { describe, expect, it, vi } from 'vitest';
+
+import { planConfigs } from '@/core/config/planner.js';
+import { planPackages } from '@/core/package/planner.js';
 
 vi.mock('@/core/combo/index.js', () => ({
     isPackageInstalled: vi.fn(async (name: string) => name === 'existing-pkg'),
@@ -12,6 +14,7 @@ vi.mock('@/core/combo/index.js', () => ({
 describe('Package & Config Planners (Tasks 2.1 - 2.6)', () => {
     it('plans packages without side effects and detects existing package', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'package-plan-test-'));
+
         try {
             const mockManifests = [
                 { id: 'new-pkg', name: 'New Pkg', installer: { kind: 'npm', packageName: 'new-pkg' } },
@@ -36,6 +39,7 @@ describe('Package & Config Planners (Tasks 2.1 - 2.6)', () => {
 
     it('plans configs without side effects and detects existing config file', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'config-plan-test-'));
+
         try {
             await mkdir(join(cwd, 'custom'), { recursive: true });
             await writeFile(join(cwd, 'custom/config.json'), 'existing config');

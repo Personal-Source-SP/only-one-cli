@@ -1,14 +1,16 @@
-import { describe, expect, it, vi } from 'vitest';
-import { mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { existsSync } from 'node:fs';
+
 import { createProgram } from '@src/index.js';
+import { describe, expect, it, vi } from 'vitest';
 
 let tempHome: string;
 
 vi.mock('node:os', async () => {
     const actual = await vi.importActual<typeof import('node:os')>('node:os');
+
     return {
         ...actual,
         homedir: () => tempHome,
@@ -18,6 +20,7 @@ vi.mock('node:os', async () => {
 vi.mock('node:child_process', () => ({
     execFile: vi.fn((file, args, options, callback) => {
         const cb = typeof options === 'function' ? options : callback;
+
         if (cb) {
             cb(null, { stdout: '', stderr: '' });
         }
@@ -74,6 +77,7 @@ describe('combo command', () => {
                 prompts: {
                     checkbox: vi.fn(async (options) => {
                         prompts.push(options);
+
                         return [];
                     }),
                 },
@@ -131,6 +135,7 @@ describe('combo command', () => {
                 prompts: {
                     checkbox: vi.fn(async (options) => {
                         if (options.message.includes('Select combos')) comboChoices = options.choices;
+
                         return [];
                     }),
                 },
@@ -148,6 +153,7 @@ describe('combo command', () => {
 
     it('rejects installing global-only combo in project mode', async () => {
         const cwd = await mkdtemp(join(tmpdir(), 'combo-scope-err-'));
+
         try {
             const program = createProgram({
                 cwd,

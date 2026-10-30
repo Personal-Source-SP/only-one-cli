@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { validateDebugDoc } from '@assets/skills/only-one-debug/scripts/validate-debug.js';
+import { describe, expect, it } from 'vitest';
 
 describe('validateDebugDoc', () => {
     const sample4SectionDoc = `---

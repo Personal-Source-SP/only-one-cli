@@ -13,9 +13,11 @@ export function resolveGoBinaryPath(baseDir?: string): string | null {
             path.join(baseDir, 'src', 'tui', binaryName),
             path.join(baseDir, 'dist', 'bin', binaryName),
         ];
+
         for (const p of candidates) {
             if (fs.existsSync(p)) return p;
         }
+
         return null;
     }
 
@@ -39,11 +41,13 @@ export function resolveGoBinaryPath(baseDir?: string): string | null {
     for (const p of defaultCandidates) {
         if (fs.existsSync(p)) return p;
     }
+
     return null;
 }
 
 export async function launchGoTui(workspaceDir: string = process.cwd()): Promise<number> {
     const binaryPath = resolveGoBinaryPath(workspaceDir);
+
     if (!binaryPath) {
         throw new Error('Go TUI Engine binary không tìm thấy. Vui lòng chạy npm run build:go.');
     }
@@ -61,6 +65,7 @@ export async function launchGoTui(workspaceDir: string = process.cwd()): Promise
 
 export async function launchGoInit(workspaceDir: string = process.cwd()): Promise<number> {
     const binaryPath = resolveGoBinaryPath(workspaceDir);
+
     if (!binaryPath) {
         throw new Error('Go TUI Engine binary không tìm thấy. Vui lòng chạy npm run build:go.');
     }

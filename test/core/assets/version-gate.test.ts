@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
+
 import { mapChangedFileToAsset, verifyAllAssetsHaveValidVersions } from '@/core/assets/gate.js';
 
 describe('Assets Version Gate & Integrity Verification', () => {
     it('verifies that 100% of all registered asset manifests have a valid decimal version', () => {
         const result = verifyAllAssetsHaveValidVersions();
+
         if (!result.valid) {
             console.error('Asset Version Violations:\n', result.errors.join('\n'));
         }
+
         expect(result.valid).toBe(true);
         expect(result.errors).toHaveLength(0);
     });

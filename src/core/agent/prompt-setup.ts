@@ -1,12 +1,14 @@
 import { confirm as confirmPrompt } from '@inquirer/prompts';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { readCliVersion } from '@/core/runtime/read-cli-version.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
+
 import { detectActiveAgentToolId } from './detect-active-agent.js';
 import { getAvailableTools } from './detect-tools.js';
 import { installAgentArtifacts, type InstallAgentArtifactsResult } from './install.js';
 import { isPromptInteractive } from './interactive.js';
-import { ResolveToolsArgError, resolveToolsArg } from './resolve-tools.js';
+import { resolveToolsArg, ResolveToolsArgError } from './resolve-tools.js';
 import { getInstallableAgentTools } from './tools.js';
 
 export type AgentSkillSetupRequest = {
@@ -40,6 +42,7 @@ const buildToolChoices = (projectDir: string, configuredToolIds: Set<string>, pr
             const configured = configuredToolIds.has(tool.value);
             const detectedOnly = detected.has(tool.value) && !configured;
             const activeSession = tool.value === activeAgentId;
+
             return {
                 activeSession,
                 configured,
@@ -57,21 +60,27 @@ const buildToolChoices = (projectDir: string, configuredToolIds: Set<string>, pr
             if (a.configured && !b.configured) {
                 return -1;
             }
+
             if (!a.configured && b.configured) {
                 return 1;
             }
+
             if (a.activeSession && !b.activeSession) {
                 return -1;
             }
+
             if (!a.activeSession && b.activeSession) {
                 return 1;
             }
+
             if (a.detected && !b.detected) {
                 return -1;
             }
+
             if (!a.detected && b.detected) {
                 return 1;
             }
+
             return 0;
         });
 };
@@ -82,6 +91,7 @@ export const promptAgentSkillSetup = async (deps: ProgramDeps, request: AgentSki
     }
 
     const resolved = resolveToolsArg(request.toolsArg);
+
     if (resolved.kind === 'none') {
         return { installRan: false, tools: [] };
     }
@@ -94,6 +104,7 @@ export const promptAgentSkillSetup = async (deps: ProgramDeps, request: AgentSki
             skillName: request.skillName,
             commandId: request.commandId,
         });
+
         return { artifacts, installRan: true, tools: resolved.toolIds };
     }
 
@@ -109,12 +120,14 @@ export const promptAgentSkillSetup = async (deps: ProgramDeps, request: AgentSki
             default: true,
             message: 'Install structure agent skills for your IDE/agent?',
         });
+
         if (!install) {
             return { installRan: false, tools: [] };
         }
     }
 
     const activeAgentId = detectActiveAgentToolId();
+
     if (activeAgentId && configuredToolIds.size === 0) {
         deps.stdout(`Active agent detected: ${getAgentToolDisplayName(activeAgentId)} (pre-selected).`);
     }
@@ -142,12 +155,15 @@ export const formatAgentSkillSetupError = (error: unknown): string => {
     if (error instanceof ResolveToolsArgError) {
         return error.message;
     }
+
     if (error instanceof AgentSkillSetupError) {
         return error.message;
     }
+
     if (error instanceof Error) {
         return error.message;
     }
+
     return String(error);
 };
 

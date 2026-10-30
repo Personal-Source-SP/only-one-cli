@@ -1,21 +1,24 @@
 import { access, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+
 import yaml from 'js-yaml';
-import { HYBRID_API_KEY_ENV, formatApiKeyConfigHint, resolveApiKey } from '@/core/runtime/credentials.js';
-import { isUuidV4 } from '@/utils/uuid.js';
+
 import {
+    ensureIndexOutputDir,
     ONLY_ONE_CONFIG_FILE,
     ONLY_ONE_DIR,
-    ensureIndexOutputDir,
     resolveLocalConfigPath,
     resolveLocalConfigPathForProject,
 } from '@/core/prebuilt/index-output.js';
+import { formatApiKeyConfigHint, HYBRID_API_KEY_ENV, resolveApiKey } from '@/core/runtime/credentials.js';
+import { isUuidV4 } from '@/utils/uuid.js';
+
 import type {
     BulkConfig,
     GlobalOptions,
-    OnlyOneConfig,
     IndexMode,
+    OnlyOneConfig,
     ResolvedBulkConfig,
     ResolvedGlobals,
     ResolvedIndexMode,
@@ -25,7 +28,7 @@ import type {
     SearchScope,
 } from './types.js';
 
-export { HYBRID_API_KEY_ENV, formatApiKeyConfigHint, resolveApiKey } from '@/core/runtime/credentials.js';
+export { formatApiKeyConfigHint, HYBRID_API_KEY_ENV, resolveApiKey } from '@/core/runtime/credentials.js';
 export { isUuidV4 } from '@/utils/uuid.js';
 
 let legacyCredentialWarningShown = false;
@@ -41,6 +44,7 @@ export const warnLegacyYamlCredentials = (warn: (message: string) => void = (mes
     if (legacyCredentialWarningShown) {
         return;
     }
+
     legacyCredentialWarningShown = true;
     warn(LEGACY_CREDENTIAL_DEPRECATION);
 };
@@ -52,25 +56,31 @@ export const stripLegacyCredentials = (
     hadLegacy: boolean;
 } => {
     const hadLegacy = Boolean(config.api_key) || Boolean(config.api_key_env);
+
     if (!hadLegacy) {
         return { config, hadLegacy: false };
     }
+
     const { api_key: _apiKey, api_key_env: _apiKeyEnv, ...rest } = config;
+
     return { config: rest, hadLegacy: true };
 };
 
 const parseConfigYaml = (raw: string): OnlyOneConfig => {
     const parsed = (yaml.load(raw) as (OnlyOneConfig & { api_key?: string; api_key_env?: string }) | null) ?? {};
     const { config, hadLegacy } = stripLegacyCredentials(parsed);
+
     if (hadLegacy) {
         warnLegacyYamlCredentials();
     }
+
     return config;
 };
 
 export const loadGlobalConfig = async (): Promise<OnlyOneConfig> => {
     try {
         const raw = await readFile(join(homedir(), '.onlyonecli', 'config.yaml'), 'utf-8');
+
         return parseConfigYaml(raw);
     } catch {
         return {};
@@ -81,6 +91,7 @@ export const loadConfig = async (cwd = process.cwd()): Promise<OnlyOneConfig> =>
     const globalConfig = await loadGlobalConfig();
     let localConfig: OnlyOneConfig = {};
     const localConfigPath = resolveLocalConfigPathForProject(cwd);
+
     if (localConfigPath) {
         try {
             const raw = await readFile(localConfigPath, 'utf-8');
@@ -91,6 +102,7 @@ export const loadConfig = async (cwd = process.cwd()): Promise<OnlyOneConfig> =>
     }
 
     const merged = { ...globalConfig, ...localConfig };
+
     if (globalConfig.bulk || localConfig.bulk) {
         merged.bulk = {
             ...globalConfig.bulk,
@@ -108,7 +120,9 @@ export const loadConfig = async (cwd = process.cwd()): Promise<OnlyOneConfig> =>
         const parts = merged.project_name.split('/');
         const org = parts.length > 1 ? parts[0] : 'default';
         const proj = parts.length > 1 ? parts[1] : parts[0];
+
         if (!merged.organization && org) merged.organization = org;
+
         if (!merged.project && proj) merged.project = proj;
     }
 
@@ -119,6 +133,7 @@ export const loadConfig = async (cwd = process.cwd()): Promise<OnlyOneConfig> =>
             tags: [...(globalConfig.search?.tags ?? []), ...(localConfig.search?.tags ?? [])],
         };
     }
+
     return merged;
 };
 
@@ -151,6 +166,7 @@ export const resolveSearchConfig = (
     const scopeCli = command.getOptionValueSource('scope') === 'cli';
 
     let scope: SearchScope = 'per-project';
+
     if (crossProjectCli || Boolean(cliOptions.crossProject)) {
         scope = 'cross-project';
     } else if (scopeCli) {
@@ -165,9 +181,11 @@ export const resolveSearchConfig = (
             : [...(merged.tags ?? defaults.tags ?? [])];
 
     let interactive = merged.interactive ?? defaults.interactive ?? true;
+
     if (command.getOptionValueSource('once') === 'cli' || cliOptions.once) {
         interactive = false;
     }
+
     if (command.getOptionValueSource('interactive') === 'cli' || cliOptions.interactive) {
         interactive = true;
     }
@@ -184,15 +202,19 @@ export const resolveSearchConfig = (
 
 export const validateSearchConfig = (config: ResolvedSearchConfig): string[] => {
     const errors: string[] = [];
+
     if (!Number.isFinite(config.topK) || config.topK <= 0 || !Number.isInteger(config.topK)) {
         errors.push('search.top_k must be a positive integer');
     }
+
     if (!Number.isFinite(config.snippetLines) || config.snippetLines < 0 || !Number.isInteger(config.snippetLines)) {
         errors.push('search.snippet_lines must be a non-negative integer');
     }
+
     if (config.scope !== 'per-project' && config.scope !== 'cross-project') {
         errors.push('search.scope must be per-project or cross-project');
     }
+
     return errors;
 };
 
@@ -216,8 +238,11 @@ export const resolveBulkConfig = (
 
 export const validateBulkConfig = (config: ResolvedBulkConfig): string[] => {
     const errors: string[] = [];
+
     if (config.depth < 1 || config.depth > 10) errors.push('depth must be 1-10');
+
     if (config.concurrency < 1 || config.concurrency > 10) errors.push('concurrency must be 1-10');
+
     return errors;
 };
 
@@ -225,6 +250,7 @@ export const writeConfig = async (config: OnlyOneConfig, cwd = process.cwd(), op
     const outputDir = join(cwd, ONLY_ONE_DIR);
     await ensureIndexOutputDir(outputDir);
     const target = resolveLocalConfigPath(cwd);
+
     if (!options.force && (await exists(target))) {
         throw new Error(`${ONLY_ONE_DIR}/${ONLY_ONE_CONFIG_FILE} already exists; pass --force to overwrite`);
     }
@@ -234,6 +260,7 @@ export const writeConfig = async (config: OnlyOneConfig, cwd = process.cwd(), op
 
 export const persistConfigAgentTools = async (cwd: string, agentTools: string[]): Promise<void> => {
     const configPath = resolveLocalConfigPathForProject(cwd);
+
     if (!configPath) {
         throw new Error(`${ONLY_ONE_DIR}/${ONLY_ONE_CONFIG_FILE} not found`);
     }
@@ -245,22 +272,26 @@ export const persistConfigAgentTools = async (cwd: string, agentTools: string[])
 
 export const persistConfigProjectId = async (cwd: string, projectId: string): Promise<boolean> => {
     const configPath = resolveLocalConfigPathForProject(cwd);
+
     if (!configPath) {
         return false;
     }
 
     const normalizedProjectId = projectId.trim();
+
     if (!normalizedProjectId) {
         return false;
     }
 
     const config = parseConfigYaml(await readFile(configPath, 'utf-8'));
+
     if (config.project_id === normalizedProjectId) {
         return false;
     }
 
     config.project_id = normalizedProjectId;
     await writeFile(configPath, dumpOnlyOneConfig(config));
+
     return true;
 };
 
@@ -280,12 +311,14 @@ export const formatSearchSectionYaml = (search?: SearchConfig): string => {
         lines.push('  tags: []  # Tag filters when scope is cross-project (--tag, repeatable)');
     } else {
         lines.push('  tags:  # Tag filters when scope is cross-project (--tag, repeatable)');
+
         for (const tag of resolved.tags) {
             lines.push(`    - ${tag}`);
         }
     }
 
     lines.push(`  interactive: ${resolved.interactive}  # On a TTY, prompt to search again after results; false or --once disables`);
+
     return lines.join('\n');
 };
 
@@ -293,6 +326,7 @@ const dumpOnlyOneConfig = (config: OnlyOneConfig): string => {
     const serialized = serializeConfig(config);
     const { search, ...rest } = serialized;
     const body = yaml.dump(rest, { lineWidth: -1, noRefs: true }).trimEnd();
+
     return `${body}\n${formatSearchSectionYaml(search as SearchConfig)}\n`;
 };
 
@@ -318,9 +352,11 @@ export const parseIndexMode = (value?: string): IndexMode => {
     if (!value) {
         return 'local';
     }
+
     if (value !== 'docker' && value !== 'local') {
         throw new Error(`Invalid index mode "${value}". Expected "docker" or "local".`);
     }
+
     return value;
 };
 
@@ -362,6 +398,7 @@ export const resolveGlobals = async (
 const exists = async (path: string): Promise<boolean> => {
     try {
         await access(path);
+
         return true;
     } catch {
         return false;

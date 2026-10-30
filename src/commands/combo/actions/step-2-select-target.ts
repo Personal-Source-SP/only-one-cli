@@ -1,6 +1,7 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { selectSingleAllowedAgentTarget } from '@/core/target-selection/index.js';
+
 import type { ComboCommandOptions } from '../types.js';
 
 export const selectComboTargetStep = async (
@@ -13,5 +14,6 @@ export const selectComboTargetStep = async (
         message: 'Select target IDEs/Tools for combo setup:',
         prompts: deps.prompts,
     });
+
     return { targetTool, targetTools: [targetTool] };
 };

@@ -1,12 +1,13 @@
-import { describe, expect, it, vi } from 'vitest';
-import { mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createProgram } from '@src/index.js';
+
 import { installAgentArtifacts } from '@src/core/agent/install.js';
-import { ONLY_ONE_DIR, ONLY_ONE_CONFIG_FILE } from '@src/core/prebuilt/index-output.js';
-import { readBlueprintStatus, STRUCTURE_SECTION_HEADINGS } from '@src/core/structure/status.js';
+import { ONLY_ONE_CONFIG_FILE, ONLY_ONE_DIR } from '@src/core/prebuilt/index-output.js';
 import { LEGACY_STRUCTURAL_BLUEPRINT_FILENAME } from '@src/core/structure/paths.js';
+import { readBlueprintStatus, STRUCTURE_SECTION_HEADINGS } from '@src/core/structure/status.js';
+import { createProgram } from '@src/index.js';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@src/utils/git-project-name.js', () => ({
     resolveGitProjectName: vi.fn().mockResolvedValue('acme/payments-api'),

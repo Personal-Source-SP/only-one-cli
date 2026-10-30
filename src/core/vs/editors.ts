@@ -1,5 +1,6 @@
 import { join } from 'node:path';
-import { VsEditorId, VsPlatform, type VsEditorDescriptor } from './types.js';
+
+import { type VsEditorDescriptor, VsEditorId, VsPlatform } from './types.js';
 
 const macUser = (homeDir: string, appName: string) => join(homeDir, 'Library', 'Application Support', appName, 'User', 'settings.json');
 const winUser = (homeDir: string, appName: string) => join(homeDir, 'AppData', 'Roaming', appName, 'User', 'settings.json');
@@ -31,6 +32,7 @@ export const findVsEditor = (id: VsEditorId): VsEditorDescriptor | undefined => 
 
 export const parseVsEditorIds = (value: string | undefined): VsEditorId[] => {
     if (!value) return [];
+
     return value
         .split(',')
         .map((item) => item.trim().toLowerCase())

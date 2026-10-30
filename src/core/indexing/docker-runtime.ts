@@ -10,6 +10,7 @@ export function isDockerDaemonRunning(): boolean {
             encoding: 'utf-8',
             stdio: 'pipe',
         });
+
         return true;
     } catch {
         return false;
@@ -33,6 +34,7 @@ export function hasDockerImage(image: string): boolean {
             encoding: 'utf-8',
             stdio: 'pipe',
         });
+
         return true;
     } catch {
         return false;
@@ -45,6 +47,7 @@ export function getContainerState(name: string): DockerContainerState {
             encoding: 'utf-8',
             stdio: 'pipe',
         }).trim();
+
         return running === 'true' ? 'running' : 'stopped';
     } catch {
         return 'missing';
@@ -53,12 +56,16 @@ export function getContainerState(name: string): DockerContainerState {
 
 export function ensureContainerRunning(name: string, runArgs: string[]): void {
     const state = getContainerState(name);
+
     if (state === 'running') {
         return;
     }
+
     if (state === 'stopped') {
         execFileSync(DOCKER, ['start', name], { encoding: 'utf-8', stdio: 'pipe' });
+
         return;
     }
+
     execFileSync(DOCKER, runArgs, { encoding: 'utf-8', stdio: 'pipe' });
 }

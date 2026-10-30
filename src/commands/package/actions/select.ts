@@ -1,6 +1,7 @@
+import type { PackageManifest } from '@assets/types.js';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { isPackageInstalled } from '@/core/combo/index.js';
-import type { PackageManifest } from '@assets/types.js';
 import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
 
 export interface SelectPackagesResult {
@@ -18,8 +19,10 @@ export const selectPackagesStep = async (
     const packageStatuses = await Promise.all(
         availablePackages.map(async (pkg) => {
             if (pkg.installer.kind !== 'npm') return { pkg, installed: false };
+
             const scope = pkg.installer.scope ?? 'global';
             const installed = await isPackageInstalled(pkg.installer.packageName, scope, projectDir);
+
             return { pkg, installed };
         }),
     );
@@ -31,13 +34,16 @@ export const selectPackagesStep = async (
             .split(',')
             .map((n) => n.trim())
             .filter(Boolean);
+
         for (const name of inputNames) {
             const found = availablePackages.find(
                 (pkg) => pkg.id === name || (pkg.installer.kind === 'npm' && pkg.installer.packageName === name),
             );
+
             if (!found) {
                 throw new Error(`Package '${name}' not found in assets/packages.`);
             }
+
             selectedPackageIds.push(found.id);
         }
     } else {
@@ -69,12 +75,14 @@ export const selectPackagesStep = async (
         });
     } else if (installedSelected.length > 0) {
         const confirmFn = deps.prompts?.confirm;
+
         if (confirmFn) {
             for (const s of installedSelected) {
                 const proceed = await confirmFn({
                     message: `Package '${s.pkg.id}' is already installed. Reinstall/overwrite?`,
                     default: false,
                 });
+
                 if (proceed) {
                     overwriteList.push(s.pkg.id);
                 }

@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
-import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+
+import { ONLY_ONE_DIR } from '@src/core/prebuilt/index-output.js';
 import {
     buildStructureFilename,
     isExplicitBlueprintFileOutput,
@@ -10,7 +11,7 @@ import {
     sanitizeStructureSegment,
     StructurePathResolutionError,
 } from '@src/core/structure/paths.js';
-import { ONLY_ONE_DIR } from '@src/core/prebuilt/index-output.js';
+import { describe, expect, it } from 'vitest';
 
 describe('structure paths', () => {
     it('sanitizes filename segments', () => {

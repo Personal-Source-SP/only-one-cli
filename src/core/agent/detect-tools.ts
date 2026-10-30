@@ -1,6 +1,7 @@
 import { statSync } from 'node:fs';
 import { join } from 'node:path';
-import { AI_TOOLS, type AgentToolOption } from './tools.js';
+
+import { type AgentToolOption, AI_TOOLS } from './tools.js';
 
 /**
  * Ported from open-spec-source/src/core/available-tools.ts
@@ -15,6 +16,7 @@ export const getAvailableTools = (projectPath: string): AgentToolOption[] =>
             return tool.detectionPaths.some((p) => {
                 try {
                     statSync(join(projectPath, p));
+
                     return true;
                 } catch {
                     return false;

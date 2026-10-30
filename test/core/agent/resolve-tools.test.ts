@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { getToolsWithSkillsDir } from '@src/core/agent/tools.js';
 import { resolveToolsArg, ResolveToolsArgError } from '@src/core/agent/resolve-tools.js';
+import { getToolsWithSkillsDir } from '@src/core/agent/tools.js';
+import { describe, expect, it } from 'vitest';
 
 describe('resolveToolsArg', () => {
     it('parses none', () => {
@@ -10,6 +10,7 @@ describe('resolveToolsArg', () => {
     it('parses all', () => {
         const result = resolveToolsArg('all');
         expect(result.kind).toBe('list');
+
         if (result.kind === 'list') {
             expect(result.toolIds).toEqual(getToolsWithSkillsDir());
             expect(result.toolIds.length).toBe(30);

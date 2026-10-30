@@ -11,6 +11,7 @@ export function deduplicatePlannedItems(items: PlannedItem[]): PlannedItem[] {
 
     for (const item of items) {
         const existing = map.get(item.key);
+
         if (!existing) {
             map.set(item.key, { ...item });
         } else {
@@ -30,7 +31,9 @@ export function deduplicatePlannedItems(items: PlannedItem[]): PlannedItem[] {
     return Array.from(map.values()).sort((a, b) => {
         const catA = CATEGORY_ORDER.indexOf(a.category);
         const catB = CATEGORY_ORDER.indexOf(b.category);
+
         if (catA !== catB) return catA - catB;
+
         return a.key.localeCompare(b.key);
     });
 }
@@ -51,6 +54,7 @@ export function renderPreExecutionSummary(plan: InitPlan): string {
 
     if (selectedItems.length > 0) {
         lines.push('\nSelected Items:');
+
         for (const item of selectedItems) {
             const targetStr = item.target ? ` (${item.target})` : '';
             const stateStr = item.state === 'existing' ? ' [EXISTING - Will Overwrite/Reinstall]' : '';
@@ -60,6 +64,7 @@ export function renderPreExecutionSummary(plan: InitPlan): string {
 
     if (autoRequired.length > 0) {
         lines.push('\nAuto-Required Dependencies:');
+
         for (const item of autoRequired) {
             const targetStr = item.target ? ` (${item.target})` : '';
             const reasonStr = item.reason ? ` (Required by: ${item.reason})` : '';
@@ -70,12 +75,14 @@ export function renderPreExecutionSummary(plan: InitPlan): string {
 
     if (actionOnlyItems.length > 0) {
         lines.push('\nPlanned Actions:');
+
         for (const item of actionOnlyItems) {
             lines.push(`  - [${item.category.toUpperCase()}] ${item.name}: ${item.reason || 'Action required'}`);
         }
     }
 
     lines.push('\n==================================================');
+
     return lines.join('\n');
 }
 
@@ -90,9 +97,11 @@ export function renderFinalReport(result: InitResult): string {
 
     for (const cat of CATEGORY_ORDER) {
         const catResults = result.results.filter((r) => r.item.category === cat);
+
         if (catResults.length === 0) continue;
 
         lines.push(`\n${cat.toUpperCase()}S:`);
+
         for (const res of catResults) {
             const targetStr = res.item.target ? ` in ${res.item.target}` : '';
             const errStr = res.error ? ` (${res.error})` : '';

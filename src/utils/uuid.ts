@@ -4,5 +4,6 @@ export const isUuidV4 = (value: string | undefined): boolean => {
     if (!value?.trim()) {
         return false;
     }
+
     return UUID_V4_PATTERN.test(value.trim());
 };

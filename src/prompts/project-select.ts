@@ -1,7 +1,8 @@
 import { select as selectPrompt } from '@inquirer/prompts';
-import { HybridApiClient } from '@/core/client/index.js';
-import type { BackendProject, ProjectStructureInfo } from '@/core/client/index.js';
+
 import type { ProgramDeps } from '@/cli/deps.js';
+import type { BackendProject, ProjectStructureInfo } from '@/core/client/index.js';
+import type { HybridApiClient } from '@/core/client/index.js';
 
 export const selectBackendProject = async (client: HybridApiClient, deps: ProgramDeps): Promise<BackendProject> => {
     const projects = await client.listProjects('ready');
@@ -17,6 +18,7 @@ export const selectBackendProject = async (client: HybridApiClient, deps: Progra
         const org = p.organization || 'default';
         const projectSlug = p.project || 'unknown';
         const displayName = p.name ? ` (${p.name})` : '';
+
         return {
             name: `${org}/${projectSlug}${displayName}`,
             value: p.id,
@@ -29,6 +31,7 @@ export const selectBackendProject = async (client: HybridApiClient, deps: Progra
     });
 
     const selectedProject = readyProjects.find((p) => p.id === selectedId);
+
     if (!selectedProject) {
         throw new Error('Selected project not found');
     }
@@ -54,6 +57,7 @@ export const selectStructuralProject = async (
         const projectSlug = s.project || 'unknown';
         const displayName = s.name ? ` (${s.name})` : '';
         const sizeStr = `${(s.structuralFileSize / 1024).toFixed(1)} KB`;
+
         return {
             name: `${org}/${projectSlug}${displayName} [${sizeStr}]`,
             value: s.projectId,
@@ -66,6 +70,7 @@ export const selectStructuralProject = async (
     });
 
     const selected = structureProjects.find((s) => s.projectId === selectedId);
+
     if (!selected) {
         throw new Error('Selected project not found');
     }

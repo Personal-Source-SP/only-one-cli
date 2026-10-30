@@ -10,16 +10,19 @@ export const resolveToolsArg = (raw: string | undefined): ResolveToolsArgResult 
     }
 
     const trimmed = raw.trim();
+
     if (!trimmed.length) {
         throw new ResolveToolsArgError('The --tools option requires a value. Use "all", "none", or a comma-separated list of tool IDs.');
     }
 
     const lower = trimmed.toLowerCase();
+
     if (lower === 'none') {
         return { kind: 'none' };
     }
 
     const installable = getToolsWithSkillsDir();
+
     if (lower === 'all') {
         return { kind: 'list', toolIds: [...installable] };
     }
@@ -34,6 +37,7 @@ export const resolveToolsArg = (raw: string | undefined): ResolveToolsArgResult 
     }
 
     const supported = new Set(installable);
+
     for (const id of ids) {
         if (!supported.has(id)) {
             throw new ResolveToolsArgError(

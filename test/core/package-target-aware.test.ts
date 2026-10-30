@@ -1,7 +1,8 @@
+import { PACKAGES } from '@assets/packages/index.js';
 import { describe, expect, it, vi } from 'vitest';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { executePackageActions } from '@/core/init/package-installer.js';
-import { PACKAGES } from '@assets/packages/index.js';
 
 describe('Package Verification & Non-TTY Reinstall Safety (Tasks 4.1 & 4.3)', () => {
     it('skips package when overwriteList does not include package ID', async () => {

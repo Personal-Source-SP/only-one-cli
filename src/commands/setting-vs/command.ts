@@ -1,7 +1,8 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import type { SettingVsCommandOptions } from './types.js';
+
 import {
     confirmSettingOverwriteStep,
     executeAndReportStep,
@@ -10,6 +11,7 @@ import {
     selectEditorsStep,
     selectSettingsStep,
 } from './actions/index.js';
+import type { SettingVsCommandOptions } from './types.js';
 
 export function createSettingVsCommand(deps: ProgramDeps): Command {
     const cmd = new Command('setting-vs')

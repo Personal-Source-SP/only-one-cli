@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
+
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
 export interface InstallHooksOptions {
@@ -30,9 +31,11 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
 
     const copyScriptsTo = async (destDir: string) => {
         await mkdir(destDir, { recursive: true });
+
         for (const script of hookScripts) {
             const srcPath = join(srcHooksDir, script);
             const destPath = join(destDir, script);
+
             if (existsSync(srcPath)) {
                 await cp(srcPath, destPath, { force: true });
                 installedFiles.push(destPath);
@@ -48,6 +51,7 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
 
         const srcJson = join(srcHooksDir, 'hooks.json');
         const destJson = isGlobal ? join(homeDir, '.gemini', 'config', 'hooks.json') : join(projectDir, '.gemini', 'hooks.json');
+
         if (existsSync(srcJson)) {
             await mkdir(dirname(destJson), { recursive: true });
             const rawContent = await readFile(srcJson, 'utf-8');
@@ -62,14 +66,17 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
     if (tools.includes('claude')) {
         const claudeHooksDir = isGlobal ? join(homeDir, '.claude', 'hooks') : join(projectDir, '.claude', 'hooks');
         await copyScriptsTo(claudeHooksDir);
+
         if (!primaryHooksDir) primaryHooksDir = claudeHooksDir;
 
         const srcClaude = join(srcHooksDir, 'claude-settings.json');
         const destClaude = isGlobal ? join(homeDir, '.claude', 'settings.json') : join(projectDir, '.claude', 'settings.json');
+
         if (existsSync(srcClaude)) {
             await mkdir(dirname(destClaude), { recursive: true });
             const rawContent = await readFile(srcClaude, 'utf-8');
             let customized = rawContent;
+
             if (isGlobal) {
                 customized = customized
                     .replaceAll('$CLAUDE_PROJECT_DIR/.agents/hooks/', '~/.claude/hooks/')
@@ -77,6 +84,7 @@ export async function installHooks(options: InstallHooksOptions): Promise<Instal
             } else {
                 customized = customized.replaceAll('.agents/hooks/', '.claude/hooks/');
             }
+
             await writeFile(destClaude, customized, 'utf-8');
             configsCreated.push(destClaude);
         }

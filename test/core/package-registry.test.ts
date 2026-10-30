@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest';
 import { PACKAGES } from '@assets/packages/index.js';
 import type { PackageManifest } from '@assets/types.js';
+import { describe, expect, it } from 'vitest';
 
 describe('Package Registry Model (Task 1.1, 1.4 & 1.5)', () => {
     it('all package manifest entries have a stable id and supported installer strategy', () => {
         expect(PACKAGES.length).toBeGreaterThan(0);
+
         for (const pkg of PACKAGES) {
             expect(pkg.id).toBeDefined();
             expect(typeof pkg.id).toBe('string');
@@ -25,6 +26,7 @@ describe('Package Registry Model (Task 1.1, 1.4 & 1.5)', () => {
         const uiux = PACKAGES.find((p) => p.id === 'ui-ux-pro-max-cli');
         expect(uiux).toBeDefined();
         expect(uiux?.installer.kind).toBe('npm');
+
         if (uiux?.installer.kind === 'npm') {
             expect(uiux.installer.packageName).toBe('ui-ux-pro-max-cli');
         }

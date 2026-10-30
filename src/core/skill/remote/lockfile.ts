@@ -1,7 +1,9 @@
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { readInstalledLockfile, resolveInstalledLockfilePath, removeInstalledAsset, ONLY_ONE_DIR_NAME } from '@/core/assets/lockfile.js';
+
+import { ONLY_ONE_DIR_NAME, readInstalledLockfile, removeInstalledAsset, resolveInstalledLockfilePath } from '@/core/assets/lockfile.js';
+
 import type { RemoteSkillMeta, SkillsLockfile } from './types.js';
 
 export { ONLY_ONE_DIR_NAME };
@@ -39,10 +41,12 @@ export async function readSkillsLockfile(projectDir: string, isGlobal = false): 
     // Transparent fallback: if installed.json has no remote skills, check if legacy skills-lock.json exists
     if (Object.keys(result.skills).length === 0 && !isGlobal) {
         const legacyPath = join(projectDir, ONLY_ONE_DIR_NAME, 'skills-lock.json');
+
         if (existsSync(legacyPath)) {
             try {
                 const content = await readFile(legacyPath, 'utf-8');
                 const legacy = JSON.parse(content) as SkillsLockfile;
+
                 if (legacy.skills) {
                     return legacy;
                 }
@@ -58,9 +62,11 @@ export async function readSkillsLockfile(projectDir: string, isGlobal = false): 
 export async function saveSkillToLockfile(projectDir: string, skillName: string, meta: RemoteSkillMeta, isGlobal = false): Promise<void> {
     const installedLock = await readInstalledLockfile(projectDir, isGlobal);
     const now = new Date().toISOString();
+
     if (!installedLock.installed.skills) {
         installedLock.installed.skills = {};
     }
+
     const existing = installedLock.installed.skills[skillName];
     installedLock.installed.skills[skillName] = {
         version: existing?.version || '0.0.1',

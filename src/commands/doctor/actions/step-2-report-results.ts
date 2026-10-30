@@ -8,8 +8,11 @@ export const reportDoctorResultsStep = (deps: ProgramDeps, checks: CheckResult[]
     // Group items by category
     const categorized = checks.reduce<Record<string, CheckResult[]>>((acc, item) => {
         const cat = item.category || 'General';
+
         if (!acc[cat]) acc[cat] = [];
+
         acc[cat].push(item);
+
         return acc;
     }, {});
 
@@ -26,7 +29,9 @@ export const reportDoctorResultsStep = (deps: ProgramDeps, checks: CheckResult[]
                 if (check.required) {
                     hasFailure = true;
                 }
+
                 deps.stdout(COLORS.error(`  ✗ ${check.name}: ${check.detail}`));
+
                 if (check.remediation) {
                     deps.stdout(COLORS.warning(`      → Remediation: ${check.remediation}`));
                 }
@@ -35,6 +40,7 @@ export const reportDoctorResultsStep = (deps: ProgramDeps, checks: CheckResult[]
     }
 
     deps.stdout('');
+
     if (hasFailure) {
         process.exitCode = 1;
     }

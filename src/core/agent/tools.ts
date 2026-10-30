@@ -24,8 +24,11 @@ export function resolveToolDestinationPaths(
         isGlobal && tool.globalRulesDir
             ? tool.globalRulesDir
             : tool.rulesDir || (tool.skillsDir ? join(tool.skillsDir, 'rules') : '.agents/rules');
+
     if (assetType === 'skills') return join(targetDir, effectiveSkillsDir, 'skills');
+
     if (assetType === 'workflows') return join(targetDir, effectiveSkillsDir, 'workflows');
+
     return join(targetDir, effectiveRulesDir);
 }
 

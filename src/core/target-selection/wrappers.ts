@@ -2,13 +2,14 @@ import type { PromptDeps } from '@/cli/deps.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import type { McpIdeAdapter } from '@/core/mcp/types.js';
 import type { VsEditorDescriptor } from '@/core/vs/types.js';
+
 import {
+    type AllowedTarget,
     getAllowedAgentTargets,
     getAllowedMcpTargets,
     getAllowedRuleTargets,
     getAllowedVsExtensionsTargets,
     getAllowedVsSettingsTargets,
-    type AllowedTarget,
 } from './catalog.js';
 import { selectTargets, type TargetChoice } from './selection.js';
 
@@ -26,25 +27,32 @@ const toChoices = (targets: readonly AllowedTarget[]): TargetChoice<string>[] =>
 
 const selectAllowed = async (targets: readonly AllowedTarget[], request: AllowedTargetSelectionRequest): Promise<AllowedTarget[]> => {
     const ids = await selectTargets({ ...request, choices: toChoices(targets) });
+
     return ids.map((id) => {
         const target = targets.find((entry) => entry.id === id);
+
         if (!target) throw new Error(`Unsupported target '${id}'`);
+
         return target;
     });
 };
 
 export const selectAllowedAgentTargets = async (request: AllowedTargetSelectionRequest): Promise<AgentToolOption[]> => {
     const targets = await selectAllowed(getAllowedAgentTargets(), request);
+
     return targets.map((target) => {
         if (!target.agent) throw new Error(`Missing agent backing for allowed target '${target.id}'`);
+
         return target.agent;
     });
 };
 
 export const selectAllowedMcpTargets = async (request: AllowedTargetSelectionRequest): Promise<McpIdeAdapter[]> => {
     const targets = await selectAllowed(getAllowedMcpTargets(), request);
+
     return targets.map((target) => {
         if (!target.mcp) throw new Error(`Missing MCP backing for allowed target '${target.id}'`);
+
         return target.mcp;
     });
 };
@@ -58,8 +66,10 @@ const selectAllowedVsTargets = async (
     request: AllowedTargetSelectionRequest,
 ): Promise<VsEditorDescriptor[]> => {
     const selected = await selectAllowed(targets, request);
+
     return selected.map((target) => {
         if (!target.vs) throw new Error(`Missing VS backing for allowed target '${target.id}'`);
+
         return target.vs;
     });
 };

@@ -1,14 +1,17 @@
-import type { ProgramDeps } from '@/cli/deps.js';
-import type { ExecutedItemResult, InitPlan, InitResult } from './plan-types.js';
-import { executePackageActions } from './package-installer.js';
-import { PACKAGES } from '@assets/packages/index.js';
-import { readMcpManifests, syncMcpGlobalConfig } from '../mcp/index.js';
-import { installSkills } from '../skill/index.js';
-import { installRules } from '../rule/index.js';
-import { updateGitignore } from './gitignore.js';
-import { getAllowedAgentTargets } from '../target-selection/catalog.js';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
+
+import { PACKAGES } from '@assets/packages/index.js';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+
+import { readMcpManifests, syncMcpGlobalConfig } from '../mcp/index.js';
+import { installRules } from '../rule/index.js';
+import { installSkills } from '../skill/index.js';
+import { getAllowedAgentTargets } from '../target-selection/catalog.js';
+import { updateGitignore } from './gitignore.js';
+import { executePackageActions } from './package-installer.js';
+import type { ExecutedItemResult, InitPlan, InitResult } from './plan-types.js';
 
 export interface ExecutePlanOptions {
     deps: ProgramDeps;
@@ -22,12 +25,13 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
 
     let installedCount = 0;
     let overwrittenCount = 0;
-    let actionRequiredCount = 0;
+    const actionRequiredCount = 0;
     let skippedCount = 0;
     let failedCount = 0;
 
     // 1. Packages
     const pkgItems = plan.items.filter((i) => i.category === 'package');
+
     if (pkgItems.length > 0) {
         const selectedPackageIds = pkgItems.map((i) => i.name);
         const overwriteList = pkgItems.filter((i) => i.state === 'existing').map((i) => i.name);
@@ -43,6 +47,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
         for (const item of pkgItems) {
             if (pkgRes.summary.installed.includes(item.name)) {
                 results.push({ item, status: item.state === 'existing' ? 'overwritten' : 'installed' });
+
                 if (item.state === 'existing') overwrittenCount++;
                 else installedCount++;
             } else if (pkgRes.summary.skipped.includes(item.name)) {
@@ -59,11 +64,14 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
     const { mkdir, cp } = await import('node:fs/promises');
     const { resolvePackageRoot } = await import('@/core/runtime/package-root.js');
     const configItems = plan.items.filter((i) => i.category === 'config');
+
     for (const item of configItems) {
         try {
             const srcRel = item.meta?.src;
             const destRel = item.meta?.dest;
+
             if (!srcRel || !destRel) continue;
+
             const packageRoot = resolvePackageRoot(import.meta.url);
             const absSrc = join(packageRoot, 'assets', srcRel);
             const absDest = join(plan.projectDir, destRel);
@@ -71,6 +79,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
             await cp(absSrc, absDest, { recursive: true, force: true });
 
             results.push({ item, status: item.state === 'existing' ? 'overwritten' : 'installed' });
+
             if (item.state === 'existing') overwrittenCount++;
             else installedCount++;
         } catch (err: any) {
@@ -81,6 +90,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
 
     // 3. MCPs
     const mcpItems = plan.items.filter((i) => i.category === 'mcp');
+
     if (mcpItems.length > 0) {
         const ideIds = Array.from(new Set(mcpItems.map((i) => i.target!).filter(Boolean)));
         const mcpNames = Array.from(new Set(mcpItems.map((i) => i.name)));
@@ -101,6 +111,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
         for (const item of mcpItems) {
             const ideResult = syncRes.results.find((r) => r.ideId === item.target);
             const mcpEntry = ideResult?.results.find((m) => m.id === item.name);
+
             if (mcpEntry) {
                 const status =
                     mcpEntry.status === 'added' || (mcpEntry.status as string) === 'reconfigured'
@@ -111,6 +122,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
                           ? 'skipped'
                           : 'failed';
                 results.push({ item, status });
+
                 if (status === 'installed') installedCount++;
                 else if (status === 'overwritten') overwrittenCount++;
                 else if (status === 'skipped') skippedCount++;
@@ -124,6 +136,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
 
     // 4. Skills
     const skillItems = plan.items.filter((i) => i.category === 'skill');
+
     if (skillItems.length > 0) {
         const allowedTargets = getAllowedAgentTargets();
         const toolsForSkills = allowedTargets
@@ -143,6 +156,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
 
         for (const item of skillItems) {
             const res = installRes.find((r) => r.toolId === item.target && r.skillName === item.name);
+
             if (res) {
                 const status =
                     res.status === 'success'
@@ -153,6 +167,7 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
                             ? 'skipped'
                             : 'failed';
                 results.push({ item, status, error: res.error });
+
                 if (status === 'installed') installedCount++;
                 else if (status === 'overwritten') overwrittenCount++;
                 else if (status === 'skipped') skippedCount++;
@@ -166,8 +181,10 @@ export async function executeInitPlan(options: ExecutePlanOptions): Promise<Init
 
     // 7. Rules
     const ruleItems = plan.items.filter((i) => i.category === 'rule');
+
     if (ruleItems.length > 0) {
         const allowedTargets = getAllowedAgentTargets();
+
         for (const item of ruleItems) {
             try {
                 const targets = allowedTargets.filter((t) => t.id === item.target);

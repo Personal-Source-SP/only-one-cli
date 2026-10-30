@@ -1,16 +1,19 @@
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { describe, expect, it, vi } from 'vitest';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { createComboCommand } from '@/commands/combo/command.js';
 import { createMcpCommand } from '@/commands/mcp/command.js';
-import { createSkillCommand } from '@/commands/skill/command.js';
 import { createRuleCommand } from '@/commands/rule/command.js';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { createSkillCommand } from '@/commands/skill/command.js';
 
 const testProjectDir = join(process.cwd(), 'tmp/regression-agent-first-test');
 
 vi.mock('node:os', async () => {
     const actual = await vi.importActual<typeof import('node:os')>('node:os');
+
     return {
         ...actual,
         homedir: () => testProjectDir,
@@ -32,8 +35,11 @@ describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5
             prompts: {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
+
                     if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
+
                     if (opts.message.includes('skills to add')) return ['grill-me'];
+
                     return [];
                 },
             },
@@ -62,8 +68,11 @@ describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5
             prompts: {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
+
                     if (opts.message.includes('target IDEs')) return ['cursor'];
+
                     if (opts.message.includes('MCP servers')) return ['github'];
+
                     return [];
                 },
             },
@@ -91,9 +100,13 @@ describe('Regression & Integration for Agent-First Selections (Tasks 5.1, 5.2, 5
             prompts: {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
+
                     if (opts.message.includes('target IDEs/Tools')) return ['antigravity'];
+
                     if (opts.message.includes('combos to install')) return ['backend-flow'];
+
                     if (opts.message.includes('already exist')) return [];
+
                     return [];
                 },
             },

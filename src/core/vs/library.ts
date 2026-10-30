@@ -1,6 +1,8 @@
 import { join } from 'node:path';
-import { parseJsoncObject } from './json.js';
+
 import { VS_LIBRARY } from '@assets/vs/index.js';
+
+import { parseJsoncObject } from './json.js';
 import type { VsFileSystem } from './types.js';
 
 export interface VsLibraryManifest {
@@ -14,6 +16,7 @@ export const loadVsLibraryManifest = async (fs?: VsFileSystem, libraryDir?: stri
             const settings = parseJsoncObject(await fs.readFile(join(libraryDir, 'settings.json')));
             const parsed = parseJsoncObject(await fs.readFile(join(libraryDir, 'extensions.json')));
             const extensions = parsed.extensions;
+
             if (Array.isArray(extensions) && extensions.every((item) => typeof item === 'string')) {
                 return { extensions: normalizeExtensionIds(extensions), settings };
             }
@@ -21,6 +24,7 @@ export const loadVsLibraryManifest = async (fs?: VsFileSystem, libraryDir?: stri
             // fall back
         }
     }
+
     return { extensions: normalizeExtensionIds(VS_LIBRARY.extensions), settings: VS_LIBRARY.settings };
 };
 

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+
 import type { AssetType, InstalledAssetRecord, OnlyOneInstalledState } from './types.js';
 
 export const ONLY_ONE_DIR_NAME = 'only-one';
@@ -13,6 +14,7 @@ export const ONLY_ONE_LOCKFILE_NAME = 'installed.json';
  */
 export function resolveInstalledLockfilePath(projectDir: string, isGlobal = false): string {
     const dirName = isGlobal ? ONLY_ONE_GLOBAL_DIR_NAME : ONLY_ONE_DIR_NAME;
+
     return join(projectDir, dirName, ONLY_ONE_LOCKFILE_NAME);
 }
 
@@ -22,6 +24,7 @@ export function resolveInstalledLockfilePath(projectDir: string, isGlobal = fals
  */
 export async function readInstalledLockfile(projectDir: string, isGlobal = false): Promise<OnlyOneInstalledState> {
     const lockPath = resolveInstalledLockfilePath(projectDir, isGlobal);
+
     if (!existsSync(lockPath)) {
         return {
             schemaVersion: 1,
@@ -38,11 +41,13 @@ export async function readInstalledLockfile(projectDir: string, isGlobal = false
 
         if (legacyWorkflows && typeof legacyWorkflows === 'object') {
             installed.skills = installed.skills || {};
+
             for (const [wfName, record] of Object.entries(legacyWorkflows)) {
                 if (!installed.skills[wfName]) {
                     installed.skills[wfName] = record as InstalledAssetRecord;
                 }
             }
+
             delete (installed as any).workflows;
             await writeFile(lockPath, JSON.stringify({ ...parsed, installed }, null, 2) + '\n', 'utf-8');
         }
@@ -104,6 +109,7 @@ export async function recordInstalledAssetsBatch(
  */
 export async function removeInstalledAsset(projectDir: string, type: AssetType, id: string, isGlobal = false): Promise<void> {
     const state = await readInstalledLockfile(projectDir, isGlobal);
+
     if (state.installed[type] && state.installed[type]![id]) {
         delete state.installed[type]![id];
         state.updatedAt = new Date().toISOString();

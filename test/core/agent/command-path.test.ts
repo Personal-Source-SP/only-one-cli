@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { normalizeStructureCommandPath } from '@src/core/agent/command-path.js';
-import { windsurfCommandAdapter } from '@src/core/command-generation/adapters/windsurf.js';
 import { codexCommandAdapter } from '@src/core/command-generation/adapters/codex.js';
+import { windsurfCommandAdapter } from '@src/core/command-generation/adapters/windsurf.js';
 import { STRUCTURE_COMMAND_ID } from '@src/core/templates/structure.js';
+import { describe, expect, it } from 'vitest';
 
 describe('normalizeStructureCommandPath', () => {
     it('strips opsx prefix from windsurf workflow path', () => {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
+
 import { AllowedToolId } from '@/constants/allowed-tools.js';
-import { getAllowedRuleTargets, ALLOWED_TARGETS } from '@/core/target-selection/catalog.js';
+import { ALLOWED_TARGETS, getAllowedRuleTargets } from '@/core/target-selection/catalog.js';
 
 describe('Native Rule Adapters and Codex Exclusion (Task 2.4 & 2.5)', () => {
     it('returns only Antigravity, Claude, and Cursor for getAllowedRuleTargets', () => {

@@ -12,6 +12,7 @@ const parseObject = (value: unknown, path: string, format: string): Record<strin
     if (!isRecord(value)) {
         throw new Error(`Malformed ${format} MCP configuration at '${path}': root must be an object`);
     }
+
     return value;
 };
 
@@ -22,6 +23,7 @@ const jsonCodec: McpConfigCodec = {
             return parseObject(JSON.parse(content), path, 'JSON');
         } catch (error) {
             if (error instanceof Error && error.message.startsWith('Malformed JSON')) throw error;
+
             throw new Error(`Malformed JSON MCP configuration at '${path}': ${error instanceof Error ? error.message : String(error)}`);
         }
     },
@@ -35,6 +37,7 @@ const tomlCodec: McpConfigCodec = {
             return parseObject(toml.parse(content), path, 'TOML');
         } catch (error) {
             if (error instanceof Error && error.message.startsWith('Malformed TOML')) throw error;
+
             throw new Error(`Malformed TOML MCP configuration at '${path}': ${error instanceof Error ? error.message : String(error)}`);
         }
     },

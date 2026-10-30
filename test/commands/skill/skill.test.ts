@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
-import { mkdtemp, rm, mkdir, readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { existsSync } from 'node:fs';
+
 import { createProgram } from '@src/index.js';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('skill command', () => {
     it('runs skill command with --yes and custom skill name', async () => {

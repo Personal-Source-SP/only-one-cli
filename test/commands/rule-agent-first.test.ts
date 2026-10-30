@@ -1,9 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
-import type { ProgramDeps } from '@/cli/deps.js';
-import { createRuleCommand } from '@/commands/rule/command.js';
-import { RULES } from '@assets/rules/index.js';
 import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
+
+import { RULES } from '@assets/rules/index.js';
+import { describe, expect, it, vi } from 'vitest';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import { createRuleCommand } from '@/commands/rule/command.js';
 
 const testProjectDir = join(process.cwd(), 'tmp/rule-command-agent-first-test');
 
@@ -17,12 +19,15 @@ describe('Rule Command Agent-First Selection & Per-Agent Choices (Tasks 2.3, 2.4
             prompts: {
                 checkbox: async (opts) => {
                     checkboxCalls.push({ message: opts.message, choices: opts.choices });
+
                     if (opts.message.includes('target IDEs/Tools') || opts.message.includes('agents')) {
                         return ['claude'];
                     }
+
                     if (opts.message.includes('Claude')) {
                         return ['context-and-tools'];
                     }
+
                     return [];
                 },
             },

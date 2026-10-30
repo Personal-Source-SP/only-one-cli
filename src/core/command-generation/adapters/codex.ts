@@ -2,6 +2,7 @@
 
 import os from 'node:os';
 import { join, resolve } from 'node:path';
+
 import type { CommandContent, ToolCommandAdapter } from '@/core/command-generation/types.js';
 
 /**
@@ -10,6 +11,7 @@ import type { CommandContent, ToolCommandAdapter } from '@/core/command-generati
  */
 function getCodexHome(): string {
     const envHome = process.env.CODEX_HOME?.trim();
+
     return resolve(envHome ? envHome : join(os.homedir(), '.codex'));
 }
 
@@ -27,12 +29,15 @@ export const codexCommandAdapter: ToolCommandAdapter = {
 
     getInvokeLabel(commandId: string): string {
         const filePath = this.getFilePath(commandId);
+
         if (filePath.startsWith('/') || /^[A-Za-z]:\\/.test(filePath)) {
             return filePath;
         }
+
         if (this.toolId === 'cursor') {
             return `/${commandId}`;
         }
+
         return filePath.replace(/\/opsx\//g, '/').replace(new RegExp(`opsx-${commandId}`, 'g'), commandId);
     },
 

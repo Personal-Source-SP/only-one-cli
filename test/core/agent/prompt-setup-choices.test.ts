@@ -1,9 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { mkdtemp, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { promptAgentSkillSetup } from '@src/core/agent/prompt-setup.js';
+import { join } from 'node:path';
+
 import type { ProgramDeps } from '@src/cli/deps.js';
+import { promptAgentSkillSetup } from '@src/core/agent/prompt-setup.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const searchableMultiSelectMock = vi.hoisted(() => vi.fn());
 

@@ -1,17 +1,20 @@
 import { existsSync } from 'node:fs';
-import { mkdir, cp, writeFile } from 'node:fs/promises';
+import { cp, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+
+import { SKILLS } from '@assets/agents/skills/index.js';
+
+import type { ProgramDeps } from '@/cli/deps.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
 import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
-import type { ProgramDeps } from '@/cli/deps.js';
+import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import { updateGitignore } from '@/core/init/gitignore.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
-import { SKILLS } from '@assets/agents/skills/index.js';
+
 import { fetchSkillContentFromGitHub } from './remote/github-fetcher.js';
-import { syncGlobalSkillsManifest } from './manifest-bridge.js';
 import { saveSkillToLockfile } from './remote/lockfile.js';
-import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
 import { installSkillViaSkillsCli } from './remote/skills-sh-installer.js';
+import { syncGlobalSkillsManifest } from './manifest-bridge.js';
 
 const skillsDir = join(resolvePackageRoot(import.meta.url), 'assets/agents/skills');
 
@@ -38,8 +41,10 @@ export const checkExistingSkills = async (
     isGlobal = false,
 ): Promise<ExistingSkill[]> => {
     const results: ExistingSkill[] = [];
+
     for (const tool of selectedTools) {
         if (!tool.skillsDir) continue;
+
         for (const skillName of skillNames) {
             const toolSkillsDir = resolveToolDestinationPaths(tool, 'skills', projectDir, isGlobal);
             const destPath = join(toolSkillsDir, skillName);
@@ -53,6 +58,7 @@ export const checkExistingSkills = async (
             });
         }
     }
+
     return results;
 };
 
@@ -79,6 +85,7 @@ export const installSkills = async (request: {
 
             if (exists) {
                 const identifier = `${tool.value}:${skillName}`;
+
                 if (!overwriteList.includes(identifier)) {
                     results.push({
                         toolId: tool.value,
@@ -171,10 +178,12 @@ export const installSkills = async (request: {
     }
 
     const successfulSkills = results.filter((r) => r.status === 'success' || r.status === 'overwritten');
+
     if (successfulSkills.length > 0) {
         const uniqueSkillNames = Array.from(new Set(successfulSkills.map((s) => s.skillName)));
         const entries = uniqueSkillNames.map((sName) => {
             const manifest = SKILLS.find((m) => m.name === sName);
+
             return {
                 type: 'skills' as const,
                 id: sName,

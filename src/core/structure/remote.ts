@@ -1,15 +1,20 @@
-import { confirm as confirmPrompt } from '@inquirer/prompts';
 import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, relative } from 'node:path';
+
+import { confirm as confirmPrompt } from '@inquirer/prompts';
+
 import type { PromptDeps } from '@/cli/deps.js';
 import type { BackendProject } from '@/core/client/index.js';
-import { HybridApiClient } from '@/core/client/index.js';
+import type { HybridApiClient } from '@/core/client/index.js';
+
 import { resolveStructureBlueprintPath, resolveStructurePathIdentity } from './blueprint.js';
 
 export const fetchRemoteStructure = async (client: HybridApiClient, project: BackendProject): Promise<string> => {
     const res = await client.getProjectStructureBlueprint(project.id);
+
     if (!res?.content?.trim()) throw new Error('No structural blueprint found for this project');
+
     return res.content;
 };
 
@@ -41,6 +46,7 @@ export const saveStructureLocally = async (
     });
 
     let overwritten = false;
+
     if (existsSync(filePath)) {
         if (!options.force) {
             const confirm = options.prompts?.confirm ?? confirmPrompt;
@@ -51,6 +57,7 @@ export const saveStructureLocally = async (
 
             if (!proceed) throw new Error('Aborted by user.');
         }
+
         overwritten = true;
     }
 

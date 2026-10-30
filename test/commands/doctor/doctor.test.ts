@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { execFileSync } from 'node:child_process';
+
 import { createProgram } from '@src/index.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('node:child_process', async (importOriginal) => {
     const actual = await importOriginal<typeof import('node:child_process')>();
+
     return {
         ...actual,
         execFileSync: vi.fn(),
@@ -15,6 +17,7 @@ describe('doctor command', () => {
         vi.resetAllMocks();
         vi.mocked(execFileSync).mockImplementation((cmd: string) => {
             if (cmd === 'git') return 'git version 2.43.0\n';
+
             return 'Python 3.11.8\n';
         });
     });
@@ -36,6 +39,7 @@ describe('doctor command', () => {
     it('sets exitCode to 1 if git fails', async () => {
         vi.mocked(execFileSync).mockImplementation((cmd: string) => {
             if (cmd === 'git') throw new Error('not found');
+
             return 'Python 3.11.8\n';
         });
 

@@ -4,5 +4,6 @@ import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/global
 export const resolveProjectStep = (deps: ProgramDeps, path?: string): string => {
     const projectDir = resolveProjectDir(deps, path);
     assertProjectDirectory(projectDir);
+
     return projectDir;
 };

@@ -1,7 +1,8 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
-import type { ExtensionsVsCommandOptions } from './types.js';
+
 import {
     confirmExtensionOverwriteStep,
     executeAndReportStep,
@@ -9,6 +10,7 @@ import {
     selectEditorsStep,
     selectExtensionsStep,
 } from './actions/index.js';
+import type { ExtensionsVsCommandOptions } from './types.js';
 
 export function createExtensionsVsCommand(deps: ProgramDeps): Command {
     const cmd = new Command('extensions-vs')

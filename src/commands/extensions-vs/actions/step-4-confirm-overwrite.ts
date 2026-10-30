@@ -1,5 +1,6 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { ExistingVsExtensionCheck, VsEditorId } from '@/core/vs/index.js';
+
 import type { ExtensionsVsCommandOptions } from '../types.js';
 
 export const confirmExtensionOverwriteStep = async (
@@ -15,6 +16,7 @@ export const confirmExtensionOverwriteStep = async (
         for (const editorId of editorIds) {
             extensionIdsPerEditor[editorId] = [...selectedExtensions];
         }
+
         return extensionIdsPerEditor;
     }
 
@@ -39,6 +41,7 @@ export const confirmExtensionOverwriteStep = async (
 
     for (const editorId of editorIds) {
         const toInstall: string[] = [];
+
         for (const ext of selectedExtensions) {
             const check = existingChecks.find((c) => c.editorId === editorId && c.extensionId.toLowerCase() === ext.toLowerCase());
             const exists = check?.exists ?? false;
@@ -47,6 +50,7 @@ export const confirmExtensionOverwriteStep = async (
                 toInstall.push(ext);
             }
         }
+
         extensionIdsPerEditor[editorId] = toInstall;
     }
 

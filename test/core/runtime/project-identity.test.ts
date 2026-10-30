@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { HybridApiClient } from '@src/core/client/index.js';
+
+import type { HybridApiClient } from '@src/core/client/index.js';
 import { findProjectByIdentity, resolveBackendProjectId, syncBackendProjectOnInit } from '@src/core/runtime/project-identity.js';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('project-identity', () => {
     it('findProjectByIdentity matches organization and project slug', async () => {

@@ -18,6 +18,7 @@ export const filterCompatibleAssets = <TAsset extends TargetAssetItem>(
 ): TAsset[] => {
     return assets.filter((asset) => {
         if (!asset.supportedTargets || !asset.supportedTargets.length) return true;
+
         return asset.supportedTargets.includes(targetId as AllowedToolId);
     });
 };
@@ -34,16 +35,20 @@ export const createTargetAssetPlan = <TAsset extends TargetAssetItem>(
         const requestedIds = targetAssetMap[targetId] ?? [];
 
         const selectedAssets: TAsset[] = [];
+
         for (const reqId of requestedIds) {
             const found = compatible.find((a) => a.id === reqId);
+
             if (!found) {
                 const assetExists = assets.some((a) => a.id === reqId);
+
                 if (assetExists) {
                     throw new Error(`Asset '${reqId}' is not compatible with target '${targetId}'.`);
                 } else {
                     throw new Error(`Unknown asset '${reqId}'.`);
                 }
             }
+
             selectedAssets.push(found);
         }
 
@@ -66,14 +71,18 @@ export const formatMissingArgumentError = (
     },
 ): string => {
     const parts: string[] = [];
+
     if (details.requiredArg) {
         parts.push(`Missing required positional argument '${details.requiredArg}'.`);
     }
+
     if (details.optionFlag) {
         parts.push(`Specify using ${details.optionFlag}.`);
     }
+
     if (details.validValues?.length) {
         parts.push(`Valid values: ${details.validValues.join(', ')}.`);
     }
+
     return parts.join(' ');
 };

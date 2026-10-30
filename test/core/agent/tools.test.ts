@@ -1,6 +1,7 @@
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+
 import { AI_TOOLS, getToolsWithSkillsDir, resolveToolDestinationPaths } from '@src/core/agent/tools.js';
+import { describe, expect, it } from 'vitest';
 
 describe('AI_TOOLS catalog', () => {
     it('matches OpenSpec installable tool count', () => {

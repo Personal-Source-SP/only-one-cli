@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
 import { RULES } from '@assets/rules/index.js';
 import { SKILLS } from '@assets/skills/index.js';
+import { describe, expect, it } from 'vitest';
+
 import { AllowedToolId } from '@/constants/allowed-tools.js';
 import { buildDeduplicatedDependencyPlan, validateRuleDependenciesPreflight } from '@/core/rule/dependencies.js';
 

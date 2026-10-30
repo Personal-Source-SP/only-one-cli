@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import { isOversized } from '@src/core/indexing/git-archive.js';
+import { describe, expect, it } from 'vitest';
 
 describe('git-archive', () => {
     it('detects oversized archives', () => {

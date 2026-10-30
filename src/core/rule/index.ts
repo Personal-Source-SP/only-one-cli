@@ -1,16 +1,19 @@
 import { existsSync } from 'node:fs';
-import { mkdir, cp } from 'node:fs/promises';
+import { cp, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ProgramDeps } from '@/cli/deps.js';
-import { AllowedToolId } from '@/constants/allowed-tools.js';
-import { type AllowedTarget } from '@/core/target-selection/catalog.js';
-import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
-import { executePackageActions } from '@/core/init/package-installer.js';
-import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+
 import { RULES } from '@assets/agents/rules/index.js';
 import type { RuleManifest } from '@assets/types.js';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import type { AllowedToolId } from '@/constants/allowed-tools.js';
+import { resolveToolDestinationPaths } from '@/core/agent/tools.js';
 import { recordInstalledAssetsBatch } from '@/core/assets/lockfile.js';
-import { validateRuleDependenciesPreflight, buildDeduplicatedDependencyPlan } from './dependencies.js';
+import { executePackageActions } from '@/core/init/package-installer.js';
+import { resolvePackageRoot } from '@/core/runtime/package-root.js';
+import { type AllowedTarget } from '@/core/target-selection/catalog.js';
+
+import { buildDeduplicatedDependencyPlan, validateRuleDependenciesPreflight } from './dependencies.js';
 
 const rulesAssetsDir = join(resolvePackageRoot(import.meta.url), 'assets/agents/rules');
 
@@ -39,11 +42,15 @@ export const checkExistingRules = async (
     isGlobal = false,
 ): Promise<ExistingRule[]> => {
     const results: ExistingRule[] = [];
+
     for (const target of selectedTargets) {
         if (!target.agent?.rulesDir) continue;
+
         for (const ruleId of ruleIds) {
             const manifest = ruleManifests.find((r) => r.id === ruleId);
+
             if (!manifest) continue;
+
             const filename = manifest.sourceFile;
             const targetRulesDir = resolveToolDestinationPaths(target.agent, 'rules', projectDir, isGlobal);
             const absoluteDestPath = join(targetRulesDir, filename);
@@ -57,6 +64,7 @@ export const checkExistingRules = async (
             });
         }
     }
+
     return results;
 };
 
@@ -84,6 +92,7 @@ export const installRules = async (
 
     // 1. Preflight validation
     const validation = validateRuleDependenciesPreflight(ruleIds, targetIds, ruleManifests);
+
     if (!validation.valid) {
         throw new Error(`Rule preflight validation failed:\n${validation.errors.join('\n')}`);
     }
@@ -93,6 +102,7 @@ export const installRules = async (
 
     // 3. Execute package dependencies
     let installedPackages: string[] = [];
+
     if (plan.packages.length > 0 && !isGlobal) {
         deps.stdout('\nInstalling rule package dependencies...');
         const pkgResult = await executePackageActions({
@@ -116,6 +126,7 @@ export const installRules = async (
 
         for (const ruleId of ruleIds) {
             const manifest = ruleManifests.find((r) => r.id === ruleId);
+
             if (!manifest) continue;
 
             const check = existingChecks.find((c) => c.toolId === target.id && c.ruleId === ruleId);
@@ -123,6 +134,7 @@ export const installRules = async (
 
             if (exists) {
                 const identifier = `${target.id}:${ruleId}`;
+
                 if (!overwriteList.includes(identifier)) {
                     results.push({
                         toolId: target.id,
@@ -163,10 +175,12 @@ export const installRules = async (
     }
 
     const successfulRules = results.filter((r) => r.status === 'success' || r.status === 'overwritten');
+
     if (successfulRules.length > 0) {
         const uniqueRuleIds = Array.from(new Set(successfulRules.map((r) => r.ruleId)));
         const entries = uniqueRuleIds.map((rId) => {
             const manifest = ruleManifests.find((m) => m.id === rId);
+
             return {
                 type: 'rules' as const,
                 id: rId,

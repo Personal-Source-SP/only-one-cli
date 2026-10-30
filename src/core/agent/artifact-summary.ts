@@ -1,7 +1,9 @@
 import { existsSync } from 'node:fs';
 import { basename } from 'node:path';
+
 import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import { STRUCTURE_COMMAND_ID, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
+
 import { resolveStructureCommandPath, resolveStructureSkillPath } from './command-path.js';
 import type { AgentArtifactSummary } from './types.js';
 
@@ -32,6 +34,7 @@ export const buildAgentArtifactSummaries = (
 
 export const formatAgentToolInstruction = (toolId: string, invokeLabel: string): string[] => {
     const lines: string[] = [];
+
     if (toolId === 'cursor' || toolId === 'windsurf') {
         lines.push('    Type the slash command in your chat window:');
         lines.push(`      ${invokeLabel}`);
@@ -45,5 +48,6 @@ export const formatAgentToolInstruction = (toolId: string, invokeLabel: string):
         lines.push('    Ask the agent to use the installed skill/instruction at:');
         lines.push(`      ${invokeLabel}`);
     }
+
     return lines;
 };

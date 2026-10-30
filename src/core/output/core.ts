@@ -1,9 +1,11 @@
-import type { BulkDryRunEntry, BulkSummaryStats, IndexVersionRow } from './types.js';
 import { padCell } from '@/utils/index.js';
+
+import type { BulkDryRunEntry, BulkSummaryStats, IndexVersionRow } from './types.js';
 
 export const printIndexVersions = (entries: IndexVersionRow[], write: (line: string) => void): void => {
     if (!entries?.length) {
         write('No uploaded index versions found.');
+
         return;
     }
 
@@ -42,8 +44,10 @@ export const printJson = (value: unknown, write: (line: string) => void): void =
 
 export const printProjects = (value: unknown, write: (line: string) => void): void => {
     const projects = Array.isArray(value) ? value : [];
+
     if (!projects.length) {
         write('No projects found.');
+
         return;
     }
 
@@ -58,9 +62,11 @@ export const printProjectStatus = (value: unknown, write: (line: string) => void
     write(`Status: ${project.status ?? '-'}`);
     write(`Files: ${project.fileCount ?? project.file_count ?? 0}`);
     const indexingJob = project.indexingJob as Record<string, unknown> | undefined;
+
     if (indexingJob?.id) {
         write(`Indexing job: ${indexingJob.id}`);
     }
+
     if (project.lastIndexedAt ?? project.last_indexed_at) {
         write(`Last indexed: ${project.lastIndexedAt ?? project.last_indexed_at}`);
     }
@@ -68,8 +74,10 @@ export const printProjectStatus = (value: unknown, write: (line: string) => void
 
 export const printJobs = (value: unknown, write: (line: string) => void): void => {
     const jobs = Array.isArray(value) ? value : value && typeof value === 'object' ? [value] : [];
+
     if (!jobs.length) {
         write('No jobs found.');
+
         return;
     }
 
@@ -90,6 +98,7 @@ export const printSearchResults = (value: unknown, write: (line: string) => void
         };
     };
     const results = response.results ?? [];
+
     if (!results.length) {
         write(query ? `No results for "${query}".` : 'No results found.');
     } else {
@@ -116,6 +125,7 @@ export const printStructuralError = (error: { code: string; message: string }, w
 
 export const hasQueryBodyError = (value: unknown): boolean => {
     const payload = value as { error?: { code?: string; message?: string } };
+
     return Boolean(payload.error?.code && payload.error?.message);
 };
 
@@ -143,6 +153,7 @@ export const printImpact = (value: unknown, write: (line: string) => void): void
 
     if (impact.error) {
         write(`${impact.error.code}: ${impact.error.message}`);
+
         return;
     }
 
@@ -164,9 +175,11 @@ export const printImpact = (value: unknown, write: (line: string) => void): void
 
     // Affected processes
     const processes = impact.affected_processes ?? [];
+
     if (processes.length) {
         write('');
         write('Affected Flows:');
+
         for (const p of processes) {
             write(`  ${p.name ?? '-'} (${p.type ?? '-'})  hits: ${p.total_hits ?? 0}  broken at step: ${p.earliest_broken_step ?? '-'}`);
             write(`    ${p.filePath ?? '-'}`);
@@ -175,9 +188,11 @@ export const printImpact = (value: unknown, write: (line: string) => void): void
 
     // Affected modules
     const modules = impact.affected_modules ?? [];
+
     if (modules.length) {
         write('');
         write('Affected Modules:');
+
         for (const m of modules) {
             write(`  ${m.name ?? '-'}  hits: ${m.hits ?? 0}  impact: ${m.impact ?? '-'}`);
         }
@@ -186,11 +201,14 @@ export const printImpact = (value: unknown, write: (line: string) => void): void
     // By depth
     const byDepth = impact.byDepth ?? {};
     const depthKeys = Object.keys(byDepth).sort((a, b) => Number(a) - Number(b));
+
     if (depthKeys.length) {
         write('');
         write('Call Chain (by depth):');
+
         for (const key of depthKeys) {
             const nodes = byDepth[key] ?? [];
+
             for (const node of nodes) {
                 const conf = typeof node.confidence === 'number' ? ` (conf: ${node.confidence.toFixed(2)})` : '';
                 write(`  [depth ${node.depth ?? key}] ${node.name ?? '-'} — ${node.relationType ?? '-'}${conf}`);
@@ -226,13 +244,16 @@ export const printCallGraph = (value: unknown, write: (line: string) => void): v
 
     if (graph.error) {
         write(`${graph.error.code}: ${graph.error.message}`);
+
         return;
     }
 
     // Root symbol
     const root = graph.root;
+
     if (root) {
         write(`Symbol: ${root.name ?? '-'} [${root.kind ?? '-'}]`);
+
         if (root.filePath) {
             const loc = root.startLine != null ? `:${root.startLine}–${root.endLine ?? root.startLine}` : '';
             write(`  File: ${root.filePath}${loc}`);
@@ -250,9 +271,11 @@ export const printCallGraph = (value: unknown, write: (line: string) => void): v
     // Incoming callers (deduplicated by uid)
     const incomingCalls = graph.raw?.incoming?.calls ?? [];
     const uniqueCallers = dedupByUid(incomingCalls);
+
     if (uniqueCallers.length) {
         write('');
         write(`Callers (${uniqueCallers.length}):`);
+
         for (const c of uniqueCallers) {
             write(`  ← ${c.name ?? '-'}${c.kind ? ` [${c.kind}]` : ''}`);
             write(`    ${c.filePath ?? '-'}`);
@@ -261,9 +284,11 @@ export const printCallGraph = (value: unknown, write: (line: string) => void): v
 
     // Owning class
     const ownerClass = graph.raw?.incoming?.has_method ?? [];
+
     if (ownerClass.length) {
         write('');
         write('Defined in:');
+
         for (const cls of ownerClass) {
             write(`  ${cls.name ?? '-'} [${cls.kind ?? 'Class'}]`);
             write(`    ${cls.filePath ?? '-'}`);
@@ -273,9 +298,11 @@ export const printCallGraph = (value: unknown, write: (line: string) => void): v
     // Outgoing calls (deduplicated)
     const outgoingCalls = graph.raw?.outgoing?.calls ?? [];
     const uniqueCallees = dedupByUid(outgoingCalls);
+
     if (uniqueCallees.length) {
         write('');
         write(`Calls (${uniqueCallees.length}):`);
+
         for (const c of uniqueCallees) {
             write(`  → ${c.name ?? '-'}${c.kind ? ` [${c.kind}]` : ''}`);
             write(`    ${c.filePath ?? '-'}`);
@@ -285,9 +312,11 @@ export const printCallGraph = (value: unknown, write: (line: string) => void): v
     // Property accesses (deduplicated)
     const accesses = graph.raw?.outgoing?.accesses ?? [];
     const uniqueAccesses = dedupByUid(accesses);
+
     if (uniqueAccesses.length) {
         write('');
         write(`Accesses (${uniqueAccesses.length}):`);
+
         for (const a of uniqueAccesses) {
             write(`  . ${a.name ?? '-'}`);
         }
@@ -295,9 +324,11 @@ export const printCallGraph = (value: unknown, write: (line: string) => void): v
 
     // Related execution processes
     const processes = graph.raw?.processes ?? [];
+
     if (processes.length) {
         write('');
         write(`Execution Flows (${processes.length}):`);
+
         for (const p of processes) {
             write(`  ${p.name ?? p.id ?? '-'}  (step ${p.step_index ?? '-'} / ${p.step_count ?? '-'})`);
         }
@@ -306,10 +337,14 @@ export const printCallGraph = (value: unknown, write: (line: string) => void): v
 
 const dedupByUid = (nodes: CallGraphNode[]): CallGraphNode[] => {
     const seen = new Set<string>();
+
     return nodes.filter((n) => {
         const key = n.uid ?? n.id ?? n.name ?? '';
+
         if (seen.has(key)) return false;
+
         seen.add(key);
+
         return true;
     });
 };
@@ -323,13 +358,16 @@ const printStructuralSearch = (
     write: (line: string) => void,
 ): void => {
     if (!structural) return;
+
     if (structural.error) {
         printStructuralError(structural.error, write);
+
         return;
     }
 
     const processes = structural.processes ?? [];
     write(`Structural flows: ${processes.length}`);
+
     for (const process of processes.slice(0, 3)) {
         write(String(process.summary ?? process.name ?? process.id ?? '-'));
     }
@@ -338,10 +376,12 @@ const printStructuralSearch = (
 export const printBulkDryRun = (repos: BulkDryRunEntry[], write: (line: string) => void): void => {
     write('Discovered Repositories (Dry Run):');
     write('----------------------------------');
+
     for (const repo of repos) {
         const status = repo.excluded ? '[EXCLUDE]' : repo.skip ? '[SKIP]' : '[INDEX]';
         write(`${status.padEnd(10)} ${repo.name.padEnd(30)} ${repo.path} (tags: ${repo.tags.join(', ')})`);
     }
+
     write('----------------------------------');
     write(`Total discovered: ${repos.length}`);
 };
@@ -359,6 +399,7 @@ export const printBulkSummary = (stats: BulkSummaryStats, write: (line: string) 
 export const printProjectsWithStructure = (entries: any[], write: (line: string) => void): void => {
     if (!entries?.length) {
         write('No projects with structural blueprints found.');
+
         return;
     }
 

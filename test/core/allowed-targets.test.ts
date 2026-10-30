@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { ALLOWED_TOOL_IDS, AllowedToolCapability, AllowedToolId } from '@src/constants/index.js';
 import {
     ALLOWED_TARGETS,
@@ -8,6 +7,7 @@ import {
     getAllowedVsExtensionsTargets,
     getAllowedVsSettingsTargets,
 } from '@src/core/target-selection/index.js';
+import { describe, expect, it } from 'vitest';
 
 describe('allowed target catalog', () => {
     it('keeps unique IDs in stable display order', () => {

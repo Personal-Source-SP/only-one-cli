@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+
 import { listStructureRelativePaths } from '@/core/structure/paths.js';
 
 const CORE_BUNDLE_ENTRIES = ['manifest.json'] as const;

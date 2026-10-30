@@ -9,6 +9,7 @@ export async function reportOutdatedSkillsStep(deps: ProgramDeps, projectDir: st
 
     if (reports.length === 0) {
         deps.stdout(COLORS.dim('\nNo skills found in project or lockfile.'));
+
         return;
     }
 

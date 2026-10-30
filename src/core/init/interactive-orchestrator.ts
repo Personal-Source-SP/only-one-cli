@@ -1,12 +1,13 @@
-import type { ProgramDeps } from '@/cli/deps.js';
-import { selectAllowedAgentTargets } from '@/core/target-selection/wrappers.js';
-import { select } from '@inquirer/prompts';
-import { readComboManifests } from '@/core/combo/index.js';
-import { PACKAGES } from '@assets/packages/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
-import { readMcpManifests } from '@/core/mcp/registry.js';
-import { SKILLS } from '@assets/skills/index.js';
+import { PACKAGES } from '@assets/packages/index.js';
 import { RULES } from '@assets/rules/index.js';
+import { SKILLS } from '@assets/skills/index.js';
+import { select } from '@inquirer/prompts';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import { readComboManifests } from '@/core/combo/index.js';
+import { readMcpManifests } from '@/core/mcp/registry.js';
+import { selectAllowedAgentTargets } from '@/core/target-selection/wrappers.js';
 
 export interface InitSelectionInputs {
     selectedTools: string[];
@@ -22,10 +23,13 @@ export interface InitSelectionInputs {
 
 export async function promptInitSelectionsViaTui(projectDir: string, explicitTools?: string): Promise<InitSelectionInputs | null> {
     const { launchGoInit, resolveGoBinaryPath } = await import('@/tui/bridge.js');
+
     if (resolveGoBinaryPath()) {
         await launchGoInit(projectDir);
+
         return null;
     }
+
     return null;
 }
 
@@ -107,6 +111,7 @@ export async function promptInitSelections(
         }
 
         const configChoices = Object.values(CONFIGS).map((c) => ({ name: `${c.name} — ${c.description}`, value: c.name }));
+
         if (configChoices.length > 0) {
             selectedConfigs = await deps.prompts.checkbox({
                 message: 'Select configuration templates to generate (optional, empty to skip):',
@@ -129,6 +134,7 @@ export async function promptInitSelections(
 
         for (const toolId of selectedTools) {
             const compatibleRules = RULES.filter((r) => r.supportedTargets.includes(toolId as any));
+
             if (compatibleRules.length > 0) {
                 rulesPerAgent[toolId] = await deps.prompts.checkbox({
                     message: `Select rules for ${toolId} (optional, empty to skip):`,

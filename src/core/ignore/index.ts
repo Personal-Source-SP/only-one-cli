@@ -1,7 +1,9 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
 import { IGNORE_TEMPLATES, IgnoreTarget } from '@assets/templates/ignore/index.js';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { updateGitignore } from '@/core/init/gitignore.js';
 import { resolvePackageRoot } from '@/core/runtime/package-root.js';
@@ -25,6 +27,7 @@ export const resolveIgnoreTemplatePath = (metaUrl: string, target: IgnoreTarget)
 
 export const selectIgnoreTargets = async (deps: ProgramDeps): Promise<IgnoreTarget[]> => {
     if (!deps.prompts?.checkbox) return [];
+
     const selected = await deps.prompts.checkbox({
         message: 'Select ignore files to update (optional, empty to skip):',
         choices: [
@@ -33,11 +36,13 @@ export const selectIgnoreTargets = async (deps: ProgramDeps): Promise<IgnoreTarg
             { name: 'npm (.npmignore)', value: IgnoreTarget.Npm },
         ],
     });
+
     return (selected ?? []).filter((target): target is IgnoreTarget => Object.values(IgnoreTarget).includes(target as IgnoreTarget));
 };
 
 export const writeIgnoreTemplates = async (projectDir: string, targets: IgnoreTarget[] = []): Promise<IgnoreWriteResult[]> => {
     const results: IgnoreWriteResult[] = [];
+
     for (const target of targets) {
         const { fileName } = IGNORE_TEMPLATES[target];
         const templatePath = resolveIgnoreTemplatePath(import.meta.url, target);
@@ -60,12 +65,15 @@ export const writeIgnoreTemplates = async (projectDir: string, targets: IgnoreTa
             await updateGitignore(projectDir);
         } else {
             const additions = templatePatterns.filter((line) => !existing.has(line.replace(/\/$/, '')));
+
             if (additions.length) {
                 const prefix = content && !content.endsWith('\n') ? '\n' : '';
                 await writeFile(targetPath, `${content}${prefix}${additions.join('\n')}\n`, 'utf8');
             }
         }
+
         results.push({ added, fileName, target });
     }
+
     return results;
 };

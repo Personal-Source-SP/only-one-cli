@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { parseGitRemoteUrl } from '@src/utils/git-project-name.js';
+import { describe, expect, it } from 'vitest';
 
 describe('parseGitRemoteUrl', () => {
     it('parses github ssh remotes as organization/repository', () => {

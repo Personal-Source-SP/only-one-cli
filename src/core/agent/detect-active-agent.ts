@@ -45,6 +45,7 @@ const ACTIVE_AGENT_RULES: Array<{ isActive: (env: NodeJS.ProcessEnv) => boolean;
 
 const normalizeAiAgentValue = (raw: string): string => {
     const base = raw.trim().toLowerCase().split('@')[0] ?? '';
+
     return AI_AGENT_ALIASES[base] ?? base;
 };
 
@@ -57,8 +58,10 @@ export const detectActiveAgentToolId = (env: NodeJS.ProcessEnv = process.env): s
     const installable = new Set(getToolsWithSkillsDir());
 
     const aiAgent = env.AI_AGENT?.trim();
+
     if (aiAgent) {
         const normalized = normalizeAiAgentValue(aiAgent);
+
         if (isInstallableToolId(normalized, installable)) {
             return normalized;
         }

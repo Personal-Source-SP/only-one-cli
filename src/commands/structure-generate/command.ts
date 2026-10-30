@@ -1,15 +1,17 @@
 import { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
 import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
 import { STRUCTURALS_DIR } from '@/core/structure/paths.js';
-import type { StructureGenerateCommandOptions } from './types.js';
+
 import {
     ensureStructureSkillsStep,
     generatePayloadAndReportStep,
     reportStructureStatusStep,
     scaffoldBlueprintStep,
 } from './actions/index.js';
+import type { StructureGenerateCommandOptions } from './types.js';
 
 export function createStructureGenerateCommand(deps: ProgramDeps): Command {
     return new Command('structure-generate')
@@ -46,17 +48,20 @@ export function createStructureGenerateCommand(deps: ProgramDeps): Command {
             const isJsonOutput = Boolean(parent.json);
 
             const skillsResult = await ensureStructureSkillsStep(deps, projectDir, options);
+
             if (!skillsResult.ok) {
                 return;
             }
 
             const scaffoldResult = await scaffoldBlueprintStep(deps, projectDir, options);
+
             if (!scaffoldResult.ok || !scaffoldResult.scaffold || !scaffoldResult.blueprintStatus) {
                 return;
             }
 
             if (options.status) {
                 reportStructureStatusStep(deps, projectDir, scaffoldResult.scaffold, scaffoldResult.blueprintStatus, isJsonOutput);
+
                 return;
             }
 

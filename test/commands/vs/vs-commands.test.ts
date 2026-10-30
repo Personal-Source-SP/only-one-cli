@@ -1,10 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
-import { createProgram } from '@src/index.js';
-import { VsEditorId, VsPlatform } from '@src/core/vs/types.js';
 import { checkExistingVsExtensions, checkExistingVsSettings, syncVsExtensions, syncVsSettings } from '@src/core/vs/index.js';
+import { VsEditorId, VsPlatform } from '@src/core/vs/types.js';
+import { createProgram } from '@src/index.js';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@src/core/vs/index.js', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@src/core/vs/index.js')>();
+
     return {
         ...actual,
         checkExistingVsExtensions: vi.fn().mockImplementation(async ({ editorIds, extensionIds }) => {

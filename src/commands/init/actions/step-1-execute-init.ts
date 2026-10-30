@@ -1,6 +1,8 @@
 import type { Command } from 'commander';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { executeInitCommand, printInitResult } from '@/core/init/init-command.js';
+
 import type { InitCommandOptions } from '../types.js';
 
 export const executeInitStep = async (
@@ -25,5 +27,6 @@ export const executeInitStep = async (
     });
 
     if (!result) return;
+
     printInitResult(deps, isJson, result);
 };

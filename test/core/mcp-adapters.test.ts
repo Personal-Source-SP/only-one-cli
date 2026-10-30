@@ -1,5 +1,7 @@
 import { join } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
+
 import { antigravityMcpAdapter, claudeMcpAdapter, codexMcpAdapter, cursorMcpAdapter, McpIdeId } from '@/core/mcp/adapters.js';
 
 describe('MCP IDE Adapters', () => {

@@ -1,16 +1,18 @@
 import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
+
 import { generateCommand, resolveCommandWritePath } from '@/core/command-generation/generator.js';
+import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
 import {
     buildStructureCommandContent,
     buildStructureSkillMarkdown,
     STRUCTURE_COMMAND_ID,
     STRUCTURE_SKILL_NAME,
 } from '@/core/templates/structure.js';
-import { getAgentToolById } from './tools.js';
+
 import { normalizeStructureCommandPath, resolveStructureSkillPath } from './command-path.js';
+import { getAgentToolById } from './tools.js';
 
 export type InstallFileResult = {
     installed: boolean;
@@ -60,6 +62,7 @@ const installForTool = async (
     commandId: string = STRUCTURE_COMMAND_ID,
 ): Promise<PerToolInstallResult> => {
     const tool = getAgentToolById(toolId);
+
     if (!tool?.skillsDir) {
         throw new Error(`Unknown or non-installable tool '${toolId}'`);
     }

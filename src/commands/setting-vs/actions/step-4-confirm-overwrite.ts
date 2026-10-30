@@ -1,5 +1,6 @@
 import type { ProgramDeps } from '@/cli/deps.js';
 import type { ExistingVsSettingCheck, VsEditorId } from '@/core/vs/index.js';
+
 import type { SettingVsCommandOptions } from '../types.js';
 
 export const confirmSettingOverwriteStep = async (
@@ -15,6 +16,7 @@ export const confirmSettingOverwriteStep = async (
         for (const editorId of editorIds) {
             settingKeysPerEditor[editorId] = [...selectedKeys];
         }
+
         return settingKeysPerEditor;
     }
 
@@ -39,6 +41,7 @@ export const confirmSettingOverwriteStep = async (
 
     for (const editorId of editorIds) {
         const keysToSync: string[] = [];
+
         for (const key of selectedKeys) {
             const check = existingChecks.find((c) => c.editorId === editorId && c.key === key);
             const exists = check?.exists ?? false;
@@ -48,6 +51,7 @@ export const confirmSettingOverwriteStep = async (
                 keysToSync.push(key);
             }
         }
+
         settingKeysPerEditor[editorId] = keysToSync;
     }
 

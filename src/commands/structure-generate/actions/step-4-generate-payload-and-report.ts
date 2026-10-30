@@ -1,4 +1,5 @@
 import { basename, relative } from 'node:path';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { COLORS } from '@/constants/index.js';
 import { buildAgentArtifactSummaries, formatAgentToolInstruction } from '@/core/agent/artifact-summary.js';
@@ -8,6 +9,7 @@ import { printJson } from '@/core/output/index.js';
 import { readCliVersion } from '@/core/runtime/read-cli-version.js';
 import type { readBlueprintStatus } from '@/core/structure/status.js';
 import { getStructurePlaybookSteps, STRUCTURE_SKILL_NAME } from '@/core/templates/structure.js';
+
 import type { StructureGenerateCommandJson, StructureGenerateCommandOptions } from '../types.js';
 
 export const generatePayloadAndReportStep = async (
@@ -45,6 +47,7 @@ export const generatePayloadAndReportStep = async (
 
     if (isJsonOutput) {
         printJson({ ...payload, skillName: STRUCTURE_SKILL_NAME }, deps.stdout);
+
         return;
     }
 
@@ -60,13 +63,16 @@ export const generatePayloadAndReportStep = async (
     deps.stdout(border('└────────────────────────────────────────────────────────────────────────┘'));
     deps.stdout('');
     deps.stdout(`  ${COLORS.bold('How to run this skill inside your AI agent chat:')}`);
+
     if (agentArtifacts?.length) {
         for (const artifact of agentArtifacts) {
             const toolName = getAgentToolDisplayName(artifact.toolId);
             deps.stdout(`  ${COLORS.success('•')} ${COLORS.secondary(toolName)}:`);
+
             for (const line of formatAgentToolInstruction(artifact.toolId, artifact.invokeLabel)) {
                 deps.stdout(COLORS.dim(line));
             }
+
             deps.stdout('');
         }
     } else {

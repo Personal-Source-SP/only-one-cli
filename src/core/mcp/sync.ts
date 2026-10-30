@@ -1,8 +1,10 @@
 import { dirname, join } from 'node:path';
+
 import { PercentProgressReporter } from '@/core/vs/progress.js';
 import { nodeVsFileSystem, NodeVsProcessRunner } from '@/core/vs/runtime.js';
 import { VsSyncTransaction } from '@/core/vs/transaction.js';
 import type { VsFileSystem, VsPlatform, VsProcessRunner } from '@/core/vs/types.js';
+
 import { findMcpIdeAdapter } from './adapters.js';
 import { mergeMcpServers } from './merge.js';
 import type { McpManifest, McpMergeResult } from './types.js';
@@ -41,6 +43,7 @@ export const syncMcpGlobalConfig = async (request: SyncMcpGlobalConfigRequest): 
     await transaction.recoverIfNeeded();
 
     const adapters = request.ideIds.map((id) => findMcpIdeAdapter(id));
+
     if (adapters.some((adapter) => !adapter)) {
         throw new Error('Unsupported MCP IDE selected');
     }
@@ -52,6 +55,7 @@ export const syncMcpGlobalConfig = async (request: SyncMcpGlobalConfigRequest): 
         await transaction.rollback();
         process.exit(130);
     };
+
     process.once('SIGINT', handleSignal);
     process.once('SIGTERM', handleSignal);
 
@@ -60,10 +64,12 @@ export const syncMcpGlobalConfig = async (request: SyncMcpGlobalConfigRequest): 
     try {
         for (const adapter of adapters) {
             if (!adapter) continue;
+
             const configPath = adapter.getConfigPath(request.homeDir, request.platform as NodeJS.Platform);
             await fs.mkdir(dirname(configPath));
 
             let config: Record<string, unknown> = {};
+
             try {
                 config = adapter.codec.parse(await fs.readFile(configPath), configPath);
             } catch (error) {
@@ -86,11 +92,13 @@ export const syncMcpGlobalConfig = async (request: SyncMcpGlobalConfigRequest): 
         process.off('SIGTERM', handleSignal);
         await transaction.commit();
         progress.step('MCP config committed');
+
         return { changed: results.filter((result) => result.results.some((entry) => entry.status === 'added')).length, results };
     } catch (error) {
         process.off('SIGINT', handleSignal);
         process.off('SIGTERM', handleSignal);
         await transaction.rollback();
+
         throw error;
     }
 };

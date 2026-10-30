@@ -1,8 +1,9 @@
 import type { ProgramDeps } from '@/cli/deps.js';
-import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { COLORS } from '@/constants/index.js';
 import type { AgentToolOption } from '@/core/agent/tools.js';
+import { writeIgnoreTemplates } from '@/core/ignore/index.js';
 import { installSkills } from '@/core/skill/index.js';
+
 import type { SkillCommandOptions } from '../types.js';
 
 export const executeAndReportSkillsStep = async (
@@ -37,6 +38,7 @@ export const executeAndReportSkillsStep = async (
 
     if (successes.length > 0) {
         deps.stdout(COLORS.success('\n✓ Successfully Installed (New):'));
+
         for (const r of successes) {
             deps.stdout(`  - ${COLORS.secondary(r.skillName)} -> ${COLORS.primary(r.toolName)}`);
         }
@@ -44,6 +46,7 @@ export const executeAndReportSkillsStep = async (
 
     if (overwrites.length > 0) {
         deps.stdout(COLORS.success('\n✓ Successfully Overwritten/Reinstalled:'));
+
         for (const r of overwrites) {
             deps.stdout(`  - ${COLORS.secondary(r.skillName)} -> ${COLORS.primary(r.toolName)} [Overwritten]`);
         }
@@ -51,6 +54,7 @@ export const executeAndReportSkillsStep = async (
 
     if (skips.length > 0) {
         deps.stdout(COLORS.dim('\n- Skipped (Kept Existing):'));
+
         for (const r of skips) {
             deps.stdout(`  - ${COLORS.secondary(r.skillName)} in ${COLORS.primary(r.toolName)}`);
         }
@@ -58,6 +62,7 @@ export const executeAndReportSkillsStep = async (
 
     if (failures.length > 0) {
         deps.stdout(COLORS.error('\n✗ Failed:'));
+
         for (const r of failures) {
             deps.stdout(`  - ${COLORS.secondary(r.skillName)} in ${COLORS.primary(r.toolName)}: ${COLORS.warning(r.error || '')}`);
         }

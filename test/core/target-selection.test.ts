@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
 import {
     createTargetAssetPlan,
     filterCompatibleAssets,
     formatMissingArgumentError,
     selectTargets,
 } from '@src/core/target-selection/index.js';
+import { describe, expect, it } from 'vitest';
 
 const choices = [
     { name: 'Antigravity', value: 'antigravity' },
@@ -45,6 +45,7 @@ describe('selectTargets', () => {
             prompts: {
                 checkbox: async ({ choices: checkboxChoices }) => {
                     calls.push(...checkboxChoices);
+
                     return ['claude'];
                 },
             },

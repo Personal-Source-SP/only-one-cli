@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { mkdir, rename, rm, readFile, appendFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, rename, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
 /** Default directory for project config and pre-index artifacts (under the project root). */
@@ -11,6 +11,7 @@ export function resolveIndexOutputDir(projectDir: string, output?: string): stri
     if (output) {
         return resolve(projectDir, output);
     }
+
     return join(projectDir, ONLY_ONE_DIR);
 }
 
@@ -21,13 +22,17 @@ export function resolveLocalConfigPath(projectDir: string, output?: string): str
 /** Prefer `.only-one/.onlyonecli.yml`, fall back to legacy project-root config. */
 export function resolveLocalConfigPathForProject(projectDir: string, output?: string): string | null {
     const preferred = resolveLocalConfigPath(projectDir, output);
+
     if (existsSync(preferred)) {
         return preferred;
     }
+
     const legacy = join(projectDir, ONLY_ONE_CONFIG_FILE);
+
     if (existsSync(legacy)) {
         return legacy;
     }
+
     return null;
 }
 
@@ -38,13 +43,17 @@ export function resolveManifestPath(outputDir: string): string {
 /** Prefer `.only-one/manifest.json`, fall back to legacy project-root manifest. */
 export function resolveManifestPathForProject(projectDir: string, output?: string): string | null {
     const preferred = resolveManifestPath(resolveIndexOutputDir(projectDir, output));
+
     if (existsSync(preferred)) {
         return preferred;
     }
+
     const legacy = join(projectDir, 'manifest.json');
+
     if (existsSync(legacy)) {
         return legacy;
     }
+
     return null;
 }
 
@@ -68,8 +77,10 @@ export async function relocateArtifactDir(sourceRoot: string, dirName: string, o
     if (existsSync(to)) {
         if (!force) {
             await rm(from, { recursive: true, force: true });
+
             return;
         }
+
         await rm(to, { recursive: true, force: true });
     }
 
@@ -81,9 +92,11 @@ export async function relocateArtifactDir(sourceRoot: string, dirName: string, o
  */
 export async function ignoreInGitignore(projectDir: string, ignoreEntry: string): Promise<void> {
     const gitignorePath = join(projectDir, '.gitignore');
+
     if (existsSync(gitignorePath)) {
         try {
             const content = await readFile(gitignorePath, 'utf-8');
+
             if (
                 !content
                     .split('\n')

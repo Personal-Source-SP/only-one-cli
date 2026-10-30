@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from 'node:fs';
-import { basename, join, dirname } from 'node:path';
+import { basename, dirname, join } from 'node:path';
+
 import { resolveIndexOutputDir } from '@/core/prebuilt/index-output.js';
 
 export const STRUCTURALS_DIR = 'structure';
@@ -24,6 +25,7 @@ export const sanitizeStructureSegment = (value: string): string => {
         .replace(/^-|-$/g, '');
 
     const segment = normalized || 'unknown';
+
     return segment.length > SEGMENT_MAX_LENGTH ? segment.slice(0, SEGMENT_MAX_LENGTH) : segment;
 };
 
@@ -37,11 +39,13 @@ export type StructurePathIdentity = {
 
 export const resolveStructurePathIdentity = (config: { organization?: string; project?: string }): StructurePathIdentity | null => {
     const source = config.project?.trim();
+
     if (!source) {
         return null;
     }
 
     const organization = config.organization?.trim() ? config.organization : 'default';
+
     return { organization, source };
 };
 
@@ -53,7 +57,9 @@ export const resolveStructureStructuralsDir = (projectDir: string, output?: stri
     if (output && isExplicitBlueprintFileOutput(output)) {
         return dirname(join(projectDir, output));
     }
+
     const indexDir = output ? join(projectDir, output) : resolveIndexOutputDir(projectDir);
+
     return join(indexDir, STRUCTURALS_DIR);
 };
 
@@ -68,11 +74,13 @@ export const resolveStructureBlueprintPath = (
 
     if (output) {
         const resolved = join(projectDir, output);
+
         if (isExplicitBlueprintFileOutput(output)) {
             return resolved;
         }
 
         const identity = resolveStructurePathIdentity({ organization, project });
+
         if (!identity) {
             throw new StructurePathResolutionError(
                 'Cannot resolve structural blueprint path: set `project` in .onlyonecli.yml, pass an explicit --output file path ending in .md, or run `only-one init`.',
@@ -83,6 +91,7 @@ export const resolveStructureBlueprintPath = (
     }
 
     const identity = resolveStructurePathIdentity({ organization, project });
+
     if (!identity) {
         throw new StructurePathResolutionError(
             'Cannot resolve structural blueprint path: set `project` in .onlyonecli.yml (run `only-one init`) or pass --output <path-to-file.md>.',
@@ -94,6 +103,7 @@ export const resolveStructureBlueprintPath = (
 
 export const listStructureRelativePaths = (outputDir: string): string[] => {
     const dir = join(outputDir, STRUCTURALS_DIR);
+
     if (!existsSync(dir)) {
         return [];
     }

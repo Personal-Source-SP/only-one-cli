@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { createProgram } from '@/index.js';
 
 describe('tui command integration', () => {

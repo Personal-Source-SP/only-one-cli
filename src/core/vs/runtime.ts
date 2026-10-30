@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
+
 import type { VsFileSystem, VsProcessResult, VsProcessRunner } from './types.js';
 
 export const nodeVsFileSystem: VsFileSystem = {

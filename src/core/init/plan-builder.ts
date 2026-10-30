@@ -1,9 +1,9 @@
+import { planMcps, planSkills } from '../agent/service-planners.js';
+import { planConfigs } from '../config/planner.js';
+import { planPackages } from '../package/planner.js';
+import type { InitSelectionInputs } from './interactive-orchestrator.js';
 import type { InitPlan, PlannedItem } from './plan-types.js';
 import { deduplicatePlannedItems } from './plan-utils.js';
-import { planPackages } from '../package/planner.js';
-import { planConfigs } from '../config/planner.js';
-import { planMcps, planSkills } from '../agent/service-planners.js';
-import type { InitSelectionInputs } from './interactive-orchestrator.js';
 
 export interface BuildInitPlanOptions {
     projectDir: string;

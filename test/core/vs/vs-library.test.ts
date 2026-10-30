@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
 import { VS_LIBRARY } from '@assets/vs/index.js';
 import { loadVsLibraryManifest } from '@src/core/vs/library.js';
+import { describe, expect, it } from 'vitest';
 
 describe('VS_LIBRARY manifest', () => {
     it('contains unique and alphabetically sorted extensions', () => {

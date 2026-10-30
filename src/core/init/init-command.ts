@@ -1,46 +1,49 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { mkdir, cp, readdir, stat, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
 import { execFile } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { cp, mkdir, readdir, stat, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
-import { homedir } from 'node:os';
-import { confirm, select } from '@inquirer/prompts';
-import type { ProgramDeps } from '@/cli/deps.js';
-import { printJson } from '@/core/output/index.js';
-import { selectIgnoreTargets, writeIgnoreTemplates } from '@/core/ignore/index.js';
-import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
-import { getAllowedAgentTargets } from '@/core/target-selection/index.js';
-import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
-import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
-import { promptInitSelections } from './interactive-orchestrator.js';
-import { launchGoInit, resolveGoBinaryPath } from '@/tui/bridge.js';
-import { buildInitPlan } from './plan-builder.js';
-import { renderPreExecutionSummary, renderFinalReport } from './plan-utils.js';
-import { executeInitPlan } from './plan-executor.js';
-import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
-import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
-import { generateCommand } from '@/core/command-generation/generator.js';
-import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
-import { buildPrGitCommandContent } from '@/core/templates/agent-workflows.js';
-import { parseJsoncObject } from '@/core/vs/json.js';
-import { cursorMcpAdapter, antigravityMcpAdapter } from '@/core/mcp/adapters.js';
-import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
-import { checkExistingMcps } from '@/core/mcp/index.js';
+
 import { COMBOS } from '@assets/agents/combos/index.js';
 import { PACKAGES } from '@assets/agents/packages/index.js';
-import { CONFIGS } from '@assets/templates/configs/index.js';
 import { SKILLS } from '@assets/agents/skills/index.js';
+import { CONFIGS } from '@assets/templates/configs/index.js';
+import { confirm, select } from '@inquirer/prompts';
+
+import type { ProgramDeps } from '@/cli/deps.js';
+import { normalizeStructureCommandPath } from '@/core/agent/command-path.js';
+import { generateCommand } from '@/core/command-generation/generator.js';
+import { CommandAdapterRegistry } from '@/core/command-generation/registry.js';
+import { selectIgnoreTargets, writeIgnoreTemplates } from '@/core/ignore/index.js';
+import { antigravityMcpAdapter, cursorMcpAdapter } from '@/core/mcp/adapters.js';
+import { checkExistingMcps } from '@/core/mcp/index.js';
+import { syncMcpGlobalConfig } from '@/core/mcp/sync.js';
+import { printJson } from '@/core/output/index.js';
+import { assertProjectDirectory, resolveProjectDir } from '@/core/runtime/globals.js';
+import { checkExistingSkills, installSkills } from '@/core/skill/index.js';
+import { getAllowedAgentTargets } from '@/core/target-selection/index.js';
+import { selectAllowedAgentTargets } from '@/core/target-selection/index.js';
+import { buildPrGitCommandContent } from '@/core/templates/agent-workflows.js';
+import { parseJsoncObject } from '@/core/vs/json.js';
+import { searchableMultiSelect } from '@/prompts/searchable-multi-select.js';
+import { launchGoInit, resolveGoBinaryPath } from '@/tui/bridge.js';
+
+import { promptInitSelections } from './interactive-orchestrator.js';
+import { buildInitPlan } from './plan-builder.js';
+import { executeInitPlan } from './plan-executor.js';
+import { renderFinalReport, renderPreExecutionSummary } from './plan-utils.js';
 import type {
+    ComboManifest,
+    ConfigsStepResult,
     InitCommandRequest,
     InitCommandResponse,
-    ToolsStepResult,
-    PackagesStepResult,
-    SkillsStepResult,
-    ConfigsStepResult,
     McpStepResult,
     PackageManifest,
-    ComboManifest,
+    PackagesStepResult,
+    SkillsStepResult,
+    ToolsStepResult,
 } from './types.js';
 
 const execFileAsync = promisify(execFile);
@@ -65,27 +68,35 @@ const readPackageManifests = async (): Promise<PackageManifest[]> => {
 const isPackageInstalled = async (pkg: PackageManifest, projectDir: string): Promise<boolean> => {
     if (pkg.installer.kind === 'npm') {
         const { packageName, scope = 'global' } = pkg.installer;
+
         try {
             const args = ['list', packageName, '--depth=0'];
+
             if (scope === 'global') args.push('-g');
+
             await execFileAsync('npm', args, { cwd: projectDir, shell: true });
+
             return true;
         } catch {
             return false;
         }
     }
+
     return false;
 };
 
 const npmInstall = async (name: string, scope: 'global' | 'local', projectDir: string): Promise<boolean> => {
     const args = ['install', name];
+
     if (scope === 'global') args.push('-g');
 
     try {
         await execFileAsync('npm', args, { cwd: projectDir, timeout: 120000, shell: true });
+
         return true;
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
+
         // error handled by caller
         throw new Error(`npm install failed for ${name}: ${message}`);
     }
@@ -102,10 +113,12 @@ export const executeToolsStep = async (
 
     if (!tools.length) {
         deps.stdout('  No installable agent tools found');
+
         return null;
     }
 
     let selectedValues: string[] = [];
+
     if (selectedValuesOverride) {
         const selected = await selectAllowedAgentTargets({
             automatic: false,
@@ -118,6 +131,7 @@ export const executeToolsStep = async (
         const choices = tools.map((t) => {
             const configured = t.skillsDir ? existsSync(join(projectDir, t.skillsDir)) : false;
             const detected = t.detectionPaths ? t.detectionPaths.some((p) => existsSync(join(projectDir, p))) : false;
+
             return {
                 name: t.name,
                 value: t.value,
@@ -132,6 +146,7 @@ export const executeToolsStep = async (
             choices,
             validate: (selected: string[]) => {
                 if (!selected.length) return 'Select at least one tool';
+
                 return true;
             },
         });
@@ -155,22 +170,27 @@ export const executePackagesStep = async (
 
     if (manifests.length === 0) {
         deps.stdout('  No packages available');
+
         return null;
     }
 
     let selectedNames: string[] = [];
+
     if (selectedNamesOverride) {
         for (const name of selectedNamesOverride) {
             const found = manifests.find((m) => m.id === name);
+
             if (!found) {
                 throw new Error(`Package '${name}' not found in assets/packages`);
             }
         }
+
         selectedNames = selectedNamesOverride;
     } else {
         const choices = await Promise.all(
             manifests.map(async (pkg) => {
                 const configured = await isPackageInstalled(pkg, projectDir);
+
                 return {
                     name: pkg.description ? `${pkg.id} — ${pkg.description}` : pkg.id,
                     value: pkg.id,
@@ -201,6 +221,7 @@ export const executeSkillsStep = async (
 ): Promise<SkillsStepResult | null> => {
     if (!existsSync(skillsDir)) {
         deps.stdout('  No skills available');
+
         return null;
     }
 
@@ -209,8 +230,10 @@ export const executeSkillsStep = async (
 
     for (const name of entries) {
         const fullPath = join(skillsDir, name);
+
         try {
             const s = await stat(fullPath);
+
             if (s.isDirectory()) skillNames.push(name);
         } catch {
             // skip unreadable entries
@@ -219,26 +242,31 @@ export const executeSkillsStep = async (
 
     if (skillNames.length === 0) {
         deps.stdout('  No skills available');
+
         return null;
     }
 
     let selectedSkillNames: string[] = [];
+
     if (selectedSkillNamesOverride) {
         for (const name of selectedSkillNamesOverride) {
             if (!skillNames.includes(name)) {
                 throw new Error(`Skill '${name}' not found in assets/skills`);
             }
         }
+
         selectedSkillNames = selectedSkillNamesOverride;
     } else {
         const choices = skillNames.map((name) => {
             let configured = false;
+
             for (const tool of selectedTools) {
                 if (tool.skillsDir && existsSync(join(projectDir, tool.skillsDir, 'skills', name))) {
                     configured = true;
                     break;
                 }
             }
+
             return {
                 name,
                 value: name,
@@ -265,21 +293,25 @@ export const executeConfigsStep = async (
 ): Promise<ConfigsStepResult | null> => {
     if (Object.keys(CONFIGS).length === 0) {
         deps.stdout('  No config templates available');
+
         return null;
     }
 
     try {
         let selectedConfigNames: string[] = [];
+
         if (selectedConfigNamesOverride) {
             for (const name of selectedConfigNamesOverride) {
                 if (!CONFIGS[name]) {
                     throw new Error(`Config template '${name}' not found in assets/configs`);
                 }
             }
+
             selectedConfigNames = selectedConfigNamesOverride;
         } else {
             const choices = Object.entries(CONFIGS).map(([name, config]) => {
                 const alreadyExists = existsSync(join(projectDir, name));
+
                 return {
                     name: config.description ? `${name} — ${config.description}` : name,
                     value: name,
@@ -299,6 +331,7 @@ export const executeConfigsStep = async (
         return { selectedConfigs: selectedConfigNames };
     } catch {
         deps.stdout('  Failed to read configuration templates');
+
         return null;
     }
 };
@@ -319,8 +352,10 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
 
         // Prompt selections via TUI Wizard when running in interactive terminal
         const isInteractive = !isJson && Boolean(process.stdout.isTTY);
+
         if (isInteractive && resolveGoBinaryPath()) {
             await launchGoInit(projectDir);
+
             return {
                 projectDir,
                 installedPackages: [],
@@ -346,6 +381,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
 
         if (!selections) {
             deps.stdout('\nInitialization cancelled. No changes were made.');
+
             return null;
         }
 
@@ -373,6 +409,7 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
 
             if (!proceed) {
                 deps.stdout('\nInitialization cancelled. No changes were made.');
+
                 return null;
             }
         }
@@ -424,12 +461,16 @@ export const executeInitCommand = async (originalDeps: ProgramDeps, request: Ini
     } catch (error: any) {
         if (error?.name === 'ExitPromptError' || error?.message?.includes('force closed')) {
             originalDeps.stdout('\nInitialization cancelled (SIGINT).');
+
             return null;
         }
+
         if (request.json) {
             printJson({ success: false, error: error instanceof Error ? error.message : String(error) }, originalDeps.stdout);
+
             return null;
         }
+
         throw error;
     }
 };
@@ -448,6 +489,7 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
             },
             deps.stdout,
         );
+
         return;
     }
 
@@ -456,24 +498,30 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
     if (result.toolsStep) {
         deps.stdout(`  Tools: ${result.toolsStep.selectedTools.map((t) => t.name).join(', ')}`);
     }
+
     if (result.packagesStep && result.packagesStep.installedPackages.length > 0) {
         deps.stdout(`  Packages: ${result.packagesStep.installedPackages.join(', ')}`);
     }
+
     if (result.skillsStep && result.skillsStep.installedSkills.length > 0) {
         deps.stdout(`  Skills: ${result.skillsStep.installedSkills.join(', ')}`);
     }
+
     if (result.configsStep && result.configsStep.selectedConfigs.length > 0) {
         deps.stdout(`  Configs: ${result.configsStep.selectedConfigs.join(', ')}`);
     }
+
     if (result.mcpStep && result.mcpStep.selectedMcps.length > 0) {
         deps.stdout(`  MCPs: ${result.mcpStep.selectedMcps.join(', ')}`);
     }
 
     const projectDir = result.projectDir;
+
     if (projectDir) {
         const activeTools = getAllowedAgentTargets()
             .flatMap((target) => (target.agent ? [target.agent] : []))
             .filter((t) => t.skillsDir && existsSync(join(projectDir, t.skillsDir)));
+
         if (activeTools.length > 0) {
             deps.stdout('\n==================================================');
             deps.stdout('                READINESS REPORT');
@@ -494,6 +542,7 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                 const mcpId = wf.requiredMcps?.[0];
                 let secretKey: string | undefined;
                 let usageNote: string | undefined;
+
                 if (mcpId === 'github') secretKey = 'GITHUB_PERSONAL_ACCESS_TOKEN';
 
                 return {
@@ -507,8 +556,10 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
             for (const workflow of workflows) {
                 const commandPaths = activeTools.map((tool) => {
                     const adapter = CommandAdapterRegistry.get(tool.value);
+
                     return adapter ? join(projectDir, normalizeStructureCommandPath(adapter.getFilePath(workflow.id), workflow.id)) : '';
                 });
+
                 if (!commandPaths.some((path) => path && existsSync(path))) continue;
 
                 deps.stdout(`\n  ${workflow.id} workflow:`);
@@ -523,13 +574,17 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                     for (const adapter of [cursorMcpAdapter, antigravityMcpAdapter]) {
                         try {
                             const path = adapter.getConfigPath(homedir(), process.platform);
+
                             if (existsSync(path)) {
                                 const config = parseJsoncObject(readFileSync(path, 'utf8')) as any;
                                 const mcpConfig = config?.mcpServers?.[workflow.mcpId] as any;
+
                                 if (mcpConfig) {
                                     configuredIdes.push(adapter.name);
+
                                     if (workflow.secretKey) {
                                         const credentialValue = mcpConfig.env?.[workflow.secretKey];
+
                                         if (credentialValue === undefined || credentialValue === '') {
                                             incompleteIdes.push({ name: adapter.name, path });
                                         }
@@ -541,9 +596,11 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
 
                     if (configuredIdes.length > 0) {
                         deps.stdout(`    - MCP Server (${workflow.mcpId}): Configured in ${configuredIdes.join(', ')}`);
+
                         if (workflow.secretKey) {
                             if (incompleteIdes.length > 0) {
                                 deps.stdout(`    - Credentials: Setup incomplete`);
+
                                 for (const ide of incompleteIdes) {
                                     deps.stdout(`      ⚠️ ${ide.name}: ${ide.path} -> ${workflow.secretKey} requires manual editing`);
                                 }
@@ -558,6 +615,7 @@ export const printInitResult = (deps: ProgramDeps, parentJson: boolean, result: 
                     }
                 }
             }
+
             deps.stdout('\n==================================================');
         }
     }

@@ -1,4 +1,5 @@
 import { homedir } from 'node:os';
+
 import type { ProgramDeps } from '@/cli/deps.js';
 import { checkExistingMcps, type McpManifest } from '@/core/mcp/index.js';
 import type { McpIdeAdapter } from '@/core/mcp/types.js';
@@ -20,12 +21,14 @@ export const selectMcpsStep = async (
     );
 
     let selectedMcpIds = parseCsv(namesArg);
+
     if (!selectedMcpIds?.length) {
         if (!deps.prompts?.checkbox) {
             throw new Error('MCP server selection is required in non-interactive mode. Pass server names positionally.');
         } else {
             const choices = manifests.map((m) => {
                 const isExisting = allExisting.some((e) => e.mcpId === m.id && e.exists);
+
                 return {
                     name: isExisting ? `${m.id} (already exists)` : m.id,
                     value: m.id,
@@ -48,7 +51,9 @@ export const selectMcpsStep = async (
 
     const selectedManifests = selectedMcpIds.map((id) => {
         const found = manifests.find((m) => m.id === id);
+
         if (!found) throw new Error(`Unknown MCP server '${id}'`);
+
         return found;
     });
 

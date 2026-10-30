@@ -1,17 +1,20 @@
 import { execSync } from 'node:child_process';
 import { homedir } from 'node:os';
 import { basename, join } from 'node:path';
+
 import { inferName } from './repo-name.js';
 
 /** Trả về đường dẫn kho improvements toàn cục hoặc thư mục con theo repo. */
 export function getGlobalImprovementsDir(repoName?: string): string {
     const base = join(homedir(), '.only-one', 'improvements');
+
     return repoName ? join(base, repoName) : base;
 }
 
 /** Kiểm tra xem danh sách target_skills có chứa kỹ năng thuộc hệ sinh thái only-one-* hay không. */
 export function isOnlyOneTargetSkill(skills?: string[]): boolean {
     if (!Array.isArray(skills)) return false;
+
     return skills.some((s) => typeof s === 'string' && s.trim().startsWith('only-one-'));
 }
 
@@ -27,6 +30,7 @@ export function resolveRepoIdentifierSync(baseDir = process.cwd()): string {
 
         if (stdout) {
             const inferred = inferName(stdout);
+
             if (inferred && inferred !== 'remote-repo') {
                 return inferred;
             }
