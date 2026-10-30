@@ -13,7 +13,7 @@ references:
   - only-one/archives/refactor-dev-skills-standards.md
   - only-one/archives/asset-versioning-and-sync-systems.md
   - only-one/archives/mcp-registry-and-servers.md
-  - only-one/archives/cli-tooling-and-cocoindex-purge.md
+  - only-one/archives/cli-tooling-and-developer-ecosystem.md
 affected_modules:
   - assets/agents/skills
   - assets/agents/skills/only-one-apply

@@ -11,7 +11,7 @@ status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
   - only-one/archives/tui-modernization.md
-  - only-one/archives/cli-tooling-and-cocoindex-purge.md
+  - only-one/archives/cli-tooling-and-developer-ecosystem.md
 affected_modules:
   - assets/agents
   - assets/devenv

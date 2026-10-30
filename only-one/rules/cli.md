@@ -49,3 +49,9 @@ triggers:
 - **NEVER_DO**: Rely on generic flat alias prefix replacement that fails to mirror the domain directory structure in `dist/assets/`.
 - **RATIONALE**: Node.js ESM loader requires exact relative file paths to existing `.js` files; unmapped aliases cause fatal `ERR_MODULE_NOT_FOUND` crashes at runtime.
 
+### CLI-009: Pre-Build Lint Gate Integration
+- **MUST_DO**: Hook `npm run lint` into the pre-build or build lifecycle (`npm run build`) to ensure zero-error lint compliance and strict type-only imports before artifact generation.
+- **NEVER_DO**: Allow `npm run build` to package dist artifacts while lint errors or unhandled architectural boundary violations exist.
+- **RATIONALE**: Catches unawaited promises, broken module boundaries, and invalid imports before distribution.
+
+

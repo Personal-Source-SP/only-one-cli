@@ -39,3 +39,14 @@ triggers:
 - **NEVER_DO**: Retain legacy flat asset directories at the root of `assets/` or introduce temporary re-export facade shims.
 - **RATIONALE**: Eliminates structural ambiguity, prevents stale path fallbacks, and maintains clean separation between AI agents, development tooling, and shared templates.
 
+### CORE-007: Development Tooling Isolation Outside Assets Directory
+- **MUST_DO**: Place internal repository development tools, linters, and custom rules in dedicated root directories (such as `eslint-rules/`, `scripts/`).
+- **NEVER_DO**: Put internal development or build tooling inside `assets/`; keep `assets/` strictly dedicated to distributable client templates.
+- **RATIONALE**: Prevents internal developer tooling from being bundled, distributed, or synced into client workspaces during asset operations.
+
+### CORE-008: Architectural Layer Boundaries for Inward Dependency Flow
+- **MUST_DO**: Enforce inward dependency flow (`cli` -> `commands` -> `core`) via architectural boundary lint rules (`custom/architectural-boundaries`).
+- **NEVER_DO**: Import higher-level modules (`src/commands/`, `src/cli/`) into lower-level modules (`src/core/`).
+- **RATIONALE**: Eliminates circular dependencies and ensures core domain logic remains headless, modular, and reusable.
+
+
