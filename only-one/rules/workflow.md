@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.3.0
+version: 1.4.0
 triggers:
   - ".agents/skills/only-one-*/**"
   - "assets/agents/skills/only-one-*/**"
@@ -44,10 +44,10 @@ triggers:
 - **NEVER_DO**: Create unstandardized subdirectories (such as `.agents/agents/` or `assets/agents/`) outside standard Antigravity customization roots (`workflows`, `skills`, `rules`, `plugins`).
 - **RATIONALE**: Antigravity does not recognize `.agents/agents/`, risking discovery failure and maintenance fragmentation.
 
-### WF-008: Crisp Completion Report Format in Chat
-- **MUST_DO**: Present the final completion report in chat using the 4 crisp sections (Source Structure Changes, Work Processed, Acceptance & Tests, Next Steps) with zero extra disk files (`walkthrough.md`).
-- **NEVER_DO**: Emit verbose per-file descriptions, raw unformatted diffs, or loose unstandardized chat summaries upon task completion.
-- **RATIONALE**: Standardizes scanning speed, keeps context token-efficient, and guarantees instantaneous reviewer comprehension.
+### WF-008: Collapsible Hybrid Completion Report & Friction Check Gate
+- **MUST_DO**: Present task completion in chat using the Collapsible Hybrid schema (2-line quantitative glance with status, files changed, tests passed, and core takeaway; collapsible `<details>` blocks for changed files and test outputs; and an interactive Friction Check prompt for `/only-one-evolve`) without extra disk files (`walkthrough.md`).
+- **NEVER_DO**: Emit bloated ASCII directory trees, duplicate raw task lists, print obsolete "Next Steps" sections, or omit the interactive friction check question.
+- **RATIONALE**: Minimizes cognitive overhead, eliminates token bloat in chat, and feeds actionable in-task friction notes into the automated skill evolution loop.
 
 ### WF-009: Dual-Engine Worktree Isolation & Rebase-First Guard
 - **MUST_DO**: Execute branch implementations in isolated git worktrees (`.worktrees/<slug>`) with junction-synchronized dependencies, and verify against upstream using a Rebase-First Guard before merge.

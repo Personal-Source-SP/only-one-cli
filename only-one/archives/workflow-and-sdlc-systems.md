@@ -6,7 +6,7 @@ triggers:
   - ".agents/skills/**"
   - "assets/agents/skills/**"
   - "only-one/tasks/**"
-archived_at: 2026-10-30T01:06:00+07:00
+archived_at: 2026-10-30T10:30:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -37,7 +37,7 @@ affected_modules:
 4. **Chi phí thời gian lớn cho Quick Tasks**: Các tác vụ nhỏ bị bắt buộc phải chạy qua 3 giai đoạn độc lập nặng nề.
 5. **Thực thi tuần tự gây nghẽn (Sequential Bottleneck)**: `/only-one-apply` chạy từng file một làm chậm tiến độ và phình to ngữ cảnh Main Agent.
 6. **Vi phạm ranh giới vòng đời (Lifecycle Drift)**: Debug tự ý sửa code sản phẩm; review không có định dạng thực thi chuẩn.
-7. **Báo cáo Hoàn thành Chat Tùy tiện & Khó Quét Mắt**: Khi `/only-one-apply` kết thúc, báo cáo chat quá sơ sài hoặc phân rã chi tiết từng file rườm rà.
+7. **Báo cáo Hoàn thành Chat Cồng kềnh & Thụ động**: Khi `/only-one-apply` kết thúc, báo cáo in cây thư mục ASCII rườm rà, lặp lại mô tả công việc, in mục bước tiếp theo thừa thãi, và bỏ qua cổng tiếp nhận phản hồi cải tiến cho `/only-one-evolve`.
 8. **Rủi ro Ô nhiễm Nhánh Chính Khi Thực thi In-Place**: Thực thi trực tiếp các thay đổi đa file trên working directory có nguy cơ gây xung đột git hoặc làm gián đoạn trạng thái commit hiện tại.
 
 ### 1.2. Core Value & Solutions
@@ -58,12 +58,12 @@ affected_modules:
      - Kế hoạch trình bày trực tiếp qua chat kèm Defect Scenario, có Review Gate bắt buộc ở Step 2 trước khi sửa code ở Step 3.
    - **Strict Lifecycle RCA Lane (`/only-one-debug`)**:
      - Tuân thủ 2 pha tách biệt: Pha 1 chẩn đoán lỗi, dựng Red feedback loop, lập kế hoạch vá theo chuẩn 4 sections trong `debug.md` và dừng tại Review Gate; Pha 2 giao cho `/only-one-apply` thực thi.
-6. **Mẫu Báo Cáo Hoàn Thành Tinh Gọn 4 Mục (Crisp In-Chat Completion Report)**:
-   - Chuẩn hóa Step 5 của `only-one-apply` với 4 mục súc tích bằng tiếng Việt:
-     1. Cấu trúc source thay đổi.
-     2. Các công việc đã xử lý.
-     3. Nghiệm thu & Kiểm thử.
-     4. Bước tiếp theo.
+6. **Mô Hình Báo Cáo Nghiệm Thu Collapsible Hybrid & Cổng Friction Check Gate ([`only-one-apply`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-apply/SKILL.md))**:
+   - Chuẩn hóa Step 5 của `only-one-apply` sang mô hình Collapsible Hybrid súc tích:
+     + *High-Signal Glance*: Chỉ gồm 2 dòng hiển thị trạng thái `DONE` ✅ kèm định lượng (số file thay đổi, số test passed) và 1-2 câu tóm tắt điểm mấu chốt kỹ thuật.
+     + *Deep Audit on Demand*: Gói danh sách file thay đổi và log kiểm thử chi tiết trong các thẻ `<details>` có thể đóng mở.
+     + *Loại bỏ hoàn toàn*: Không in cây thư mục ASCII, không lặp lại mô tả task, và loại bỏ mục "Bước tiếp theo".
+     + *Interactive Friction Check Gate*: Đặt câu hỏi tương tác trực tiếp ở cuối báo cáo để tiếp nhận điểm ma sát kỹ thuật; kích hoạt `assets/agents/skills/only-one-apply/scripts/record-improvement.ts` tạo `improvements.md` cho `/only-one-evolve`.
 7. **Quy Chuẩn Viết 80% ASD-STE100 & Triệt Tiêu Thể Bị Động ([`karpathy-ste100-discipline`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/karpathy-ste100-discipline/SKILL.md))**:
    - Khống chế trần từ: Câu chỉ dẫn $\le 20$ từ, câu mô tả/ngữ cảnh $\le 25$ từ.
    - Cấm triệt để thể bị động; 100% sử dụng câu chủ động trực diện.
