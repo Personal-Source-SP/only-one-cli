@@ -9,7 +9,7 @@ triggers:
   - "package.json"
   - "src/core/doctor/**"
   - "src/core/indexing/**"
-archived_at: 2026-10-30T10:00:00+07:00
+archived_at: 2026-10-31T19:17:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -21,11 +21,13 @@ affected_modules:
   - eslint-rules/rules
   - eslint.config.mjs
   - package.json
+  - src/commands/combo/actions/step-3-select-combos.ts
   - src/core/doctor
   - src/core/indexing
   - src/core/prebuilt
   - src/core/client
   - src/core/ignore
+  - test/commands/combo/combo.test.ts
   - test/core/postbuild-paths.test.ts
   - test/core/linter
 ---
@@ -38,12 +40,14 @@ affected_modules:
   2. **Gánh nặng Legacy CocoIndex & Timesheet**: Tính năng CocoIndex ban đầu được dùng để tạo code index artifact nhưng đã lỗi thời và phân mảnh rải rác trên nhiều tầng (Python script, doctor checks, Docker lifecycle, prebuilt bundles); tương tự là hệ sinh thái chấm công mồ côi. Người dùng bị ép kiểm tra Python 3.11+ và Docker container ngoài.
   3. **Lỗi Nạp ESM Sau Tái Cấu Trúc 3 Domain**: Việc chuyển `assets/` sang 3 domain (`agents/`, `devenv/`, `templates/`) gây lỗi `ERR_MODULE_NOT_FOUND` khi chạy binary CLI do script chuyển đổi path hậu biên dịch (`scripts/postbuild-paths.cjs`) dùng phép thế tiền tố phẳng (`@assets/` -> `../../assets/`) không phản ánh cấu trúc phân cấp.
   4. **Thiếu Phân Tích Tĩnh & Nguy Cơ Rò Rỉ Lỗi Runtime**: Dự án chỉ dựa vào Prettier (`format:check`) để định dạng khoảng trắng, thiếu kiểm tra tĩnh cho imports lộn xộn, thiếu `import type`, nguy cơ floating promises không được await, và nguy cơ phụ thuộc vòng giữa các tầng module (`src/core/` import ngược từ `src/commands/`).
+  5. **Crash Khi Hiển Thị Checkbox Prompt Trống Lựa Chọn**: Khi gọi `@inquirer/checkbox` mà mảng `choices: []` rỗng (ví dụ: chạy `only-one combo` ở chế độ local project trong khi toàn bộ combos đều có `scope: 'global'`), `@inquirer/checkbox` ném ngoại lệ `ValidationError: [checkbox prompt] No selectable choices` làm sập tiến trình CLI.
 - **Giá trị Cốt lõi (Value)**:
   - **Tinh gọn Tooling & Đóng gói Sạch**: Thu gọn `scripts/` về đúng các dev tools cần thiết (`publish.js`, `bump-asset.ts`, `build-go.js`, `postbuild-paths.cjs`) và thu gọn danh sách đóng gói npm package về đúng 2 thư mục: `["dist", "assets"]`.
   - **Phẫu thuật Loại bỏ Triệt để (Surgical Purge)**: Xóa bỏ 100% mã nguồn, doctor checks, container runners và metadata của CocoIndex và Timesheet workflows/MCPs, giúp lệnh `doctor` siêu tốc và không còn phụ thuộc ngoài.
   - **Domain Subpath Mapping trong Postbuild Transformer**: Thiết lập bảng ánh xạ `domainMappings` rõ ràng trong `scripts/postbuild-paths.cjs` (`@assets/ignore/` -> `templates/ignore/`, `@assets/skills/` -> `agents/skills/`, `@assets/rules/` -> `agents/rules/`, `@assets/vs/` -> `devenv/editor/`, `@assets/git/` -> `devenv/shell/`), đảm bảo 100% lệnh CLI khởi chạy mượt mà.
   - **Tách Biệt Linter Nội Bộ & Enterprise Ruleset**: Khởi tạo thư mục `eslint-rules/` ở root dự án (bảo vệ tuyệt đối `assets/` không bị pha trộn tooling nội bộ), kích hoạt bộ quy tắc TypeScript Enterprise (`simple-import-sort`, `consistent-type-imports`, `padding-line-between-statements`), cùng 3 custom rules nội bộ (`async-safety`, `interface-member-ordering`, `architectural-boundaries`).
   - **Chốt Chặn Pre-Build Lint Gate**: Tích hợp `npm run lint` vào quy trình `npm run build` để chặn đứng mã nguồn không đạt chuẩn trước khi biên dịch artifact.
+  - **Chốt Chặn Kiểm Tra Lựa Chọn Trước Khi Hiển Thị Prompt (Empty Choices Guard)**: Kiểm tra sớm `compatibleCombos.length` trước khi gọi prompt. Nếu rỗng, hiển thị thông báo hướng dẫn người dùng sử dụng cờ `-g` / `--global` và thoát êm đẹp với mã 0 thay vì làm sập CLI.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
 - **Surgical Purge & Clean Seams**:
@@ -104,13 +108,17 @@ flowchart TD
   - `[NEW]` `test/core/linter/architectural-boundaries.test.ts`: Unit test ranh giới kiến trúc.
   - `[NEW]` `test/core/linter/async-safety.test.ts`: Unit test an toàn bất đồng bộ.
   - `[NEW]` `test/core/linter/interface-member-ordering.test.ts`: Unit test sắp xếp thuộc tính interface.
+- **CLI Commands Defect Remediation**:
+  - `[MODIFY]` `src/commands/combo/actions/step-3-select-combos.ts`: Guard candidate choices và early exit với hướng dẫn `-g` / `--global` khi mảng combos rỗng.
+  - `[MODIFY]` `test/commands/combo/combo.test.ts`: Bổ sung regression test `handles interactive combo selection gracefully when no compatible combos exist for the scope`.
 
 ## 4. Verification Evidence (Bằng chứng Nghiệm thu)
 - **Lint Suite**:
-  - `npm run lint` hoàn thành với **0 lỗi vi phạm** (174 warnings không chặn build).
+  - `npm run lint` hoàn thành với **0 lỗi vi phạm** (178 warnings không chặn build).
   - Tự động sắp xếp imports và chuẩn hóa `import type` trên toàn bộ codebase qua `npm run lint:fix`.
 - **Unit Test Suite**:
-  - `npm test` đạt **100% Passed**: 69 test suites passed, 298 unit tests passed, 2 skipped, 0 failures.
+  - `npm test` đạt **100% Passed**: 75 test suites passed, 334 unit tests passed, 4 skipped, 0 failures.
+  - Test case `handles interactive combo selection gracefully when no compatible combos exist for the scope` verified 100% passed.
   - Test suites cho custom linter rules (`test/core/linter/*.test.ts`) đạt 100% Passed.
 - **Postbuild Verification**:
   - `npm run build` thực thi trơn tru: kích hoạt lint gate $\rightarrow$ tsc compile $\rightarrow$ postbuild-paths.cjs transform.

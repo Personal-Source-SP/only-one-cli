@@ -1,6 +1,6 @@
 ---
 domain: cli
-version: 1.3.0
+version: 1.4.0
 triggers:
   - "src/commands/**"
   - "src/core/runtime/**"
@@ -58,5 +58,10 @@ triggers:
 - **MUST_DO**: Route subagent asset installations in combo managers to user-level global configuration roots (`~/.gemini/config/agents/` for Antigravity, `~/.claude/agents/` for Claude Code) when installed globally.
 - **NEVER_DO**: Place global subagents into non-standard tool directories or omit machine-level directory creation during combo distribution.
 - **RATIONALE**: Ensures universal subagent discovery and immediate reuse across all projects on the workstation.
+
+### CLI-011: Guard Interactive Choice Prompts Against Empty Candidate Lists
+- **MUST_DO**: Verify candidate choice lists have `length > 0` and display actionable guidance before invoking interactive `@inquirer/checkbox` or `@inquirer/select` prompts.
+- **NEVER_DO**: Pass an empty `choices: []` array to `@inquirer/checkbox` or prompts that throw `ValidationError` when no selectable options exist.
+- **RATIONALE**: Inquirer prompts crash fatally with unhandled `ValidationError: [checkbox prompt] No selectable choices` if called with an empty choice set, disrupting developer workflows instead of exiting cleanly with informative instructions.
 
 
