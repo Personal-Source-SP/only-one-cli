@@ -157,6 +157,7 @@ Activate and apply these skills throughout the clean workflow:
 
 1. For each archive file (including newly consolidated files):
    - **Inspect Codebase Directly**:
+     - Khi kiểm tra logic thực tế trên nhiều archive hoặc module phức tạp (> 2 tệp), ủy thác cho `codebase-scout` Subagent (`read-only` sandbox with `ast-grep`) để quét và xác nhận sự tồn tại của file, exported symbols và types mà không nạp code thô vào context chính.
      - Check file paths: Do the files and directories mentioned in the archive still exist?
      - Check exported symbols & APIs: Do the functions, interfaces, DTOs, or CLI commands exist with the documented signatures?
      - Check behavioral logic: Is the data flow or execution sequence described still accurate in the active code?

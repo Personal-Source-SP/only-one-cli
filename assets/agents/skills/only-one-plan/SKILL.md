@@ -82,6 +82,9 @@ Do NOT bulk-load all rules, skills, and archives blindly (avoids context polluti
 1. **Step 1 — Identify Target Files & Impact Scope**:
    - From `concept.md` and codebase analysis, assemble the preliminary list of affected files with their action tags: `[NEW]`, `[MODIFY]`, `[DELETE]`, `[RENAME]`.
    - Read direct callers, dependencies, entities, DTOs, contracts, and tests to verify exact current behavior.
+   - **Adaptive Scout Delegation (`codebase-scout`)**:
+     - If reading or scanning > 2 files, delegate to `codebase-scout` Subagent (`read-only` sandbox with `ast-grep`) to extract Technical Digest without context bloat.
+     - If target is <= 2 known files, read directly using fast-path.
    - **Mandatory Reuse-First Audit**: Actively search (`grep_search` / `list_dir`) in shared directories (`src/utils/`, `src/helpers/`, `src/hooks/`, `src/common/`, `src/components/`, `src/shared/`) to identify existing utilities, helper functions, and custom hooks. ❌ **Strict Anti-Reinvention**: Do not propose duplicate logic if existing helpers can be reused or extended.
 
 2. **Step 2 — Target-Driven Rules & Skills Lookup**:

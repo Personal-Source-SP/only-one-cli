@@ -82,6 +82,8 @@ For each conflicted file:
    - If one side refactored and the other fixed a bug: apply the bug fix inside the refactored structure.
    - If changes are mutually exclusive: preserve the deliberate architectural direction agreed in `plan.md`.
 
+When resolving complex multi-file conflicts involving related callers and interfaces, delegate to `codebase-scout` Subagent (`read-only` sandbox with `ast-grep`) to inspect surrounding call-sites and types without cluttering the conflict resolution context.
+
 ---
 
 ### Step 3 — Clean Markers & Stage Changes

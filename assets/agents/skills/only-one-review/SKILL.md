@@ -76,6 +76,8 @@ Translate narrative to Vietnamese while preserving paths, symbols, commands, sni
 
 For every finding, reproduce the claim and record evidence. Prove Root Cause before marking finding `OPEN`. Unproven claims use `NON_EXECUTABLE` and record the evidence gap. Never modify source code during review.
 
+When investigating findings across dependencies or analyzing Blast Radius (callers, callees, database models), delegate to `codebase-scout` Subagent (`read-only` sandbox with `ast-grep`) to extract Technical Digest without polluting the review context. Fast-path direct read is permitted only for <= 2 target files.
+
 ### Step 3 — Write canonical report
 
 Write only normalized `review.md`, with no raw report sibling:

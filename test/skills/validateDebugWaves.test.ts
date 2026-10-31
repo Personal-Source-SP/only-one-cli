@@ -170,4 +170,3 @@ flowchart LR
         expect(result.warnings.some((w) => w.includes('Missing Wave metadata'))).toBe(true);
     });
 });
-

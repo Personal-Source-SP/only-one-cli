@@ -89,9 +89,10 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 ### Step 2 — Minimize, Localize, and Gather Evidence
 
 1. Remove unrelated setup while preserving failure.
-2. Trace calls, state transitions, and data transformations.
-3. Inspect recent Git changes and relevant repository rules.
-4. Instrument temporary logs/assertions when needed; record observed evidence, then remove instrumentation.
+2. Use `codebase-scout` Subagent with `ast-grep` for deep call-tree and multi-file stack trace traversal to avoid polluting main debugging context. Fast-path direct read allowed only for <= 2 known files.
+3. Trace calls, state transitions, and data transformations.
+4. Inspect recent Git changes and relevant repository rules.
+5. Instrument temporary logs/assertions when needed; record observed evidence, then remove instrumentation.
 
 ### Step 3 — Prove Root Cause
 

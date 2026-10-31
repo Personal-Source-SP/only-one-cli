@@ -35,6 +35,13 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
     },
     {
+        name: 'codebase-scout',
+        version: '0.0.1',
+        description: 'Read-only reconnaissance subagent extracting compressed technical digests using ast-grep without context pollution.',
+        sourceType: 'local',
+        skillPath: 'skills/codebase-scout/SKILL.md',
+    },
+    {
         name: 'interview-me',
         version: '0.0.1',
         description: 'Conduct a one-question-at-a-time interview extracting root needs until ~95% confidence.',

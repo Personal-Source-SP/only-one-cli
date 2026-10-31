@@ -88,6 +88,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
    - Ask focused questions to uncover the **Root Problem / Business Pain Point** (Why are we building this? Who is it for?).
    - **Deconstruct Problem & Goal into Structured Bullet Points**: Never write monolithic paragraphs. Deconstruct the problem into *Context/Trigger*, *Defect/Symptom*, *Root Cause*, and *Impact*. Deconstruct goals into *Core Outcome* and *Detailed Acceptance Criteria*.
    - Extract and define strict **`In-Scope` vs `Explicit Out-of-Scope`** boundaries to eliminate scope creep.
+   - **Reuse-First Reconnaissance with `codebase-scout`**: Khi cần khảo sát các tiện ích, helpers, hoặc hook hiện có trong codebase để tránh tái phát minh, ủy thác cho `codebase-scout` Subagent quét qua `ast-grep` và trả về Technical Digest; không tải trực tiếp hàng loạt tệp vào context.
    - Define **Measurable Success Metrics / Definition of Done** (e.g., latency < 200ms, zero data loss, 100% test pass).
    - Capture domain terminology into `only-one/CONTEXT.md` (`domain-modeling`).
 2. **Exit Gate Phase 1**: Do NOT propose solutions prematurely until problem context and scope boundaries reach **~95% clarity**.
