@@ -42,6 +42,27 @@ export const SKILLS: SkillManifest[] = [
         skillPath: 'skills/codebase-scout/SKILL.md',
     },
     {
+        name: 'terminal-runner',
+        version: '0.0.1',
+        description: 'Isolated terminal execution, CLI feature test, and ANSI-stripped log isolation agent.',
+        sourceType: 'local',
+        skillPath: 'skills/terminal-runner/SKILL.md',
+    },
+    {
+        name: 'browser-tester',
+        version: '0.0.1',
+        description: 'Isolated Playwright browser testing, UI visual screenshot, and DevTools monitoring agent.',
+        sourceType: 'local',
+        skillPath: 'skills/browser-tester/SKILL.md',
+    },
+    {
+        name: 'api-tester',
+        version: '0.0.1',
+        description: 'Isolated backend API validation, concurrency race condition testing, and latency audit agent.',
+        sourceType: 'local',
+        skillPath: 'skills/api-tester/SKILL.md',
+    },
+    {
         name: 'interview-me',
         version: '0.0.1',
         description: 'Conduct a one-question-at-a-time interview extracting root needs until ~95% confidence.',

@@ -85,6 +85,10 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 2. Build the smallest deterministic automated reproduction.
 3. Record `Symptom` and `Reproduction` in Section 1.
 4. Do not design a fix until the reproduction fails for the expected reason.
+5. **Runtime Verification Subagents for Reproduction**:
+   - Use `terminal-runner` to reproduce deterministic CLI and test crashes without log clutter.
+   - Use `browser-tester` to reproduce UI bugs with visual screenshot evidence.
+   - Use `api-tester` to reproduce backend API race conditions, deadlocks, and latency spikes.
 
 ### Step 2 — Minimize, Localize, and Gather Evidence
 

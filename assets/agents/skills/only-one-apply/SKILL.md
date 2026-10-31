@@ -96,6 +96,10 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
    - Ngược lại: Kích hoạt **Direct Sequential Mode** (thực thi tuần tự đơn lẻ để tiết kiệm token).
 2. Trong Orchestrator Mode, Agent chính đóng vai trò **Apply Orchestrator**:
    - Quản lý điều phối các đợt Wave, ủy thác task cho Subagents theo Track, và giữ quyền duy nhất cập nhật `plan.md`.
+   - **Runtime Verification Subagents Suite**:
+     - Ủy thác `terminal-runner` cho việc chạy test suite và kiểm thử các lệnh CLI.
+     - Ủy thác `browser-tester` cho các Wave kiểm thử giao diện web (Playwright MCP).
+     - Ủy thác `api-tester` cho các Wave nghiệm thu route backend và kiểm thử tải/concurrency.
 
 ### Step 0 — Khởi tạo Chế độ Thực thi (Dual-Engine Mode Selection)
 
