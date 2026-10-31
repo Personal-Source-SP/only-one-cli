@@ -28,7 +28,23 @@ export const selectCombosStep = async (
     targetTools: AgentToolOption[],
     isGlobal = false,
 ): Promise<string[]> => {
+    const selectedComboNames = parseCsv(namesArg);
+
+    if (selectedComboNames?.length) {
+        return selectedComboNames;
+    }
+
     const compatibleCombos = availableCombos.filter((combo) => isComboScopeMatch(combo, isGlobal) && isComboAgentMatch(combo, targetTools));
+
+    if (!compatibleCombos.length) {
+        deps.stdout(`No compatible combos found for ${targetTool.name} in ${isGlobal ? 'global' : 'local project'} mode.`);
+
+        if (!isGlobal) {
+            deps.stdout('Tip: Predefined combos are scoped for global installation. Try running with -g / --global.');
+        }
+
+        return [];
+    }
 
     const comboChecks = await Promise.all(
         compatibleCombos.map(async (combo) => {
@@ -45,26 +61,24 @@ export const selectCombosStep = async (
         }),
     );
 
-    let selectedComboNames = parseCsv(namesArg);
+    let chosenNames: string[] = [];
 
-    if (!selectedComboNames?.length) {
-        if (!deps.prompts?.checkbox) {
-            throw new Error('Combo selection is required in non-interactive mode. Pass combo names positionally.');
-        } else {
-            const choices = comboChecks.map(({ combo, installationStatus }) => ({
-                name: formatComboChoice(combo),
-                value: combo.id,
-                checked: installationStatus !== 'installed',
-                installationStatus,
-            }));
-            choices.sort((a, b) => Number(a.installationStatus === 'installed') - Number(b.installationStatus === 'installed'));
+    if (!deps.prompts?.checkbox) {
+        throw new Error('Combo selection is required in non-interactive mode. Pass combo names positionally.');
+    } else {
+        const choices = comboChecks.map(({ combo, installationStatus }) => ({
+            name: formatComboChoice(combo),
+            value: combo.id,
+            checked: installationStatus !== 'installed',
+            installationStatus,
+        }));
+        choices.sort((a, b) => Number(a.installationStatus === 'installed') - Number(b.installationStatus === 'installed'));
 
-            selectedComboNames = await deps.prompts.checkbox({
-                message: `Select combos to install for ${targetTool.name}:`,
-                choices: choices.map(({ installationStatus: _installationStatus, ...choice }) => choice),
-            });
-        }
+        chosenNames = await deps.prompts.checkbox({
+            message: `Select combos to install for ${targetTool.name}:`,
+            choices: choices.map(({ installationStatus: _installationStatus, ...choice }) => choice),
+        });
     }
 
-    return selectedComboNames;
+    return chosenNames;
 };

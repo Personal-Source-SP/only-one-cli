@@ -169,4 +169,37 @@ describe('combo command', () => {
             await rm(cwd, { recursive: true, force: true });
         }
     });
+
+    it('handles interactive combo selection gracefully when no compatible combos exist for the scope', async () => {
+        const cwd = await mkdtemp(join(tmpdir(), 'combo-empty-choices-'));
+        const writes: string[] = [];
+
+        try {
+            const program = createProgram({
+                cwd,
+                env: {},
+                fetcher: vi.fn(async () => ({ ok: true, json: async () => ({}) })),
+                stdout: (line) => writes.push(line),
+                prompts: {
+                    select: vi.fn().mockResolvedValue('antigravity'),
+                    checkbox: vi.fn(async (options) => {
+                        if (!options.choices || options.choices.length === 0) {
+                            throw new Error('[checkbox prompt] No selectable choices. All choices are disabled.');
+                        }
+
+                        return [];
+                    }),
+                },
+            });
+
+            await program.parseAsync(['combo', '--tool', 'antigravity'], { from: 'user' });
+
+            const output = writes.join('\n');
+            expect(output).toContain('No compatible combos found for Antigravity in local project mode');
+            expect(output).toContain('Tip: Predefined combos are scoped for global installation. Try running with -g / --global.');
+            expect(output).toContain('No combos selected. Exiting.');
+        } finally {
+            await rm(cwd, { recursive: true, force: true });
+        }
+    });
 });
