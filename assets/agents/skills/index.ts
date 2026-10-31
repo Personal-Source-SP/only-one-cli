@@ -209,12 +209,13 @@ export const SKILLS: SkillManifest[] = [
         skillPath: 'skills/engineering/diagnosing-bugs/SKILL.md',
     },
     {
-        name: 'resolving-merge-conflicts',
-        version: '0.0.2',
+        name: 'resolve-merge-conflicts',
+        version: '0.0.3',
         description: 'Resolve git merge/rebase conflicts hunk by hunk based on intent.',
         source: 'warpdotdev/common-skills',
         sourceType: 'skills.sh',
         skillPath: 'skills/resolve-merge-conflicts/SKILL.md',
+        aliases: ['resolving-merge-conflicts'],
     },
 
     // --- 5. Review & Quality Gates Phase ---
@@ -373,10 +374,10 @@ export const SKILLS: SkillManifest[] = [
     },
     {
         name: 'only-one-conflict',
-        version: '0.0.3',
+        version: '0.0.4',
         description: 'Resolve in-progress git merge or rebase conflicts hunk by hunk based on intent without aborting.',
         sourceType: 'local',
-        requiredSkills: ['resolving-merge-conflicts'],
+        requiredSkills: ['resolve-merge-conflicts'],
     },
     {
         name: 'only-one-pr-git',

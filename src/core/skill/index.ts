@@ -105,13 +105,13 @@ export const installSkills = async (request: {
                 await mkdir(toolSkillsDir, { recursive: true });
                 await mkdir(destPath, { recursive: true });
 
-                const manifest = SKILLS.find((s) => s.name === skillName);
+                const manifest = SKILLS.find((s) => s.name === skillName || s.aliases?.includes(skillName));
 
                 if (manifest?.sourceType === 'skills.sh' && manifest.source) {
                     await installSkillViaSkillsCli({
                         projectDir,
                         source: manifest.source,
-                        skillName,
+                        skillName: manifest.name,
                         selectedTools: [tool],
                         isGlobal,
                     });

@@ -96,10 +96,24 @@ describe('skill registry integrity', () => {
             expect(skill.sourceType).toBe('skills.sh');
         }
 
-        const conflictSkill = SKILLS.find((s) => s.name === 'resolving-merge-conflicts');
+        const conflictSkill = SKILLS.find((s) => s.name === 'resolve-merge-conflicts');
         expect(conflictSkill).toBeDefined();
         expect(conflictSkill?.source).toBe('warpdotdev/common-skills');
         expect(conflictSkill?.sourceType).toBe('skills.sh');
+        expect(conflictSkill?.aliases).toContain('resolving-merge-conflicts');
+    });
+
+    it('ensures all remote skills.sh manifest names match their skillPath directory exactly', () => {
+        const skillsShManifests = SKILLS.filter((s) => s.sourceType === 'skills.sh' && s.skillPath);
+
+        for (const manifest of skillsShManifests) {
+            const pathParts = manifest.skillPath!.split('/');
+            const skillDirName = pathParts[pathParts.length - 2];
+            expect(
+                manifest.name,
+                `Skill manifest name '${manifest.name}' must match directory '${skillDirName}' in skillPath '${manifest.skillPath}'`,
+            ).toBe(skillDirName);
+        }
     });
 
     it('does not ship obsolete subagent-driven-development', () => {

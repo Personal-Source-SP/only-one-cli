@@ -60,6 +60,7 @@ export interface SkillManifest {
     source?: string; // remote repository, e.g. "addyosmani/agent-skills"
     sourceType?: 'github' | 'local' | 'skills.sh';
     skillPath?: string; // path in repo, e.g. "skills/performance-optimization/SKILL.md"
+    aliases?: string[];
     requiredSkills?: string[];
     requiredMcps?: string[];
 }

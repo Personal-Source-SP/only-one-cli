@@ -26,7 +26,7 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'only-one-flow',
-        version: '0.0.17',
+        version: '0.0.18',
         name: 'Only One Universal Flow Setup',
         description:
             'Stack-agnostic end-to-end SDLC and MCP toolkit: Ideation, dual-layer planning, quality gates, security, testing, review, and PR automation',
@@ -60,7 +60,7 @@ export const COMBOS: ComboManifest[] = [
             'doubt-driven-development',
             'ponytail',
             'source-driven-development',
-            'resolving-merge-conflicts',
+            'resolve-merge-conflicts',
             'code-review-and-quality',
             'karpathy-ste100-discipline',
             'anti-tautology-testing',

@@ -51,7 +51,7 @@ Safely reconcile divergent branch changes while preserving the semantic intent o
 
 | Skill | Trigger condition (Use When) | Core Purpose (What It Does) |
 | :--- | :--- | :--- |
-| **`resolving-merge-conflicts`** | In-progress git merge/rebase conflict detected (`<<<<<<<`, `=======`, `>>>>>>>`) | Resolve conflict hunks by tracing intent from git log and diffs, then finish the operation cleanly. |
+| **`resolve-merge-conflicts`** | In-progress git merge/rebase conflict detected (`<<<<<<<`, `=======`, `>>>>>>>`) | Resolve conflict hunks by tracing intent from git log and diffs, then finish the operation cleanly. |
 
 ---
 

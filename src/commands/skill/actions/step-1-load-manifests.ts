@@ -8,7 +8,7 @@ export const loadSkillManifestsStep = (deps: ProgramDeps, pathArg?: string): { p
     const projectDir = resolveProjectDir(deps, pathArg);
     assertProjectDirectory(projectDir);
 
-    const availableSkills = SKILLS.map((s) => s.name);
+    const availableSkills = SKILLS.flatMap((s) => [s.name, ...(s.aliases ?? [])]);
 
     if (!availableSkills?.length) {
         deps.stdout(COLORS.warning('No custom skills available in assets/skills.'));
