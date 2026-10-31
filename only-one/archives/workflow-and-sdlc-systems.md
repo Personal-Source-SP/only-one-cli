@@ -6,7 +6,7 @@ triggers:
   - ".agents/skills/**"
   - "assets/agents/skills/**"
   - "only-one/tasks/**"
-archived_at: 2026-10-31T19:00:00+07:00
+archived_at: 2026-10-31T21:55:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -121,6 +121,13 @@ affected_modules:
     - **`browser-tester`**: Điều hướng qua Playwright MCP, chụp ảnh màn hình lưu file ngoài đĩa, giám sát DevTools console/network, cấm in thô cây DOM.
     - **`api-tester`**: Thẩm định JSON schema, đo độ trễ P95/P99, kiểm tra Idempotency và kịch bản bắn request đồng thời (burst testing) kiểm tra race conditions.
     - Toàn bộ 3 Subagents chỉ trả về bản tóm tắt nén **Verification Digest** (Zero Raw Dump Invariant).
+20. **Vòng Lặp Hoài Nghi Đối Kháng Trong Khám Phá Ý Tưởng (Doubt Cycle Gate via `doubt-driven-development`) ([WF-018](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/workflow.md))**:
+    - Tích hợp Step 1.5 vào quy trình `/only-one-idea`, kích hoạt bắt buộc đối với các đề xuất kỹ thuật phức tạp (branching logic, tích hợp ngoài, luồng bảo mật nhạy cảm, concurrency invariants, hoặc thao tác bất khả nghịch).
+    - Quy trình 5 bước đối kháng (`CLAIM` -> `EXTRACT` -> `DOUBT` -> `RECONCILE` -> `STOP`), chốt chặn tối đa 3 vòng lặp để tránh tê liệt phân tích (Analysis Paralysis).
+    - Triệt tiêu hội chứng nịnh bợ (Sycophancy), bẻ gãy giả định sai lầm trước khi bước vào thiết kế kiến trúc, cho phép `Collaborative Override` khi người dùng chủ động chấp nhận đánh đổi.
+21. **Lá Chắn Ngữ Cảnh Bằng Phân Phối Quy Tắc Tiệm Tiến (Progressive Disclosure Context Shield) ([CORE-010](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/core.md))**:
+    - Chuyển đổi mô hình nạp toàn bộ 5 rules (~5.000 tokens) thành mô hình 2 tầng: Tier 1 Core Safety (`always_on`, < 500 tokens) nạp mặc định cho mọi prompt; Tier 2 Stack/Domain (`model_decision`, có `globs`) chỉ nạp khi thao tác trên các tệp tương ứng.
+    - Ngăn ngừa xung đột tập luật giữa các stack đối kháng (Next.js vs NestJS) và tiết kiệm tài nguyên bộ nhớ đệm ngữ cảnh.
 
 ---
 
@@ -225,6 +232,8 @@ flowchart TD
 - [`test/skills/runtimeVerificationContracts.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/runtimeVerificationContracts.test.ts): Unit tests cho hợp đồng Verification Digest của bộ 3 runtime subagents.
 - [`test/skills/applyReportTemplate.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/applyReportTemplate.test.ts): Unit test kiểm thử cấu trúc schema báo cáo 4 mục và kiểm tra độ dài câu theo tiêu chuẩn ASD-STE100.
 - [`test/skills/worktreeRunner.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/worktreeRunner.test.ts): Unit test cho worktree runner.
+- [`test/packages/doubtDrivenDevelopmentPackage.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/packages/doubtDrivenDevelopmentPackage.test.ts): Unit test kiểm thử hợp đồng remote package doubt-driven-development và quy trình idea.
+- [`test/rules/progressiveDisclosureContracts.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/rules/progressiveDisclosureContracts.test.ts): Unit test kiểm thử hợp đồng phân phối quy tắc tiệm tiến.
 - [`assets/agents/combos/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/combos/index.ts): Tích hợp hooks vào combo `only-one-flow`.
 - Hợp nhất toàn diện các workflows vào hệ thống Agent Skills (`assets/agents/skills/only-one-*`).
 

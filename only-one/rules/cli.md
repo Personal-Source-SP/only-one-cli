@@ -1,6 +1,6 @@
 ---
 domain: cli
-version: 1.4.0
+version: 1.5.0
 triggers:
   - "src/commands/**"
   - "src/core/runtime/**"
@@ -63,5 +63,11 @@ triggers:
 - **MUST_DO**: Verify candidate choice lists have `length > 0` and display actionable guidance before invoking interactive `@inquirer/checkbox` or `@inquirer/select` prompts.
 - **NEVER_DO**: Pass an empty `choices: []` array to `@inquirer/checkbox` or prompts that throw `ValidationError` when no selectable options exist.
 - **RATIONALE**: Inquirer prompts crash fatally with unhandled `ValidationError: [checkbox prompt] No selectable choices` if called with an empty choice set, disrupting developer workflows instead of exiting cleanly with informative instructions.
+
+### CLI-012: Pre-Select Outdated Components in Overwrite Confirmation Prompts
+- **MUST_DO**: Compare existing installed asset versions against incoming manifest versions in `installed.json` lockfile and pre-select `checked: true` with a version diff label (e.g., `[UPDATE: v1 -> v2]`) for outdated components, while providing a non-interactive `--force` (`-f`) flag to bypass prompts and overwrite all existing assets immediately.
+- **NEVER_DO**: Set `checked: false` indiscriminately across all choices when newer versions exist, or require interactive keyboard confirmation when an explicit `--force` flag is supplied.
+- **RATIONALE**: Defaulting all choices to unchecked causes users pressing `Enter` to skip all updates unintentionally; conversely, forcing manual prompt navigation breaks CI/scripted workflows that supply `--force`.
+
 
 

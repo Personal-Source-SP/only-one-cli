@@ -1,6 +1,6 @@
 ---
 domain: core
-version: 1.1.0
+version: 1.2.0
 triggers:
   - "*"
   - "only-one/archives/**"
@@ -48,5 +48,16 @@ triggers:
 - **MUST_DO**: Enforce inward dependency flow (`cli` -> `commands` -> `core`) via architectural boundary lint rules (`custom/architectural-boundaries`).
 - **NEVER_DO**: Import higher-level modules (`src/commands/`, `src/cli/`) into lower-level modules (`src/core/`).
 - **RATIONALE**: Eliminates circular dependencies and ensures core domain logic remains headless, modular, and reusable.
+
+### CORE-009: Canonical Skill Manifest Name and Directory Parity
+- **MUST_DO**: Ensure `SkillManifest.name` matches the canonical upstream directory name exactly when integrating remote skills from `skills.sh`, and register legacy or alternative names in `SkillManifest.aliases` while resolving manifests against both `name` and `aliases`.
+- **NEVER_DO**: Declare a mutated or gerund form in `SkillManifest.name` that diverges from the upstream repository's actual skill directory on GitHub/skills.sh.
+- **RATIONALE**: Upstream `skills add` CLI resolves remote skills by exact folder name matching; divergent identifiers result in fatal `No matching skills found` installation errors.
+
+### CORE-010: Tiered Progressive Disclosure for Agent Rules
+- **MUST_DO**: Categorize agent rules into Tier 1 Core Safety (`alwaysApply: true`, `trigger: 'always_on'`, `< 500` tokens) and Tier 2 Stack/Domain (`alwaysApply: false`, `trigger: 'model_decision'`, with file-matching `globs`), loading specialized rules strictly on demand.
+- **NEVER_DO**: Mark domain-specific or framework-specific rules as `alwaysApply: true`, flooding the agent's context window with irrelevant guidelines during unrelated tasks.
+- **RATIONALE**: Preserves agent context window and token budget, prevents instruction interference between conflicting stacks (e.g. Next.js vs NestJS), and ensures core safety rules remain prominent.
+
 
 

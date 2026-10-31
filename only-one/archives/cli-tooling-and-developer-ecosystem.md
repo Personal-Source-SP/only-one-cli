@@ -9,7 +9,7 @@ triggers:
   - "package.json"
   - "src/core/doctor/**"
   - "src/core/indexing/**"
-archived_at: 2026-10-31T19:17:00+07:00
+archived_at: 2026-10-31T21:55:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -41,6 +41,7 @@ affected_modules:
   3. **Lỗi Nạp ESM Sau Tái Cấu Trúc 3 Domain**: Việc chuyển `assets/` sang 3 domain (`agents/`, `devenv/`, `templates/`) gây lỗi `ERR_MODULE_NOT_FOUND` khi chạy binary CLI do script chuyển đổi path hậu biên dịch (`scripts/postbuild-paths.cjs`) dùng phép thế tiền tố phẳng (`@assets/` -> `../../assets/`) không phản ánh cấu trúc phân cấp.
   4. **Thiếu Phân Tích Tĩnh & Nguy Cơ Rò Rỉ Lỗi Runtime**: Dự án chỉ dựa vào Prettier (`format:check`) để định dạng khoảng trắng, thiếu kiểm tra tĩnh cho imports lộn xộn, thiếu `import type`, nguy cơ floating promises không được await, và nguy cơ phụ thuộc vòng giữa các tầng module (`src/core/` import ngược từ `src/commands/`).
   5. **Crash Khi Hiển Thị Checkbox Prompt Trống Lựa Chọn**: Khi gọi `@inquirer/checkbox` mà mảng `choices: []` rỗng (ví dụ: chạy `only-one combo` ở chế độ local project trong khi toàn bộ combos đều có `scope: 'global'`), `@inquirer/checkbox` ném ngoại lệ `ValidationError: [checkbox prompt] No selectable choices` làm sập tiến trình CLI.
+  6. **Bỏ Qua Cập Nhật Khi Bấm Enter & Thiếu Cờ Force Sync Trong Combos**: Checkbox ghi đè tài nguyên trong `confirmComboOverwriteStep` trước đây mặc định `checked: false` cho toàn bộ tài sản đã tồn tại; khi người dùng bấm phím Enter theo quán tính, `overwriteList` rỗng và toàn bộ bản cập nhật bị bỏ qua (`skipped`). Lệnh combo cũng thiếu cờ `-f, --force` để tự động ghi đè không qua prompt trong các quy trình CI/scripted.
 - **Giá trị Cốt lõi (Value)**:
   - **Tinh gọn Tooling & Đóng gói Sạch**: Thu gọn `scripts/` về đúng các dev tools cần thiết (`publish.js`, `bump-asset.ts`, `build-go.js`, `postbuild-paths.cjs`) và thu gọn danh sách đóng gói npm package về đúng 2 thư mục: `["dist", "assets"]`.
   - **Phẫu thuật Loại bỏ Triệt để (Surgical Purge)**: Xóa bỏ 100% mã nguồn, doctor checks, container runners và metadata của CocoIndex và Timesheet workflows/MCPs, giúp lệnh `doctor` siêu tốc và không còn phụ thuộc ngoài.
@@ -48,6 +49,7 @@ affected_modules:
   - **Tách Biệt Linter Nội Bộ & Enterprise Ruleset**: Khởi tạo thư mục `eslint-rules/` ở root dự án (bảo vệ tuyệt đối `assets/` không bị pha trộn tooling nội bộ), kích hoạt bộ quy tắc TypeScript Enterprise (`simple-import-sort`, `consistent-type-imports`, `padding-line-between-statements`), cùng 3 custom rules nội bộ (`async-safety`, `interface-member-ordering`, `architectural-boundaries`).
   - **Chốt Chặn Pre-Build Lint Gate**: Tích hợp `npm run lint` vào quy trình `npm run build` để chặn đứng mã nguồn không đạt chuẩn trước khi biên dịch artifact.
   - **Chốt Chặn Kiểm Tra Lựa Chọn Trước Khi Hiển Thị Prompt (Empty Choices Guard)**: Kiểm tra sớm `compatibleCombos.length` trước khi gọi prompt. Nếu rỗng, hiển thị thông báo hướng dẫn người dùng sử dụng cờ `-g` / `--global` và thoát êm đẹp với mã 0 thay vì làm sập CLI.
+  - **Cơ Chế Ghi Đè Thông Minh & Force Sync ([CLI-012](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/cli.md))**: Bổ sung cờ `-f, --force` cho lệnh combo để bypass toàn bộ prompt; trong chế độ tương tác, tự động pre-select `checked: true` cho các thành phần có phiên bản cũ hơn manifest kèm huy hiệu `[UPDATE: old -> new]`.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
 - **Surgical Purge & Clean Seams**:
@@ -117,8 +119,9 @@ flowchart TD
   - `npm run lint` hoàn thành với **0 lỗi vi phạm** (178 warnings không chặn build).
   - Tự động sắp xếp imports và chuẩn hóa `import type` trên toàn bộ codebase qua `npm run lint:fix`.
 - **Unit Test Suite**:
-  - `npm test` đạt **100% Passed**: 75 test suites passed, 334 unit tests passed, 4 skipped, 0 failures.
+  - `npm test` đạt **100% Passed**: 78 test suites passed, 347 unit tests passed, 4 skipped, 0 failures.
   - Test case `handles interactive combo selection gracefully when no compatible combos exist for the scope` verified 100% passed.
+  - Test suite `test/combo/smartOverwriteSync.test.ts` verified 100% passed (force flag bypass, outdated pre-select, and rules manifest).
   - Test suites cho custom linter rules (`test/core/linter/*.test.ts`) đạt 100% Passed.
 - **Postbuild Verification**:
   - `npm run build` thực thi trơn tru: kích hoạt lint gate $\rightarrow$ tsc compile $\rightarrow$ postbuild-paths.cjs transform.

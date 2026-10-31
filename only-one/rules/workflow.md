@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.5.0
+version: 1.6.0
 triggers:
   - ".agents/skills/only-one-*/**"
   - "assets/agents/skills/only-one-*/**"
@@ -93,4 +93,10 @@ triggers:
 - **MUST_DO**: Isolate runtime verification (terminal, browser, API) in dedicated subagents (`terminal-runner`, `browser-tester`, `api-tester`), strip ANSI escape sequences, persist UI screenshots to disk, and return only structured Verification Digests.
 - **NEVER_DO**: Stream raw terminal escape sequences, raw HTML/DOM trees, base64 image strings, or unbounded JSON payloads into the main orchestrator transcript.
 - **RATIONALE**: Shields orchestrator context from token flooding and prevents context window exhaustion during integration testing.
+
+### WF-018: Adversarial Doubt Cycle Gate in Idea Refinement
+- **MUST_DO**: Subject non-trivial technical proposals (complex branching logic, external integrations, security-sensitive flows, concurrency invariants, or irreversible operations) in `only-one-idea` to an adversarial 5-step Doubt Cycle (`CLAIM` -> `EXTRACT` -> `DOUBT` -> `RECONCILE` -> `STOP`), capping at a 3-cycle ceiling before architectural decision finalization.
+- **NEVER_DO**: Accept non-trivial architectural claims or unstated user assumptions uncritically without adversarial stress-testing, or allow infinite recursive doubt cycles beyond 3 iterations.
+- **RATIONALE**: Prevents sycophancy (AI uncritically agreeing with suboptimal designs) while enforcing a strict 3-iteration circuit breaker to prevent analysis paralysis.
+
 

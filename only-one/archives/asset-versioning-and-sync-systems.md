@@ -6,7 +6,7 @@ triggers:
   - "assets/**"
   - "src/core/assets/**"
   - "src/commands/update/**"
-archived_at: 2026-10-31T19:00:00+07:00
+archived_at: 2026-10-31T21:55:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -51,6 +51,15 @@ affected_modules:
     - Phân bổ 4 Subagents chuyên trách (`codebase-scout`, `terminal-runner`, `browser-tester`, `api-tester`) vào các combo toàn cục (`only-one-flow`, `frontend-flow`, `backend-flow`).
     - Mở rộng `resolveToolDestinationPaths` hỗ trợ asset type `subagents` ở chế độ Global: tự động định tuyến tới `~/.gemini/config/agents/<name>.md` cho Antigravity, `~/.claude/agents/<name>.md` cho Claude Code, và `~/.cursor/agents/` cho Cursor.
     - Cập nhật engine cài đặt combo `src/core/combo/index.ts` và báo cáo `COMBO REPORT` hiển thị trạng thái cài đặt toàn cục (`success`, `skipped`, `failed`).
+  - **Phân Tầng Phân Phối Quy Tắc Tiệm Tiến (Rules Progressive Disclosure & Context Shield)**:
+    - Giải quyết vấn đề nhét toàn bộ 5.000 tokens quy tắc vào mọi lượt prompt bằng cách phân tách quy tắc thành 2 tầng: Tier 1 Core Safety (`alwaysApply: true`, `trigger: 'always_on'`, dung lượng < 500 tokens) và Tier 2 Stack/Domain (`alwaysApply: false`, `trigger: 'model_decision'`, đi kèm `globs` so khớp tệp).
+    - Đồng bộ 100% metadata frontmatter trên đĩa với manifest khai báo và nâng cấp phiên bản toàn diện (`0.0.2` cho core rules, `0.0.3` cho Karpathy).
+  - **Cơ Chế Ghi Đè Thông Minh Cho Combos (Smart Overwrite & Outdated Pre-selection Engine)**:
+    - Nâng cấp `checkExistingComboComponents` đọc trực tiếp `installed.json` qua `readInstalledLockfile` để so sánh phiên bản Single Source of Truth thay vì quét đĩa regex thủ công.
+    - Tự động gắn cờ `isOutdated: true` và `versionDiff: 'old -> new'` cho các thành phần đã lỗi thời trên đĩa.
+    - Chế độ tương tác tự động tích chọn `checked: true` cho thành phần có bản cập nhật mới, hiển thị nhãn `[UPDATE: v1 -> v2]`, cho phép người dùng chỉ cần bấm `Enter` là nâng cấp thành công mà không vô tình bỏ qua các bản cập nhật.
+    - Cung cấp cờ `-f, --force` cho lệnh combo để tự động ghi đè 100% thành phần mà không cần hiển thị prompt, phục vụ kịch bản CI/CD và tự động hóa.
+    - Bổ sung trường `rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline']` và package `doubt-driven-development` vào combo `only-one-flow` (version `0.0.19`).
   - **Developer Tooling & Zero-Bypass CI Gate**: Cung cấp `scripts/bump-asset.ts` (`pnpm asset:bump <type> <id>`) và bài test `test/core/assets/version-gate.test.ts` chặn commit vi phạm.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
@@ -127,6 +136,8 @@ flowchart TD
   - `test/commands/update/update.test.ts` passed.
   - `test/core/combo.test.ts` passed.
   - `test/combo/installComboSubagents.test.ts` passed (100% verified subagents global distribution).
+  - `test/combo/smartOverwriteSync.test.ts` passed (100% verified force flag bypass, outdated pre-select, and rules manifest).
+  - `test/rules/progressiveDisclosureContracts.test.ts` passed (100% verified Tier 1/2 metadata separation and frontmatter).
   - `test/core/skill-lockfile.test.ts` passed.
   - `test/commands/skill/skill.test.ts` passed.
 - **Build**: `npm run format:check && npm run build` sạch 100% (0 errors).
