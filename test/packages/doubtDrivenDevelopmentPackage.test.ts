@@ -23,7 +23,7 @@ describe('Doubt-Driven Development External Package Contract', () => {
         const combo = COMBOS.find((c) => c.id === 'only-one-flow');
 
         expect(combo).toBeDefined();
-        expect(combo?.version).toBe('0.0.18');
+        expect(combo?.version).toBe('0.0.19');
         expect(combo?.packages).toContain('doubt-driven-development');
     });
 

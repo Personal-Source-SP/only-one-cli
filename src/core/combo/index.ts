@@ -6,6 +6,7 @@ import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
 import { type AgentToolOption, resolveToolDestinationPaths } from '@/core/agent/tools.js';
+import { readInstalledLockfile } from '@/core/assets/lockfile.js';
 import { checkExistingRules, installRules, type RuleInstallResult } from '@/core/rule/index.js';
 
 export interface WorkflowInstallResult {
@@ -81,6 +82,8 @@ export interface ExistingComboComponent {
     exists: boolean;
     status: ComboComponentStatus;
     meta: any;
+    isOutdated?: boolean;
+    versionDiff?: string;
 }
 
 export type ComboInstallationStatus = 'installed' | 'missing' | 'partial';
@@ -308,6 +311,7 @@ export const checkExistingComboComponents = async (params: {
 }): Promise<ExistingComboComponent[]> => {
     const { projectDir, homeDir, platform, selectedTools, combo, isGlobal = false } = params;
     const results: ExistingComboComponent[] = [];
+    const lockfile = await readInstalledLockfile(projectDir, isGlobal);
 
     const plan = buildComboDependencyPlan(combo, comboRegistries());
 
@@ -391,6 +395,13 @@ export const checkExistingComboComponents = async (params: {
         const ruleChecks = await checkExistingRules(projectDir, ruleTargets, combo.rules, RULES, isGlobal);
 
         for (const check of ruleChecks) {
+            const installedRule = lockfile.installed?.rules?.[check.ruleId];
+            const manifestRule = RULES.find((r) => r.id === check.ruleId);
+            const isOutdated = Boolean(
+                check.exists && installedRule?.version && manifestRule?.version && installedRule.version !== manifestRule.version,
+            );
+            const versionDiff = isOutdated ? `${installedRule?.version} -> ${manifestRule?.version}` : undefined;
+
             results.push({
                 type: 'rule',
                 id: `rule:${check.toolId}:${check.ruleId}`,
@@ -400,6 +411,8 @@ export const checkExistingComboComponents = async (params: {
                 exists: check.exists,
                 status: check.exists ? 'installed' : 'missing',
                 meta: { ruleId: check.ruleId, toolId: check.toolId },
+                isOutdated,
+                versionDiff,
             });
         }
     }

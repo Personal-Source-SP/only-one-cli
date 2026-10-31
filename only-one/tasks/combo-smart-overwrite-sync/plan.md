@@ -1,9 +1,9 @@
 ---
-status: planned
+status: done
 slug: combo-smart-overwrite-sync
 created_at: 2026-10-31T14:26:00.000Z
 started_at: 2026-10-31
-completed_at: ~
+completed_at: 2026-10-31
 pr_url: ~
 branch: ~
 ---
@@ -26,7 +26,7 @@ only-one-cli/
 ├── src/core/combo/
 │   └── [MODIFY] index.ts                                        # Bổ sung isOutdated, versionDiff vào ExistingComboComponent
 └── assets/agents/combos/
-    └── [MODIFY] index.ts                                        # Bổ sung rules vào combo only-one-flow và tăng version 0.0.18
+    └── [MODIFY] index.ts                                        # Bổ sung rules vào combo only-one-flow và tăng version 0.0.19
 ```
 
 ## Section 2. Story Board (User Journey & Feature Scenarios)
@@ -54,28 +54,34 @@ flowchart LR
 
 ### 3.1. Concept Coverage & Traceability Matrix (Đối soát Tiêu chí Concept)
 
-| Tiêu chí Concept | Mã Test Case | Hạng mục kiểm chứng | Kết quả kỳ vọng |
-| :--- | :--- | :--- | :--- |
-| Cờ `--force` (`-f`) | `TEST-FORCE-001` | Chạy `confirmComboOverwriteStep` với `force = true` | Không gọi prompt checkbox, trả về toàn bộ ID tồn tại |
-| Smart Outdated Pre-select | `TEST-FORCE-002` | Khởi tạo choices trong `step-4-confirm-overwrite` | Thành phần có `isOutdated: true` có `checked: true` |
-| Rules trong `only-one-flow` | `TEST-FORCE-003` | Manifest combo `only-one-flow` trong `COMBOS` | Chứa các core rules và version là `0.0.18` |
+| Tiêu chí Concept | Mã Test Case | Hạng mục kiểm chứng | Kết quả kỳ vọng | Trạng thái |
+| :--- | :--- | :--- | :--- | :--- |
+| Cờ `--force` (`-f`) | `TEST-FORCE-001` | Chạy `confirmComboOverwriteStep` với `force = true` | Không gọi prompt checkbox, trả về toàn bộ ID tồn tại | [x] PASS |
+| Smart Outdated Pre-select | `TEST-FORCE-002` | Khởi tạo choices trong `step-4-confirm-overwrite` | Thành phần có `isOutdated: true` có `checked: true` | [x] PASS |
+| Rules trong `only-one-flow` | `TEST-FORCE-003` | Manifest combo `only-one-flow` trong `COMBOS` | Chứa các core rules và version là `0.0.19` | [x] PASS |
 
 ### 3.2. Test Case Specification Matrix (Ma trận Test Case Chi tiết)
 
-| Test ID | Tên Kiểm thử | Loại Kiểm thử | Điều kiện Tiền đề | Các Bước Thực hiện | Kết quả Kỳ vọng |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `TEST-FORCE-001` | Force Flag Bypass | Unit | Mock deps.prompts | Gọi `confirmComboOverwriteStep` với tham số `force = true` | `prompts.checkbox` không được gọi, mảng kết quả đầy đủ ID |
-| `TEST-FORCE-002` | Outdated Pre-selection | Unit | Mock deps.prompts | Gọi `confirmComboOverwriteStep` ở chế độ interactive | Thuộc tính `checked` phản ánh chính xác trạng thái `isOutdated` |
-| `TEST-FORCE-003` | Universal Flow Rules | Unit | Mảng COMBOS đã nạp | Tìm combo `only-one-flow` | `rules` chứa `context-and-tools`, `execution-terminal`, `karpathy-ste100-discipline` |
+| Test ID | Tên Kiểm thử | Loại Kiểm thử | Điều kiện Tiền đề | Các Bước Thực hiện | Kết quả Kỳ vọng | Kết quả Thực tế |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `TEST-FORCE-001` | Force Flag Bypass | Unit | Mock deps.prompts | Gọi `confirmComboOverwriteStep` với tham số `force = true` | `prompts.checkbox` không được gọi, mảng kết quả đầy đủ ID | [x] PASS |
+| `TEST-FORCE-002` | Outdated Pre-selection | Unit | Mock deps.prompts | Gọi `confirmComboOverwriteStep` ở chế độ interactive | Thuộc tính `checked` phản ánh chính xác trạng thái `isOutdated` | [x] PASS |
+| `TEST-FORCE-003` | Universal Flow Rules | Unit | Mảng COMBOS đã nạp | Tìm combo `only-one-flow` | `rules` chứa `context-and-tools`, `execution-terminal`, `karpathy-ste100-discipline` | [x] PASS |
 
 ### Automated Test Execution Commands (Lệnh Kiểm thử Tự động Tập trung)
 
 ```bash
 # Kiểm thử toàn diện cơ chế Smart Overwrite và cờ --force
 npx vitest run test/combo/smartOverwriteSync.test.ts
+# Evidence: PASS (1 test file, 3 tests passed in 11ms)
 
 # Kiểm thử hồi quy các lệnh combo
-npx vitest run test/commands/combo/combo.test.ts test/combo/installComboSubagents.test.ts
+npx vitest run test/commands/combo/combo.test.ts test/combo/installComboSubagents.test.ts test/packages/doubtDrivenDevelopmentPackage.test.ts
+# Evidence: PASS (3 test files, 16 tests passed in 203ms)
+
+# Kiểm thử toàn diện toàn bộ repository
+npm test
+# Evidence: PASS (78 test files passed, 347 tests passed in 14.57s)
 ```
 
 ## Section 4. File Changes
@@ -116,7 +122,7 @@ flowchart TD
 
 ### 1. `[NEW]` `test/combo/smartOverwriteSync.test.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Task Type**: `code`
 - **Wave**: `1 (Track QA)`
 - **Depends On**: None.
@@ -127,10 +133,10 @@ flowchart TD
 > **Action**: Tạo mới bộ kiểm thử tự động xác minh cờ force, cơ chế pre-select outdated, và manifest combo.
 
 **Test checklist**
-- [ ] Bắt buộc theo đúng tiêu chí nghiệm thu.
-- [ ] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
-- [ ] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
-- [ ] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
+- [x] Bắt buộc theo đúng tiêu chí nghiệm thu.
+- [x] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
+- [x] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
+- [x] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
 - **Decision**: Viết test contract độc lập bằng Vitest kiểm chứng trực tiếp prompt bypass và manifest properties.
 - **Rejected alternative**: Chỉ test thủ công bằng gõ lệnh terminal; bị từ chối vì thiếu tính lặp lại tự động.
 
@@ -218,7 +224,7 @@ flowchart TD
 
 ### 2. `[MODIFY]` `src/commands/combo/types.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Task Type**: `code`
 - **Wave**: `2 (Track Dev)`
 - **Depends On**: Task 1.
@@ -229,10 +235,10 @@ flowchart TD
 > **Action**: Khai báo thuộc tính force tùy chọn trong interface ComboCommandOptions.
 
 **Ponytail checklist**
-- [ ] Bắt buộc theo đúng tiêu chí nghiệm thu.
-- [ ] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
-- [ ] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
-- [ ] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
+- [x] Bắt buộc theo đúng tiêu chí nghiệm thu.
+- [x] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
+- [x] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
+- [x] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
 - **Decision**: Thêm trực tiếp `force?: boolean` vào options interface.
 - **Rejected alternative**: Tạo interface mới; bị từ chối vì không cần thiết.
 
@@ -246,7 +252,7 @@ flowchart TD
 
 ### 3. `[MODIFY]` `src/commands/combo/command.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Task Type**: `code`
 - **Wave**: `2 (Track Dev)`
 - **Depends On**: Task 1.
@@ -257,10 +263,10 @@ flowchart TD
 > **Action**: Thêm tùy chọn dòng lệnh `-f, --force` và truyền cờ vào bước xác nhận ghi đè.
 
 **Ponytail checklist**
-- [ ] Bắt buộc theo đúng tiêu chí nghiệm thu.
-- [ ] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
-- [ ] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
-- [ ] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
+- [x] Bắt buộc theo đúng tiêu chí nghiệm thu.
+- [x] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
+- [x] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
+- [x] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
 - **Decision**: Đăng ký cờ `-f, --force` chuẩn của Commander và truyền xuống action.
 - **Rejected alternative**: Bỏ qua Commander và parse argv thủ công; bị từ chối vì vi phạm kiến trúc.
 
@@ -282,7 +288,7 @@ flowchart TD
 
 ### 4. `[MODIFY]` `src/core/combo/index.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Task Type**: `code`
 - **Wave**: `3 (Track Dev)`
 - **Depends On**: Task 2, Task 3.
@@ -293,10 +299,10 @@ flowchart TD
 > **Action**: Mở rộng ExistingComboComponent và tính toán cờ isOutdated khi kiểm tra thành phần đã tồn tại.
 
 **Ponytail checklist**
-- [ ] Bắt buộc theo đúng tiêu chí nghiệm thu.
-- [ ] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
-- [ ] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
-- [ ] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
+- [x] Bắt buộc theo đúng tiêu chí nghiệm thu.
+- [x] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
+- [x] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
+- [x] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
 - **Decision**: Sử dụng `readInstalledLockfile` có sẵn để so sánh phiên bản Single Source of Truth.
 - **Rejected alternative**: Đọc đĩa quét regex thủ công; bị từ chối vì lockfile đã lưu sẵn phiên bản chuẩn.
 
@@ -335,7 +341,7 @@ flowchart TD
 
 ### 5. `[MODIFY]` `src/commands/combo/actions/step-4-confirm-overwrite.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Task Type**: `code`
 - **Wave**: `4 (Track Dev)`
 - **Depends On**: Task 4.
@@ -346,10 +352,10 @@ flowchart TD
 > **Action**: Nâng cấp confirmComboOverwriteStep xử lý cờ force và tự động tích chọn các mục có bản cập nhật mới.
 
 **Ponytail checklist**
-- [ ] Bắt buộc theo đúng tiêu chí nghiệm thu.
-- [ ] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
-- [ ] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
-- [ ] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
+- [x] Bắt buộc theo đúng tiêu chí nghiệm thu.
+- [x] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
+- [x] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
+- [x] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
 - **Decision**: Tự động chọn sẵn các thành phần lỗi thời giúp người dùng chỉ cần bấm Enter để nâng cấp.
 - **Rejected alternative**: Ép ghi đè toàn bộ kể cả khi không outdated; bị từ chối vì vi phạm quyền kiểm soát của người dùng ở chế độ interactive.
 
@@ -385,7 +391,7 @@ flowchart TD
 
 ### 6. `[MODIFY]` `assets/agents/combos/index.ts`
 
-- **Status**: `[ ]`
+- **Status**: `[x]`
 - **Task Type**: `code`
 - **Wave**: `4 (Track Dev)`
 - **Depends On**: Task 4.
@@ -396,18 +402,18 @@ flowchart TD
 > **Action**: Bổ sung trường rules vào combo only-one-flow và tăng version của combo.
 
 **Ponytail checklist**
-- [ ] Bắt buộc theo đúng tiêu chí nghiệm thu.
-- [ ] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
-- [ ] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
-- [ ] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
+- [x] Bắt buộc theo đúng tiêu chí nghiệm thu.
+- [x] Đã rà soát code hiện có, thư viện chuẩn và dependencies.
+- [x] Không tạo logic trùng lặp hoặc điểm mở rộng suy đoán.
+- [x] Diff tối thiểu, đảm bảo an toàn và tính đúng đắn.
 - **Decision**: Đưa 3 core safety & quality rules vào combo universal flow để luôn đồng bộ quy tắc cho IDE.
 - **Rejected alternative**: Yêu cầu người dùng tự cài thêm combo standard; bị từ chối vì gây trải nghiệm phân mảnh.
 
 ```diff
 @@ -28,3 +28,3 @@
          id: 'only-one-flow',
--        version: '0.0.17',
-+        version: '0.0.18',
+-        version: '0.0.18',
++        version: '0.0.19',
          name: 'Only One Universal Flow Setup',
 @@ -34,2 +34,3 @@
          mcps: ['fetch', 'tavily', 'github', 'postgres', 'playwright-browser'],

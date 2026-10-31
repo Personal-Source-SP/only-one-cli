@@ -10,6 +10,7 @@ export const confirmComboOverwriteStep = async (
     combo: ExtendedComboManifest,
     targetTools: AgentToolOption[],
     isGlobal = false,
+    force = false,
 ): Promise<string[]> => {
     const checks = await checkExistingComboComponents({
         projectDir,
@@ -21,15 +22,20 @@ export const confirmComboOverwriteStep = async (
     });
 
     const alreadyExisting = checks.filter((c) => c.exists);
+
+    if (force) {
+        return alreadyExisting.map((c) => c.id);
+    }
+
     let overwriteList: string[] = [];
 
     if (alreadyExisting.length > 0 && deps.prompts?.checkbox) {
         overwriteList = await deps.prompts.checkbox({
             message: `The following components in combo '${combo.name}' already exist. Select which ones you want to overwrite/reinstall:`,
             choices: alreadyExisting.map((c) => ({
-                name: c.label,
+                name: c.isOutdated && c.versionDiff ? `${c.label} [UPDATE: ${c.versionDiff}]` : c.label,
                 value: c.id,
-                checked: false,
+                checked: Boolean(c.isOutdated),
             })),
         });
     }

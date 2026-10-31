@@ -25,6 +25,7 @@ export function createComboCommand(deps: ProgramDeps): Command {
         .option('--tool <tools>', 'Target IDE/tool ID')
         .option('--no-ignore', 'Skip updating the .gitignore file')
         .option('-g, --global', 'Apply combo components globally to user IDE config directories (~/.only-one)')
+        .option('-f, --force', 'Force overwrite all existing combo components without prompt')
         .action(async (pathArg: string | undefined, namesArg: string | undefined, options: ComboCommandOptions) => {
             const targetDir = options.global ? homedir() : pathArg;
             const { projectDir, availableCombos } = await loadComboManifestsStep(deps, targetDir);
@@ -72,7 +73,14 @@ export function createComboCommand(deps: ProgramDeps): Command {
 
                 deps.stdout(`\nProcessing combo: ${COLORS.primary(combo.name)}...`);
 
-                const overwriteList = await confirmComboOverwriteStep(deps, projectDir, combo, targetTools, Boolean(options.global));
+                const overwriteList = await confirmComboOverwriteStep(
+                    deps,
+                    projectDir,
+                    combo,
+                    targetTools,
+                    Boolean(options.global),
+                    Boolean(options.force),
+                );
                 await executeAndReportComboStep(deps, projectDir, combo, targetTools, overwriteList, options, ignoreTargets);
             }
         });
