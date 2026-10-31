@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { cp, readdir, rm } from 'node:fs/promises';
+import { cp, mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
@@ -103,6 +103,7 @@ export interface ComboInstallResult {
     workflows: WorkflowInstallResult[];
     mcps: { ideId: string; mcpId: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
     hooks?: { name: string; status: 'success' | 'failed' }[];
+    subagents?: { toolId: string; subagentName: string; status: 'success' | 'skipped' | 'failed'; error?: string }[];
 }
 
 export interface ComboAssetRegistries {
@@ -469,6 +470,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
         configs: [],
         rules: [],
         skills: [],
+        subagents: [],
         workflows: [],
         mcps: [],
     };
@@ -711,6 +713,38 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
             }));
         } catch (err: any) {
             deps.stdout(`Warning: Failed to install hooks: ${err.message}`);
+        }
+    }
+
+    // 9. Subagents
+    if (combo.subagents && combo.subagents.length > 0 && selectedTools.length > 0) {
+        const subagentsDir = join(resolvePackageRoot(import.meta.url), 'assets/agents/subagents');
+
+        for (const subagentName of combo.subagents) {
+            const srcFile = join(subagentsDir, `${subagentName}.md`);
+
+            for (const tool of selectedTools) {
+                const targetDir = isGlobal ? homeDir : projectDir;
+                const destFolder = resolveToolDestinationPaths(tool, 'subagents', targetDir, isGlobal);
+                const destFile = join(destFolder, `${subagentName}.md`);
+
+                try {
+                    await mkdir(destFolder, { recursive: true });
+                    await cp(srcFile, destFile);
+                    results.subagents!.push({
+                        toolId: tool.value,
+                        subagentName,
+                        status: 'success',
+                    });
+                } catch (err: any) {
+                    results.subagents!.push({
+                        toolId: tool.value,
+                        subagentName,
+                        status: 'failed',
+                        error: err.message,
+                    });
+                }
+            }
         }
     }
 

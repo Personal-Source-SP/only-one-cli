@@ -93,6 +93,18 @@ export const executeAndReportComboStep = async (
         }
     }
 
+    if (results.subagents?.length) {
+        deps.stdout('\nSubagents:');
+
+        for (const s of results.subagents) {
+            const toolName = targetTools.find((t) => t.value === s.toolId)?.name || s.toolId;
+            const statusColor = s.status === 'success' ? COLORS.success : s.status === 'skipped' ? COLORS.dim : COLORS.error;
+            deps.stdout(
+                `  - ${COLORS.secondary(s.subagentName)} in ${COLORS.primary(toolName)}: ${statusColor(s.status)}${s.error ? ` (${s.error})` : ''}`,
+            );
+        }
+    }
+
     if (results.mcps?.length) {
         deps.stdout('\nMCP Configurations:');
 

@@ -15,7 +15,7 @@ export type AgentToolOption = {
 
 export function resolveToolDestinationPaths(
     tool: AgentToolOption,
-    assetType: 'skills' | 'workflows' | 'rules',
+    assetType: 'skills' | 'workflows' | 'rules' | 'subagents',
     targetDir: string,
     isGlobal = false,
 ): string {
@@ -28,6 +28,14 @@ export function resolveToolDestinationPaths(
     if (assetType === 'skills') return join(targetDir, effectiveSkillsDir, 'skills');
 
     if (assetType === 'workflows') return join(targetDir, effectiveSkillsDir, 'workflows');
+
+    if (assetType === 'subagents') {
+        if (tool.value === 'claude') {
+            return join(targetDir, isGlobal ? '.claude' : tool.skillsDir || '.claude', 'agents');
+        }
+
+        return join(targetDir, effectiveSkillsDir, 'agents');
+    }
 
     return join(targetDir, effectiveRulesDir);
 }

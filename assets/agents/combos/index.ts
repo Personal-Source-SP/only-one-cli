@@ -11,6 +11,7 @@ export const COMBOS: ComboManifest[] = [
         packages: ['ui-ux-pro-max-cli'],
         skills: ['only-one-nextjs-development'],
         rules: ['next-architecture-stack'],
+        subagents: ['browser-tester', 'codebase-scout'],
     },
     {
         id: 'backend-flow',
@@ -21,6 +22,7 @@ export const COMBOS: ComboManifest[] = [
         supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
         skills: ['only-one-nestjs-development'],
         rules: ['nest-architecture-stack'],
+        subagents: ['api-tester', 'terminal-runner', 'codebase-scout'],
     },
     {
         id: 'only-one-flow',
@@ -30,6 +32,12 @@ export const COMBOS: ComboManifest[] = [
         scope: 'global',
         supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
         mcps: ['fetch', 'tavily', 'github', 'postgres', 'playwright-browser'],
+        subagents: [
+            'codebase-scout',
+            'terminal-runner',
+            'browser-tester',
+            'api-tester',
+        ],
         skills: [
             'i-have-adhd',
             'grill-with-docs',
