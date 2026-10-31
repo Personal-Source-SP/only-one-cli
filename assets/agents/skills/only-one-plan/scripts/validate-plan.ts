@@ -88,6 +88,13 @@ export function validatePlan(content: string): PlanValidationResult {
         if (!/-\s*\*\*Status\*\*:/i.test(singleBlock)) warnings.push(`Task ${idx + 1} (${filePath}): Missing Status`);
         if (!/-\s*\*\*Depends On\*\*:/i.test(singleBlock)) warnings.push(`Task ${idx + 1} (${filePath}): Missing Depends On`);
 
+        const waveMatch = singleBlock.match(/-\s*\*\*Wave\*\*:\s*`?(\d+)(?:\s*\(([^)]+)\))?`?/i);
+        if (!waveMatch) {
+            warnings.push(`Task ${idx + 1} (${filePath}): Missing Wave metadata (defaulting to Wave 1 sequential)`);
+        } else if (parseInt(waveMatch[1], 10) <= 0) {
+            errors.push(`Task ${idx + 1} (${filePath}): Invalid Wave number (must be >= 1)`);
+        }
+
         const taskTypeMatch = singleBlock.match(/-\s*\*\*Task Type\*\*:\s*`?(code|non-code)`?/i);
         if (!taskTypeMatch) {
             errors.push(`Task ${idx + 1} (${filePath}): Missing or invalid Task Type (must be 'code' or 'non-code')`);
@@ -101,6 +108,54 @@ export function validatePlan(content: string): PlanValidationResult {
         }
 
         if (!/```diff[\s\S]*?```/i.test(singleBlock)) errors.push(`Task ${idx + 1} (${filePath}): Missing Git Unified Diff block`);
+    });
+
+    const filesByWave = new Map<number, Set<string>>();
+    taskMatches.forEach((match, idx) => {
+        const filePath = match[2].trim();
+        const startIdx = match.index!;
+        const endIdx = idx + 1 < taskMatches.length ? taskMatches[idx + 1].index! : sFileContent.length;
+        const singleBlock = sFileContent.slice(startIdx, endIdx);
+        const waveMatch = singleBlock.match(/-\s*\*\*Wave\*\*:\s*`?(\d+)/i);
+        const waveNum = waveMatch ? parseInt(waveMatch[1], 10) : 1;
+
+        if (!filesByWave.has(waveNum)) filesByWave.set(waveNum, new Set());
+        const waveFiles = filesByWave.get(waveNum)!;
+        if (waveFiles.has(filePath)) {
+            errors.push(`Task ${idx + 1} (${filePath}): Multiple tasks in Wave ${waveNum} target the same file (concurrency race condition)`);
+        } else {
+            waveFiles.add(filePath);
+        }
+    });
+
+    taskMatches.forEach((match, idx) => {
+        const filePath = match[2].trim();
+        const startIdx = match.index!;
+        const endIdx = idx + 1 < taskMatches.length ? taskMatches[idx + 1].index! : sFileContent.length;
+        const singleBlock = sFileContent.slice(startIdx, endIdx);
+        const waveMatch = singleBlock.match(/-\s*\*\*Wave\*\*:\s*`?(\d+)/i);
+        const currentWave = waveMatch ? parseInt(waveMatch[1], 10) : 1;
+
+        const depMatch = singleBlock.match(/-\s*\*\*Depends On\*\*:\s*`?([^`\r\n]+)`?/i);
+        if (depMatch && !/none/i.test(depMatch[1])) {
+            const depString = depMatch[1];
+            const depTaskNumMatches = [...depString.matchAll(/(?:###\s*|Task\s*)(\d+)/gi)];
+            depTaskNumMatches.forEach((depNumMatch) => {
+                const depIdx = parseInt(depNumMatch[1], 10) - 1;
+                if (depIdx >= 0 && depIdx < taskMatches.length) {
+                    const depStart = taskMatches[depIdx].index!;
+                    const depEnd = depIdx + 1 < taskMatches.length ? taskMatches[depIdx + 1].index! : sFileContent.length;
+                    const depBlock = sFileContent.slice(depStart, depEnd);
+                    const depWaveMatch = depBlock.match(/-\s*\*\*Wave\*\*:\s*`?(\d+)/i);
+                    const depWave = depWaveMatch ? parseInt(depWaveMatch[1], 10) : 1;
+                    if (depWave >= currentWave) {
+                        errors.push(
+                            `Task ${idx + 1} (${filePath}): Wave dependency inversion - Task in Wave ${currentWave} cannot depend on Task ${depIdx + 1} in Wave ${depWave} (must be strictly earlier Wave)`
+                        );
+                    }
+                }
+            });
+        }
     });
 
     taskMatches.forEach((match, idx) => {

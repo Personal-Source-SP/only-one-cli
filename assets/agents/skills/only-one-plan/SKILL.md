@@ -204,10 +204,11 @@ Each file is a machine-readable task block. Preserve the exact heading format an
 
 - **Status**: `[ ]`
 - **Task Type**: `code`
+- **Wave**: `1 (Track QA)` # Tracks: Track QA (Tester Subagent), Track Dev (Coder Subagent), Track Doc
+- **Depends On**: None.
 - **Context**: <Bối cảnh hiện tại bằng tiếng Việt, tối đa 25 từ>.
 - **Target Symbols / AST Seams**: `Class.methodName`.
 - **Invariants**: <Ràng buộc bất biến bằng tiếng Việt, tối đa 25 từ>.
-- **Depends On**: None.
 
 > **Action**: <Hành động cụ thể bằng tiếng Việt, tối đa 20 từ>.
 
@@ -266,7 +267,9 @@ For test files, use **Test checklist** covering fixture/helper reuse, no duplica
 - **Enforce Serializer & Fallback Compatibility**: Handle both `time.Time` and `string` for timestamp fields, and plan document metadata fallback chains across stages.
 - **Validate UI Component Typings**: Verify layout properties against framework typings (e.g. Ink `Box` vs `Text`) before proposing JSX or TUI diffs.
 - **Synchronize Diff and Test Assertions**: Ensure regular expressions and validation logic match identically between implementation diffs and test assertions.
-- Always include `Status`, `Task Type`, `Context`, `Target Symbols / AST Seams`, `Invariants`, and `Depends On` in every file task block. DO NOT include `Fast Test Command`.
+- Always include `Status`, `Task Type`, `Wave`, `Depends On`, `Context`, `Target Symbols / AST Seams`, and `Invariants` in every file task block. DO NOT include `Fast Test Command`.
+- **Builder / Tester Separation Discipline**: Never assign test authoring and code implementation of the same feature to the same Subagent. Assign `Track QA` exclusively for test files and `Track Dev` exclusively for implementation code.
+- **Red Feedback Loop & Strict Circuit Breaker Invariant**: When tests fail, QA Subagents pass only isolated failure context to Coder Subagents (who must only modify `src/...` code). Limit retries to maximum 3 iterations before halting and escalating to the user.
 - **Mandatory Storyboard Diagrams**: Every story in Section 2 must include a dedicated Mermaid/ASCII flow or sequence diagram illustrating the user interaction or state transition.
 - **Strict Test Policy by Task Type**:
   - **Test-First Ordering**: Test task blocks must always precede their companion code implementation task blocks in Section 4.
