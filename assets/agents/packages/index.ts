@@ -36,4 +36,16 @@ export const PACKAGES: PackageManifest[] = [
         },
         requirements: ['node', 'npx'],
     },
+    {
+        id: 'doubt-driven-development',
+        version: '0.0.1',
+        description: 'Adversarial reasoning and skepticism loop from addyosmani/agent-skills',
+        installer: {
+            kind: 'skills',
+            source: 'addyosmani/agent-skills',
+            skillName: 'doubt-driven-development',
+            cliVersion: 'latest',
+        },
+        requirements: ['node', 'npx'],
+    },
 ];

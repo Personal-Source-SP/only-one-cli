@@ -77,6 +77,7 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
 | **`c4-diagrams`** | Visualizing domain models, state machines, or system boundaries | Produce clean Mermaid or ASCII diagrams to replace verbose narrative explanations. |
 | **`ponytail`** | After Phase 1 problem clarity | Remove unnecessary scope without shortening discovery or introducing code-level design. |
 | **`karpathy-ste100-discipline`** | Writing concept.md specification | Enforce 80% ASD-STE100 concise prose (instructions <= 20 words, descriptions <= 25 words, no passive voice) and Karpathy disciplines. |
+| **`doubt-driven-development`** | Non-trivial technical proposals | Execute 5-step Doubt Cycle (`CLAIM` -> `EXTRACT` -> `DOUBT` -> `RECONCILE` -> `STOP`) to break unstated assumptions before planning. |
 
 ---
 
@@ -93,6 +94,18 @@ Preserve domain-skill completeness, sources, tests, `concept.md` schema, Phase 1
    - Capture domain terminology into `only-one/CONTEXT.md` (`domain-modeling`).
 2. **Exit Gate Phase 1**: Do NOT propose solutions prematurely until problem context and scope boundaries reach **~95% clarity**.
 3. **Ponytail Scope Gate**: After clarity, remove unnecessary scope. Do not use minimization to shorten discovery or acceptance criteria.
+
+---
+
+### Step 1.5 — Adversarial Doubt & Assumption Stress-Testing (Role: Adversarial Auditor via `doubt-driven-development`)
+
+1. **Trigger Condition**: Applies strictly to non-trivial technical proposals (complex branching logic, external integrations, security-sensitive flows, concurrency invariants, or irreversible operations).
+2. **Execute Doubt Cycle**:
+   - **CLAIM**: Formulate the user's core hypothesis and operational blast radius in <= 3 lines.
+   - **EXTRACT**: Isolate proposal artifact and constraints, stripping subjective reasoning.
+   - **DOUBT**: Conduct adversarial review assuming author is overconfident. Surface unstated assumptions and failure modes under unexpected input.
+   - **RECONCILE**: Reconcile findings against evidence; proceed only if the core hypothesis stands or the user explicitly accepts trade-offs (`Collaborative Override`).
+   - **STOP**: Hard stop after maximum 3 cycles to eliminate analysis paralysis.
 
 ---
 

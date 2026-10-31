@@ -26,18 +26,15 @@ export const COMBOS: ComboManifest[] = [
     },
     {
         id: 'only-one-flow',
-        version: '0.0.16',
+        version: '0.0.17',
         name: 'Only One Universal Flow Setup',
-        description: 'Stack-agnostic end-to-end SDLC and MCP toolkit: Ideation, dual-layer planning, quality gates, security, testing, review, and PR automation',
+        description:
+            'Stack-agnostic end-to-end SDLC and MCP toolkit: Ideation, dual-layer planning, quality gates, security, testing, review, and PR automation',
         scope: 'global',
         supportedAgents: ['antigravity', 'cursor', 'claude', 'codex'],
         mcps: ['fetch', 'tavily', 'github', 'postgres', 'playwright-browser'],
-        subagents: [
-            'codebase-scout',
-            'terminal-runner',
-            'browser-tester',
-            'api-tester',
-        ],
+        packages: ['doubt-driven-development'],
+        subagents: ['codebase-scout', 'terminal-runner', 'browser-tester', 'api-tester'],
         skills: [
             'i-have-adhd',
             'grill-with-docs',
@@ -80,11 +77,6 @@ export const COMBOS: ComboManifest[] = [
             'only-one-pr-git',
         ],
         rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline'],
-        hooks: [
-            'block-heavy-scripts',
-            'no-secrets',
-            'format-on-edit',
-            'protect-configs',
-        ],
+        hooks: ['block-heavy-scripts', 'no-secrets', 'format-on-edit', 'protect-configs'],
     },
 ];
