@@ -1,6 +1,6 @@
 ---
 domain: cli
-version: 1.2.0
+version: 1.3.0
 triggers:
   - "src/commands/**"
   - "src/core/runtime/**"
@@ -53,5 +53,10 @@ triggers:
 - **MUST_DO**: Hook `npm run lint` into the pre-build or build lifecycle (`npm run build`) to ensure zero-error lint compliance and strict type-only imports before artifact generation.
 - **NEVER_DO**: Allow `npm run build` to package dist artifacts while lint errors or unhandled architectural boundary violations exist.
 - **RATIONALE**: Catches unawaited promises, broken module boundaries, and invalid imports before distribution.
+
+### CLI-010: Global Subagent Distribution Routing
+- **MUST_DO**: Route subagent asset installations in combo managers to user-level global configuration roots (`~/.gemini/config/agents/` for Antigravity, `~/.claude/agents/` for Claude Code) when installed globally.
+- **NEVER_DO**: Place global subagents into non-standard tool directories or omit machine-level directory creation during combo distribution.
+- **RATIONALE**: Ensures universal subagent discovery and immediate reuse across all projects on the workstation.
 
 

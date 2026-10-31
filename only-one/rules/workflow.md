@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.4.0
+version: 1.5.0
 triggers:
   - ".agents/skills/only-one-*/**"
   - "assets/agents/skills/only-one-*/**"
@@ -73,4 +73,24 @@ triggers:
 - **MUST_DO**: Stage skill improvement proposals targeting `only-one-*` in user-level central storage (`~/.only-one/improvements/<repo>/<slug>.md`) during `/only-one-clean`.
 - **NEVER_DO**: Leave skill improvements trapped in local repository folders where `/only-one-evolve` cannot access them across projects.
 - **RATIONALE**: Enables cross-project skill evolution and continuous refinement of developer agent tools.
+
+### WF-014: Builder/Tester Separation and Red Feedback Loop Gate
+- **MUST_DO**: Assign test authoring (`*.test.ts`) exclusively to `Track QA` (Tester) and implementation (`src/...`) to `Track Dev` (Coder) in multi-wave execution. During Red Feedback Loop, Coder MUST only edit implementation code, never tests, and retries MUST be capped at 3 (Circuit Breaker).
+- **NEVER_DO**: Allow a single agent to author both implementation and verification tests for the same feature, or allow Coder agents to modify QA test files to force a green test.
+- **RATIONALE**: Eliminates confirmation bias, prevents false-green regressions, and bounds retry loops against token exhaustion.
+
+### WF-015: Single Source of Truth (SSOT) Plan Status Invariant
+- **MUST_DO**: Restrict `plan.md` and `debug.md` task checkbox updates (`[x]`) exclusively to the primary Orchestrator agent.
+- **NEVER_DO**: Permit delegated worker subagents (Coder, Tester, Scout) to directly mutate plan or debug task checkboxes.
+- **RATIONALE**: Prevents concurrent file write race conditions and keeps execution DAG state deterministic.
+
+### WF-016: Two-Tier Token Shield & Context Isolation for Code Reconnaissance
+- **MUST_DO**: Delegate codebase scanning across > 2 files or AST queries to an isolated `codebase-scout` subagent using local `ast-grep`, returning only concise Technical Digests (signatures, line anchors, call sites, invariants).
+- **NEVER_DO**: Read multi-file raw code into the primary orchestrator context or return monolithic function bodies (> 20 lines) from reconnaissance subagents.
+- **RATIONALE**: Cuts context token usage by 75-85% and eliminates Lost-in-the-Middle degradation.
+
+### WF-017: Zero-Raw-Dump Runtime Verification Digest
+- **MUST_DO**: Isolate runtime verification (terminal, browser, API) in dedicated subagents (`terminal-runner`, `browser-tester`, `api-tester`), strip ANSI escape sequences, persist UI screenshots to disk, and return only structured Verification Digests.
+- **NEVER_DO**: Stream raw terminal escape sequences, raw HTML/DOM trees, base64 image strings, or unbounded JSON payloads into the main orchestrator transcript.
+- **RATIONALE**: Shields orchestrator context from token flooding and prevents context window exhaustion during integration testing.
 

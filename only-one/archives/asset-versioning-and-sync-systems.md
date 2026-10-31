@@ -6,7 +6,7 @@ triggers:
   - "assets/**"
   - "src/core/assets/**"
   - "src/commands/update/**"
-archived_at: 2026-10-30T01:06:00+07:00
+archived_at: 2026-10-31T19:00:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -46,6 +46,11 @@ affected_modules:
   - **Multi-IDE Target Resolution & Hooks Isolation**: Triển khai cài đặt toàn cục (`--global`) hướng trực tiếp về cấu hình riêng của từng IDE được chọn trong `AI_TOOLS` (`~/.gemini/config/skills/`, `~/.gemini/config/rules/`, `~/.gemini/hooks/` cho Antigravity; `~/.claude/` & `~/.claude/hooks/` cho Claude Code; `~/.cursor/` cho Cursor), thay vì ép buộc ghi cứng vào `~/.agents/`.
   - **Dynamic Command Path Hooks Generation**: Tự động sinh đường dẫn script thực thi động trong file cấu hình hooks (`hooks.json` của Antigravity, `settings.json` của Claude Code) trỏ tới vị trí script của IDE đó.
   - **Combo Scope & Agent Compatibility Matrix**: Phân loại các bộ Combos theo phạm vi (`global` vs `project`) và độ tương thích với target agents (`antigravity`, `cursor`, `copilot`), kiểm soát qua schema validation nghiêm ngặt.
+  - **Phân Phối Subagents Toàn Cục Qua Combos (Global First-Class Subagent Asset)**:
+    - Nâng cấp `ComboManifest` trong `assets/types.ts` chính thức hỗ trợ trường `subagents?: string[]`.
+    - Phân bổ 4 Subagents chuyên trách (`codebase-scout`, `terminal-runner`, `browser-tester`, `api-tester`) vào các combo toàn cục (`only-one-flow`, `frontend-flow`, `backend-flow`).
+    - Mở rộng `resolveToolDestinationPaths` hỗ trợ asset type `subagents` ở chế độ Global: tự động định tuyến tới `~/.gemini/config/agents/<name>.md` cho Antigravity, `~/.claude/agents/<name>.md` cho Claude Code, và `~/.cursor/agents/` cho Cursor.
+    - Cập nhật engine cài đặt combo `src/core/combo/index.ts` và báo cáo `COMBO REPORT` hiển thị trạng thái cài đặt toàn cục (`success`, `skipped`, `failed`).
   - **Developer Tooling & Zero-Bypass CI Gate**: Cung cấp `scripts/bump-asset.ts` (`pnpm asset:bump <type> <id>`) và bài test `test/core/assets/version-gate.test.ts` chặn commit vi phạm.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
@@ -95,12 +100,15 @@ flowchart TD
   - [`assets/templates/configs/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/templates/configs/index.ts)
   - [`assets/templates/ignore/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/templates/ignore/index.ts)
 - **Core Versioning & Lockfile**:
+  - [`assets/types.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/types.ts): Định nghĩa kiểu `ComboManifest` hỗ trợ `subagents?: string[]`.
   - [`src/core/assets/version.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/version.ts): Thuật toán decimal rollover arithmetic.
   - [`src/core/assets/types.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/types.ts): Khai báo `InstalledAssetRecord`, `RemoteSkillLockMeta`, `OnlyOneInstalledState`, `AssetUpdateStatus`.
   - [`src/core/assets/lockfile.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/lockfile.ts): Đọc/ghi và xóa record `only-one/installed.json` atomic.
   - [`src/core/skill/remote/lockfile.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/skill/remote/lockfile.ts): Adapter layer cho GitHub remote skills.
   - [`src/core/skill/manifest-bridge.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/skill/manifest-bridge.ts): Cầu nối đồng bộ non-destructive `skills.json` sang `~/.agents/` và `~/.gemini/config/`.
-  - [`src/core/agent/tools.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/agent/tools.ts): Phân giải đường dẫn tài nguyên toàn cục hướng về `~/.agents/`.
+  - [`src/core/agent/tools.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/agent/tools.ts): Phân giải đường dẫn tài nguyên toàn cục hướng về `~/.agents/` và subagents toàn cục (`~/.gemini/config/agents/`, `~/.claude/agents/`).
+  - [`src/core/combo/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/combo/index.ts): Engine cài đặt combo và sao chép subagents toàn cục.
+  - [`src/commands/combo/actions/step-5-execute-and-report.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/commands/combo/actions/step-5-execute-and-report.ts): Báo cáo tiến trình cài đặt combo và subagents.
   - [`src/core/assets/sync.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/sync.ts): Engine kiểm tra file trên đĩa, auto-restore và prune.
 - **Developer Tooling & CI Gate**:
   - [`src/core/assets/bump.ts`](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/bump.ts) & [`scripts/bump-asset.ts`](file:///d:/Sources/PERSONAL/only-one-cli/scripts/bump-asset.ts): Tự động bump version.
@@ -118,6 +126,7 @@ flowchart TD
   - `test/core/assets/sync.test.ts` passed.
   - `test/commands/update/update.test.ts` passed.
   - `test/core/combo.test.ts` passed.
+  - `test/combo/installComboSubagents.test.ts` passed (100% verified subagents global distribution).
   - `test/core/skill-lockfile.test.ts` passed.
   - `test/commands/skill/skill.test.ts` passed.
 - **Build**: `npm run format:check && npm run build` sạch 100% (0 errors).

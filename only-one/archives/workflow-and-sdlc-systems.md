@@ -6,7 +6,7 @@ triggers:
   - ".agents/skills/**"
   - "assets/agents/skills/**"
   - "only-one/tasks/**"
-archived_at: 2026-10-30T10:30:00+07:00
+archived_at: 2026-10-31T19:00:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -17,7 +17,15 @@ references:
 affected_modules:
   - assets/agents/skills
   - assets/agents/skills/only-one-apply
+  - assets/agents/skills/only-one-apply/scripts/plan-status.ts
   - assets/agents/skills/only-one-apply/scripts/worktree-runner.ts
+  - assets/agents/skills/only-one-plan/scripts/validate-plan.ts
+  - assets/agents/skills/only-one-debug/scripts/validate-debug.ts
+  - assets/agents/skills/codebase-scout
+  - assets/agents/skills/terminal-runner
+  - assets/agents/skills/browser-tester
+  - assets/agents/skills/api-tester
+  - assets/agents/subagents
   - assets/agents/skills/only-one-clean
   - assets/agents/skills/only-one-evolve
   - assets/agents/combos
@@ -39,6 +47,9 @@ affected_modules:
 6. **Vi phạm ranh giới vòng đời (Lifecycle Drift)**: Debug tự ý sửa code sản phẩm; review không có định dạng thực thi chuẩn.
 7. **Báo cáo Hoàn thành Chat Cồng kềnh & Thụ động**: Khi `/only-one-apply` kết thúc, báo cáo in cây thư mục ASCII rườm rà, lặp lại mô tả công việc, in mục bước tiếp theo thừa thãi, và bỏ qua cổng tiếp nhận phản hồi cải tiến cho `/only-one-evolve`.
 8. **Rủi ro Ô nhiễm Nhánh Chính Khi Thực thi In-Place**: Thực thi trực tiếp các thay đổi đa file trên working directory có nguy cơ gây xung đột git hoặc làm gián đoạn trạng thái commit hiện tại.
+9. **Thiên kiến Tự kiểm tra & Rủi ro Sửa gian lận Test (Confirmation Bias & Test Tampering)**: Một agent duy nhất vừa viết code vừa tự viết bài test cho chính mình; khi test fail, agent dễ rơi vào bế tắc hoặc tự sửa code test để ép pass thay vì sửa code triển khai.
+10. **Bùng nổ Token do Nạp Mã Thô Khi Khảo Sát (Context Pollution via Raw Code Dumps)**: Khi khảo sát nhiều tệp (> 2 tệp), agent chính đọc toàn bộ file và regex grep tràn lan làm đốt từ 15.000 đến 30.000 token, gây hiện tượng Lost-in-the-Middle.
+11. **Ô nhiễm Context do Log Terminal, HTML DOM và API Payloads Thô**: Chạy lệnh CLI, duyệt web bằng Playwright, hoặc test API đổ hàng ngàn dòng ANSI escape, cây DOM và JSON thô trực tiếp vào transcript của Orchestrator.
 
 ### 1.2. Core Value & Solutions
 1. **Direct Specialized Workflow Invocation**: Loại bỏ gateway router trung gian, cho phép kích hoạt trực tiếp các workflows chuyên biệt (`/only-one-idea`, `/only-one-plan`, `/only-one-apply`, `/only-one-flash`, `/only-one-debug`, `/only-one-review`, `/only-one-conflict`, `/only-one-clean`, `/only-one-pr-git`, `/only-one-evolve`).
@@ -92,6 +103,24 @@ affected_modules:
 15. **Hệ Thống Tiến Hóa Kỹ Năng Tự Động (`/only-one-clean` & `/only-one-evolve`)**:
     - Thu gom `improvements.md` từ task folder và lưu chuyển vào `~/.only-one/improvements/<repo>/<slug>.md`.
     - Lệnh `/only-one-evolve` thẩm định và nâng cấp trực tiếp kỹ năng đích dựa trên các đề xuất đã gom.
+16. **Cấu Trúc Execution Waves & Phân Tách Trách Nhiệm Builder / Tester (`only-one-plan` & `only-one-debug`)**:
+    - Chuẩn hóa Section 4 của `plan.md` và `debug.md` với metadata `- **Wave**: <N> (Track <Dev|QA>)`.
+    - Phân vai nghiêm ngặt: `Track QA` (Tester Subagent) viết tệp test trước (`*.test.ts`) ở trạng thái RED; `Track Dev` (Coder Subagent) viết mã nguồn triển khai (`src/...`) biến test sang GREEN. Cấm tuyệt đối một agent tự viết code vừa tự viết test cho cùng một tính năng.
+    - **Chốt chặn Gatekeeper, Red Feedback Loop & Circuit Breaker**: QA Subagent chạy test nghiệm thu độc lập cuối mỗi Wave. Khi test fail, QA trích xuất lỗi cô lập (tên test case, Expected vs Actual, vị trí dòng gây lỗi) gửi Coder sửa mã nguồn (cấm Coder sửa tệp test). Giới hạn tối đa 3 lần thử lại trước khi ngắt mạch (Circuit Breaker) chuyển giao cho Người dùng.
+    - Bắt buộc Mermaid Sequence Diagram minh họa cả Happy Path lẫn Failure/Retry Path.
+17. **Bộ Máy Điều Phối Đa Subagents (Apply Orchestrator) & Dual-Engine Mode (`only-one-apply`)**:
+    - `plan-status.ts` bóc tách cấu trúc Wave, Track và phân nhóm `ParsedWave`.
+    - Cơ chế chế độ kép (Dual-Engine Mode): Mặc định chạy Direct Sequential Mode siêu tốc cho plan đơn wave hoặc task nhỏ (< 3 files) để tiết kiệm token; tự động kích hoạt Orchestrator Mode khi plan có đa Wave ($\ge 2$) hoặc có cờ `--subagents`.
+    - **Quyền Lực Trung Tâm SSOT**: Duy nhất Agent Orchestrator cha được cập nhật trạng thái `[x]` vào `plan.md` để triệt tiêu race condition ghi đè file.
+18. **Subagent Trinh Sát Ngữ Cảnh Tách Biệt & Lá Chắn AST-Grep (`codebase-scout`)**:
+    - Subagent chuyên trách trinh sát chạy trong sandbox cô lập Read-Only, giảm 75% – 85% lượng token tiêu thụ.
+    - **Mô hình Two-Tier Token Shield**: Tầng 1 sử dụng CLI `ast-grep` quét cấu trúc cú pháp AST ở tầng máy tính (0 token LLM), fallback sang ripgrep; Tầng 2 cô lập context, chỉ trả về bản tóm tắt nén **Technical Digest** (đường dẫn neo dòng, chữ ký types, call-sites, invariants; cấm thân hàm > 20 dòng).
+    - Cơ chế rẽ nhánh thích ứng (Adaptive Fast-Path): Tự đọc trực tiếp nếu $\le 2$ files; ủy thác cho `codebase-scout` khi $> 2$ files. Lan tỏa đồng bộ trên 6 kỹ năng (`plan`, `debug`, `review`, `idea`, `conflict`, `clean`).
+19. **Bộ 3 Tác Tử Nghiệm Thu Runtime Độc Lập (Runtime Verification Suite)**:
+    - **`terminal-runner`**: Thực thi shell commands, test CLI flags, khử sạch mã màu ANSI escape, tách biệt stdout/stderr và bắt exit code.
+    - **`browser-tester`**: Điều hướng qua Playwright MCP, chụp ảnh màn hình lưu file ngoài đĩa, giám sát DevTools console/network, cấm in thô cây DOM.
+    - **`api-tester`**: Thẩm định JSON schema, đo độ trễ P95/P99, kiểm tra Idempotency và kịch bản bắn request đồng thời (burst testing) kiểm tra race conditions.
+    - Toàn bộ 3 Subagents chỉ trả về bản tóm tắt nén **Verification Digest** (Zero Raw Dump Invariant).
 
 ---
 
@@ -160,15 +189,40 @@ flowchart TD
 | **[`/only-one-pr-git`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-pr-git/SKILL.md)** | Tạo GitHub PR từ Git state qua GitHub MCP (Release Engineer) | Git preflight $\rightarrow$ GitHub PR | Không |
 | **[`/only-one-evolve`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-evolve/SKILL.md)** | Nâng cấp & tiến hóa kỹ năng định kỳ (Evolution Architect) | `~/.only-one/improvements/` $\rightarrow$ Skills | Không |
 
+### Bảng Ma trận Subagents Chuyên Trách (Verification & Reconnaissance Suite)
+
+| Subagent | Role & Trigger Condition | Core Mechanism & Sandbox | Invariant & Zero-Dump Contract |
+| :--- | :--- | :--- | :--- |
+| **[`codebase-scout`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/codebase-scout.md)** | Khảo sát cấu trúc đa tệp (> 2 tệp) hoặc AST seam queries | Chạy `ast-grep` cục bộ ở tầng OS (0 LLM token), sandbox Read-Only | Trả về Technical Digest (neo dòng, types, call-sites; cấm thân hàm > 20 dòng) |
+| **[`terminal-runner`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/terminal-runner.md)** | Chạy lệnh CLI, test flags và kiểm thử shell commands | Shell execution, bắt exit code, tách riêng `stdout`/`stderr` | Khử sạch mã màu ANSI escape, trích xuất failure stack trace cô lập |
+| **[`browser-tester`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/browser-tester.md)** | Kiểm thử giao diện web tương tác và chụp visual screenshots | Playwright MCP navigation, giám sát DevTools console/network | Lưu ảnh màn hình ra đĩa, cấm in thô toàn bộ cây DOM HTML |
+| **[`api-tester`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/api-tester.md)** | Nghiệm thu API endpoints, đo độ trễ và concurrency race condition | HTTP client bắn burst requests đồng thời, đo P95/P99 latency | Thẩm định JSON schema, kiểm tra Idempotency, trả về Verification Digest |
+
 ---
 
 ## 3. Scope & Key Changes (Phạm vi & Thay đổi Chính)
 
 - [`assets/agents/skills/karpathy-ste100-discipline/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/karpathy-ste100-discipline/SKILL.md): Nâng chuẩn 80% ASD-STE100, khống chế 20/25 từ, cấm thể bị động.
-- [`assets/agents/skills/only-one-apply/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-apply/SKILL.md): Tinh giản thực thi trực tiếp coder-first, tích hợp Dual-Engine Worktree Runner và Báo cáo Hoàn thành Chat tinh gọn 4 mục.
+- [`assets/agents/skills/only-one-apply/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-apply/SKILL.md): Tinh giản thực thi trực tiếp coder-first, tích hợp Dual-Engine Worktree Runner, Apply Orchestrator Mode theo Wave và Báo cáo Hoàn thành Collapsible Hybrid.
+- [`assets/agents/skills/only-one-apply/scripts/plan-status.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-apply/scripts/plan-status.ts): Bóc tách Execution Waves, Track QA/Dev và phân nhóm ParsedWave cho Orchestrator.
 - [`assets/agents/skills/only-one-apply/scripts/worktree-runner.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-apply/scripts/worktree-runner.ts): Quản lý tạo worktree và junction link.
+- [`assets/agents/skills/only-one-plan/scripts/validate-plan.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-plan/scripts/validate-plan.ts): Kiểm tra tính toàn vẹn của đồ thị DAG Wave và Track QA/Dev trong plan.md.
+- [`assets/agents/skills/only-one-debug/scripts/validate-debug.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-debug/scripts/validate-debug.ts): Đồng bộ cấu trúc 4 sections và kiểm tra Wave DAG trong debug.md.
+- [`assets/agents/skills/codebase-scout/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/codebase-scout/SKILL.md) & [`assets/agents/subagents/codebase-scout.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/codebase-scout.md): Subagent trinh sát AST cô lập ngữ cảnh.
+- [`assets/agents/skills/codebase-scout/scripts/scout-contract.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/codebase-scout/scripts/scout-contract.ts): Tiện ích hợp đồng trinh sát AST và kiểm tra Technical Digest.
+- [`assets/agents/skills/terminal-runner/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/terminal-runner/SKILL.md) & [`assets/agents/subagents/terminal-runner.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/terminal-runner.md): Subagent thực thi shell và khử mã ANSI escape.
+- [`assets/agents/skills/terminal-runner/scripts/terminal-contract.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/terminal-runner/scripts/terminal-contract.ts): Tiện ích khử ANSI và trích xuất lỗi terminal cô lập.
+- [`assets/agents/skills/browser-tester/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/browser-tester/SKILL.md) & [`assets/agents/subagents/browser-tester.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/browser-tester.md): Subagent kiểm thử UI qua Playwright MCP.
+- [`assets/agents/skills/browser-tester/scripts/browser-contract.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/browser-tester/scripts/browser-contract.ts): Tiện ích hợp đồng browser testing và giám sát console.
+- [`assets/agents/skills/api-tester/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/api-tester/SKILL.md) & [`assets/agents/subagents/api-tester.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/api-tester.md): Subagent thẩm định API, đo latency và burst testing race condition.
+- [`assets/agents/skills/api-tester/scripts/api-contract.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/api-tester/scripts/api-contract.ts): Tiện ích thẩm định API contract & latency.
 - [`assets/agents/skills/only-one-clean/scripts/auto-archive.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-clean/scripts/auto-archive.ts): Auto-archiving tasks và staging improvements.
 - [`assets/agents/skills/only-one-evolve/SKILL.md`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-evolve/SKILL.md): Workflow tiến hóa kỹ năng.
+- [`test/skills/applyPlanStatusWaves.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/applyPlanStatusWaves.test.ts): Unit tests cho module bóc tách Wave của plan-status.
+- [`test/skills/validatePlanWaves.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/validatePlanWaves.test.ts): Unit tests cho kiểm tra Wave DAG trong plan.md.
+- [`test/skills/validateDebugWaves.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/validateDebugWaves.test.ts): Unit tests cho kiểm tra Wave DAG trong debug.md.
+- [`test/skills/codebaseScoutContract.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/codebaseScoutContract.test.ts): Unit tests cho hợp đồng Technical Digest của Codebase Scout.
+- [`test/skills/runtimeVerificationContracts.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/runtimeVerificationContracts.test.ts): Unit tests cho hợp đồng Verification Digest của bộ 3 runtime subagents.
 - [`test/skills/applyReportTemplate.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/applyReportTemplate.test.ts): Unit test kiểm thử cấu trúc schema báo cáo 4 mục và kiểm tra độ dài câu theo tiêu chuẩn ASD-STE100.
 - [`test/skills/worktreeRunner.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/worktreeRunner.test.ts): Unit test cho worktree runner.
 - [`assets/agents/combos/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/combos/index.ts): Tích hợp hooks vào combo `only-one-flow`.
