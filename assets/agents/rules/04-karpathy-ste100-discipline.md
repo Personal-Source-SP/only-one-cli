@@ -1,5 +1,8 @@
 ---
-alwaysApply: true
+description: "Andrej Karpathy's 4 Core Disciplines and 80% ASD-STE100 Aviation Technical Writing Specification"
+globs: "**/*.md"
+alwaysApply: false
+trigger: model_decision
 ---
 
 # RULE 4: KARPATHY DISCIPLINES & 80% ASD-STE100 WRITING SPECIFICATION

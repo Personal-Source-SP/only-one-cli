@@ -1,5 +1,7 @@
 ---
+description: "No-Sleep / No Busy-Wait — ban sleep commands and polling loops; enforce approved async alternatives"
 alwaysApply: true
+trigger: always_on
 ---
 
 # RULE 3: EXECUTION & TERMINAL

@@ -1,5 +1,8 @@
 ---
-alwaysApply: true
+description: "Next.js architecture, strict TypeScript, runtime boundaries, public contracts, and verification guidelines"
+globs: "**/*.{ts,tsx,jsx,js}"
+alwaysApply: false
+trigger: model_decision
 ---
 
 # RULE 2: ARCHITECTURE, TYPES & CONTRACTS

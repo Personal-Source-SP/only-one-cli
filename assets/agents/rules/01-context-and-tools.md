@@ -1,5 +1,7 @@
 ---
+description: "Context Minimization — enforce dependency discovery and minimal file context loading before edits"
 alwaysApply: true
+trigger: always_on
 ---
 
 # CONTEXT & TOOLING

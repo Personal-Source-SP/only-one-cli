@@ -9,6 +9,9 @@ export interface RuleManifest {
     requiredPackages?: string[];
     requiredMcps?: string[];
     requiredSkills?: string[];
+    alwaysApply?: boolean;
+    globs?: string;
+    trigger?: 'always_on' | 'model_decision';
 }
 
 export type PackageInstaller =
