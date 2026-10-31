@@ -220,10 +220,11 @@ src/path/to/module/
 
 - **Status**: `[ ]`
 - **Task Type**: `code`
+- **Wave**: `1 (Track QA)`
+- **Depends On**: None.
 - **Context**: <Current failure mechanism in one sentence>.
 - **Target Symbols / AST Seams**: `describe('reproduction')`.
 - **Invariants**: <Regression constraint in one sentence>.
-- **Depends On**: None.
 
 > **Action**: Add a deterministic Red reproduction and regression guard.
 
@@ -246,10 +247,11 @@ src/path/to/module/
 
 - **Status**: `[ ]`
 - **Task Type**: `code`
+- **Wave**: `2 (Track Dev)`
+- **Depends On**: ### 1.
 - **Context**: <Current mechanism causing the defect>.
 - **Target Symbols / AST Seams**: `TargetClass.targetMethod`.
 - **Invariants**: <Must-not-break behavior>.
-- **Depends On**: Task 1.
 
 > **Action**: Apply the surgical root-cause fix.
 
@@ -267,22 +269,6 @@ src/path/to/module/
 + fixedBehavior();
 ```
 
-## Section 3. Verification
-
-### Red Feedback Loop
-- [ ] Reproduction fails before patch for expected reason.
-- [ ] Same reproduction passes after patch.
-
-### Regression
-- [ ] Targeted tests pass.
-- [ ] Related module tests pass.
-- [ ] Lint/typecheck passes.
-
-### Evidence
-- `<command>` — `PENDING -> PASS`.
-- **Lessons Learned**: <Negative rule update when a reusable trap is proven>.
-```
-
 ---
 
 ## 4. Summary Report
@@ -298,6 +284,8 @@ Report `debug.md` path, Symptom, Mechanical Root Cause, Proposed Fix, changed fi
 - **Enforce Mandatory Failure Trace Diagram**: Always include a Mermaid sequence or divergence diagram in Section 1 Diagnosis to prove the broken mechanical boundary visually.
 - **Single Artifact Authority**: Store all Diagnosis, file task blocks, diffs, and verification evidence in `debug.md`.
 - **Machine-Readable Task Block Contract**: One Section 4 block equals one changed file; preserve exact heading format and mandatory metadata labels (DO NOT include Fast Test Command; tests are centralized in Section 3).
+- **Enforce 4 Canonical Sections (Zero Duplicate Section 3)**: debug.md must strictly consist of Section 1 (Diagnosis), Section 2 (Defect Stories), Section 3 (Test Matrix), and Section 4 (File Changes). Never generate duplicate Section 3 headings.
+- **Builder / Tester Separation Discipline in Debugging**: Always assign reproduction test tasks to `Track QA` (Wave 1) and root-cause fix tasks to `Track Dev` (Wave 2).
 - Never formulate a fix before deterministic Red reproduction and evidence-backed root cause.
 - Never perform unrelated refactoring.
 - Always include an automated regression test.
