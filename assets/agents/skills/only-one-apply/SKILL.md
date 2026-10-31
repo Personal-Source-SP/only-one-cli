@@ -12,7 +12,7 @@ This skill executes an approved plan, debug document, or review finding set with
 ## Input
 
 ```text
-/only-one-apply [<task-folder> | <plan-path> | <debug-path> | <review-path>] [--worktree | --direct]
+/only-one-apply [<task-folder> | <plan-path> | <debug-path> | <review-path>] [--worktree | --direct] [--subagents]
 ```
 
 - **With `<task-folder>`, `<plan-path>`, `<debug-path>`, or `<review-path>`**: use the given plan/debug/review file (e.g., `only-one/tasks/20260819-142500-soft-delete/plan.md` or `only-one/tasks/20260917-100000-debug-bug/debug.md`) directly. If a task folder is given, locate `plan.md`, `debug.md`, or `review.md` within it (prefer `in-progress` > `planned`/`planning`).
@@ -88,6 +88,14 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 ---
 
 ## 2. Step-by-Step Execution Protocol
+
+### Step 0b — Kích hoạt Chế độ Điều phối Orchestrator (Multi-Agent Mode)
+
+1. Chạy `plan-status.ts` để phân tích cấu trúc Wave:
+   - Nếu `isMultiWave === true` (từ 2 Waves trở lên) HOẶC người dùng truyền cờ `--subagents`: Kích hoạt **Orchestrator Mode**.
+   - Ngược lại: Kích hoạt **Direct Sequential Mode** (thực thi tuần tự đơn lẻ để tiết kiệm token).
+2. Trong Orchestrator Mode, Agent chính đóng vai trò **Apply Orchestrator**:
+   - Quản lý điều phối các đợt Wave, ủy thác task cho Subagents theo Track, và giữ quyền duy nhất cập nhật `plan.md`.
 
 ### Step 0 — Khởi tạo Chế độ Thực thi (Dual-Engine Mode Selection)
 
@@ -195,6 +203,17 @@ Main Agent directly executes task blocks in sequence adhering strictly to `Depen
      - Nếu sau 3 lần thử vẫn thất bại: Dừng toàn bộ tiến trình, giữ nguyên trạng thái `Status: [/]`, và báo cáo chi tiết nguyên nhân lỗi cho PM để xin chỉ dẫn.
 4. **Non-code Tasks**:
    - Đối với các task `non-code`: Áp dụng diff, kiểm tra syntax/lint nếu có, và đánh dấu `[x]` mà không kích hoạt test loop.
+
+### Step 4b — Quy trình Điều phối Sóng (Wave Orchestration Protocol)
+
+1. **Ủy thác Subagents theo Track**:
+   - Với mỗi Wave, Orchestrator phân tích danh sách task:
+     - `Track QA`: Gọi QA Subagent (`invoke_subagent` role Tester) viết kịch bản kiểm thử độc lập (`*.test.ts`).
+     - `Track Dev`: Gọi Coder Subagent (`invoke_subagent` role Developer) viết mã nguồn triển khai (`src/...`).
+2. **Wave Gatekeeper & Red Feedback Loop**:
+   - Ở cuối mỗi Wave, QA Subagent mở terminal chạy test matrix nghiệm thu.
+   - Nếu test fail: trích xuất log lỗi tinh gọn chuyển cho Coder Subagent sửa mã nguồn (tối đa 3 lần thử lại).
+3. **Single-Writer Contract**: Chỉ Orchestrator được đánh dấu `[x]` vào `plan.md` sau khi Wave Gatekeeper phê duyệt.
 
 ---
 
