@@ -99,4 +99,10 @@ triggers:
 - **NEVER_DO**: Accept non-trivial architectural claims or unstated user assumptions uncritically without adversarial stress-testing, or allow infinite recursive doubt cycles beyond 3 iterations.
 - **RATIONALE**: Prevents sycophancy (AI uncritically agreeing with suboptimal designs) while enforcing a strict 3-iteration circuit breaker to prevent analysis paralysis.
 
+### WF-019: Two-Tier BDD Testing & Concept Traceability Separation
+- **MUST_DO**: Enforce Two-Tier BDD Testing in `plan.md`: Section 3.1 for code-level falsifiable test cases and Section 3.2 for runtime trial sanity blocks (`[CLI]`, `[WEB]`, `[API]`). Keep `evidence.md` as the single authoritative report for Concept Traceability and trial outputs.
+- **NEVER_DO**: Include post-apply acceptance status checklists or Concept Traceability Matrix inside `plan.md` (reserved strictly for `evidence.md`).
+- **RATIONALE**: Eliminates premature acceptance checklists and double-editing between `plan.md` and `evidence.md`.
+
+
 

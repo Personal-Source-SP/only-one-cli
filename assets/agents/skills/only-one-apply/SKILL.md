@@ -230,13 +230,13 @@ Main Agent directly executes task blocks in sequence adhering strictly to `Depen
    npm run lint
    ```
 2. **Thực thi các Lệnh Chạy thử Nghiệm thu Thực tế (Runtime Sanity & Trial Execution)**:
-   - Đọc Section 3.3 của `plan.md`: BẮT BUỘC thực thi các lệnh chạy thử thật (CLI commands, Web flows, hoặc API curl probes) trên terminal.
+   - Đọc Section 3.2 của `plan.md`: BẮT BUỘC thực thi các lệnh chạy thử thật (CLI commands, Web flows, hoặc API curl probes) trên terminal.
    - Bắt và ghi nhận output in ra màn hình thực tế (stdout/stderr và exit code) để đối soát kết quả.
 
 3. **Thu thập Bằng chứng & Xuất bản Báo cáo `evidence.md`**:
    - Kích hoạt `aggregate-evidence.ts` để sinh báo cáo `only-one/tasks/<slug>/evidence.md`.
    - **Quy tắc Thư mục `evidence/`**: CHỈ khởi tạo thư mục `evidence/` NẾU có tệp hình ảnh (ảnh chụp màn hình `.png`). Nếu không có ảnh, TUYỆT ĐỐI KHÔNG tạo thư mục `evidence/` trên đĩa. Toàn bộ log lệnh và payload được nhúng trực tiếp vào `evidence.md`.
-   - **Đầy đủ Danh sách Test**: Báo cáo `evidence.md` phải liệt kê chi tiết từng Test Case từ Section 3.2 của `plan.md` (kèm mã Test ID, module, mô tả, và trạng thái PASS/FAIL).
+   - **Trung tâm Nghiệm thu Concept**: Báo cáo `evidence.md` tự động xuất bản Mục 2 (Concept Traceability & Acceptance Matrix) đối soát từng tiêu chí của Concept, cùng chi tiết danh sách Test Cases (Mục 3) và kết quả Chạy thử Runtime (Mục 4).
    - Đính kèm liên kết `[evidence.md](file:///...)` vào Section 3 của `plan.md`.
    - Update document frontmatter:
    ```yaml

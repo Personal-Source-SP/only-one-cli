@@ -22,6 +22,13 @@ export interface ImageArtifact {
     summary: string;
 }
 
+export interface ConceptCriterion {
+    criterion: string;
+    trials: string;
+    evidence: string;
+    status: 'PASS' | 'FAIL';
+}
+
 export interface EvidenceReportData {
     taskSlug: string;
     title: string;
@@ -33,6 +40,7 @@ export interface EvidenceReportData {
         total: number;
         duration: string;
     };
+    conceptCriteria?: ConceptCriterion[];
     plannedTestCases?: PlannedTestCase[];
     runtimeSanityChecks?: RuntimeSanityCheck[];
     imageArtifacts?: ImageArtifact[];
@@ -72,6 +80,24 @@ export function ensureEvidenceDirs(taskSlug: string, hasImages = false, baseDir 
 export function generateEvidenceReport(data: EvidenceReportData): string {
     const now = new Date().toISOString();
 
+    const conceptRows = (data.conceptCriteria || []).map((cc) =>
+        `| ${cc.criterion} | ${cc.trials} | ${cc.evidence} | ${cc.status === 'PASS' ? '✅ PASS' : '❌ FAIL'} |`
+    ).join('\n');
+
+    const conceptSection = conceptRows
+        ? `
+## 2. Concept Traceability & Acceptance Matrix
+| Tiêu chí Nghiệm thu (Concept) | Test Cases / Trials Thực thi | Bằng chứng Xác thực | Trạng thái |
+| :--- | :--- | :--- | :--- |
+${conceptRows}
+`
+        : '';
+
+    const testSectionNum = conceptSection ? '3' : '2';
+    const sanitySectionNum = conceptSection ? '4' : '3';
+    const visualSectionNum = conceptSection ? '5' : '4';
+    const summarySectionNum = conceptSection ? '6' : '5';
+
     const plannedTestRows = (data.plannedTestCases || []).map((tc) =>
         `| **${tc.id}** | \`${tc.module}\` | ${tc.description} | ${tc.status === 'PASS' ? '✅ PASS' : '❌ FAIL'} |`
     ).join('\n');
@@ -87,7 +113,7 @@ ${sc.outputSnippet.trim()}
 
     const imageSection = data.imageArtifacts && data.imageArtifacts.length > 0
         ? `
-## 4. Visual Evidence (Ảnh chụp màn hình)
+## ${visualSectionNum}. Visual Evidence (Ảnh chụp màn hình)
 | Tên ảnh | Trạng thái | Đường dẫn | Mô tả |
 | :--- | :--- | :--- | :--- |
 ${data.imageArtifacts.map((img) => `| ${img.name} | ${img.status} | [Xem ảnh](${img.link}) | ${img.summary} |`).join('\n')}
@@ -106,8 +132,8 @@ verified_at: ${now}
 - **Overall Status**: ${data.testSuite.status === 'PASS' ? '✅ ALL VERIFIED' : '❌ VERIFICATION FAILED'}
 - **Test Suite**: \`${data.testSuite.command}\` (${data.testSuite.passed}/${data.testSuite.total} passed in ${data.testSuite.duration})
 - **Verified At**: ${now}
-
-## 2. Test Execution Details (Theo Kế hoạch Plan)
+${conceptSection}
+## ${testSectionNum}. Test Execution Details (Theo Kế hoạch Plan)
 ${plannedTestRows
     ? `| Test ID | Module Mục tiêu | Kịch bản / Mô tả Kiểm thử | Trạng thái |
 | :--- | :--- | :--- | :--- |
@@ -116,10 +142,10 @@ ${plannedTestRows}`
 | :--- | :--- | :--- | :--- |
 | Main Suite | \`${data.testSuite.command}\` | ${data.testSuite.passed}/${data.testSuite.total} passed | ${data.testSuite.duration} |`}
 
-## 3. Runtime Sanity & Trial Execution Output (Chạy thử Thực tế)
+## ${sanitySectionNum}. Runtime Sanity & Trial Execution Output (Chạy thử Thực tế)
 ${sanityRows || '_Không có bước chạy thử CLI/Web độc lập; toàn bộ đã được kiểm tra qua test suite tự động._'}
 ${imageSection}
-## 5. Acceptance Criteria Traceability
+## ${summarySectionNum}. Acceptance Criteria Traceability
 - [x] Toàn bộ kịch bản kiểm thử trong kế hoạch (Plan) đã được thực thi và thẩm định.
 - [x] Lệnh chạy thử thực tế (Runtime Sanity Check) được thực thi và in kết quả chính xác.
 `;

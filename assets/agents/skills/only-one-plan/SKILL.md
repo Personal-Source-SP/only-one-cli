@@ -130,6 +130,12 @@ Before the first user-visible response, read and activate `i-have-adhd`; keep it
 | **`frontend-ui-engineering`** | Building or modifying user-facing frontend components | Design component architecture, state management, 5-state matrix, and accessibility in Section 2 task blocks. |
 | **`source-driven-development`** | Introducing new library APIs or framework methods | Ground all code signatures in verified official documentation in Section 2 to prevent API hallucination. |
 | **`karpathy-ste100-discipline`** | Writing Section 2 task blocks and diff boundaries | Enforce surgical changes, simplicity first, and 80% ASD-STE100 tri-part action verification (<= 20 words for instructions, <= 25 words for context, active voice). |
+| **`test-driven-development`** | Section 3.1 & Section 4 file task blocks | Enforce Test-First ordering (Track QA before Track Dev) and Red-Green-Refactor discipline. |
+| **`anti-tautology-testing`** | Section 3.1 test assertions | Enforce Falsifiability, prohibit trivial assertions (toBeDefined) and mock-mirroring. |
+| **`gherkin-authoring`** | Section 2 Story Board, Section 3.1 Matrix & Section 3.2 Trials | Universal BDD language (Given - When - Then) translating business acceptance criteria into executable code and runtime tests. |
+| **`terminal-runner`** | Section 3.2 [CLI] trial blocks | Define CLI sanity check execution commands, exit code, output pattern, and timeout. |
+| **`browser-tester`** | Section 3.2 [WEB] trial blocks | Define Playwright UI flows, selectors, visual screenshot persistence, and 0-error console invariant. |
+| **`api-tester`** | Section 3.2 [API] trial blocks | Define HTTP endpoint probes, payload, status code, latency bounds, and burst concurrency. |
 
 ---
 
@@ -192,9 +198,8 @@ flowchart LR
 
 ## Section 3. Test Cases & Verification Matrix
 
-### 3.1. Concept Coverage & Traceability Matrix (Đối soát Tiêu chí Concept)
-### 3.2. Test Case Specification Matrix (Ma trận Test Case Chi tiết)
-### 3.3. Runtime Sanity & Trial Execution Steps (BẮT BUỘC: Các bước Chạy thử Nghiệm thu Thực tế)
+### 3.1. Test Case Specification Matrix (Ma trận Test Case Chi tiết - Tầng Code BDD)
+### 3.2. Runtime Sanity & Trial Execution Steps (Các bước Chạy thử Nghiệm thu Thực tế - Tầng Runtime BDD)
 - **Tác vụ CLI**: Bắt buộc chỉ định rõ lệnh chạy thử CLI thật (ví dụ: `npx tsx src/index.ts <subcommand> [flags]` hoặc chạy script đã sửa), kèm kết quả mong đợi in ra màn hình để đối soát trực tiếp.
 - **Tác vụ Web / Frontend**: Bắt buộc chỉ định rõ URL dev cục bộ, các nút bấm/form cần tương tác, và ảnh chụp màn hình mong đợi.
 - **Tác vụ Backend / API**: Bắt buộc chỉ định rõ lệnh curl hoặc fetch gửi request thật đến endpoint để xem mã trạng thái HTTP và cấu trúc JSON trả về.

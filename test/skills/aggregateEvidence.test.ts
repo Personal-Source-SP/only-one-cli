@@ -1,5 +1,6 @@
 import { existsSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+
 import { afterAll, describe, expect, it } from 'vitest';
 
 import {
@@ -77,5 +78,24 @@ describe('Aggregate Evidence Module', () => {
         expect(report).toContain('TC-01');
         expect(report).toContain('only-one --help');
         expect(report).toContain('Usage: only-one [options]');
+    });
+
+    it('should generate Section 2 Concept Traceability Matrix when criteria are provided', () => {
+        const report = generateEvidenceReport({
+            taskSlug: testSlug,
+            title: 'Test Concept Traceability',
+            testSuite: {
+                command: 'npm test',
+                status: 'PASS',
+                passed: 5,
+                failed: 0,
+                total: 5,
+                duration: '0.8s',
+            },
+            conceptCriteria: [{ criterion: 'Tự động kiểm tra CLI', trials: 'Trial 1 [CLI]', evidence: 'Stdout: 0 errors', status: 'PASS' }],
+        });
+
+        expect(report).toContain('## 2. Concept Traceability & Acceptance Matrix');
+        expect(report).toContain('Tự động kiểm tra CLI');
     });
 });

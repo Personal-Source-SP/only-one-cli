@@ -66,6 +66,16 @@ export function validatePlan(content: string): PlanValidationResult {
         }
     }
 
+    const hasCodeTasks = /-\s*\*\*Task Type\*\*:\s*`?code`?/i.test(content);
+    if (hasCodeTasks && sTestIndex !== -1) {
+        const sTestContent = sFileIndex > sTestIndex ? content.slice(sTestIndex, sFileIndex) : content.slice(sTestIndex);
+        if (!/Runtime Sanity/i.test(sTestContent)) {
+            warnings.push('Test Matrix: Missing Section 3.2 Runtime Sanity & Trial Execution Steps for code tasks');
+        } else if (!/####\s*Trial\s*\d+:\s*\[(CLI|WEB|API)\]/i.test(sTestContent)) {
+            warnings.push('Test Matrix: Section 3.2 missing formatted trial blocks (e.g. #### Trial 1: [CLI])');
+        }
+    }
+
     const sFileContent = sFileIndex !== -1
         ? (sTestIndex > sFileIndex ? content.slice(sFileIndex, sTestIndex) : content.slice(sFileIndex))
         : '';
