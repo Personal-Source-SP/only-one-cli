@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.7.0
+version: 1.8.0
 triggers:
   - ".agents/skills/only-one-*/**"
   - "assets/agents/skills/only-one-*/**"
@@ -108,6 +108,12 @@ triggers:
 - **MUST_DO**: Require every task executed through `/only-one-apply` to persist deterministic runtime evidence (raw test output, terminal logs in `evidence/terminal/`, UI screenshots in `evidence/screenshots/`, API JSON in `evidence/api/`) and compile an `evidence.md` file using `aggregate-evidence.ts` with valid absolute `file:///` links and timeout protections.
 - **NEVER_DO**: Mark tasks as `[x] PASS` without generating physical machine-verified evidence artifacts on disk, or rely on speculative manual verification.
 - **RATIONALE**: Guarantees auditable proof of completion, eliminates subjective verification claims, and ensures regression detection without polluting the main orchestrator context.
+
+### WF-021: Conventional Commit Semantic Version Bumping & Changelog Invariant
+- **MUST_DO**: Calculate release version bumps automatically via Conventional Commit parsing (`fix` -> patch, `feat` -> minor, `BREAKING CHANGE` -> major) using `release-helper.ts`, update `CHANGELOG.md` with structured sections, and require a clean working tree before generating release tags.
+- **NEVER_DO**: Manually edit `package.json` version strings or release tags without semantic commit history verification or on a dirty working tree.
+- **RATIONALE**: Ensures reproducible semantic versioning, eliminates release version drift, and prevents uncommitted work from leaking into production tags.
+
 
 
 

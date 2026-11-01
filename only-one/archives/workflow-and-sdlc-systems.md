@@ -6,7 +6,7 @@ triggers:
   - ".agents/skills/**"
   - "assets/agents/skills/**"
   - "only-one/tasks/**"
-archived_at: 2026-11-01T17:55:00+07:00
+archived_at: 2026-11-01T18:55:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -136,6 +136,10 @@ affected_modules:
     - Tinh giản Section 3 của `plan.md` thành 2 mục rõ ràng: `3.1. Test Case Specification Matrix` (tầng code, BDD `Given-When-Then`, assertions phản nghiệm) và `3.2. Runtime Sanity & Trial Execution Steps` (tầng runtime, khối `#### Trial N: [CLI|WEB|API]` có trường `Traceability` trỏ về Concept Criteria).
     - Di dời bảng đối soát tiêu chí Concept (`Concept Traceability & Acceptance Matrix`) ra khỏi `plan.md` và đặt độc quyền tại Mục 2 của `evidence.md`, triệt tiêu hoàn toàn tình trạng lập checklist sớm và sửa file plan trùng lặp sau apply.
     - Tích hợp chốt chặn `validate-plan.ts` kiểm tra tính hợp lệ của cấu trúc Section 3.1 và Section 3.2.
+24. **Quy Trình Release & Xuất Bản Tự Động (`/only-one-publish`) ([WF-021](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/workflow.md))**:
+    - Bổ sung skill chuyên trách `/only-one-publish` ([assets/agents/skills/only-one-publish/SKILL.md](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-publish/SKILL.md)) chuẩn hóa quy trình phân tích và phát hành phiên bản phần mềm.
+    - Tiện ích [release-helper.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/skills/only-one-publish/scripts/release-helper.ts) bóc tách commit theo Conventional Commits (`feat:` -> minor, `fix:` -> patch, `BREAKING CHANGE:` -> major), cập nhật tự động `CHANGELOG.md` theo chuẩn Keep a Changelog và tăng phiên bản `package.json`.
+    - Chốt chặn git working tree bắt buộc phải sạch (clean) trước khi tạo release commit và tag git `v*`.
 
 ---
 
@@ -244,6 +248,8 @@ flowchart TD
 - [`test/rules/progressiveDisclosureContracts.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/rules/progressiveDisclosureContracts.test.ts): Unit test kiểm thử hợp đồng phân phối quy tắc tiệm tiến.
 - [`test/skills/validatePlanTestingSections.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/validatePlanTestingSections.test.ts): Unit test kiểm thử thẩm định cấu trúc 2 tầng Section 3.1 & 3.2 trong validatePlan.
 - [`test/skills/aggregateEvidence.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/aggregateEvidence.test.ts): Unit test kiểm thử tổng hợp bằng chứng runtime và sinh báo cáo evidence.md.
+- [`test/skills/release-helper.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/release-helper.test.ts): Unit test phân tích semantic bump, changelog và tag git.
+- [`test/skills/publishSkillRegistration.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/publishSkillRegistration.test.ts): Unit test kiểm thử khai báo manifest của skill only-one-publish.
 - [`assets/agents/combos/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/combos/index.ts): Tích hợp hooks vào combo `only-one-flow`.
 - Hợp nhất toàn diện các workflows vào hệ thống Agent Skills (`assets/agents/skills/only-one-*`).
 

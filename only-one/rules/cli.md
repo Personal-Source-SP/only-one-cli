@@ -1,6 +1,6 @@
 ---
 domain: cli
-version: 1.5.0
+version: 1.6.0
 triggers:
   - "src/commands/**"
   - "src/core/runtime/**"
@@ -68,6 +68,12 @@ triggers:
 - **MUST_DO**: Compare existing installed asset versions against incoming manifest versions in `installed.json` lockfile and pre-select `checked: true` with a version diff label (e.g., `[UPDATE: v1 -> v2]`) for outdated components, while providing a non-interactive `--force` (`-f`) flag to bypass prompts and overwrite all existing assets immediately.
 - **NEVER_DO**: Set `checked: false` indiscriminately across all choices when newer versions exist, or require interactive keyboard confirmation when an explicit `--force` flag is supplied.
 - **RATIONALE**: Defaulting all choices to unchecked causes users pressing `Enter` to skip all updates unintentionally; conversely, forcing manual prompt navigation breaks CI/scripted workflows that supply `--force`.
+
+### CLI-013: Ephemeral Isolated Auth Config for Scoped Package Publishing
+- **MUST_DO**: Generate a temporary, isolated `.npmrc` file with strict authentication credentials during scoped package publishing (`scripts/publish.js --target github`) and guarantee its deletion in a `finally` block, while scanning pack files with a secret sanitizer to prevent `.env` and credential leakage.
+- **NEVER_DO**: Hardcode auth tokens in global/project `.npmrc`, leave temporary credential files on disk after build failure, or publish packages without pre-flight version duplication and sensitive-file sanitization.
+- **RATIONALE**: Exposing authentication tokens in source control or leaving credentials in working directories causes severe security vulnerabilities, while publishing duplicated versions leads to broken deployment pipelines.
+
 
 
 

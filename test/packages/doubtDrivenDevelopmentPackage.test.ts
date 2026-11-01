@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { COMBOS } from '../../assets/agents/combos/index.js';
 import { PACKAGES } from '../../assets/agents/packages/index.js';
+import { compareDecimalVersions } from '../../src/core/assets/version.js';
 
 describe('Doubt-Driven Development External Package Contract', () => {
     it('should declare doubt-driven-development package from addyosmani/agent-skills', () => {
@@ -35,10 +36,10 @@ describe('Doubt-Driven Development External Package Contract', () => {
         expect(content).toContain('Doubt Cycle');
     });
 
-    it('should bump CLI package.json version to 1.0.5', () => {
+    it('should have CLI package.json version at least 1.0.5', () => {
         const pkgPath = resolve(process.cwd(), 'package.json');
         const pkgJson = JSON.parse(readFileSync(pkgPath, 'utf8'));
 
-        expect(pkgJson.version).toBe('1.0.5');
+        expect(compareDecimalVersions(pkgJson.version, '1.0.5')).toBeGreaterThanOrEqual(0);
     });
 });
