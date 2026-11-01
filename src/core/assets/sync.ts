@@ -6,6 +6,7 @@ import { resolvePackageRoot } from '@/core/runtime/package-root.js';
 
 import { RULES } from '../../../assets/agents/rules/index.js';
 import { SKILLS } from '../../../assets/agents/skills/index.js';
+import { SUBAGENTS } from '../../../assets/agents/subagents/index.js';
 import { readInstalledLockfile, recordInstalledAssetsBatch, removeInstalledAsset } from './lockfile.js';
 import type { AssetInspectionItem, AssetType } from './types.js';
 import { compareDecimalVersions } from './version.js';
@@ -120,6 +121,29 @@ export async function inspectAssetUpdates(projectDir: string, isGlobal = false):
             installedVersion: record.version,
             latestVersion,
             status: !existsOnDisk ? 'missing' : cmp < 0 ? 'outdated' : 'up-to-date',
+        });
+    }
+
+    // Inspect Subagents
+    const installedSubagents = lockfile.installed.subagents || {};
+
+    for (const [subagentId, record] of Object.entries(installedSubagents)) {
+        const manifest = SUBAGENTS.find((s) => s.id === subagentId);
+
+        if (!manifest) {
+            continue;
+        }
+
+        const latestVersion = manifest.version;
+        const cmp = compareDecimalVersions(record.version, latestVersion);
+
+        inspected.push({
+            type: 'subagents',
+            id: subagentId,
+            name: manifest.id,
+            installedVersion: record.version,
+            latestVersion,
+            status: cmp < 0 ? 'outdated' : 'up-to-date',
         });
     }
 

@@ -1,4 +1,4 @@
-export type AssetType = 'skills' | 'rules' | 'mcps' | 'packages' | 'configs' | 'combos' | 'git' | 'vs';
+export type AssetType = 'skills' | 'rules' | 'mcps' | 'packages' | 'configs' | 'combos' | 'git' | 'vs' | 'subagents';
 
 export interface RemoteSkillLockMeta {
     source: string;

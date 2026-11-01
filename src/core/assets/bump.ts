@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -32,13 +33,15 @@ export function normalizeAssetType(typeInput: string): string {
         vs: 'vs',
         config: 'configs',
         configs: 'configs',
+        subagent: 'subagents',
+        subagents: 'subagents',
     };
 
     const matched = map[lower];
 
     if (!matched) {
         throw new Error(
-            `Unknown asset type: "${typeInput}". Supported types: workflows, skills, rules, mcps, packages, combos, git, vs, configs.`,
+            `Unknown asset type: "${typeInput}". Supported types: workflows, skills, rules, mcps, packages, combos, git, vs, configs, subagents.`,
         );
     }
 
@@ -47,6 +50,12 @@ export function normalizeAssetType(typeInput: string): string {
 
 export function resolveAssetManifestFilePath(normalizedType: string, customRoot?: string): string {
     const root = customRoot || resolvePackageRoot(import.meta.url);
+
+    const agentPath = join(root, 'assets/agents', normalizedType, 'index.ts');
+
+    if (existsSync(agentPath)) {
+        return agentPath;
+    }
 
     return join(root, 'assets', normalizedType, 'index.ts');
 }

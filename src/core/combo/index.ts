@@ -16,6 +16,7 @@ export interface WorkflowInstallResult {
     status: 'success' | 'skipped' | 'failed';
     error?: string;
 }
+import { SUBAGENTS } from '@assets/agents/subagents/index.js';
 import { COMBOS } from '@assets/combos/index.js';
 import { CONFIGS } from '@assets/configs/index.js';
 import { MCPS } from '@assets/mcps/index.js';
@@ -732,6 +733,7 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
     // 9. Subagents
     if (combo.subagents && combo.subagents.length > 0 && selectedTools.length > 0) {
         const subagentsDir = join(resolvePackageRoot(import.meta.url), 'assets/agents/subagents');
+        const subagentLockEntries: Array<{ type: 'subagents'; id: string; version: string }> = [];
 
         for (const subagentName of combo.subagents) {
             const srcFile = join(subagentsDir, `${subagentName}.md`);
@@ -749,6 +751,16 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
                         subagentName,
                         status: 'success',
                     });
+
+                    const subManifest = SUBAGENTS.find((s) => s.id === subagentName);
+
+                    if (!subagentLockEntries.some((e) => e.id === subagentName)) {
+                        subagentLockEntries.push({
+                            type: 'subagents',
+                            id: subagentName,
+                            version: subManifest?.version || '0.0.1',
+                        });
+                    }
                 } catch (err: any) {
                     results.subagents!.push({
                         toolId: tool.value,
@@ -758,6 +770,10 @@ export const installCombo = async (params: InstallComboRequest): Promise<ComboIn
                     });
                 }
             }
+        }
+
+        if (subagentLockEntries.length > 0) {
+            await recordInstalledAssetsBatch(projectDir, subagentLockEntries, isGlobal);
         }
     }
 

@@ -104,6 +104,16 @@ export interface ComboManifest {
     subagents?: string[];
 }
 
+export interface SubagentManifest {
+    id: string;
+    version: string;
+    description: string;
+    sourceFile: string;
+    supportedTargets: AllowedToolId[];
+    tools?: string[];
+    disallowedTools?: string[];
+}
+
 export interface GitAssetManifest {
     id: string;
     version: string;
