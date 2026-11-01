@@ -1,5 +1,65 @@
 # Changelog
 
+### [1.0.6] - 2026-11-01
+
+#### Added
+- add private package publish workflow and release helper skill
+- add asset version bumping utility for manifest files
+- add subagents asset management, version bumping, and lockfile tracking
+- add apply and plan skills with workflow automation scripts and tests
+- add runtime verification contracts and agent skills for execution and testing
+- add comprehensive domain rules and knowledge index documentation
+- implement combo command and core workflow for smart overwrite sync
+- add agent skill manifests, combo definitions, and skill loading core logic
+- add doubt-driven development package, only-one-idea skill, and workflow manifests
+- add progressive disclosure agent rules and validation tests
+- support subagents distribution as first-class combo assets
+- implement terminal, browser, and api subagents suite
+- implement isolated scout subagent and ast-grep heuristics
+- align debug.md with 4-section plan architecture and wave DAG
+- implement orchestrator mode, subagent delegation and wave parsing
+- implement execution waves, builder/tester separation and circuit breaker
+- implement compact collapsible walkthrough report and friction check gate
+- add knowledge index and core/cli rules documentation
+- implement internal eslint flat config ruleset and enterprise lint gate
+- implement core combo management and skills installer module
+- implement skill installation core logic and global command tests
+- add core combo, hook installer, and manifest bridge modules with tests
+- isolate antigravity global and hooks resolution without .agents
+- add universal combo flow, hook installers, and debug skill scaffolding
+- add core agent tools definition and comprehensive test suites for combo and global commands
+- add predefined combo configurations and corresponding tests
+- add skill definitions and utility scripts for only-one CLI workflow automation
+- add pragmatic TDD plan-and-apply workflow with automated test-first linter validation
+- introduce plan storyboard section and enhance plan validation script
+- add only-one-apply skill definition for plan implementation and task execution
+- add only-one planning, application, evolution skills and improve workflow documentation
+- add postbuild path transformer script with tests and archive TUI migration docs
+- add Go-based TUI engine and interactive wizard orchestration for CLI init and dashboard
+- add core engine modules, asset management, and skill testing infrastructure
+- add tui-engine board tests and herdr client integration
+- add new TUI and stack rules, index catalog, and modernization architecture archive
+- add tui-engine modules for sysmetrics, quota tracking, herdr client, and dashboard model
+- enhance TUI board UI with separated footer, column scrolling, and glamour markdown rendering
+
+#### Fixed
+- handle empty compatible combos gracefully in interactive combo selection
+- remove empty deleted file from repository
+
+#### Changed
+- initialize knowledge index, core rules, and system archives
+- add unit tests for validatePlan testing and sanity sections validation
+- add knowledge index, CLI rules, and tooling ecosystem archive
+- add knowledge index and rules documentation for cli and workflow domains
+- add unit tests for debug document wave and plan validation
+- add unit tests for plan status wave extraction and parsing
+- add knowledge index and workflow rules for SDLC systems
+- add architecture index and domain rules catalogs with tui modernization archive
+- remove unused file
+- migrate workflow rules from archive to active rules directory
+
+# Changelog
+
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
