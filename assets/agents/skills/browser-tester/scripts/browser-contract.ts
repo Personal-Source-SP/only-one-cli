@@ -1,8 +1,17 @@
-import { resolve } from 'node:path';
+import { mkdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 export function formatScreenshotPath(relativePath: string): string {
     const absPath = resolve(process.cwd(), relativePath).replace(/\\/g, '/');
     return `file:///${absPath.replace(/^\//, '')}`;
+}
+
+export function resolveTaskScreenshotPath(taskSlug: string, screenshotName: string, baseDir = process.cwd()): { absPath: string; fileUri: string } {
+    const safeName = screenshotName.endsWith('.png') ? screenshotName : `${screenshotName}.png`;
+    const targetDir = join(baseDir, 'only-one/tasks', taskSlug, 'evidence/screenshots');
+    mkdirSync(targetDir, { recursive: true });
+    const absPath = resolve(targetDir, safeName);
+    return { absPath, fileUri: formatScreenshotPath(absPath) };
 }
 
 export interface BrowserDigestValidationResult {
@@ -35,4 +44,3 @@ export function validateBrowserDigest(content: string): BrowserDigestValidationR
         errors,
     };
 }
-

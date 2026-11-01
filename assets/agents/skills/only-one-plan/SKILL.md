@@ -194,7 +194,11 @@ flowchart LR
 
 ### 3.1. Concept Coverage & Traceability Matrix (Đối soát Tiêu chí Concept)
 ### 3.2. Test Case Specification Matrix (Ma trận Test Case Chi tiết)
-### Automated Test Execution Commands (Lệnh Kiểm thử Tự động Tập trung)
+### 3.3. Runtime Sanity & Trial Execution Steps (BẮT BUỘC: Các bước Chạy thử Nghiệm thu Thực tế)
+- **Tác vụ CLI**: Bắt buộc chỉ định rõ lệnh chạy thử CLI thật (ví dụ: `npx tsx src/index.ts <subcommand> [flags]` hoặc chạy script đã sửa), kèm kết quả mong đợi in ra màn hình để đối soát trực tiếp.
+- **Tác vụ Web / Frontend**: Bắt buộc chỉ định rõ URL dev cục bộ, các nút bấm/form cần tương tác, và ảnh chụp màn hình mong đợi.
+- **Tác vụ Backend / API**: Bắt buộc chỉ định rõ lệnh curl hoặc fetch gửi request thật đến endpoint để xem mã trạng thái HTTP và cấu trúc JSON trả về.
+- 🛑 **CẤM TUYỆT ĐỐI**: Chỉ ghi `npm test` chung chung mà bỏ qua các bước chạy thử nghiệm thu thực tế trên.
 
 ## Section 4. File Changes
 
@@ -233,12 +237,10 @@ Each file is a machine-readable task block. Preserve the exact heading format an
 
 For test files, use **Test checklist** covering fixture/helper reuse, no duplicate setup, changed behavior only, existing toolchain, Decision, and Rejected alternative.
 
-## Section 3. Test Cases & Verification
-- **Automated Tests**:
-  - `<Specific unit / integration test command>`
-  - `npm run lint`
-- **Manual Checks**:
-  - `<Các bước kiểm tra nghiệm thu thực tế hoặc curl commands bằng tiếng Việt>`
+## Section 3. Test Cases & Verification Matrix
+- **Test Case Matrix Table**: Liệt kê các Test Cases chi tiết (| Test ID | Module | Kịch bản | Mong đợi |).
+- **Runtime Sanity & Trial Execution**:
+  - `<Lệnh chạy thử CLI / kịch bản Web / endpoint API thật kèm kết quả in ra mong đợi>`
 ```
 
 ---

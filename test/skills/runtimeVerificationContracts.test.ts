@@ -1,11 +1,16 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 
-import { buildConcurrencyScript, validateApiDigest } from '../../assets/agents/skills/api-tester/scripts/api-contract';
+import { buildConcurrencyScript, saveApiEvidence, validateApiDigest } from '../../assets/agents/skills/api-tester/scripts/api-contract';
 import { formatScreenshotPath, validateBrowserDigest } from '../../assets/agents/skills/browser-tester/scripts/browser-contract';
-import { isolateFailureStackTrace, stripAnsiColors } from '../../assets/agents/skills/terminal-runner/scripts/terminal-contract';
+import {
+    isolateFailureStackTrace,
+    parseTestStats,
+    saveTerminalLog,
+    stripAnsiColors,
+} from '../../assets/agents/skills/terminal-runner/scripts/terminal-contract';
 
 describe('Runtime Verification Contracts', () => {
     describe('Terminal Runner Contract', () => {
@@ -20,6 +25,19 @@ describe('Runtime Verification Contracts', () => {
             const isolated = isolateFailureStackTrace(fullLog);
             const lineCount = isolated.split('\n').length;
             expect(lineCount).toBeLessThanOrEqual(20);
+        });
+
+        it('should parse test statistics from vitest output', () => {
+            const output = 'Tests  24 passed (24)\nDuration  1.25s';
+            const stats = parseTestStats(output);
+            expect(stats.passed).toBe(24);
+            expect(stats.failed).toBe(0);
+            expect(stats.total).toBe(24);
+        });
+
+        it('should format and save terminal log path', () => {
+            const logLink = saveTerminalLog('dummy-slug', 'npm-test', 'PASS all', process.cwd());
+            expect(logLink).toMatch(/^file:\/\/\/.*dummy-slug\/evidence\/terminal\/npm-test\.log$/);
         });
     });
 
@@ -95,6 +113,21 @@ ${jsonEcho}
             expect(result.valid).toBe(false);
             expect(result.errors.some((e) => e.includes('Excessive'))).toBe(true);
         });
+    });
+
+    describe('API Tester Persistence', () => {
+        it('should save API payload evidence to json file', () => {
+            const payloadLink = saveApiEvidence('dummy-slug', 'get-order', { status: 200 }, process.cwd());
+            expect(payloadLink).toMatch(/^file:\/\/\/.*dummy-slug\/evidence\/api\/get-order\.json$/);
+        });
+    });
+
+    afterAll(() => {
+        const dummyDir = join(process.cwd(), 'only-one/tasks/dummy-slug');
+
+        if (existsSync(dummyDir)) {
+            rmSync(dummyDir, { recursive: true, force: true });
+        }
     });
 
     describe('Subagent Definition Files Integrity', () => {

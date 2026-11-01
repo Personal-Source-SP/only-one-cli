@@ -60,3 +60,9 @@ export function validateTechnicalDigest(content: string): DigestValidationResult
     };
 }
 
+export function buildTargetDiscoveryCommands(): { routesPattern: string; cliPattern: string } {
+    return {
+        routesPattern: "ast-grep scan -p '@$DECORATOR($PATH)' src/",
+        cliPattern: "ast-grep scan -p '.command($NAME)' src/",
+    };
+}
