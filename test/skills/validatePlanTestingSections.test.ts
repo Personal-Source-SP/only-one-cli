@@ -129,4 +129,3 @@ Chạy lệnh kiểm tra thủ công không theo format trial.
         expect(result.warnings.some((w) => w.includes('Section 3.2 missing formatted trial blocks'))).toBe(true);
     });
 });
-
