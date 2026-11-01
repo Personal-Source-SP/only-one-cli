@@ -1,6 +1,6 @@
 ---
 domain: workflow
-version: 1.6.0
+version: 1.7.0
 triggers:
   - ".agents/skills/only-one-*/**"
   - "assets/agents/skills/only-one-*/**"
@@ -103,6 +103,12 @@ triggers:
 - **MUST_DO**: Enforce Two-Tier BDD Testing in `plan.md`: Section 3.1 for code-level falsifiable test cases and Section 3.2 for runtime trial sanity blocks (`[CLI]`, `[WEB]`, `[API]`). Keep `evidence.md` as the single authoritative report for Concept Traceability and trial outputs.
 - **NEVER_DO**: Include post-apply acceptance status checklists or Concept Traceability Matrix inside `plan.md` (reserved strictly for `evidence.md`).
 - **RATIONALE**: Eliminates premature acceptance checklists and double-editing between `plan.md` and `evidence.md`.
+
+### WF-020: Deterministic Automated Runtime Verification Evidence Persistence
+- **MUST_DO**: Require every task executed through `/only-one-apply` to persist deterministic runtime evidence (raw test output, terminal logs in `evidence/terminal/`, UI screenshots in `evidence/screenshots/`, API JSON in `evidence/api/`) and compile an `evidence.md` file using `aggregate-evidence.ts` with valid absolute `file:///` links and timeout protections.
+- **NEVER_DO**: Mark tasks as `[x] PASS` without generating physical machine-verified evidence artifacts on disk, or rely on speculative manual verification.
+- **RATIONALE**: Guarantees auditable proof of completion, eliminates subjective verification claims, and ensures regression detection without polluting the main orchestrator context.
+
 
 
 

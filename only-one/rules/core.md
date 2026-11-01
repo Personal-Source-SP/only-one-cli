@@ -1,6 +1,6 @@
 ---
 domain: core
-version: 1.2.0
+version: 1.3.0
 triggers:
   - "*"
   - "only-one/archives/**"
@@ -58,6 +58,12 @@ triggers:
 - **MUST_DO**: Categorize agent rules into Tier 1 Core Safety (`alwaysApply: true`, `trigger: 'always_on'`, `< 500` tokens) and Tier 2 Stack/Domain (`alwaysApply: false`, `trigger: 'model_decision'`, with file-matching `globs`), loading specialized rules strictly on demand.
 - **NEVER_DO**: Mark domain-specific or framework-specific rules as `alwaysApply: true`, flooding the agent's context window with irrelevant guidelines during unrelated tasks.
 - **RATIONALE**: Preserves agent context window and token budget, prevents instruction interference between conflicting stacks (e.g. Next.js vs NestJS), and ensures core safety rules remain prominent.
+
+### CORE-011: First-Class Subagent Asset Versioning & Lockfile Tracking
+- **MUST_DO**: Register all subagent definitions in the central `SUBAGENTS` manifest (`assets/agents/subagents/index.ts`) with semver versions, support atomic version bumping via `pnpm asset:bump subagent <id>`, and record installed subagent versions under `installed.subagents` in `only-one/installed.json` to enable automated updates via `only-one update`.
+- **NEVER_DO**: Distribute subagent `.md` templates as untracked loose files without manifest registration or omit their version metadata from the `installed.json` lockfile.
+- **RATIONALE**: Enables the CLI update engine (`inspectAssetUpdates` / `applyAssetUpdates`) to detect outdated subagents and apply updates deterministically across all supported agent runners.
+
 
 
 

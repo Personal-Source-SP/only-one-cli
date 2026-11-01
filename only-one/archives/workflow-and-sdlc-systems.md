@@ -6,7 +6,7 @@ triggers:
   - ".agents/skills/**"
   - "assets/agents/skills/**"
   - "only-one/tasks/**"
-archived_at: 2026-10-31T21:55:00+07:00
+archived_at: 2026-11-01T17:55:00+07:00
 status: active
 references:
   - only-one/archives/tui-modernization.md
@@ -128,6 +128,14 @@ affected_modules:
 21. **Lá Chắn Ngữ Cảnh Bằng Phân Phối Quy Tắc Tiệm Tiến (Progressive Disclosure Context Shield) ([CORE-010](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/core.md))**:
     - Chuyển đổi mô hình nạp toàn bộ 5 rules (~5.000 tokens) thành mô hình 2 tầng: Tier 1 Core Safety (`always_on`, < 500 tokens) nạp mặc định cho mọi prompt; Tier 2 Stack/Domain (`model_decision`, có `globs`) chỉ nạp khi thao tác trên các tệp tương ứng.
     - Ngăn ngừa xung đột tập luật giữa các stack đối kháng (Next.js vs NestJS) và tiết kiệm tài nguyên bộ nhớ đệm ngữ cảnh.
+22. **Thu Thập Bằng Chứng Runtime Tự Động & Báo Cáo evidence.md ([WF-020](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/workflow.md))**:
+    - Tích hợp công cụ tổng hợp bằng chứng `aggregate-evidence.ts` vào Step 5 của `/only-one-apply`.
+    - Tự động chạy test suites và phối hợp các runner hợp đồng lưu log terminal thô (`evidence/terminal/`), ảnh chụp màn hình Playwright (`evidence/screenshots/`), và payloads JSON API (`evidence/api/`).
+    - Tạo tệp `evidence.md` độc lập trong thư mục task chứa bằng chứng máy thực thi kèm đường dẫn liên kết tuyệt đối `file:///...`, loại bỏ nhu cầu kiểm tra thủ công.
+23. **Kiến Trúc Kiểm Thử 2 Tầng & Phân Tách Nghiệm Thu Khỏi Kế Hoạch ([WF-019](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/workflow.md))**:
+    - Tinh giản Section 3 của `plan.md` thành 2 mục rõ ràng: `3.1. Test Case Specification Matrix` (tầng code, BDD `Given-When-Then`, assertions phản nghiệm) và `3.2. Runtime Sanity & Trial Execution Steps` (tầng runtime, khối `#### Trial N: [CLI|WEB|API]` có trường `Traceability` trỏ về Concept Criteria).
+    - Di dời bảng đối soát tiêu chí Concept (`Concept Traceability & Acceptance Matrix`) ra khỏi `plan.md` và đặt độc quyền tại Mục 2 của `evidence.md`, triệt tiêu hoàn toàn tình trạng lập checklist sớm và sửa file plan trùng lặp sau apply.
+    - Tích hợp chốt chặn `validate-plan.ts` kiểm tra tính hợp lệ của cấu trúc Section 3.1 và Section 3.2.
 
 ---
 
@@ -234,6 +242,8 @@ flowchart TD
 - [`test/skills/worktreeRunner.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/worktreeRunner.test.ts): Unit test cho worktree runner.
 - [`test/packages/doubtDrivenDevelopmentPackage.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/packages/doubtDrivenDevelopmentPackage.test.ts): Unit test kiểm thử hợp đồng remote package doubt-driven-development và quy trình idea.
 - [`test/rules/progressiveDisclosureContracts.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/rules/progressiveDisclosureContracts.test.ts): Unit test kiểm thử hợp đồng phân phối quy tắc tiệm tiến.
+- [`test/skills/validatePlanTestingSections.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/validatePlanTestingSections.test.ts): Unit test kiểm thử thẩm định cấu trúc 2 tầng Section 3.1 & 3.2 trong validatePlan.
+- [`test/skills/aggregateEvidence.test.ts`](file:///d:/Sources/PERSONAL/only-one-cli/test/skills/aggregateEvidence.test.ts): Unit test kiểm thử tổng hợp bằng chứng runtime và sinh báo cáo evidence.md.
 - [`assets/agents/combos/index.ts`](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/combos/index.ts): Tích hợp hooks vào combo `only-one-flow`.
 - Hợp nhất toàn diện các workflows vào hệ thống Agent Skills (`assets/agents/skills/only-one-*`).
 

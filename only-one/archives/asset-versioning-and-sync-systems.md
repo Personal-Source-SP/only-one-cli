@@ -6,7 +6,7 @@ triggers:
   - "assets/**"
   - "src/core/assets/**"
   - "src/commands/update/**"
-archived_at: 2026-10-31T21:55:00+07:00
+archived_at: 2026-11-01T17:55:00+07:00
 status: active
 references:
   - only-one/archives/workflow-and-sdlc-systems.md
@@ -60,6 +60,10 @@ affected_modules:
     - Chế độ tương tác tự động tích chọn `checked: true` cho thành phần có bản cập nhật mới, hiển thị nhãn `[UPDATE: v1 -> v2]`, cho phép người dùng chỉ cần bấm `Enter` là nâng cấp thành công mà không vô tình bỏ qua các bản cập nhật.
     - Cung cấp cờ `-f, --force` cho lệnh combo để tự động ghi đè 100% thành phần mà không cần hiển thị prompt, phục vụ kịch bản CI/CD và tự động hóa.
     - Bổ sung trường `rules: ['context-and-tools', 'execution-terminal', 'karpathy-ste100-discipline']` và package `doubt-driven-development` vào combo `only-one-flow` (version `0.0.19`).
+  - **Quản Lý Danh Mục & Phiên Bản Subagents Tập Trung ([CORE-011](file:///d:/Sources/PERSONAL/only-one-cli/only-one/rules/core.md))**:
+    - Khởi tạo manifest tập trung [assets/agents/subagents/index.ts](file:///d:/Sources/PERSONAL/only-one-cli/assets/agents/subagents/index.ts) định nghĩa danh mục `SUBAGENTS` chuẩn hóa kiểu `SubagentManifest` (`codebase-scout`, `terminal-runner`, `browser-tester`, `api-tester`) với version cơ số 10 độc lập.
+    - Đăng ký `'subagents'` vào `AssetType`, mở rộng bộ tăng phiên bản [src/core/assets/bump.ts](file:///d:/Sources/PERSONAL/only-one-cli/src/core/assets/bump.ts) hỗ trợ lệnh `pnpm asset:bump subagent <id>`.
+    - Ghi nhận phiên bản subagent vào `installed.json` (`installed.subagents`) khi cài đặt combo, cho phép `only-one update` tự động phát hiện `outdated` và cập nhật đè bản mới nhất cho toàn bộ IDEs.
   - **Developer Tooling & Zero-Bypass CI Gate**: Cung cấp `scripts/bump-asset.ts` (`pnpm asset:bump <type> <id>`) và bài test `test/core/assets/version-gate.test.ts` chặn commit vi phạm.
 
 ## 2. Key Architecture & Decisions (Kiến trúc & Quyết định Then chốt)
@@ -136,6 +140,7 @@ flowchart TD
   - `test/commands/update/update.test.ts` passed.
   - `test/core/combo.test.ts` passed.
   - `test/combo/installComboSubagents.test.ts` passed (100% verified subagents global distribution).
+  - `test/core/assets/subagentsVersioning.test.ts` passed (100% verified subagents manifest, bump version, lockfile tracking, and update inspection).
   - `test/combo/smartOverwriteSync.test.ts` passed (100% verified force flag bypass, outdated pre-select, and rules manifest).
   - `test/rules/progressiveDisclosureContracts.test.ts` passed (100% verified Tier 1/2 metadata separation and frontmatter).
   - `test/core/skill-lockfile.test.ts` passed.
