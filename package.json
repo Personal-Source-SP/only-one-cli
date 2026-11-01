@@ -24,6 +24,8 @@
         "lint:fix": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix",
         "publish:npm": "npm run format && node scripts/publish.js",
         "publish:local": "npm run format && node scripts/publish.js --local",
+        "publish:github": "npm run format && node scripts/publish.js --target github",
+        "release": "tsx assets/agents/skills/only-one-publish/scripts/release-helper.ts",
         "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
         "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
         "asset:bump": "tsx scripts/bump-asset.ts"

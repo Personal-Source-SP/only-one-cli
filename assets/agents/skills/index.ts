@@ -407,4 +407,11 @@ export const SKILLS: SkillManifest[] = [
         sourceType: 'local',
         requiredSkills: ['i-have-adhd', 'ponytail', 'karpathy-ste100-discipline'],
     },
+    {
+        name: 'only-one-publish',
+        version: '0.0.1',
+        description: 'Automate semantic version bumping, CHANGELOG generation, git tagging, and package publishing to GitHub Packages or npm registry.',
+        sourceType: 'local',
+        requiredSkills: ['i-have-adhd', 'sparring-partner', 'karpathy-ste100-discipline'],
+    },
 ];

@@ -1,7 +1,7 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import os from 'node:os';
 import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -11,6 +11,14 @@ const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const localInstall = args.includes('--local');
+
+let target = 'npm';
+const targetIdx = args.indexOf('--target');
+if (targetIdx !== -1 && args[targetIdx + 1]) {
+  target = args[targetIdx + 1];
+} else if (args.includes('--github')) {
+  target = 'github';
+}
 
 let npmTag = 'latest';
 const tagIdx = args.indexOf('--tag');
@@ -40,11 +48,19 @@ try {
 }
 
 if (!localInstall) {
-  try {
-    const whoami = execSync('npm whoami', { encoding: 'utf8' }).trim();
-    ok(`Logged in to npm as: ${whoami}`);
-  } catch {
-    die('Not logged in to npm. Run: npm login');
+  if (target === 'github') {
+    const githubToken = process.env.GITHUB_TOKEN || process.env.NODE_AUTH_TOKEN || process.env.GH_TOKEN;
+    if (!githubToken && !dryRun) {
+      die('Missing GITHUB_TOKEN or NODE_AUTH_TOKEN environment variable for GitHub Packages.');
+    }
+    ok('GitHub Packages target selected.');
+  } else {
+    try {
+      const whoami = execSync('npm whoami', { encoding: 'utf8' }).trim();
+      ok(`Logged in to npm as: ${whoami}`);
+    } catch {
+      die('Not logged in to npm. Run: npm login');
+    }
   }
 } else {
   ok('Local install mode — skipping npm login check.');
@@ -53,7 +69,10 @@ if (!localInstall) {
 // Read package.json
 const pkgPath = path.join(ROOT, 'package.json');
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-const pkgName = pkg.name;
+let pkgName = pkg.name;
+if (target === 'github') {
+  pkgName = '@personal-source-sp/only-one';
+}
 const pkgVersion = pkg.version;
 
 let publishVersion = pkgVersion;
@@ -66,14 +85,16 @@ if (npmTag !== 'latest') {
 if (localInstall) {
   info(`Package : ${pkgName}@${publishVersion} (local install)`);
 } else {
-  info(`Package : ${pkgName}@${publishVersion} (tag: ${npmTag})`);
+  const registryUrl = target === 'github' ? 'https://npm.pkg.github.com' : 'https://registry.npmjs.org';
+  info(`Package : ${pkgName}@${publishVersion} (registry: ${registryUrl})`);
 }
 
 if (!localInstall && npmTag === 'latest') {
   try {
-    const infoVersion = execSync(`npm info ${pkgName}@${publishVersion} version`, { encoding: 'utf8', stdio: [] }).trim();
+    const registryFlag = target === 'github' ? ' --registry=https://npm.pkg.github.com' : '';
+    const infoVersion = execSync(`npm info ${pkgName}@${publishVersion} version${registryFlag}`, { encoding: 'utf8', stdio: [] }).trim();
     if (infoVersion) {
-      die(`Version ${publishVersion} is already published on npm. Bump the version first.`);
+      die(`Version ${publishVersion} is already published on ${target === 'github' ? 'GitHub Packages' : 'npm'}. Bump the version first.`);
     }
   } catch {
     // Version does not exist, safe to proceed
@@ -111,7 +132,6 @@ info('Copying files for packaging...');
 copyRecursive(path.join(ROOT, 'dist'), path.join(packRoot, 'dist'));
 fs.copyFileSync(path.join(ROOT, 'package.json'), path.join(packRoot, 'package.json'));
 
-
 for (const file of ['README.md', 'LICENSE']) {
   const filePath = path.join(ROOT, file);
   if (fs.existsSync(filePath)) {
@@ -135,11 +155,15 @@ const packPkg = JSON.parse(fs.readFileSync(packPkgPath, 'utf8'));
 packPkg.version = publishVersion;
 delete packPkg.devDependencies;
 packPkg.scripts = {};
+if (target === 'github') {
+  packPkg.name = '@personal-source-sp/only-one';
+  packPkg.publishConfig = { registry: 'https://npm.pkg.github.com' };
+}
 fs.writeFileSync(packPkgPath, JSON.stringify(packPkg, null, 2) + '\n');
 
 // Sensitive file check
 const sensitivePatterns = [/\.npmrc$/, /\.env$/, /\.env\..*$/, /\.netrc$/, /\.pem$/, /\.key$/];
-const sensitiveContentPattern = /(_authToken|npm_[A-Za-z0-9]{20,})/;
+const sensitiveContentPattern = /(:_authToken\s*=\s*(?!<|YOUR|\$)[A-Za-z0-9_]{10,}|npm_[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,})/;
 
 const checkSensitive = (dir) => {
   for (const child of fs.readdirSync(dir)) {
@@ -185,16 +209,28 @@ if (dryRun) {
     die(`Local installation failed: ${err.message}`);
   }
 } else {
-  info(`Publishing ${pkgName}@${publishVersion} to npm (tag: ${npmTag})...`);
+  info(`Publishing ${pkgName}@${publishVersion} to ${target === 'github' ? 'GitHub Packages' : 'npm'} (tag: ${npmTag})...`);
+  const tempNpmrc = path.join(packDir, '.npmrc-temp');
   try {
-    let publishCmd = 'npm publish --access public --tag ' + npmTag;
+    let publishCmd = '';
+    if (target === 'github') {
+      const token = process.env.GITHUB_TOKEN || process.env.NODE_AUTH_TOKEN || process.env.GH_TOKEN || '';
+      fs.writeFileSync(tempNpmrc, `//npm.pkg.github.com/:_authToken=${token}\n@personal-source-sp:registry=https://npm.pkg.github.com\n`);
+      publishCmd = `npm publish --userconfig "${tempNpmrc}" --registry=https://npm.pkg.github.com --tag ${npmTag}`;
+    } else {
+      publishCmd = 'npm publish --access public --tag ' + npmTag;
+    }
     if (otp) {
       publishCmd += ` --otp ${otp}`;
     }
     execSync(publishCmd, { stdio: 'inherit', cwd: packRoot });
     fs.rmSync(packDir, { recursive: true, force: true });
     if (npmTag === 'latest') {
-      ok(`Published! Install with: npm install -g ${pkgName}`);
+      if (target === 'github') {
+        ok(`Published to GitHub Packages! Install with: npm install -g ${pkgName}`);
+      } else {
+        ok(`Published! Install with: npm install -g ${pkgName}`);
+      }
     } else {
       ok(`Published as '${npmTag}'! Install with: npm install -g ${pkgName}@${npmTag}`);
     }
